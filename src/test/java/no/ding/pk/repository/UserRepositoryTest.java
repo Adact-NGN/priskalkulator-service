@@ -1,30 +1,37 @@
 package no.ding.pk.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
 
 import no.ding.pk.domain.User;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
+@SpringBootTest
+@TestPropertySource("/application.properties")
 public class UserRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private UserRepository repository;
 
     @Test
+    @Transactional
     public void testFindBySureName() {
         User user = new User();
 
