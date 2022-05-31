@@ -6,15 +6,13 @@ import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
-
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -22,18 +20,17 @@ import no.ding.pk.domain.User;
 
 @Ignore
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@TestPropertySource("/application.properties")
-public class UserRepositoryTest {
-
-    @PersistenceContext
-    private EntityManager entityManager;
+@DataJpaTest
+@TestPropertySource("/h2-db.properties")
+public class H2UserRepositoryTest {
+    
+    @Autowired
+    private TestEntityManager entityManager;
 
     @Autowired
     private UserRepository repository;
 
     @Test
-    @Transactional
     public void testFindBySureName() {
         User user = new User();
 
@@ -47,4 +44,5 @@ public class UserRepositoryTest {
         assertThat(actual, hasSize(1));
         assertThat(actual.get(0).getSureName(), equalTo("Testesen"));
     }
+
 }
