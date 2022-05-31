@@ -1,6 +1,6 @@
-create database pk_poa_users;
+create database @datasource.database@;
 
-ALTER SCHEMA `pk_poa_users`  DEFAULT CHARACTER SET utf8;
+ALTER SCHEMA `@datasource.database@`  DEFAULT CHARACTER SET utf8;
 
 create table sales_role (id bigint not null, description varchar(255), role_name varchar(255), primary key (id)) engine=InnoDB
 create table sales_role_user_list (sales_role_id bigint not null, user_list_id bigint not null) engine=InnoDB
