@@ -51,21 +51,21 @@ variables:
     value: ding-ip-app-sap-payments
 
 stages:
-  - stage: Test
-    dependsOn: []
-    variables:
-      - template: javascript/variables/global.yaml@build_tools
-    jobs:
-      - job: Test
-        steps:
-          - template: javascript/npm/steps/provision.yaml@build_tools
-            parameters:
-              NodeVersion: ${{ parameters.NodeVersion }}
+  # - stage: Test
+  #   dependsOn: []
+  #   variables:
+  #     - template: javascript/variables/global.yaml@build_tools
+  #   jobs:
+  #     - job: Test
+  #       steps:
+  #         - template: javascript/npm/steps/provision.yaml@build_tools
+  #           parameters:
+  #             NodeVersion: ${{ parameters.NodeVersion }}
 
-          - bash: |
-              npm install
-              npm run build
-            displayName: Build and Export application
+  #         - bash: |
+  #             npm install
+  #             npm run build
+  #           displayName: Build and Export application
   - stage: Build
     dependsOn: [Test]
     displayName: Build Docker Image
