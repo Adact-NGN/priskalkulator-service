@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  backend:
+    depends_on:
+      - db
+    image: ding-ip-app-pk-service
+    build: .
+    environment:
+      - DB_HOST=mariadb102
+    ports:
+      - "8080:8080"
+    networks:
+      - ding-network
+
+networks:
+  ding-network:
+    external: true

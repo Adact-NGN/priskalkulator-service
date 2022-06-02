@@ -1,0 +1,139 @@
+name: $(Date:yyyy.MM.dd)$(Rev:.r)
+
+resources:
+  repositories:
+    - repository: build_tools
+      type: git
+      name: DING/ding-build-tools
+      #ref: refs/tags/0.1.0
+      ref: refs/heads/develop
+
+trigger:
+  branches:
+    include:
+      - "*"
+
+pr:
+  branches:
+    include:
+      - develop
+      - release
+      - main
+
+pool:
+  vmImage: "ubuntu-latest"
+
+parameters:
+  - name: AcrServiceConnection
+    type: string
+    default: ding-ip-sp-acr
+
+  - name: RmServiceConnection
+    type: string
+    default: ding-ip-sp-$(environment)
+
+  - name: Dockerfile
+    type: string
+    default: Dockerfile
+
+  - name: DockerRepository
+    type: string
+    default: ding-ip-app-pk-service
+
+  - name: ContainerRegistry
+    type: string
+    default: dingipacr.azurecr.io
+
+variables:
+  - template: java/variables/global.yaml@build_tools
+
+  - name: tf-backend-file-name
+    value: ding-ip-app-sap-payments
+
+stages:
+  - stage: Test
+    dependsOn: []
+    variables:
+      - template: javascript/variables/global.yaml@build_tools
+    jobs:
+      - job: Test
+        steps:
+          - template: javascript/npm/steps/provision.yaml@build_tools
+            parameters:
+              NodeVersion: ${{ parameters.NodeVersion }}
+
+          - bash: |
+              npm install
+              npm run build
+            displayName: Build and Export application
+  - stage: Build
+    dependsOn: [Test]
+    displayName: Build Docker Image
+    condition: and(succeeded(), or(eq(variables.isDevelop, true), eq(variables.isRc, true), eq(variables.isMain, true)))
+    variables:
+      - template: javascript/variables/global.yaml@build_tools
+    jobs:
+      - template: javascript/jobs/docker.yaml@build_tools
+        parameters:
+          AcrServiceConnection: ${{ parameters.AcrServiceConnection }}
+          RmServiceConnection: ${{ parameters.RmServiceConnection }}
+          Dockerfile: ${{ parameters.Dockerfile }}
+          DockerRepository: ${{ parameters.DockerRepository }}
+          ContainerRegistry: ${{ parameters.ContainerRegistry }}
+  - stage: Deployment
+    dependsOn: [Build]
+    displayName: "Deployment"
+    jobs:
+      - deployment: App_Service
+        displayName: Deploy
+        environment: ding_rg_ip_$(environment)
+        variables:
+          - template: java/variables/global.yaml@build_tools
+        pool:
+          vmImage: "ubuntu-latest"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  clean: true
+                  path: s
+                  persistCredentials: true
+
+                - template: shared/steps/git-config.yaml@build_tools
+
+                - bash: |
+                    git checkout develop
+                    git pull
+                  displayName: Checkout develop Branch
+                  condition: eq(variables.isDevelop, 'true')
+
+                - bash: |
+                    git checkout release
+                    git pull
+                  displayName: Checkout release Branch
+                  condition: eq(variables.isRc, 'true')
+
+                - bash: |
+                    git checkout main
+                    git pull
+                  displayName: Checkout Main Branch
+                  condition: eq(variables.isMain, 'true')
+
+                - template: shared/steps/app-service.yaml@build_tools
+                  parameters:
+                    AppName: $(tf-backend-file-name)-$(environment)
+                    DockerRepository: $(tf-backend-file-name)
+                    ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release') }}:
+                      Tag: $(Build.BuildNumber)-rc
+                    ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+                      Tag: $(Build.BuildNumber)
+                    ${{ else }}:
+                      Tag: $(Build.BuildNumber)-beta
+
+  # - template: terraform/stages/plan_apply_api.yaml@build_tools
+  #   parameters:
+  #     TerraformVersion: "1.0.10"
+  #     TerraformDirectory: terraform
+  #     TerraformVariables: -var client_id=$(tf-sp-id) -var client_secret=$(tf-sp-secret) -var tenant_id=$(tf-tenant-id) -var subscription_id=$(tf-subscription-id) -var environment=$(environment)
+  #     ConfigKey: "$(tf-backend-file-name)-api-$(environment).tfstate"
