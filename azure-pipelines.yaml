@@ -67,7 +67,7 @@ stages:
   #             npm run build
   #           displayName: Build and Export application
   - stage: Build
-    dependsOn: [Test]
+    dependsOn: []
     displayName: Build Docker Image
     condition: and(succeeded(), or(eq(variables.isDevelop, true), eq(variables.isRc, true), eq(variables.isMain, true)))
     variables:
