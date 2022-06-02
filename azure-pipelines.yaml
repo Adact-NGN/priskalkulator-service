@@ -6,7 +6,7 @@ resources:
       type: git
       name: DING/ding-build-tools
       #ref: refs/tags/0.1.0
-      ref: refs/heads/develop
+      ref: refs/heads/feature/java-build-tool
 
 trigger:
   branches:
