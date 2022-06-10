@@ -49,12 +49,21 @@ public class User {
     @Column
     private String associatedPlace;
 
+    /**
+     * Fullmaktsnivå Vanlig Avfall
+     */
     @Column
-    private String powerOfAtterneyOA;
+    private Integer powerOfAtterneyOA;
 
+    /**
+     * Fullmaktsnivå Farlig Avfall
+     */
     @Column
-    private String powerOfAtterneyFA;
+    private Integer powerOfAtterneyFA;
 
+    /**
+     * Overordnet fullmaktsinnehaver (salgssjef)
+     */
     @Column
     private String overallPowerOfAtterney;
 
@@ -163,19 +172,19 @@ public class User {
         this.associatedPlace = associatedPlace;
     }
 
-    public String getPowerOfAtterneyOA() {
+    public Integer getPowerOfAtterneyOA() {
         return powerOfAtterneyOA;
     }
 
-    public void setPowerOfAtterneyOA(String powerOfAtterneyOA) {
+    public void setPowerOfAtterneyOA(Integer powerOfAtterneyOA) {
         this.powerOfAtterneyOA = powerOfAtterneyOA;
     }
 
-    public String getPowerOfAtterneyFA() {
+    public Integer getPowerOfAtterneyFA() {
         return powerOfAtterneyFA;
     }
 
-    public void setPowerOfAtterneyFA(String powerOfAtterneyFA) {
+    public void setPowerOfAtterneyFA(Integer powerOfAtterneyFA) {
         this.powerOfAtterneyFA = powerOfAtterneyFA;
     }
 
