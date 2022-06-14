@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: dingipapppkservice 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dingipapppkservice
+  template:
+    metadata:
+      labels:
+        app: dingipapppkservice 
+    spec:
+      containers:
+        - name: dingipapppkservice 
+          image: dingipacr.azurecr.io/dingipapppkservice
+          ports:
+          - containerPort: 8080
