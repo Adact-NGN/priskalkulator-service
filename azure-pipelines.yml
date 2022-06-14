@@ -12,7 +12,7 @@ variables:
 
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '40901825-5dcf-4133-8276-8c5001311d20'
-  imageRepository: 'dingipapppkservice'
+  imageRepository: 'ding-ip-app-pk-service'
   containerRegistry: 'dingipacr.azurecr.io'
   dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
