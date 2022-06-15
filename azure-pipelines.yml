@@ -34,6 +34,7 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    
     - task: AzureKeyVault@2
       inputs:
         azureSubscription: 'ding-ip-sp-dev'
