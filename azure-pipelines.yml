@@ -38,7 +38,7 @@ jobs:
         echo $(ResourceGroupName)
 
   - job: RunMaven
-    dependsOn: ReadResourceGroupName
+    dependsOn: GetResourceGroupName
     steps:
     - task: Maven@3
       inputs:
