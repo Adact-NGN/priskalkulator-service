@@ -19,6 +19,13 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'VH-Norsk Gjenvinning-DING(5)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az aks show --resource-group $1 --name $2 --query nodeResourceGroup -o tsv'
+    arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
