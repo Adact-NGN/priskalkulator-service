@@ -34,7 +34,7 @@ jobs:
         scriptLocation: 'inlineScript'
         inlineScript: |
           output=$(az aks show --resource-group $1 --name $2 --query nodeResourceGroup -o tsv)
-          echo $output | jq .
+          echo $output
           echo "##vso[task.setvariable variable=ResourceGroupName;isoutput=true]$output"
         arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
     - bash: |
