@@ -45,21 +45,16 @@ jobs:
     steps:
       - script: echo $(AksResourceGroupName)
 
-steps:
-- task: AzureCLI@2
-  inputs:
-    azureSubscription: 'VH-Norsk Gjenvinning-DING(5)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
-    scriptType: 'bash'
-    scriptLocation: 'inlineScript'
-    inlineScript: 'az aks show --resource-group $1 --name $2 --query nodeResourceGroup -o tsv'
-    arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+  - job: Run Maven
+    dependsOn: ReadResourceGroupName
+    steps:
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
