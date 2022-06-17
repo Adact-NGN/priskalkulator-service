@@ -18,6 +18,33 @@ pr:
 pool:
   vmImage: ubuntu-latest
 
+jobs:
+  - job: GetResourceGroupName
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    # Gets resource group name for AKS cluster to use for Ingress Controller and Service
+    # Please define pipeline the variables:
+    # - RESOURCE_GROUP_NAME
+    # - KUBERNETES_CLUSTER_NAME
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'VH-Norsk Gjenvinning-DING(5)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: '##vso[task.setvariable variable=ResourceGroupName;isoutput=true]az aks show --resource-group $1 --name $2 --query nodeResourceGroup -o tsv'
+        name: passOutput
+        arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
+
+  - job: ReadResourceGroupName
+    dependsOn: GetResourceGroupName
+    pool:
+      vmImage: ubuntu-latest
+    variables:
+      AksResourceGroupName: $[ dependencies.GetResourceGroupName.outputs['passOutput.ResourceGroupName']]
+    steps:
+      - scprit: echo $(AksResourceGroupName)
+
 steps:
 - task: AzureCLI@2
   inputs:
