@@ -28,6 +28,8 @@ jobs:
     # - RESOURCE_GROUP_NAME
     # - KUBERNETES_CLUSTER_NAME
     - task: AzureCLI@2
+      displayName: 'Get AKS Resource name'
+      name: myOutput
       inputs:
         azureSubscription: 'VH-Norsk Gjenvinning-DING(5)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
         scriptType: 'bash'
@@ -37,8 +39,12 @@ jobs:
           echo $output
           echo "##vso[task.setvariable variable=ResourceGroupName;isoutput=true]$output"
         arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
-    - bash: |
-        echo $(ResourceGroupName)
+    - task: Bash@3
+      displayName: 'Do something with the variable set in previous task'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "$(myOutput.ResourceGroupName)"
 
   - job: RunMaven
     dependsOn: GetResourceGroupName
