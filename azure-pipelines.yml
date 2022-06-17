@@ -33,17 +33,9 @@ jobs:
         scriptType: 'bash'
         scriptLocation: 'inlineScript'
         inlineScript: '##vso[task.setvariable variable=ResourceGroupName;isoutput=true]az aks show --resource-group $1 --name $2 --query nodeResourceGroup -o tsv'
-        name: passOutput
         arguments: '$(RESOURCE_GROUP_NAME) $(KUBERNETES_CLUSTER_NAME)'
-
-  - job: ReadResourceGroupName
-    dependsOn: GetResourceGroupName
-    pool:
-      vmImage: ubuntu-latest
-    variables:
-      AksResourceGroupName: $[ dependencies.GetResourceGroupName.outputs['passOutput.ResourceGroupName']]
-    steps:
-      - script: echo $(AksResourceGroupName)
+    - bash: |
+        echo $(ResourceGroupName)
 
   - job: RunMaven
     dependsOn: ReadResourceGroupName
