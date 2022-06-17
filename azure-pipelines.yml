@@ -45,7 +45,7 @@ jobs:
     steps:
       - script: echo $(AksResourceGroupName)
 
-  - job: Run Maven
+  - job: RunMaven
     dependsOn: ReadResourceGroupName
     steps:
     - task: Maven@3
