@@ -34,15 +34,15 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: AzureKeyVault@2
-      inputs:
-        azureSubscription: 'dingServiceConnection'
-        KeyVaultName: 'ding-kv-ip-dev'
-        SecretsFilter: '*'
-        RunAsPreJob: false
-    - task: CmdLine@2
-      inputs:
-        script: echo $(pk-datasource-username)
+    # - task: AzureKeyVault@2
+    #   inputs:
+    #     azureSubscription: 'dingServiceConnection'
+    #     KeyVaultName: 'ding-kv-ip-dev'
+    #     SecretsFilter: '*'
+    #     RunAsPreJob: false
+    # - task: CmdLine@2
+    #   inputs:
+    #     script: echo $(pk-datasource-username)
     - task: Docker@2
       displayName: Build and push an image to container registry
       inputs:
