@@ -6,7 +6,7 @@ metadata:
     app: ding-ip-app-pk-service
     tier: backend
 spec:
-  type: ClusterIP is default service in k8s
+  type: ClusterIP # is default service in k8s
   selector:
     app: ding-ip-app-pk-service
   ports:
