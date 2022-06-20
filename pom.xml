@@ -201,6 +201,17 @@
       </activation>
     </profile>
     <profile>
+      <id>prod</id>
+      <properties>
+        <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
+        <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
+        <datasource.database>pk_poal_db_prod</datasource.database>
+        <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=verify-full</datasource.url>
+        <datasource.show.sql>true</datasource.show.sql>
+        <datasource.ddl>update</datasource.ddl>
+      </properties>
+    </profile>
+    <profile>
       <id>dev</id>
       <properties>
         <datasource.username>admin</datasource.username>

@@ -31,6 +31,16 @@ data "azurerm_app_service" "pk_app_service" {
   resource_group_name = data.azurerm_resource_group.rg.name
 }
 
+data "azurerm_key_vault" "kv" {
+  name = "ding-kv-ip-${var.environment}"
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+output "DATABASE_USERNAME" {
+  value = data.azurerm_key_vault.kv.pk-datasource-username
+  description = "Database username"
+}
+
 // Creating or updating apim
 # resource "azurerm_api_management_api" "payment_api" {
 #   name                = "payment"

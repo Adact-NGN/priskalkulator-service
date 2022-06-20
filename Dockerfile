@@ -2,10 +2,11 @@
 # Build stage
 #
 FROM maven:3.6-jdk-11 AS build
+ARG BUILD_PROFILE=test
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN mvn -Pdev clean package
+RUN mvn -P${BUILD_PROFILE} clean package
 
 #
 # Package stage
