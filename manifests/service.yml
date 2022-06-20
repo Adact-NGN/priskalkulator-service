@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-    name: ding-ip-app-pk-backend-clusterip-service
-    labels:
-        app: ding-ip-app-pk-service
-        tier: backend
+  name: ding-ip-app-pk-backend-clusterip-service
+  labels:
+    app: ding-ip-app-pk-service
+    tier: backend
 spec:
-  #type: ClusterIP is default service in k8s
+  type: ClusterIP is default service in k8s
   selector:
     app: ding-ip-app-pk-service
   ports:
