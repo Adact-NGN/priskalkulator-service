@@ -27,6 +27,10 @@ public class SalesRole {
     @OneToMany
     private List<User> userList;
 
+    public SalesRole() {
+        
+    }
+
     public Long getId() {
         return id;
     }

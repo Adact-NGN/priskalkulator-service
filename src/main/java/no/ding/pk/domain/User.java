@@ -76,6 +76,10 @@ public class User {
     @Column
     private String emailRegionalManager;
 
+    public User() {
+        
+    }
+
     public Long getId() {
         return id;
     }
