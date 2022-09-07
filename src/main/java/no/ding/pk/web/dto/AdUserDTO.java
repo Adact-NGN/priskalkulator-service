@@ -1,139 +1,80 @@
-package no.ding.pk.domain;
+package no.ding.pk.web.dto;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-
-@Entity
-@Table(name = "users")
-public class User {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+@JsonIgnoreProperties(value = { "@odata.context" })
+public class AdUserDTO {
+    /**
+     * Azure AD id field.
+     */
+    @JsonProperty("id")
+    @JsonAlias("adId")
     private String adId;
 
-    @Column
-    private String orgNr;
-
-    @Column
-    private String orgName;
-
-    @Column
-    private String regionName;
-
-    @Column
+    @JsonProperty("surename")
     private String sureName;
 
-    @Column
+    @JsonProperty("givenName")
     private String name;
 
-    @Column
-    private String username;
-
-    @Column
-    private String usernameAlias;
-
-    @Column
-    private String jobTitle;
-
-    @Column
+    @JsonProperty("displayName")
     private String fullName;
 
-    @Column
+    @JsonProperty("employeeId")
     private String resourceNr;
 
-    @Column
+    @JsonProperty("userPrincipalName")
+    private String username;
+
+    @JsonProperty("mailNickname")
+    private String usernameAlias;
+
+    @JsonProperty("mobilePhone")
     private String phoneNumber;
 
-    @Column
+    @JsonProperty("mail")
     private String email;
 
-    @ManyToOne(optional = true)
-    private SalesRole salesRole;
+    @JsonProperty(value = "salesRole", required = false)
+    private String salesRole;
 
-    @Column
+    @JsonProperty("city")
     private String associatedPlace;
+
+    @JsonProperty("jobTitle")
+    private String jobTitle;
+
+    @JsonProperty("department")
+    private String department;
 
     /**
      * Fullmaktsnivå Vanlig Avfall
      */
-    @Column
+    @JsonProperty(required = false)
     private Integer powerOfAtterneyOA;
 
     /**
      * Fullmaktsnivå Farlig Avfall
      */
-    @Column
+    @JsonProperty(required = false)
     private Integer powerOfAtterneyFA;
 
     /**
      * Overordnet fullmaktsinnehaver (salgssjef)
      */
-    @Column
+    @JsonProperty(required = false)
     private String overallPowerOfAtterney;
 
-    @Column
+    @JsonProperty(required = false)
     private String emailSalesManager;
 
-    @Column
+    @JsonProperty(required = false)
     private String regionalManagersPowerOfAtterney;
 
-    @Column
+    @JsonProperty(required = false)
     private String emailRegionalManager;
-
-    @Column
-    private String department;
-
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
-    public String getUsernameAlias() {
-        return usernameAlias;
-    }
-
-    public void setUsernameAlias(String usernameAlias) {
-        this.usernameAlias = usernameAlias;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
-    public User() {
-        
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getAdId() {
         return adId;
@@ -141,30 +82,6 @@ public class User {
 
     public void setAdId(String adId) {
         this.adId = adId;
-    }
-
-    public String getOrgNr() {
-        return orgNr;
-    }
-
-    public void setOrgNr(String orgNr) {
-        this.orgNr = orgNr;
-    }
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
-    }
-
-    public String getRegionName() {
-        return regionName;
-    }
-
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
     }
 
     public String getSureName() {
@@ -215,11 +132,11 @@ public class User {
         this.email = email;
     }
 
-    public SalesRole getSalesRole() {
+    public String getSalesRole() {
         return salesRole;
     }
 
-    public void setSalesRole(SalesRole salesRole) {
+    public void setSalesRole(String salesRole) {
         this.salesRole = salesRole;
     }
 
@@ -279,16 +196,36 @@ public class User {
         this.emailRegionalManager = emailRegionalManager;
     }
 
-    @Override
-    public String toString() {
-        return "User [adId=" + adId + ", associatedPlace=" + associatedPlace + ", email=" + email
-                + ", emailRegionalManager=" + emailRegionalManager + ", emailSalesManager=" + emailSalesManager
-                + ", fullName=" + fullName + ", id=" + id + ", name=" + name + ", orgName=" + orgName + ", orgNr="
-                + orgNr + ", overallPowerOfAtterney=" + overallPowerOfAtterney + ", phoneNumber=" + phoneNumber
-                + ", powerOfAtterneyFA=" + powerOfAtterneyFA + ", powerOfAtterneyOA=" + powerOfAtterneyOA
-                + ", regionName=" + regionName + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney
-                + ", resourceNr=" + resourceNr + ", salesRole=" + salesRole + ", sureName=" + sureName + ", username="
-                + username + ", usernameAlias=" + usernameAlias + "]";
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    public String getUsernameAlias() {
+        return usernameAlias;
+    }
+
+    public void setUsernameAlias(String usernameAlias) {
+        this.usernameAlias = usernameAlias;
     }
 
     

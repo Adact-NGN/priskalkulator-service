@@ -1,4 +1,4 @@
-package no.ding.pk.web;
+package no.ding.pk.web.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

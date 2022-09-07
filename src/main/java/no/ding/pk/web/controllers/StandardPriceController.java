@@ -1,4 +1,4 @@
-package no.ding.pk.web;
+package no.ding.pk.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -7,17 +7,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.service.StandardPriceService;
+import no.ding.pk.service.StandardPriceServiceImpl;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/standard-price")
 public class StandardPriceController {
     
-    private StandardPriceService service;
+    private StandardPriceServiceImpl service;
     
     @Autowired
-    public StandardPriceController(StandardPriceService priceService) {
+    public StandardPriceController(StandardPriceServiceImpl priceService) {
         this.service = priceService;
     }
     

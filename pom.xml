@@ -22,6 +22,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <environment>dev</environment>
+    <logging.level>DEBUG</logging.level>
     <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
     <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
     <datasource.database>pk_poal_db_${environment}</datasource.database>
@@ -58,9 +59,22 @@
     </dependency> -->
 
     <dependency>
+      <groupId>com.microsoft.azure</groupId>
+      <artifactId>msal4j</artifactId>
+      <version>1.13.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
       <version>3.0.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-hibernate5</artifactId>
+      <version>2.13.3</version>
+    <!-- <type>bundle</type> -->
     </dependency>
 
     <dependency>
@@ -68,6 +82,18 @@
       <artifactId>json</artifactId>
       <version>20220320</version>
       <!-- <type>bundle</type> -->
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.13.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.modelmapper</groupId>
+      <artifactId>modelmapper</artifactId>
+      <version>3.1.0</version>
     </dependency>
 
     <dependency>
@@ -162,7 +188,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M6</version>
+          <version>3.0.0-M7</version>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
@@ -242,6 +268,7 @@
         <datasource.ddl>update</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
         <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+        <logging.level>INFO</logging.level>
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
@@ -264,6 +291,7 @@
         <datasource.ddl>create-drop</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
         <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+        <logging.level>DEBUG</logging.level>
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
@@ -271,6 +299,13 @@
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
       </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-devtools</artifactId>
+          <optional>true</optional>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
       <id>itest</id>

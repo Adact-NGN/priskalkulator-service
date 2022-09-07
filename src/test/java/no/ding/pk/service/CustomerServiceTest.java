@@ -9,13 +9,15 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Profile;
 
 import no.ding.pk.repository.CustomerRepository;
 
+@Profile("itest")
 public class CustomerServiceTest {
 
     private CustomerRepository customerRepository = mock(CustomerRepository.class);
-    private CustomerService service = new CustomerService();
+    private CustomerServiceImpl service = new CustomerServiceImpl();
 
     @Test
     void testFetchCustomers() throws IOException, URISyntaxException, InterruptedException {
