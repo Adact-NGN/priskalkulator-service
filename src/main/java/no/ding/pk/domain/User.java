@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 
 @Entity
 @Table(name = "users")
@@ -49,6 +51,7 @@ public class User {
     @Column
     private String resourceNr;
 
+    @JsonAlias("phone")
     @Column
     private String phoneNumber;
 

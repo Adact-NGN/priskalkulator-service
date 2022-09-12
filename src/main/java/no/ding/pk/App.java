@@ -40,7 +40,7 @@ public class App implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-        .allowedMethods("GET", "POST");
+        .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
     
     @Override

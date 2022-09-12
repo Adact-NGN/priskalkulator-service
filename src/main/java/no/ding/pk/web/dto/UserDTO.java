@@ -1,5 +1,7 @@
 package no.ding.pk.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 public class UserDTO {
     private Long id;
     private String adId;
@@ -13,6 +15,7 @@ public class UserDTO {
     private String jobTitle;
     private String fullName;
     private String resourceNr;
+    @JsonAlias("phone")
     private String phoneNumber;
     private String email;
     private String salesRole;
@@ -174,6 +177,18 @@ public class UserDTO {
     }
     public void setDepartment(String department) {
         this.department = department;
+    }
+    @Override
+    public String toString() {
+        return "UserDTO [adId=" + adId + ", associatedPlace=" + associatedPlace + ", department=" + department
+                + ", email=" + email + ", emailRegionalManager=" + emailRegionalManager + ", emailSalesManager="
+                + emailSalesManager + ", fullName=" + fullName + ", id=" + id + ", jobTitle=" + jobTitle + ", name="
+                + name + ", orgName=" + orgName + ", orgNr=" + orgNr + ", overallPowerOfAtterney="
+                + overallPowerOfAtterney + ", phoneNumber=" + phoneNumber + ", powerOfAtterneyFA=" + powerOfAtterneyFA
+                + ", powerOfAtterneyOA=" + powerOfAtterneyOA + ", regionName=" + regionName
+                + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney + ", resourceNr=" + resourceNr
+                + ", salesRole=" + salesRole + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
+                + usernameAlias + "]";
     }
 
     
