@@ -15,6 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -26,7 +27,7 @@ import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 import no.ding.pk.domain.User;
 import no.ding.pk.web.dto.AdUserDTO;
 
-
+@EnableScheduling
 @SpringBootApplication
 @PropertySource("classpath:application.properties")
 public class App implements WebMvcConfigurer {

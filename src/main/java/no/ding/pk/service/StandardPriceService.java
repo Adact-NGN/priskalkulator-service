@@ -1,5 +1,9 @@
 package no.ding.pk.service;
 
+import java.util.List;
+
+import no.ding.pk.web.dto.MaterialDTO;
+
 public interface StandardPriceService {
-    String getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg);
+    List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg);
 }

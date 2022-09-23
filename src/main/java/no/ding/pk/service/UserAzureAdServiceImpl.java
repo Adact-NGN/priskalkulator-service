@@ -14,7 +14,6 @@ import javax.management.RuntimeErrorException;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import com.microsoft.aad.msal4j.IAuthenticationResult;
 import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 
 import no.ding.pk.domain.User;
+import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.web.dto.AdUserDTO;
 import no.ding.pk.web.mappers.MapperService;
 
@@ -70,7 +70,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        checkForValidJSON(userListFromGraph);
+        LocalJSONUtils.checkForValidJSON(userListFromGraph);
 
         List<AdUserDTO> adUserDtoList = jsonToAdUserDTOList(userListFromGraph);
 
@@ -104,7 +104,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        checkForValidJSON(userJson);
+        LocalJSONUtils.checkForValidJSON(userJson);
 
         AdUserDTO user = jsonToAdUserDTO(userJson);
 
@@ -123,19 +123,11 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        checkForValidJSON(userSearch);
+        LocalJSONUtils.checkForValidJSON(userSearch);
 
         List<AdUserDTO> adUserDTO = jsonToAdUserDTOList(userSearch);
 
         return mapperService.toUserList(adUserDTO);
-    }
-
-    private void checkForValidJSON(String userJson) {
-        try {
-            new JSONObject(userJson);
-        } catch (JSONException e) {
-            throw new RuntimeErrorException(new Error("JSON received from response is not valid, got: " + userJson));
-        }
     }
 
     private AdUserDTO jsonToAdUserDTO(String userJson) {

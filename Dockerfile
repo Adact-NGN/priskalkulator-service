@@ -2,7 +2,7 @@
 # Build stage
 #
 FROM maven:3.6-jdk-11 AS build
-ARG BUILD_PROFILE=test
+ARG BUILD_PROFILE=docker-dev
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
