@@ -20,6 +20,18 @@ Follow the instructions https://maven.apache.org/install.html
 ### Local docker installation
 
 ### Docker container with Mariadb 10.2 or above
+Log in to mariadb with:
+```
+mysql -u <username> -p<password>
+```
+
+In this command:
+
+```-u``` specifies the username. <br/>
+```-p``` specifies the password for the username. You have to input the password directly after the flag, no space.
+
+<b>NB:</b> To execute the following commands you have to be <b>root</b> user. <br/>
+When connected to the mariadb, execute the following commands:
 ```
 create database pk_poal_db_dev;
 

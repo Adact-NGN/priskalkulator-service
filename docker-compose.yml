@@ -2,19 +2,19 @@ version: '3.9'
 services:
   backend:
     depends_on:
-      - db
+      - maria_db
     image: ding-ip-app-pk-service
     build: .
     environment:
-      - DB_HOST=mariadb102
+      - DB_HOST=maria_db
     ports:
       - "8080:8080"
-    networks:
-      - ding-network
-  db:
+  maria_db:
     image: mariadb
+    ports:
+      - 3306:3306
+    environment:
+      - MARIADB_USER=admin
+      - MARIADB_PASSWORD=admin1234
+      - MARIADB_ROOT_PASSWORD=admin1234
     
-
-networks:
-  ding-network:
-    external: true
