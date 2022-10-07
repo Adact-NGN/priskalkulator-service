@@ -97,10 +97,24 @@
     </dependency>
 
     <dependency>
-    <groupId>org.apache.commons</groupId>
+      <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.12.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.4</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -150,7 +164,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
     <dependency>
 			<groupId>org.mockito</groupId>
@@ -163,6 +177,13 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.2.2</version>
+    </dependency>
+  
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <!-- <version>5.1.9.RELEASE</version> -->
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -285,6 +306,7 @@
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
         <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
       </properties>
@@ -308,6 +330,7 @@
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
         <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
       </properties>
@@ -325,7 +348,7 @@
         <datasource.username>admin</datasource.username>
         <datasource.password>admin1234</datasource.password>
         <datasource.database>pk_poal_db_dev</datasource.database>
-        <datasource.url>jdbc:mariadb://maria_db:3306/${datasource.database}</datasource.url>
+        <datasource.url>jdbc:mariadb://${env.DB_HOST}:3306/${datasource.database}</datasource.url>
         <datasource.show.sql>true</datasource.show.sql>
         <datasource.ddl>create-drop</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
@@ -334,7 +357,8 @@
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
+        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
       </properties>
@@ -353,7 +377,8 @@
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
+        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
       </properties>

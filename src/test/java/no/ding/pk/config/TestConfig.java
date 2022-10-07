@@ -7,6 +7,8 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import no.ding.pk.web.mappers.MapperService;
+
 @TestConfiguration
 public class TestConfig {
     @Bean
@@ -17,5 +19,10 @@ public class TestConfig {
     @Bean
     public EntityManagerFactory entityManagerFactory() {
         return Mockito.mock(EntityManagerFactory.class);
+    }
+
+    @Bean 
+    public MapperService mapperService() {
+        return Mockito.mock(MapperService.class);
     }
 }
