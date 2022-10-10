@@ -14,11 +14,11 @@ spec:
   template: 
     metadata:
       labels:
-        app: ding-ip-app-pk-service-deployment
+        app: ding-ip-app-pk-service
         tier: backend
     spec:
       containers:
-        - name: ding-ip-app-pk-service-deployment
+        - name: ding-ip-app-pk-service
           image: dingipacr.azurecr.io/ding-ip-app-pk-service
           # resources:
           #   limits:
