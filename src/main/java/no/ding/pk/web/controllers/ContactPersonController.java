@@ -35,7 +35,11 @@ public class ContactPersonController {
     public List<ContactPersonDTO> getContactPersons(
         @RequestParam(value = "expand", required = false) String expand,
         @RequestParam(value = "skipToken", required = false) Integer skipToken) {
-        return service.fetchContactPersons(new ArrayList<>(Arrays.asList(expand.split(","))), skipToken);
+            List<String> expansionFields = new ArrayList<>();
+            if(expand != null) {
+                expansionFields.addAll(Arrays.asList(expand.split(",")));
+            }
+        return service.fetchContactPersons(expansionFields, skipToken);
     }
 
     /**
