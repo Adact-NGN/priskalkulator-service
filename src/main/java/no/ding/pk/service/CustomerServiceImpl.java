@@ -67,6 +67,8 @@ public class CustomerServiceImpl implements CustomerService {
         
         if(!CollectionUtils.isEmpty(expansionFields)) {
             params.add("$expand", expansionFields.stream().collect(Collectors.joining(",")));
+        } else {
+            params = getDefaultParams();
         }
 
         if(skipToken != null) {

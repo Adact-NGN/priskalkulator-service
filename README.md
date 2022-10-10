@@ -23,6 +23,19 @@ Follow the instructions https://maven.apache.org/install.html
 ### Local docker installation
 
 ### Docker container with Mariadb 10.2 or above
+
+The <i>docker-compose.yml</i> contains two services. The first is the application, and the second is the database.<br/>
+It is advised to build the database before the application to prepear it before the application is beeing used.
+
+To only build the database run the following command:
+
+```
+docker-compose up -d maria_db
+```
+In this command:
+- -d the container will run in a detached state.
+
+
 Log in to mariadb with:
 ```
 mysql -u <username> -p<password>
@@ -60,7 +73,7 @@ grant all privileges on pk_poal_db_dev.* TO 'admin'@'%' identified by 'admin1234
 flush privileges;
 ```
 ### WSL2 for Windows users
-For information on how to installing WSL2 for Windows with desired distro: https://learn.microsoft.com/en-us/windows/wsl/install
+For information on how to install WSL2 for Windows with desired distro: (WSL install)[https://learn.microsoft.com/en-us/windows/wsl/install]
 
 1. wsl --install
 2. wls

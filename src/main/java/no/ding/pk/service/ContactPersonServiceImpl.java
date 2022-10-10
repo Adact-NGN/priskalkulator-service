@@ -54,6 +54,8 @@ public class ContactPersonServiceImpl implements ContactPersonService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         if(!CollectionUtils.isEmpty(expansionFields)) {
             params.add("$expand", expansionFields.stream().collect(Collectors.joining(",")));
+        } else {
+            params = getDefaultParams();
         }
 
         if(skipTokens != null && skipTokens > 0) {
