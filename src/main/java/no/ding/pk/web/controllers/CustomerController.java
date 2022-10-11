@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,8 @@ import no.ding.pk.web.dto.CustomerDTO;
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
+
+    private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
     
     private CustomerServiceImpl service;
     
@@ -34,6 +38,10 @@ public class CustomerController {
      * @param parentCompany (<i>Required</i>) Parent company number (SalesOrg number), ex 100
      * @param customerType (<i>Optional</i>) Customer type to filter for, ex Node, Betaler etc.
      * @param expand (<i>Optional</i>) Comma separated list of fields in the object to expand.
+     * <ul>
+     * <li>Node</li>
+     * <li>Betaler</li>
+     * </ul>
      * @param skipToken (<i>Optional</i>) Amount of items to skip for this request
      * @return List of customer object, else empty list.
      */
@@ -43,6 +51,10 @@ public class CustomerController {
     @RequestParam(value = "customerType", required = false, defaultValue = "Betaler") String customerType,
     @RequestParam(value = "expand", required = false) String expand,
     @RequestParam(value = "skipToken", required = false) Integer skipToken) {
+
+        log.debug(String.format("Request received with params: %s", "parentCompany=" + parentCompany +", customerType=" + customerType +
+        ", expand=" + expand + ", skipToken=" + skipToken));
+
         if(StringUtils.isBlank(parentCompany)) {
             return new ArrayList<>();
         }
@@ -65,6 +77,7 @@ public class CustomerController {
      */
     @GetMapping(value = "/{knr}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> getCustomerByCustomerNumber(@PathVariable("knr") String knr) {
+        log.debug("Request received with params: knr=" + knr);
         return service.findCustomerByCustomerNumber(knr);
     }
 }

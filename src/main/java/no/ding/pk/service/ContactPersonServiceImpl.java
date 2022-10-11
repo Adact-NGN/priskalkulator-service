@@ -32,18 +32,10 @@ public class ContactPersonServiceImpl implements ContactPersonService {
     
     private String contactPersonSapServiceUrl;
 
-    private String sapUsername;
-    private String sapPassword;
-
     private ObjectMapper objectMapper;
 
-    public ContactPersonServiceImpl(
-        @Value(value = "${sap.username}") String sapUsername, 
-        @Value(value = "${sap.password}") String sapPassword,
-        @Value(value = "${sap.api.contact.person.url}") String contactPersonSapServiceUrl,
+    public ContactPersonServiceImpl(@Value(value = "${sap.api.contact.person.url}") String contactPersonSapServiceUrl,
         ObjectMapper objectMapper) {
-        this.sapUsername = sapUsername;
-        this.sapPassword = sapPassword;
         this.contactPersonSapServiceUrl = contactPersonSapServiceUrl;
 
         this.objectMapper = objectMapper;

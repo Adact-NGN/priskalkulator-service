@@ -3,18 +3,17 @@ package no.ding.pk.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import no.ding.pk.config.SchedulingTestConfig;
 
+@Tag("unittest")
 @ActiveProfiles({ "test" })
 @TestPropertySource(properties = {"cache.ttl=1000", "cache.max.amount.items=5000"})
 @SpringJUnitConfig(SchedulingTestConfig.class)

@@ -15,19 +15,25 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.web.dto.ContactPersonDTO;
 
+@Tag("integrationtest")
+@Profile("itest")
+@ActiveProfiles("itest")
 @SpringBootTest
 public class ContactPersonServiceTest {
     
     private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts";
     
-    private ContactPersonService service = new ContactPersonServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", url, new ObjectMapper());
+    private ContactPersonService service = new ContactPersonServiceImpl(url, new ObjectMapper());
     
     @BeforeEach
     public void setup() {

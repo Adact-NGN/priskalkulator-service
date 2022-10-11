@@ -58,14 +58,26 @@ public class CustomerServiceImpl implements CustomerService {
     }
     
     public List<CustomerDTO> fetchCustomersJSON(String motherCompany, String customerType, List<String> expansionFields, Integer skipToken) {
-        String localCustomerType = checkString(customerType, "Node");
         String localMotherCompany = checkString(motherCompany, "");
+
+        StringBuilder filterString = new StringBuilder();
+
+        filterString.append(String.format("Morselskap eq '%s", localMotherCompany));
+
+        if(!StringUtils.isBlank(customerType)) {
+            filterString.append(" and ");
+            filterString.append(String.format("Kundetype eq '%s'", customerType));
+        }
         
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", String.format("Morselskap eq '%s' and Kundetype ne '%s'", localMotherCompany, localCustomerType));
+        params.add("$filter", filterString.toString());
         params.add("$format", "json");
         
         if(!CollectionUtils.isEmpty(expansionFields)) {
+            if(!expansionFields.contains("KontaktPersoner")) {
+                expansionFields.add("KontaktPersoner");
+            }
+
             params.add("$expand", expansionFields.stream().collect(Collectors.joining(",")));
         } else {
             params = getDefaultParams();

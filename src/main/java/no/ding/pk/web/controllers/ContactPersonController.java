@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,8 @@ import no.ding.pk.web.dto.ContactPersonDTO;
 @RestController
 @RequestMapping("/api/contact-person")
 public class ContactPersonController {
+
+    private static final Logger log = LoggerFactory.getLogger(ContactPersonController.class);
 
     private ContactPersonService service;
 
@@ -35,6 +39,9 @@ public class ContactPersonController {
     public List<ContactPersonDTO> getContactPersons(
         @RequestParam(value = "expand", required = false) String expand,
         @RequestParam(value = "skipToken", required = false) Integer skipToken) {
+
+            log.debug(String.format("Request received with with params: %s", "expand=" + expand + ", skipToken=" + skipToken));
+
             List<String> expansionFields = new ArrayList<>();
             if(expand != null) {
                 expansionFields.addAll(Arrays.asList(expand.split(",")));
@@ -49,6 +56,9 @@ public class ContactPersonController {
      */
     @GetMapping("/{cpn}")
     public List<ContactPersonDTO> findContactPersonByNumber(@PathVariable("cpn") String contactPersonNumber) {
+
+        log.debug(String.format("Request received with with params: %s", "cpn=" + contactPersonNumber));
+
         return service.findContactPersonByNumber(contactPersonNumber);
     }
 }

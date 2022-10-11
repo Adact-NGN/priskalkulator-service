@@ -16,6 +16,7 @@ import org.hamcrest.core.Is;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.web.dto.MaterialDTO;
 
+@Tag("unittest")
 public class StandardPriceServiceImplTest {
 
     private StandardPriceService service;

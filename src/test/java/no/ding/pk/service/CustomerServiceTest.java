@@ -10,12 +10,18 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.web.dto.CustomerDTO;
 
+@Tag("integrationtest")
+@Profile("itest")
+@ActiveProfiles("itest")
 public class CustomerServiceTest {
 
     private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder";
@@ -27,17 +33,17 @@ public class CustomerServiceTest {
 
         List<String> expansionFields = new ArrayList<>();
         expansionFields.add("KontaktPersoner");
-        List<CustomerDTO> actual = service.fetchCustomersJSON("", "Node", expansionFields, null);
+        List<CustomerDTO> actual = service.fetchCustomersJSON("100", "", expansionFields, null);
 
-        assertThat(actual, not(org.hamcrest.collection.IsEmptyCollection.empty()));
+        assertThat(actual, not(empty()));
     }
 
     @Test
     void shouldFetchTheNextBatchOfCustomerObjects() {
         List<String> expansionFields = new ArrayList<>();
         expansionFields.add("KontaktPersoner");
-        List<CustomerDTO> firstBatch = service.fetchCustomersJSON("", "Node", expansionFields, null);
-        List<CustomerDTO> secondBatch = service.fetchCustomersJSON("", "Node", expansionFields, 100);
+        List<CustomerDTO> firstBatch = service.fetchCustomersJSON("100", "", expansionFields, null);
+        List<CustomerDTO> secondBatch = service.fetchCustomersJSON("100", "", expansionFields, 100);
 
         CustomerDTO[] firstBatchArray = new CustomerDTO[firstBatch.size()];
         firstBatch.toArray(firstBatchArray);
