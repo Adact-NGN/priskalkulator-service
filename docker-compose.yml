@@ -10,7 +10,10 @@ services:
     ports:
       - "8080:8080"
   maria_db:
-    image: mariadb
+    #image: mariadb
+    build:
+      context: .
+      dockerfile: Dockerfile.mariadb
     ports:
       - 3306:3306
     environment:

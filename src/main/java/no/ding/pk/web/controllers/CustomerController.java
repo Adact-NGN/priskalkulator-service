@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,9 +43,18 @@ public class CustomerController {
     @RequestParam(value = "customerType", required = false, defaultValue = "Betaler") String customerType,
     @RequestParam(value = "expand", required = false) String expand,
     @RequestParam(value = "skipToken", required = false) Integer skipToken) {
+        if(StringUtils.isBlank(parentCompany)) {
+            return new ArrayList<>();
+        }
+
+        List<String> expansionFields = new ArrayList<>();
+        if(expand != null) {
+            expansionFields.addAll(Arrays.asList(expand.split(",")));
+        }
+
         return service.fetchCustomersJSON(parentCompany, 
         customerType, 
-        new ArrayList<String>(Arrays.asList(expand.split(","))), 
+        expansionFields, 
         skipToken);
     }    
 
