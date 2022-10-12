@@ -3,47 +3,47 @@ package no.ding.pk.web.dto;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonIgnoreProperties(value = { "__metadata" })
 public class MaterialDTO  {
     @JsonDeserialize(converter = LongToDateConverter.class)
-    @JsonProperty("Gyldigfra") //: "/Date(1663027200000)/",
+    @JsonAlias("Gyldigfra") //: "/Date(1663027200000)/",
     private Date validFrom;
-    @JsonProperty("Salgsorg") //: "100",
+    @JsonAlias("Salgsorg") //: "100",
     private String salesOrg;
-    @JsonProperty("Salgskontor") //: "104",
+    @JsonAlias("Salgskontor") //: "104",
     private String salesOffice;
-    @JsonProperty("Material") //: "50000",
+    @JsonAlias("Material") //: "50000",
     private String material;
-    @JsonProperty("Betegnelse") //: "Mal for tjenester",
+    @JsonAlias("Betegnelse") //: "Mal for tjenester",
     private String designation;
-    @JsonProperty("Apparattype") //: "",
+    @JsonAlias("Apparattype") //: "",
     private String deviceType;
-    @JsonProperty("Sone") //: "",
+    @JsonAlias("Sone") //: "",
     private String zone;
-    @JsonProperty("Skalakvantum") //: "0.000",
+    @JsonAlias("Skalakvantum") //: "0.000",
     private String scaleQuantum;
-    @JsonProperty("StandardPris") //: "0.00",
+    @JsonAlias("StandardPris") //: "0.00",
     private String standardPrice;
-    @JsonProperty("Valuta") //: "",
+    @JsonAlias("Valuta") //: "",
     private String currency;
-    @JsonProperty("Prisenhet") //: "1000",
+    @JsonAlias("Prisenhet") //: "1000",
     private String priceUnit;
-    @JsonProperty("Kvantumsenhet") //: "KG",
+    @JsonAlias("Kvantumsenhet") //: "KG",
     private String quantumUnit;
     @JsonDeserialize(converter = LongToDateConverter.class)
-    @JsonProperty("Gyldigtil") //: "/Date(253402214400000)/",
+    @JsonAlias("Gyldigtil") //: "/Date(253402214400000)/",
     private Date validTo;
 
-    @JsonProperty("Varegruppe") //: "0501",
+    @JsonAlias("Varegruppe") //: "0501",
     private String productGroup;
-    @JsonProperty("Varegruppebetegnelse") //: "Tj. Lift",
+    @JsonAlias("Varegruppebetegnelse") //: "Tj. Lift",
     private String productGroupDesignation;
-    @JsonProperty("Materialtype") //: "DIEN",
+    @JsonAlias("Materialtype") //: "DIEN",
     private String materialType;
-    @JsonProperty("Materialbeskrivelse") //: "Tjeneste"
+    @JsonAlias("Materialbeskrivelse") //: "Tjeneste"
     private String materialDesignation;
     
     public Date getValidFrom() {

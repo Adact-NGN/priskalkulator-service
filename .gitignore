@@ -63,3 +63,5 @@ buildNumber.properties
 .vscode/
 
 *.ignore
+
+.env

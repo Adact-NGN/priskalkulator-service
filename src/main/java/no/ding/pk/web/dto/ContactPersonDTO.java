@@ -4,35 +4,33 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ContactPersonDTO {
-    @JsonProperty("ContactPerson") //: "200039946",
+    @JsonAlias("ContactPerson") //: "200039946",
     private String contactPerson;
-    @JsonProperty("FirstName") //: "",
+    @JsonAlias("FirstName") //: "",
     private String firstName;
-    @JsonProperty("LastName") //: "Hanne Karin Varhaug Søberg",
+    @JsonAlias("LastName") //: "Hanne Karin Varhaug Søberg",
     private String lastName;
-    @JsonProperty("EmailAddress") //: "",
+    @JsonAlias("EmailAddress") //: "",
     private String emailAddress;
-    @JsonProperty("MobileNumber") //: "",
-    @JsonAlias("MobilePhoneNumber")
+    @JsonAlias({"MobileNumber", "MobilePhoneNumber"})  //: "",
     private String mobileNumber;
-    @JsonProperty("PhoneNumber") //: "",
+    @JsonAlias("PhoneNumber") //: "",
     private String phoneNumber;
-    @JsonProperty("ContactPersonFunction") //: "02",
+    @JsonAlias("ContactPersonFunction") //: "02",
     private String contactPersonFunction;
-    @JsonProperty("ContactPersonFunctionName") //: "Finans Ansvarlig",
+    @JsonAlias("ContactPersonFunctionName") //: "Finans Ansvarlig",
     private String contactPersonFunctionName;
-    @JsonProperty("ContactPersonDepartment") //: "",
+    @JsonAlias("ContactPersonDepartment") //: "",
     private String contactPersonDepartment;
-    @JsonProperty("ContactPersonDepartmentName") //: "",
+    @JsonAlias("ContactPersonDepartmentName") //: "",
     private String contactPersonDepartmentName;
-    @JsonProperty("ChangedDate") //: "2021-09-09",
+    @JsonAlias("ChangedDate") //: "2021-09-09",
     private Date chagedDate;
-    @JsonProperty("ChangedTime") //: "21:28:44",
+    @JsonAlias("ChangedTime") //: "21:28:44",
     private String chagedTime;
-    @JsonProperty("_Customers")
+    @JsonAlias("_Customers")
     private List<ContactPersonCustomerDTO> customers;
 
     // [

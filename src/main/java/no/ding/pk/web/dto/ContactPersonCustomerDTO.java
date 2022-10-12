@@ -1,9 +1,9 @@
 package no.ding.pk.web.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class ContactPersonCustomerDTO {
-    @JsonProperty("Customer")
+    @JsonAlias("Customer")
     private String customerNumber;
 
     public String getCustomerNumber() {

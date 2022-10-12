@@ -3,59 +3,59 @@ package no.ding.pk.web.dto;
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class CustomerDTO {
-    @JsonProperty("Kundenummer")
+    @JsonAlias("Kundenummer")
     private String customerNumber;
-    @JsonProperty("Selskap") //: "100",
+    @JsonAlias("Selskap") //: "100",
     private String company;
-    @JsonProperty("Distribusjonskanal") //: "01",
+    @JsonAlias("Distribusjonskanal") //: "01",
     private String distributionChannel;
-    @JsonProperty("Navn1") //: "Dekkmann Hedmark/Oppland",
+    @JsonAlias("Navn1") //: "Dekkmann Hedmark/Oppland",
     private String name1;
-    @JsonProperty("Navn2") //: "",
+    @JsonAlias("Navn2") //: "",
     private String name2;
-    @JsonProperty("Orgnummer") //: "",
+    @JsonAlias("Orgnummer") //: "",
     private String organizationNumber;
     
-    @JsonProperty("Kundegruppe") //: "Organisasjon",
+    @JsonAlias("Kundegruppe") //: "Organisasjon",
     private String customerGroup;
-    @JsonProperty("Kundetype") //: "Node",
+    @JsonAlias("Kundetype") //: "Node",
     private String customerType;
-    @JsonProperty("Morselskap") //: "",
+    @JsonAlias("Morselskap") //: "",
     private String motherCompany;
-    @JsonProperty("Betaler") //: "",
+    @JsonAlias("Betaler") //: "",
     private String payer;
-    @JsonProperty("Gate") //: "",
+    @JsonAlias("Gate") //: "",
     private String streetAddress;
-    @JsonProperty("Husnummer") //: "",
+    @JsonAlias("Husnummer") //: "",
     private String houseNumber;
-    @JsonProperty("Postnummer") //: "",
+    @JsonAlias("Postnummer") //: "",
     private String postalNumber;
-    @JsonProperty("Sted") //: "Oslo",
+    @JsonAlias("Sted") //: "Oslo",
     private String city;
-    @JsonProperty("Land") //: "NO",
+    @JsonAlias("Land") //: "NO",
     private String country;
-    @JsonProperty("Region") //: "",
+    @JsonAlias("Region") //: "",
     private String region;
-    @JsonProperty("Tidssone") //: "CET",
+    @JsonAlias("Tidssone") //: "CET",
     private String timeZone;
-    @JsonProperty("RegStrGrp") //: "",
+    @JsonAlias("RegStrGrp") //: "",
     private String regStrGrp;
-    @JsonProperty("Postboks") //: "",
+    @JsonAlias("Postboks") //: "",
     private String postBox;
-    @JsonProperty("Postboksnummer") //: "",
+    @JsonAlias("Postboksnummer") //: "",
     private String postBoxNumber;
-    @JsonProperty("FirmaPostnummer") //: "",
+    @JsonAlias("FirmaPostnummer") //: "",
     private String firmPostalNumber;
-    @JsonProperty("CreditScore") //: "",
+    @JsonAlias("CreditScore") //: "",
     private String creditScore;
-    @JsonProperty("ChangedDate") //: null,
+    @JsonAlias("ChangedDate") //: null,
     private Date changedDate;
-    @JsonProperty("ChangedTime") //: "00:00:00",
+    @JsonAlias("ChangedTime") //: "00:00:00",
     private String changedTime;
-    @JsonProperty("KontaktPersoner") //: []
+    @JsonAlias("KontaktPersoner") //: []
     private List<ContactPersonDTO> contactPersons;
     
     public String getCustomerNumber() {
