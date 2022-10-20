@@ -8,6 +8,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,11 +59,12 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     public List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg) {
         if(inMemoryCache.size(salesOffice) == 0 || inMemoryCache.isExpired()) {
+            inMemoryCache.cleanUp();
             log.debug("Cache is empty or expired, fetching new items.");
             HttpClient client = HttpClient.newBuilder()
             .build();
             
-            String filterQuery = String.format("Salgskontor eq '%s' and Salgsorg eq '%s'", salesOffice, salesOrg);
+            String filterQuery = String.format("Salgskontor eq '%s' and Salgsorg eq '%s' and Sone eq ''", salesOffice, salesOrg);
             
             log.debug(String.format("Filter query: %s", filterQuery));
             
@@ -95,13 +97,21 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             
             List<MaterialDTO> standardPriceDTOList = jsonToMaterialDTO(response);
 
-            log.debug("Adding items to cache.");
+            log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
             for(MaterialDTO material : standardPriceDTOList) {
-                inMemoryCache.put(salesOffice, material.getMaterial(), material);
+                StringBuffer objectKey = new StringBuffer();
+                objectKey.append(material.getMaterial());
+
+                if(!StringUtils.isBlank(material.getDeviceType())) {
+                    objectKey.append("_").append(material.getDeviceType());
+                }
+                inMemoryCache.put(salesOffice, objectKey.toString(), material);
             }
-            log.debug(String.format("Added %d items to cache.", inMemoryCache.size(salesOffice)));
+            int amountAddedForSalesOffice = inMemoryCache.size(salesOffice);
+            log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
             
-            return standardPriceDTOList;
+            log.debug("Returning from new cache");
+            return inMemoryCache.getAll(salesOffice);
         } else {
             return inMemoryCache.getAll(salesOffice);
         }
@@ -110,16 +120,24 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private List<MaterialDTO> jsonToMaterialDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         JSONArray results = jsonObject.getJSONObject("d").getJSONArray("results");
-        
+        log.debug(String.format("JSON array contains %d elements", results.length()));
         List<MaterialDTO> standardPriceDTOList = new ArrayList<>();
+
+        int amountOfSuccessfullMaps = 0;
+        int amountOfUnSuccessfullMaps = 0;
         for(int i = 0; i < results.length(); i++) {
             try {
                 MaterialDTO stdPriceDTO = objectMapper.readValue(results.get(i).toString(), MaterialDTO.class);
                 standardPriceDTOList.add(stdPriceDTO);
+                amountOfSuccessfullMaps++;
             } catch (JsonProcessingException | JSONException e) {
+                amountOfUnSuccessfullMaps++;
                 throw new Error("Failed to process JSON", e.getCause());
             }
         }
+
+        log.debug(String.format("Amount of successful maps: %d", amountOfSuccessfullMaps));
+        log.debug(String.format("Amount of unsuccessful maps: %d", amountOfUnSuccessfullMaps));
         return standardPriceDTOList;
     }
 }

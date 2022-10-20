@@ -43,6 +43,7 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
     }
     
     public MaterialInMemoryCache() { 
+        log.debug(String.format("Max item cache size: %d", this.maxItems));
         updatedExpirationDate();
         cacheMap = new LinkedHashMap<>(maxItems);
     }
@@ -55,6 +56,15 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
             
             CacheObject<V> cacheObject = new CacheObject<>();
             cacheObject.value = value;
+
+            if(cacheMap.get(groupKey).containsKey(objectKey)) {
+                log.debug(String.format("Group %s already contains objectKey %s", groupKey, objectKey));
+            }
+
+            if(cacheMap.get(groupKey).containsValue(cacheObject)) {
+                log.debug(String.format("Group %s already contains object: %s", groupKey, cacheObject.toString()));
+            }
+
             cacheMap.get(groupKey).put(objectKey, cacheObject);
         }
     }
@@ -105,6 +115,7 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
     public int size(K groupKey) {
         synchronized (cacheMap) {
             if(cacheMap.containsKey(groupKey)) {
+                log.debug(String.format("Synchronized cache size: %d", cacheMap.get(groupKey).size()));
                 return cacheMap.get(groupKey).size();
             }
             return 0;
@@ -131,6 +142,8 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
             log.debug(String.format("Keyset size is %d with content %s", groupKeySet.size(), groupKeySet.toString()));
             groupDeleteKey = new HashMap<>();
             
+            log.debug(String.format("Time to live is set to: %d", timeToLive));
+
             for(K key : groupKeySet) {
                 Map<T, CacheObject<V>> objectGroup = cacheMap.get(key);
                 Set<T> objectGroupKeySet = objectGroup.keySet();
@@ -150,6 +163,8 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
             }
         }
         
+        log.debug(String.format("Cache size before deletion: %d", this.cacheMap.keySet().size()));
+        
         for(K key : groupDeleteKey.keySet()) {
             List<T> objectKeySet = groupDeleteKey.get(key);
             synchronized(cacheMap) {
@@ -157,10 +172,12 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
                     log.debug(String.format("Removing cached object with key: %s", objectKey));
                     cacheMap.get(key).remove(objectKey);
                 }
-
+                
                 cacheMap.remove(key);
             }
         }
+        
+        log.debug(String.format("Cache size after deletion: %d", this.cacheMap.keySet().size()));
     }
     
     private String prettyPrintDate(long lastAccessed) {

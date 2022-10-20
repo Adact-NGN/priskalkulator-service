@@ -148,6 +148,119 @@ public class MaterialDTO  {
     public void setMaterialDesignation(String materialDesignation) {
         this.materialDesignation = materialDesignation;
     }
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((validFrom == null) ? 0 : validFrom.hashCode());
+        result = prime * result + ((salesOrg == null) ? 0 : salesOrg.hashCode());
+        result = prime * result + ((salesOffice == null) ? 0 : salesOffice.hashCode());
+        result = prime * result + ((material == null) ? 0 : material.hashCode());
+        result = prime * result + ((designation == null) ? 0 : designation.hashCode());
+        result = prime * result + ((deviceType == null) ? 0 : deviceType.hashCode());
+        result = prime * result + ((zone == null) ? 0 : zone.hashCode());
+        result = prime * result + ((scaleQuantum == null) ? 0 : scaleQuantum.hashCode());
+        result = prime * result + ((currency == null) ? 0 : currency.hashCode());
+        result = prime * result + ((priceUnit == null) ? 0 : priceUnit.hashCode());
+        result = prime * result + ((quantumUnit == null) ? 0 : quantumUnit.hashCode());
+        result = prime * result + ((validTo == null) ? 0 : validTo.hashCode());
+        result = prime * result + ((productGroup == null) ? 0 : productGroup.hashCode());
+        result = prime * result + ((productGroupDesignation == null) ? 0 : productGroupDesignation.hashCode());
+        result = prime * result + ((materialType == null) ? 0 : materialType.hashCode());
+        result = prime * result + ((materialDesignation == null) ? 0 : materialDesignation.hashCode());
+        return result;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MaterialDTO other = (MaterialDTO) obj;
+        if (validFrom == null) {
+            if (other.validFrom != null)
+                return false;
+        } else if (!validFrom.equals(other.validFrom))
+            return false;
+        if (salesOrg == null) {
+            if (other.salesOrg != null)
+                return false;
+        } else if (!salesOrg.equals(other.salesOrg))
+            return false;
+        if (salesOffice == null) {
+            if (other.salesOffice != null)
+                return false;
+        } else if (!salesOffice.equals(other.salesOffice))
+            return false;
+        if (material == null) {
+            if (other.material != null)
+                return false;
+        } else if (!material.equals(other.material))
+            return false;
+        if (designation == null) {
+            if (other.designation != null)
+                return false;
+        } else if (!designation.equals(other.designation))
+            return false;
+        if (deviceType == null) {
+            if (other.deviceType != null)
+                return false;
+        } else if (!deviceType.equals(other.deviceType))
+            return false;
+        if (zone == null) {
+            if (other.zone != null)
+                return false;
+        } else if (!zone.equals(other.zone))
+            return false;
+        if (scaleQuantum == null) {
+            if (other.scaleQuantum != null)
+                return false;
+        } else if (!scaleQuantum.equals(other.scaleQuantum))
+            return false;
+        if (currency == null) {
+            if (other.currency != null)
+                return false;
+        } else if (!currency.equals(other.currency))
+            return false;
+        if (priceUnit == null) {
+            if (other.priceUnit != null)
+                return false;
+        } else if (!priceUnit.equals(other.priceUnit))
+            return false;
+        if (quantumUnit == null) {
+            if (other.quantumUnit != null)
+                return false;
+        } else if (!quantumUnit.equals(other.quantumUnit))
+            return false;
+        if (validTo == null) {
+            if (other.validTo != null)
+                return false;
+        } else if (!validTo.equals(other.validTo))
+            return false;
+        if (productGroup == null) {
+            if (other.productGroup != null)
+                return false;
+        } else if (!productGroup.equals(other.productGroup))
+            return false;
+        if (productGroupDesignation == null) {
+            if (other.productGroupDesignation != null)
+                return false;
+        } else if (!productGroupDesignation.equals(other.productGroupDesignation))
+            return false;
+        if (materialType == null) {
+            if (other.materialType != null)
+                return false;
+        } else if (!materialType.equals(other.materialType))
+            return false;
+        if (materialDesignation == null) {
+            if (other.materialDesignation != null)
+                return false;
+        } else if (!materialDesignation.equals(other.materialDesignation))
+            return false;
+        return true;
+    }
 
     
 }

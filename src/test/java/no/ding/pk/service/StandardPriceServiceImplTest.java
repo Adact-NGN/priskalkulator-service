@@ -34,10 +34,11 @@ public class StandardPriceServiceImplTest {
     @BeforeEach
     public void setup() {
         this.workingDir = Path.of("", "src/test/resources");
-        service = new StandardPriceServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", new ObjectMapper(), mock(InMemoryCache.class));
+        InMemoryCache<String, String, MaterialDTO> inMemoryCache = new MaterialInMemoryCache<>();
+        service = new StandardPriceServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", new ObjectMapper(), inMemoryCache);//mock(InMemoryCache.class));
     }
 
-    @Ignore
+    // @Ignore
     @Test
     void shouldGetStandardPricesBySalesOfficeSalesOrg() {
         String salesOffice = "104";
