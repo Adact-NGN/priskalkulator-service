@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import no.ding.pk.service.CustomerServiceImpl;
 import no.ding.pk.web.dto.CustomerDTO;
+import no.ding.pk.web.enums.SapCustomerField;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -79,5 +81,23 @@ public class CustomerController {
     public List<CustomerDTO> getCustomerByCustomerNumber(@PathVariable("knr") String knr) {
         log.debug("Request received with params: knr=" + knr);
         return service.findCustomerByCustomerNumber(knr);
+    }
+
+    /**
+     * 
+     * @param salesOrg Which sales organization to search in
+     * @param searchString Search string containing either part of the customer number or name
+     * @return List of customer object, else empty list
+     */
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CustomerDTO> searchForCustomer(@RequestParam("salesOrg") String salesOrg, @RequestParam("searchString") String searchString) {
+        if(!StringUtils.isBlank(searchString)) {
+            if(NumberUtils.isDigits(searchString)) {
+                return service.searchCustomerBy(salesOrg, SapCustomerField.Kundenummer.getValue(), searchString);
+            } else {
+                return service.searchCustomerBy(salesOrg, SapCustomerField.Navn1.getValue(), searchString);
+            }
+        }
+        return new ArrayList<>();
     }
 }

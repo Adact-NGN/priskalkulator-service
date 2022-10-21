@@ -36,4 +36,13 @@ public interface CustomerService {
      * @return A list with a single customer object, else empty list.
      */
     List<CustomerDTO> findCustomerByCustomerNumber(String knr);
+
+    /**
+     * 
+     * @param salesOrg Sales organisation number.
+     * @param searchField The object field to search on
+     * @param searchString The search string to use in the search.
+     * @return List of CustomerDTO objects, else empty list.
+     */
+    List<CustomerDTO> searchCustomerBy(String salesOrg, String searchField, String searchString);
 }

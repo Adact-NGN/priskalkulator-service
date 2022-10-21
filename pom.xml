@@ -337,7 +337,7 @@
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
         <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>

@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.utils.RequestHeaderUtil;
 import no.ding.pk.web.dto.CustomerDTO;
+import no.ding.pk.web.enums.SapCustomerField;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -41,7 +42,7 @@ public class CustomerServiceImpl implements CustomerService {
     
     private ObjectMapper objectMapper;
 
-    private String customerSapServiceUrl = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder";
+    private String customerSapServiceUrl;
     
     private String sapUsername;
     private String sapPassword;
@@ -54,6 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
     ObjectMapper objectMapper) {
         this.sapUsername = username;
         this.sapPassword = password;
+        this.customerSapServiceUrl = customerSapServiceUrl;
         this.objectMapper = objectMapper;
     }
     
@@ -62,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         StringBuilder filterString = new StringBuilder();
 
-        filterString.append(String.format("Morselskap eq '%s", localMotherCompany));
+        filterString.append(String.format("Selskap eq '%s'", localMotherCompany));
 
         if(!StringUtils.isBlank(customerType)) {
             filterString.append(" and ");
@@ -74,8 +76,8 @@ public class CustomerServiceImpl implements CustomerService {
         params.add("$format", "json");
         
         if(!CollectionUtils.isEmpty(expansionFields)) {
-            if(!expansionFields.contains("KontaktPersoner")) {
-                expansionFields.add("KontaktPersoner");
+            if(!expansionFields.contains(SapCustomerField.KontaktPersoner.getValue())) {
+                expansionFields.add(SapCustomerField.KontaktPersoner.getValue());
             }
 
             params.add("$expand", expansionFields.stream().collect(Collectors.joining(",")));
@@ -145,6 +147,23 @@ public class CustomerServiceImpl implements CustomerService {
         return new ArrayList<CustomerDTO>();
     }
 
+    @Override
+    public List<CustomerDTO> searchCustomerBy(String salesOrg, String searchField, String searchString) {
+        MultiValueMap<String, String> params = getDefaultParams();
+        params.add("$filter", String.format("substringof('%s',%s)", salesOrg, searchString, searchField));
+
+        HttpRequest request = createGetRequest(params);
+
+        log.debug("Request URI: " + request.uri().toString());
+
+        HttpResponse<String> response = getResponse(request);
+
+        if(response.statusCode() == HttpStatus.OK.value()) {
+            return responseToCustomerDTOList(response);
+        }
+        return new ArrayList<>();
+    }
+
     private HttpResponse<String> getResponse(HttpRequest request) {
         HttpClient client = HttpClient.newBuilder()
         .build();
@@ -204,6 +223,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         return params;
     }
+
+    
 
     
 }
