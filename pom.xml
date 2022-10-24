@@ -301,6 +301,7 @@
     <profile>
       <id>prod</id>
       <properties>
+        <allowed.cors.url>http://20.238.224.213</allowed.cors.url>
         <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
         <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
         <datasource.database>pk_poal_db_prod</datasource.database>
@@ -325,6 +326,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>admin</datasource.username>
         <datasource.password>admin1234</datasource.password>
         <datasource.database>pk_poal_db_dev</datasource.database>
@@ -365,6 +367,7 @@
     <profile>
       <id>docker-dev</id>
       <properties>
+        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>admin</datasource.username>
         <datasource.password>admin1234</datasource.password>
         <datasource.database>pk_poal_db_dev</datasource.database>
@@ -399,6 +402,7 @@
     <profile>
       <id>itest</id>
       <properties>
+        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
         <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
         <datasource.database>pk_poal_db_dev</datasource.database>

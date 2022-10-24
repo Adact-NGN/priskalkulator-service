@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: ding-ip-app-pk-service-deployment
   labels:
-    app: ding-ip-app-pk-service-deployment
+    app: ding-ip-app-pk-service
     tier: backend
 spec:
   progressDeadlineSeconds: 3600
