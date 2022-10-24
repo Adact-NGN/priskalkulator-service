@@ -150,7 +150,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<CustomerDTO> searchCustomerBy(String salesOrg, String searchField, String searchString) {
         MultiValueMap<String, String> params = getDefaultParams();
-        params.add("$filter", String.format("contains('%s',%s)", salesOrg, searchField, searchString));
+        params.add("$filter", String.format("contains(%s,'%s')", salesOrg, searchField, searchString));
 
         HttpRequest request = createGetRequest(params);
 
@@ -160,6 +160,8 @@ public class CustomerServiceImpl implements CustomerService {
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToCustomerDTOList(response);
+        } else {
+            log.error(response.body());
         }
         return new ArrayList<>();
     }
