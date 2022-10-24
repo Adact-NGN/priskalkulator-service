@@ -150,7 +150,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<CustomerDTO> searchCustomerBy(String salesOrg, String searchField, String searchString) {
         MultiValueMap<String, String> params = getDefaultParams();
-        params.add("$filter", String.format("substringof('%s',%s)", salesOrg, searchString, searchField));
+        params.add("$filter", String.format("contains('%s',%s)", salesOrg, searchField, searchString));
 
         HttpRequest request = createGetRequest(params);
 
