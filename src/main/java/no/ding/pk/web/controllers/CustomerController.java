@@ -83,13 +83,14 @@ public class CustomerController {
     }
 
     /**
-     * 
+     * Search for customer by partial name or number.
      * @param salesOrg Which sales organization to search in
      * @param searchString Search string containing either part of the customer number or name
      * @return List of customer object, else empty list
      */
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> searchForCustomer(@RequestParam("salesOrg") String salesOrg, @RequestParam("searchString") String searchString) {
+        log.debug(String.format("Getting search request with salesOrg: '%s' and searchString: '%s'", salesOrg, searchString));
         if(!StringUtils.isBlank(searchString)) {
             if(NumberUtils.isDigits(searchString)) {
                 return service.searchCustomerBy(salesOrg, SapCustomerField.Kundenummer.getValue(), searchString);

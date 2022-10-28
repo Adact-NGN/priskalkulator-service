@@ -3,6 +3,7 @@ package no.ding.pk.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 
@@ -64,13 +65,12 @@ public class CustomerServiceTest {
         assertThat(actual.get(0).getCustomerNumber(), equalTo(knr));
     }
 
-    @Ignore("SAP API not ready yet")
     @Test
     void shouldSearchForCustomerByName() {
         String partialName = "Notodd";
         List<CustomerDTO> actual = service.searchCustomerBy("100", SapCustomerField.Navn1.getValue(), partialName);
 
         assertThat(actual, not(empty()));
-        assertThat(actual.get(0).getName1(), matchesPattern(partialName));
+        assertThat(actual.get(0).getName1(), containsString(partialName));
     }
 }
