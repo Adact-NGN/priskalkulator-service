@@ -37,7 +37,7 @@ stages:
     steps:
     - task: AzureKeyVault@2
       inputs:
-        azureSubscription: 'ding-ip-aks-uami-dev'
+        azureSubscription: 'VH-Norsk Gjenvinning-DING(6)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
         KeyVaultName: 'ding-kv-ip-dev'
         SecretsFilter: '*'
         RunAsPreJob: false
