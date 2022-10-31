@@ -27,13 +27,6 @@ variables:
   # Name of the new namespace being created to deploy the PR changes.
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
-  - name: app_config
-    value: >-
-      [
-        { "name": "DATABASE_USERNAME", "value": "@Microsoft.KeyVault(SecretUri=https://ding-kv-ip-$(environment).vault.azure.net/secrets/pk-datasource-username/)" },
-        { "name": "DATABASE_PASSWORD", "value": "@Microsoft.KeyVault(SecretUri=https://ding-kv-ip-$(environment).vault.azure.net/secrets/pk-datasource-password/)"},
-      ]
-
 stages:
 - stage: Build
   displayName: Build stage
@@ -43,24 +36,6 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
-    - task: AzureKeyVault@2
-      inputs:
-        azureSubscription: 'ding-ip-aks-uami-dev'
-        KeyVaultName: 'ding-kv-ip-dev'
-        SecretsFilter: '*'
-        RunAsPreJob: false
-    - task: CmdLine@2
-      inputs:
-        script: echo $(pk-datasource-username)
-    # - task: AzureKeyVault@2
-    #   inputs:
-    #     azureSubscription: 'dingServiceConnection'
-    #     KeyVaultName: 'ding-kv-ip-dev'
-    #     SecretsFilter: '*'
-    #     RunAsPreJob: false
-    # - task: CmdLine@2
-    #   inputs:
-    #     script: echo $(pk-datasource-username)
     - task: Docker@2
       displayName: Build and push an image to container registry
       env:
