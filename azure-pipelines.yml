@@ -38,7 +38,7 @@ stages:
     steps:
     - task: AzureKeyVault@2
       inputs:
-        azureSubscription: 'ding-ip-sp-dev'
+        azureSubscription: 'dingServiceConnection'
         KeyVaultName: 'ding-kv-ip-dev'
         SecretsFilter: '*'
         RunAsPreJob: true
