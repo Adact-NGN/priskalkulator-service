@@ -1,6 +1,7 @@
 # Deploy to Azure Kubernetes Service
 
 
+
 # Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
@@ -42,6 +43,24 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'ding-ip-aks-uami-dev'
+        KeyVaultName: 'ding-kv-ip-dev'
+        SecretsFilter: '*'
+        RunAsPreJob: false
+    - task: CmdLine@2
+      inputs:
+        script: echo $(pk-datasource-username)
+    # - task: AzureKeyVault@2
+    #   inputs:
+    #     azureSubscription: 'dingServiceConnection'
+    #     KeyVaultName: 'ding-kv-ip-dev'
+    #     SecretsFilter: '*'
+    #     RunAsPreJob: false
+    # - task: CmdLine@2
+    #   inputs:
+    #     script: echo $(pk-datasource-username)
     - task: Docker@2
       displayName: Build and push an image to container registry
       env:
