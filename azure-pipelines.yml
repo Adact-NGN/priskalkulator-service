@@ -27,6 +27,7 @@ variables:
   # Name of the new namespace being created to deploy the PR changes.
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
+
 stages:
 - stage: Build
   displayName: Build stage
@@ -36,6 +37,12 @@ stages:
     pool:
       vmImage: $(vmImageName)
     steps:
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'VH-Norsk Gjenvinning-DING(1)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
+        KeyVaultName: 'ding-kv-ip-dev'
+        SecretsFilter: '*'
+        RunAsPreJob: false
     - task: Docker@2
       displayName: Build and push an image to container registry
       env:
