@@ -40,7 +40,15 @@ public class SalesOrgServiceTest {
     @Test
     void shouldGetAllSaleOrgBasedOnQuery() {
         String query = "PostalNumber eq '0178' and City eq 'OSLO'";
-        List<SalesOrgDTO> result = service.findByQuery(query);
+        List<SalesOrgDTO> result = service.findByQuery(query, null);
+
+        assertThat(result, not(empty()));
+    }
+
+    @Test
+    void shouldGetAllSaleOrgBasedOnQueryPostalOrganization() {
+        String query = "SalesOrganization eq '100'";
+        List<SalesOrgDTO> result = service.findByQuery(query, null);
 
         assertThat(result, not(empty()));
     }

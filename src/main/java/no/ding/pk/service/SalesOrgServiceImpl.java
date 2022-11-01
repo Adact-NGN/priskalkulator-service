@@ -37,7 +37,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     SalesOrgServiceImpl(
     @Value(value = "${sap.username}") String username,
     @Value(value = "${sap.password}") String password,
-    @Value(value = "${sap.api.customer.url}") String salesOrgServiceUrl,
+    @Value(value = "${sap.api.salesorg.url}") String salesOrgServiceUrl,
     ObjectMapper objectMapper
     ) {
         this.username = username;
@@ -60,18 +60,23 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     }
 
     @Override
-    public List<SalesOrgDTO> findByQuery(String query) {
-
+    public List<SalesOrgDTO> findByQuery(String query, Integer skipTokens) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", query);
 
+        if(skipTokens != null && skipTokens > 0) {
+            params.add("$skiptoken", skipTokens.toString());
+        }
+
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
+        log.debug("Request uri: " + request.uri().toString());
+        log.debug("Request query: " + request.uri().getQuery().toString());
         HttpResponse response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
         }
-
+        log.debug("Unsuccsessfull response: " + response.statusCode());
         return new ArrayList<>();
     }
 
@@ -152,7 +157,10 @@ public class SalesOrgServiceImpl implements SalesOrgService {
 
     private List<SalesOrgDTO> responseToDtoList(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
+        log.debug(String.format("JSON object size: %d", jsonObject.length()));
         JSONArray result = jsonObject.getJSONArray("value");
+
+        log.debug(String.format("Got %d amount of objects in JSON array", result.length()));
 
         List<SalesOrgDTO> salesOrgDTOs = new ArrayList<>();
 

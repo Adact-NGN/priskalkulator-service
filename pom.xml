@@ -31,6 +31,7 @@
     <datasource.ddl>update</datasource.ddl>
     <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
     <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+    <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
   </properties>
 
   <dependencies>
@@ -318,6 +319,7 @@
         <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
       </properties>
     </profile>
     <profile>
@@ -343,6 +345,7 @@
         <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
       </properties>
       <dependencies>
         <dependency>
@@ -385,6 +388,7 @@
         <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
       </properties>
       <build>
         <plugins>
@@ -418,6 +422,7 @@
         <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
         <sap.api.material.url></sap.api.material.url>
         <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
       </properties>
       <build>
         <plugins>

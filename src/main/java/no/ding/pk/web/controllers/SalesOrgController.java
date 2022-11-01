@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,9 @@ import no.ding.pk.web.enums.SalesOrgField;
 @RestController
 @RequestMapping("/api/salesorg")
 public class SalesOrgController {
+
+    private static final Logger log = LoggerFactory.getLogger(SalesOrgController.class);
+
     private SalesOrgService service;
     
     @Autowired
@@ -42,6 +47,7 @@ public class SalesOrgController {
      * @param postalNumber number value for postal number
      * @param salesZone number value for sales zone
      * @param city string value
+     * @param greedy wheter to use greedy or ungreedy query, 'or' or 'and'. Default greedy (true): or
      * @return List of sales organizations, else empty list
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,9 +57,10 @@ public class SalesOrgController {
     @RequestParam(name = "postalNumber", required = false) String postalNumber,
     @RequestParam(name = "salesZone", required = false) String salesZone,
     @RequestParam(name = "city", required = false) String city,
+    @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
     @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        List<String> paramList = List.of(salesOrg, salesOffice, postalNumber, salesZone,city);
+        String[] paramList = {salesOrg, salesOffice, postalNumber, salesZone,city};
         boolean isAllBlank = true;
         for(String param : paramList) {
             if(!StringUtils.isBlank(param)) {
@@ -77,17 +84,19 @@ public class SalesOrgController {
             logicDivider = " and ";
         }
 
-        for(int i = 0; i < paramList.size(); i++) {
-            String param = paramList.get(i);
+        for(int i = 0; i < paramList.length; i++) {
+            String param = paramList[i];
 
             if(StringUtils.isNotBlank(param)) {
                 addAndToQuery(queryBuilder, logicDivider);
                 String field = fieldList.get(i);
-                queryBuilder.append(field).append(" eq ").append(param);
+                queryBuilder.append(field).append(" eq ").append(String.format("'%s'", param));
             }
         }
 
-        return service.findByQuery(queryBuilder.toString());
+        log.debug("Calling service with query: " + queryBuilder.toString());
+
+        return service.findByQuery(queryBuilder.toString(), skipTokens);
     }
 
     private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {

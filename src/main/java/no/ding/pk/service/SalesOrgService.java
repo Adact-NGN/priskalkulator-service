@@ -7,7 +7,7 @@ import no.ding.pk.web.dto.SalesOrgDTO;
 public interface SalesOrgService {
     List<SalesOrgDTO> getAll();
 
-    List<SalesOrgDTO> findByQuery(String string);
+    List<SalesOrgDTO> findByQuery(String string, Integer skipTokens);
 
     List<SalesOrgDTO> getAllBySalesOrganization(String salesOrg);
 
