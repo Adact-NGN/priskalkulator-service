@@ -10,6 +10,9 @@ public class SalesOrgDTO {
     @JsonAlias("PostalNumber")
     private String postalNumber;
 
+    @JsonAlias("SalesOfficeName")
+    private String salesOfficeName;
+
     @JsonAlias("City")
     private String city;
 
@@ -33,6 +36,14 @@ public class SalesOrgDTO {
 
     public void setPostalNumber(String postalNumber) {
         this.postalNumber = postalNumber;
+    }
+
+    public String getSalesOfficeName() {
+        return salesOfficeName;
+    }
+
+    public void setSalesOfficeName(String salesOfficeName) {
+        this.salesOfficeName = salesOfficeName;
     }
 
     public String getCity() {
@@ -65,6 +76,7 @@ public class SalesOrgDTO {
         int result = 1;
         result = prime * result + ((salesOrganization == null) ? 0 : salesOrganization.hashCode());
         result = prime * result + ((postalNumber == null) ? 0 : postalNumber.hashCode());
+        result = prime * result + ((salesOfficeName == null) ? 0 : salesOfficeName.hashCode());
         result = prime * result + ((city == null) ? 0 : city.hashCode());
         result = prime * result + ((salesOffice == null) ? 0 : salesOffice.hashCode());
         result = prime * result + ((salesZone == null) ? 0 : salesZone.hashCode());
@@ -90,6 +102,11 @@ public class SalesOrgDTO {
                 return false;
         } else if (!postalNumber.equals(other.postalNumber))
             return false;
+        if(salesOfficeName == null) {
+            if(other.salesOfficeName != null)
+                return false;
+        } else if(!salesOfficeName.equals(other.salesOfficeName))
+            return false;
         if (city == null) {
             if (other.city != null)
                 return false;
@@ -107,6 +124,4 @@ public class SalesOrgDTO {
             return false;
         return true;
     }
-
-    
 }

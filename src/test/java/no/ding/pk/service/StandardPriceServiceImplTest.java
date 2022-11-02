@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -14,10 +12,11 @@ import java.util.List;
 
 import org.hamcrest.core.Is;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -25,7 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.web.dto.MaterialDTO;
 
-@Tag("unittest")
+@Tag("integrationtest")
+@Profile("itest")
+@ActiveProfiles("itest")
 public class StandardPriceServiceImplTest {
 
     private StandardPriceService service;
@@ -38,7 +39,6 @@ public class StandardPriceServiceImplTest {
         service = new StandardPriceServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", new ObjectMapper(), inMemoryCache);//mock(InMemoryCache.class));
     }
 
-    // @Ignore
     @Test
     void shouldGetStandardPricesBySalesOfficeSalesOrg() {
         String salesOffice = "104";

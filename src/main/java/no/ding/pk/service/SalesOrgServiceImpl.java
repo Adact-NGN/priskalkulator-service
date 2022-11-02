@@ -176,6 +176,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         try {
             return objectMapper.readValue(string, SalesOrgDTO.class);
         } catch(JsonProcessingException | JSONException e) {
+            log.debug(e.getMessage());
             throw new Error("Failed to process JSON", e.getCause());
         }
     }
