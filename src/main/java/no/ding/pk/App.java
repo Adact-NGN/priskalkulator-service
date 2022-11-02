@@ -29,7 +29,12 @@ import no.ding.pk.web.dto.AdUserDTO;
 
 @EnableScheduling
 @SpringBootApplication
-@PropertySource("classpath:application.properties")
+@PropertySource({
+    "classpath:application.properties", 
+    "classpath:sap.properties", 
+    "classpath:db.properties", 
+    "classpath:msal.properties"
+})
 public class App implements WebMvcConfigurer {
     private static final Logger log = LoggerFactory.getLogger(App.class);
     public static void main( String[] args )

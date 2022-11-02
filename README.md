@@ -126,7 +126,7 @@ The application is mainly communicating with SAP. It gets all the information it
 For more information about the usage of Sap APIs: [Integrasjon SAP til Hubspot](https://ping24.atlassian.net/wiki/spaces/DOI/pages/2276229128/Integrasjon+SAP+til+Hubspot)
 
 
-# Build and Test
+# Build, Test and Debug
 ## Building
 Building the service application:
 ```
@@ -151,6 +151,23 @@ mvn clean test -P <profile-name>
 mvn spring-boot:run
 ```
 No need for profile here, since profiles is only for setting values during build.
+
+## Debug
+
+To se what is happening in the pod in AKS you can either read the deployments logs:
+```
+kubectl logs <pod-name>
+```
+
+Or access the container, if it's running:
+```
+kubectl exec -it <pod-name> -- /bin/sh
+```
+
+You get the pod names with:
+```
+kubectl get pod
+```
 
 # Contribute
 TODO: Explain how other users and developers can contribute to make your code better. 

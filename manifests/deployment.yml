@@ -26,3 +26,17 @@ spec:
           #     memory: "256M"
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: app-config
+              mountPath: /app/config
+              readOnly: true
+            - name: sap-secret
+              mountPath: /app/secret
+              readOnly: true
+      volumes:
+        - name: app-config
+          configMap:
+            name: ding-ip-app-pk-service-configmap
+        - name: sap-secret
+          secret:
+            secretName: sap-secret

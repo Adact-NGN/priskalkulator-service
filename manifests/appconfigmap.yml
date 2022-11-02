@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ding-ip-app-pk-service-configmap
+data:
+  db_username: value
+  db_password: value
