@@ -303,8 +303,8 @@
       <id>prod</id>
       <properties>
         <allowed.cors.url>http://20.238.224.213</allowed.cors.url>
-        <datasource.username>DqaZXsw%!_1234</datasource.username>
-        <datasource.password>test@pk-poal-db-srv-dev</datasource.password>
+        <datasource.username>test@pk-poal-db-srv-dev</datasource.username>
+        <datasource.password>DqaZXsw%!_1234</datasource.password>
         <datasource.database>pk_poal_db_prod</datasource.database>
         <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=verify-full</datasource.url>
         <datasource.show.sql>true</datasource.show.sql>
