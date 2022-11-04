@@ -14,5 +14,5 @@ FROM openjdk:11-jre-slim
 LABEL maintainer="kjetil.torvund.minde@ngn.no"
 WORKDIR /usr/local/lib
 COPY --from=build /home/app/target/*.jar app.jar
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
