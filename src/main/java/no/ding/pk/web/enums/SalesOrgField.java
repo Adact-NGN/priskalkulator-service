@@ -7,7 +7,8 @@ public enum SalesOrgField {
     SalesOffice("SalesOffice"),
     PostalNumber("PostalNumber"),
     SalesZone("SalesZone"),
-    City("City");
+    City("City"),
+    SkipTokens("skiptokens");
     
     private String value;
     

@@ -311,7 +311,7 @@
         <datasource.ddl>update</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
         <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
-        <logging.level>INFO</logging.level>
+        <logging.level>DEBUG</logging.level>
         <sap.username>AZURE_ECOM</sap.username>
         <sap.password>AzureEcom@NGN2022</sap.password>
         <sap.api.user.url></sap.api.user.url>

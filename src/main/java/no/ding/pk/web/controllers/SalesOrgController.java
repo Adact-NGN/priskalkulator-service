@@ -72,12 +72,14 @@ public class SalesOrgController {
         for(String param : paramsList) {
             if(!StringUtils.isBlank(param)) {
                 isAllBlank = false;
-                break;
             }
         }
 
         if(isAllBlank) {
+            log.debug("All request parameters where blank.");
             return new ArrayList<>();
+        } else {
+            log.debug("Got the parameters: " + paramsList.toString());
         }
 
         List<String> fieldList = SalesOrgField.fieldList();

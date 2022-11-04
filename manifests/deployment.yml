@@ -1,13 +1,13 @@
 apiVersion : apps/v1
 kind: Deployment
 metadata:
-  name: ding-ip-app-pk-service-deployment
+  name: ding-ip-app-pk-service
   labels:
     app: ding-ip-app-pk-service
     tier: backend
 spec:
   progressDeadlineSeconds: 3600
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ding-ip-app-pk-service
@@ -20,16 +20,10 @@ spec:
       containers:
         - name: ding-ip-app-pk-service
           image: dingipacr.azurecr.io/ding-ip-app-pk-service
+          imagePullPolicy: Always
           # resources:
           #   limits:
           #     cpu: "500m"
           #     memory: "256M"
           ports:
             - containerPort: 8080
-      volumes:
-        - name: app-config
-          configMap:
-            name: ding-ip-app-pk-service-configmap
-        - name: sap-secret
-          secret:
-            secretName: sap-secret

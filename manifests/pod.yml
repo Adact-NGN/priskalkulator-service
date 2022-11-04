@@ -1,16 +1,13 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: myapp
+  name: my-pod
   labels:
     name: myapp
 spec:
   containers:
-  - name: myapp
-    image: kjetiltminde/pk-service:1.0.0
-    resources:
-      limits:
-        memory: "128Mi"
-        cpu: "500m"
+  - name: ding-ip-app-pk-service
+    image: ding-ip-app-pk-service
+    # imagePullPolicy: Never
     ports:
-      - containerPort: 8080
+      - containerPort: 80
