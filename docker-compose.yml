@@ -3,7 +3,7 @@ services:
   backend:
     depends_on:
       - maria_db
-    image: ding-ip-app-pk-service
+    # image: ding-ip-app-pk-service
     build: .
     environment:
       - DB_HOST=maria_db
