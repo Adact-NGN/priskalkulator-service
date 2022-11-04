@@ -60,17 +60,23 @@ public class SalesOrgController {
     @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
     @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        String[] paramList = {salesOrg, salesOffice, postalNumber, salesZone,city};
+        String[] paramList = {salesOrg, salesOffice, postalNumber, salesZone, city, greedy};
         boolean isAllBlank = true;
+
+        StringBuilder paramsList = new StringBuilder();
+        int counter = 0;
         for(String param : paramList) {
+            paramsList.append(counter).append(": ").append(param).append(" ");
             if(!StringUtils.isBlank(param)) {
                 isAllBlank = false;
-                break;
             }
         }
 
         if(isAllBlank) {
+            log.debug("All request parameters where blank.");
             return new ArrayList<>();
+        } else {
+            log.debug("Got the parameters: " + paramList.toString());
         }
 
         List<String> fieldList = SalesOrgField.fieldList();
