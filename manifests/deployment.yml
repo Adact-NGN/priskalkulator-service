@@ -25,11 +25,4 @@ spec:
           #     cpu: "500m"
           #     memory: "256M"
           ports:
-            - containerPort: 8080
-      volumes:
-        - name: app-config
-          configMap:
-            name: ding-ip-app-pk-service-configmap
-        - name: sap-secret
-          secret:
-            secretName: sap-secret
+            - containerPort: 80

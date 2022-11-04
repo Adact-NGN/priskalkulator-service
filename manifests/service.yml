@@ -10,5 +10,5 @@ spec:
   selector:
     app: ding-ip-app-pk-service
   ports:
-    - port: 8080 # ClusterIP Service Port
-      targetPort: 8080 # Container Port
+    - port: 80 # ClusterIP Service Port
+      targetPort: 80 # Container Port
