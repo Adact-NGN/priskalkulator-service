@@ -60,9 +60,16 @@ public class SalesOrgController {
     @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
     @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        String[] paramList = {salesOrg, salesOffice, postalNumber, salesZone,city};
+        String[] paramsList;
+        if(skipTokens != null) {
+            paramsList = new String[]{salesOrg, salesOffice, postalNumber, salesZone, city, Integer.toString(skipTokens)};
+        } else {
+            paramsList = new String[]{salesOrg, salesOffice, postalNumber, salesZone, city};
+        }
+
+        
         boolean isAllBlank = true;
-        for(String param : paramList) {
+        for(String param : paramsList) {
             if(!StringUtils.isBlank(param)) {
                 isAllBlank = false;
                 break;
@@ -84,8 +91,8 @@ public class SalesOrgController {
             logicDivider = " and ";
         }
 
-        for(int i = 0; i < paramList.length; i++) {
-            String param = paramList[i];
+        for(int i = 0; i < paramsList.length; i++) {
+            String param = paramsList[i];
 
             if(StringUtils.isNotBlank(param)) {
                 addAndToQuery(queryBuilder, logicDivider);
