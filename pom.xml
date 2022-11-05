@@ -302,6 +302,7 @@
     <profile>
       <id>prod</id>
       <properties>
+        <active.profile>prod</active.profile>
         <allowed.cors.url>http://20.238.224.213</allowed.cors.url>
         <datasource.username>test@pk-poal-db-srv-dev</datasource.username>
         <datasource.password>DqaZXsw%!_1234</datasource.password>
@@ -328,6 +329,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <active.profile>dev</active.profile>
         <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>admin</datasource.username>
         <datasource.password>admin1234</datasource.password>
@@ -370,6 +372,7 @@
     <profile>
       <id>docker-dev</id>
       <properties>
+        <active.profile>docker-dev</active.profile>
         <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>admin</datasource.username>
         <datasource.password>admin1234</datasource.password>
@@ -406,6 +409,7 @@
     <profile>
       <id>itest</id>
       <properties>
+        <active.profile>itest</active.profile>
         <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
         <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
@@ -458,6 +462,7 @@
         </plugins>
       </build>
       <properties>
+        <active.profile>test</active.profile>
         <datasource.username>sa</datasource.username>
         <datasource.password></datasource.password>
         <mariadb.datasource.username>admin</mariadb.datasource.username>

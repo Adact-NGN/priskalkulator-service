@@ -32,7 +32,7 @@ import no.ding.pk.web.dto.AdUserDTO;
 @PropertySource({
     "classpath:application.properties", 
     "classpath:sap.properties", 
-    "classpath:db.properties", 
+    // "classpath:db.properties", 
     "classpath:msal.properties"
 })
 public class App implements WebMvcConfigurer {

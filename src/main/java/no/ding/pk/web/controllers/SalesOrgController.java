@@ -93,7 +93,7 @@ public class SalesOrgController {
             logicDivider = " and ";
         }
 
-        for(int i = 0; i < paramsList.length; i++) {
+        for(int i = 0; i < paramsList.length && i < fieldList.size(); i++) {
             String param = paramsList[i];
 
             if(StringUtils.isNotBlank(param)) {
