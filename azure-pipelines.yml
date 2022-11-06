@@ -11,6 +11,22 @@ trigger:
 resources:
 - repo: self
 
+steps:
+  - task: AzureKeyVault@2
+    displayName: Get secrets from KeyVault
+    inputs:
+      #azureSubscription: 'ding-ip-aks-cluster-dev'
+      azureSubscription: 'ding-ip-sp-dev'
+      KeyVaultName: 'ding-kv-ip-dev'
+      SecretsFilter: '*'
+      RunAsPreJob: false
+
+  - task: CmdLine@2
+    displayName: Write Secret into File
+    inputs:
+      script: |
+        echo $(pk-datasource-username)
+
 variables:
   buildProfile: '${buildProfile}'
   # Container registry service connection established during pipeline creation
