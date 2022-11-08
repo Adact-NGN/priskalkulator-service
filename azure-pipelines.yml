@@ -37,7 +37,7 @@ stages:
         - task: AzureKeyVault@2
           displayName: Get secrets from KeyVault
           inputs:
-            azureSubscription: 'VH-Norsk Gjenvinning-DING(2)(41d3ebaf-2ed7-487b-8ffb-f9ccfade8414)'
+            azureSubscription: 'ding-ip-aks-uami-dev'
             #azureSubscription: 'ding-ip-aks-cluster-dev'
             #azureSubscription: 'ding-ip-sp-dev'
             KeyVaultName: 'ding-kv-ip-dev'
