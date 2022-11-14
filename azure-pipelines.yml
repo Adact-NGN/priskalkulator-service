@@ -28,23 +28,6 @@ variables:
   k8sNamespaceForPR: 'review-app-$(System.PullRequest.PullRequestId)'
 
 stages:
-- stage: Prepear
-  displayName: Prepear environment
-  jobs:
-    - job: Prepear
-      displayName: Prepear
-      steps:
-        - task: AzureKeyVault@2
-          inputs:
-            azureSubscription: 'ding-ip-sp-dev'
-            KeyVaultName: 'ding-kv-ip-dev'
-            SecretsFilter: '*'
-            RunAsPreJob: false
-        - task: CmdLine@2
-          displayName: Write Secret into File
-          inputs:
-            script: |
-              echo $(pk-datasource-username)
 - stage: Build
   displayName: Build stage
   jobs:
