@@ -12,6 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 
+import no.ding.pk.repository.DiscountLevelRepository;
+import no.ding.pk.repository.DiscountRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.service.MaterialInMemoryCache;
 import no.ding.pk.web.mappers.MapperService;
@@ -49,5 +51,15 @@ public class SchedulingTestConfig {
     @Bean
     public UserRepository userRepository() {
         return mock(UserRepository.class);
+    }
+
+    @Bean
+    public DiscountRepository discountRepository() {
+        return mock(DiscountRepository.class);
+    }
+
+    @Bean
+    public DiscountLevelRepository discountLevelRepository() {
+        return mock(DiscountLevelRepository.class);
     }
 }
