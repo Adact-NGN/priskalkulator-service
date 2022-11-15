@@ -5,7 +5,9 @@ public enum SapCustomerField {
     Selskap("Selskap"),
     Navn1("Navn1"),
     KontaktPersoner("KontaktPersoner"),
-    Kundetype("Kundetype");
+    Kundetype("Kundetype"),
+    KundeBransje("KundeBransje"),
+    Nodekunder("Nodekunder");
 
     private String value;
 

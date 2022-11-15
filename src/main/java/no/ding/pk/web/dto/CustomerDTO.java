@@ -4,7 +4,10 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(value = { "AbcKlassifisering" })
 public class CustomerDTO {
     @JsonAlias("Kundenummer")
     private String customerNumber;
@@ -55,8 +58,18 @@ public class CustomerDTO {
     private Date changedDate;
     @JsonAlias("ChangedTime") //: "00:00:00",
     private String changedTime;
+
+    @JsonAlias("AbcKlassifisering")
+    private String abcClassification;
+
     @JsonAlias("KontaktPersoner") //: []
     private List<ContactPersonDTO> contactPersons;
+
+    @JsonAlias("KundeBransje")
+    private List<CustomerBranchDTO> customerBranchList;
+
+    @JsonAlias("Nodekunder")
+    private List<NodeCustomerDTO> nodeCustomerList;
     
     public String getCustomerNumber() {
         return customerNumber;
@@ -207,6 +220,24 @@ public class CustomerDTO {
     }
     public void setContactPersons(List<ContactPersonDTO> contactPersons) {
         this.contactPersons = contactPersons;
+    }
+    public List<CustomerBranchDTO> getCustomerBranchList() {
+        return customerBranchList;
+    }
+    public void setCustomerBranchList(List<CustomerBranchDTO> customerBranchList) {
+        this.customerBranchList = customerBranchList;
+    }
+    public List<NodeCustomerDTO> getNodeCustomerList() {
+        return nodeCustomerList;
+    }
+    public void setNodeCustomerList(List<NodeCustomerDTO> nodeCustomerList) {
+        this.nodeCustomerList = nodeCustomerList;
+    }
+    public String getAbcClassification() {
+        return abcClassification;
+    }
+    public void setAbcClassification(String abcClassification) {
+        this.abcClassification = abcClassification;
     }
     
     
