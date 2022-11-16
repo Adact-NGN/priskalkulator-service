@@ -1,5 +1,6 @@
 package no.ding.pk.service;
 
+import java.io.Console;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -64,7 +65,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             HttpClient client = HttpClient.newBuilder()
             .build();
             
-            String filterQuery = String.format("Salgskontor eq '%s' and Salgsorg eq '%s' and Sone eq ''", salesOffice, salesOrg);
+            String filterQuery = String.format("SalesOffice eq '%s' and SalesOrganization eq '%s' and SalesZone eq ''", salesOffice, salesOrg);
             
             log.debug(String.format("Filter query: %s", filterQuery));
             
@@ -119,6 +120,14 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     private List<MaterialDTO> jsonToMaterialDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
+
+        if(jsonObject.has("error")) {
+            JSONObject errorObject = jsonObject.getJSONObject("error");
+
+            log.debug("code: " + errorObject.getString("code"));
+            log.debug("message" + errorObject.getJSONObject("message").getString("value"));
+        }
+
         JSONArray results = jsonObject.getJSONObject("d").getJSONArray("results");
         log.debug(String.format("JSON array contains %d elements", results.length()));
         List<MaterialDTO> standardPriceDTOList = new ArrayList<>();
@@ -132,6 +141,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 amountOfSuccessfullMaps++;
             } catch (JsonProcessingException | JSONException e) {
                 amountOfUnSuccessfullMaps++;
+                log.debug(e.getMessage());
                 throw new Error("Failed to process JSON", e.getCause());
             }
         }
