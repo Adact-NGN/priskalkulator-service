@@ -9,41 +9,45 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 @JsonIgnoreProperties(value = { "__metadata" })
 public class MaterialDTO  {
     @JsonDeserialize(converter = LongToDateConverter.class)
-    @JsonAlias("Gyldigfra") //: "/Date(1663027200000)/",
+    @JsonAlias({"Gyldigfra", "ValidFrom"}) //: "/Date(1663027200000)/",
     private Date validFrom;
-    @JsonAlias("Salgsorg") //: "100",
+    @JsonAlias({"Salgsorg", "SalesOrganization"}) //: "100",
     private String salesOrg;
-    @JsonAlias("Salgskontor") //: "104",
+    @JsonAlias({"Salgskontor", "SalesOffice"}) //: "104",
     private String salesOffice;
-    @JsonAlias("Material") //: "50000",
+    @JsonAlias({"Material"}) //: "50000",
     private String material;
-    @JsonAlias("Betegnelse") //: "Mal for tjenester",
+    @JsonAlias({"Betegnelse", "MaterialDescription"}) //: "Mal for tjenester",
     private String designation;
-    @JsonAlias("Apparattype") //: "",
+    @JsonAlias({"Apparattype", "DeviceCategory"}) //: "",
     private String deviceType;
-    @JsonAlias("Sone") //: "",
+    @JsonAlias({"Sone", "SalesZone"}) //: "",
     private String zone;
-    @JsonAlias("Skalakvantum") //: "0.000",
+    @JsonAlias({"Skalakvantum", "ScaleQuantity"}) //: "0.000",
     private String scaleQuantum;
-    @JsonAlias("StandardPris") //: "0.00",
+    @JsonAlias({"StandardPris", "StandardPrice"}) //: "0.00",
     private String standardPrice;
-    @JsonAlias("Valuta") //: "",
+    @JsonAlias({"Valuta"}) //: "",
     private String currency;
-    @JsonAlias("Prisenhet") //: "1000",
+    @JsonAlias({"Prisenhet", "PricingUnit"}) //: "1000",
     private String priceUnit;
-    @JsonAlias("Kvantumsenhet") //: "KG",
+    @JsonAlias({"Kvantumsenhet", "QuantumUnit"}) //: "KG",
     private String quantumUnit;
+
+    @JsonAlias({"MaterialExpired"})
+    private String materialExpired;
+
     @JsonDeserialize(converter = LongToDateConverter.class)
-    @JsonAlias("Gyldigtil") //: "/Date(253402214400000)/",
+    @JsonAlias({"Gyldigtil", "ValidTo"}) //: "/Date(253402214400000)/",
     private Date validTo;
 
-    @JsonAlias("Varegruppe") //: "0501",
+    @JsonAlias({"Varegruppe", "MaterialGroup"}) //: "0501",
     private String productGroup;
-    @JsonAlias("Varegruppebetegnelse") //: "Tj. Lift",
+    @JsonAlias({"Varegruppebetegnelse", "MaterialGroupDescription"}) //: "Tj. Lift",
     private String productGroupDesignation;
-    @JsonAlias("Materialtype") //: "DIEN",
+    @JsonAlias({"Materialtype", "MaterialType"}) //: "DIEN",
     private String materialType;
-    @JsonAlias("Materialbeskrivelse") //: "Tjeneste"
+    @JsonAlias({"Materialbeskrivelse", "MaterialTypeDescription"}) //: "Tjeneste"
     private String materialDesignation;
     
     public Date getValidFrom() {
@@ -118,6 +122,14 @@ public class MaterialDTO  {
     public void setQuantumUnit(String quantumUnit) {
         this.quantumUnit = quantumUnit;
     }
+
+    public String getMaterialExpired() {
+        return materialExpired;
+    }
+    public void setMaterialExpired(String materialExpired) {
+        this.materialExpired = materialExpired;
+    }
+
     public Date getValidTo() {
         return validTo;
     }
@@ -148,6 +160,7 @@ public class MaterialDTO  {
     public void setMaterialDesignation(String materialDesignation) {
         this.materialDesignation = materialDesignation;
     }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -261,6 +274,4 @@ public class MaterialDTO  {
             return false;
         return true;
     }
-
-    
 }
