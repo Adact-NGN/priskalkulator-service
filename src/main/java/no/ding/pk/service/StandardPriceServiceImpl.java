@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.utils.RequestHeaderUtil;
 import no.ding.pk.web.dto.MaterialDTO;
+import no.ding.pk.web.enums.MaterialField;
 
 @Service
 public class StandardPriceServiceImpl implements StandardPriceService {
@@ -65,7 +66,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             HttpClient client = HttpClient.newBuilder()
             .build();
             
-            String filterQuery = String.format("SalesOffice eq '%s' and SalesOrganization eq '%s' and SalesZone eq ''", salesOffice, salesOrg);
+            String filterQuery = String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
+            MaterialField.SalesOffice.getValue(), salesOffice, 
+            MaterialField.SalesOrganization.getValue(), salesOrg, 
+            MaterialField.MaterialExpired.getValue());
             
             log.debug(String.format("Filter query: %s", filterQuery));
             
