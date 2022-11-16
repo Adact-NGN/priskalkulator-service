@@ -1,5 +1,9 @@
 package no.ding.pk.service;
 
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,6 +13,7 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import no.ding.pk.domain.Discount;
@@ -47,9 +52,18 @@ public class DiscountServiceImpl implements DiscountService {
     public Discount update(Long id, Discount discount) {
         Optional<Discount> opt = repository.findById(id);
         if(opt.isPresent()) {
+            updateDiscountLevels(discount);
             return repository.save(discount);
         }
         return null;
+    }
+
+    private void updateDiscountLevels(Discount discount) {
+        discount.getDiscountLevelList().forEach(dl -> {
+            if(dl.getParent() == null) {
+                discount.addDiscountLevel(dl);
+            }
+        });
     }
 
     @Override
@@ -83,6 +97,11 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber) {
         return repository.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumber);
+    }
+
+    @Override
+    public List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber) {
+        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
     }
 
     @Override

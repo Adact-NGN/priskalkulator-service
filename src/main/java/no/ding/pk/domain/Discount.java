@@ -21,11 +21,17 @@ public class Discount {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column
+    @Column(nullable = false)
     private String salesOrg;
 
-    @Column
+    @Column(nullable = false)
     private String materialNumber;
+
+    @Column
+    private String zone;
+
+    @Column
+    private String deviceType;
 
     @Column
     private String materialDesignation;
@@ -86,11 +92,51 @@ public class Discount {
         this.discountLevels = discountLevelList;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+    }
+
+    public Set<DiscountLevel> getDiscountLevels() {
+        return discountLevels;
+    }
+
     public void addDiscountLevel(DiscountLevel discountLevel) {
         discountLevel.setParent(this);
 
         if(discountLevels == null) {
             discountLevels = new HashSet<>();
+        }
+
+        if(discountLevel.getDiscount() != null && discountLevel.getCalculatedDiscount() == null) {
+            discountLevel.setCalculatedDiscount(standardPrice - discountLevel.getDiscount());
+
+            double pct = (discountLevel.getDiscount() / standardPrice);
+
+            discountLevel.setPctDiscount(pct);
+        }
+
+        if(discountLevel.getDiscount() == null && discountLevel.getCalculatedDiscount() != null) {
+            discountLevel.setDiscount(standardPrice - discountLevel.getCalculatedDiscount());
+
+            double pct = (discountLevel.getDiscount() / standardPrice);
+
+            discountLevel.setPctDiscount(pct);
         }
 
         discountLevels.add(discountLevel);
@@ -139,4 +185,6 @@ public class Discount {
             return false;
         return true;
     }
+
+    
 }

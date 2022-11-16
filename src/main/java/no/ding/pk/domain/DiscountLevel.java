@@ -22,13 +22,13 @@ public class DiscountLevel {
     private int level;
 
     @Column
-    private double discount;
+    private Double discount;
 
     @Column
-    private double calculatedDiscount;
+    private Double calculatedDiscount;
 
     @Column
-    private double pctDiscount;
+    private Double pctDiscount;
 
     @JsonIgnore
     @ManyToOne
@@ -38,7 +38,7 @@ public class DiscountLevel {
     public DiscountLevel() {
     }
     
-    public DiscountLevel(int level, double discount, double calculatedDiscount, double pctDiscount) {
+    public DiscountLevel(int level, Double discount, Double calculatedDiscount, Double pctDiscount) {
         this.level = level;
         this.discount = discount;
         this.calculatedDiscount = calculatedDiscount;
@@ -59,22 +59,22 @@ public class DiscountLevel {
     public void setLevel(int level) {
         this.level = level;
     }
-    public double getDiscount() {
+    public Double getDiscount() {
         return discount;
     }
-    public void setDiscount(double discount) {
+    public void setDiscount(Double discount) {
         this.discount = discount;
     }
-    public double getCalculatedDiscount() {
+    public Double getCalculatedDiscount() {
         return calculatedDiscount;
     }
-    public void setCalculatedDiscount(double calculatedDiscount) {
+    public void setCalculatedDiscount(Double calculatedDiscount) {
         this.calculatedDiscount = calculatedDiscount;
     }
-    public double getPctDiscount() {
+    public Double getPctDiscount() {
         return pctDiscount;
     }
-    public void setPctDiscount(double pctDiscount) {
+    public void setPctDiscount(Double pctDiscount) {
         this.pctDiscount = pctDiscount;
     }
     

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.ding.pk.domain.Discount;
@@ -19,37 +20,33 @@ import no.ding.pk.service.DiscountService;
 @RestController
 @RequestMapping("/api/discount")
 public class DiscountController {
-
+    
     private static final Logger log = LoggerFactory.getLogger(DiscountController.class);
     
     private DiscountService service;
-
+    
     @Autowired
     public DiscountController(DiscountService service) {
         this.service = service;
     }
-
+    
     @GetMapping("/list")
     public List<Discount> getAllDiscounts() {
         return service.findAll();
     }
-
+    
     /**
-     * Get a list of all discounts for a given salesorg and sales office
-     * @param salesOrg Sales organization number
-     * @param salesOffice Sales office number
-     * @return A list off all discounts, else empty list
-     */
+    * Get a list of all discounts for a given salesorg and sales office
+    * @param salesOrg Sales organization number
+    * @param salesOffice Sales office number
+    * @return A list of all discounts, else empty list
+    */
     @GetMapping("/list/{salesOrg}")
-    public List<Discount> getAllDiscountsForSalesOrg(@PathVariable("salesOrg") String salesOrg) {
-        return service.findAllBySalesOrg(salesOrg);
+    public List<Discount> getAllDiscountsForSalesOrg(@PathVariable("salesOrg") String salesOrg,
+    @RequestParam(value = "materialNumber", required = false) String materialNumber, @RequestParam(value = "zone", required = false) String zone) {
+        return service.findAllBySalesOrgAndZoneAndMaterialNumber(salesOrg, zone, materialNumber);
     }
-
-    @GetMapping("/list/{salesOrg}/{materialNumber}")
-    public List<Discount> getAllDiscountsForSalesOrgAndSalesOfficeAndMaterialNumber(@PathVariable("salesOrg") String salesOrg, @PathVariable("materialNumber") String materialNumber) {
-        return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumber);
-    }
-
+    
     /**
      * Create a new Discount object and persist it to the database.
      * @param discount - The Discount object.
@@ -60,24 +57,24 @@ public class DiscountController {
         log.debug("Creating Discount object.");
         return service.save(discount);
     }
-
+    
     /**
-     * A batch job to create multiple new Discount objects.
-     * @param discounts A list of Discount objects to be created.
-     * @return A list of all the newly created Discount objects.
-     */
+    * A batch job to create multiple new Discount objects.
+    * @param discounts A list of Discount objects to be created.
+    * @return A list of all the newly created Discount objects.
+    */
     @PostMapping("/batch")
     public List<Discount> createDiscounts(@RequestBody List<Discount> discounts) {
         log.debug("Batch creating Discount objects. Amount of items: " + discounts.size());
         return service.saveAll(discounts);
     }
-
+    
     /**
-     * Update an existing Discount object.
-     * @param id The object id to look up the object with.
-     * @param discount New values for the existing Discount object.
-     * @return The updated Discount object.
-     */
+    * Update an existing Discount object.
+    * @param id The object id to look up the object with.
+    * @param discount New values for the existing Discount object.
+    * @return The updated Discount object.
+    */
     @PutMapping("/{id}")
     public Discount updateDiscount(@PathVariable("id") Long id, @RequestBody Discount discount) {
         log.debug("Updating Disvount object with id: " + id);
