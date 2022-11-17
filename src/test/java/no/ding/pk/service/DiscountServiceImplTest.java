@@ -44,7 +44,7 @@ public class DiscountServiceImplTest {
     public void setup() throws FileNotFoundException, IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
-        File file = new File(classLoader.getResource("discounts.json").getFile());
+        File file = new File(classLoader.getResource("discounts_simple.json").getFile());
 
         assertThat(file.exists(), is(true));
 
