@@ -5,6 +5,7 @@ import static no.ding.pk.repository.specifications.DiscountSpecifications.withSa
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,8 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public Discount save(Discount discount) {
-        discount.getDiscountLevels().stream().forEach(dl -> discount.addDiscountLevel(dl));
+        addDiscountLevelsToDiscounList(Arrays.asList(discount));
+
         return repository.save(discount);
     }
     
@@ -70,7 +72,12 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> saveAll(List<Discount> discounts) {
+        addDiscountLevelsToDiscounList(discounts);
         
+        return repository.saveAll(discounts);
+    }
+
+    private void addDiscountLevelsToDiscounList(List<Discount> discounts) {
         for(Iterator<Discount> iterator = discounts.iterator(); iterator.hasNext();) {
             Discount discount = iterator.next();
             List<DiscountLevel> dlsToAdd = new ArrayList<>();
@@ -84,7 +91,6 @@ public class DiscountServiceImpl implements DiscountService {
                 discount.addDiscountLevel(dl);
             }
         }
-        return repository.saveAll(discounts);
     }
 
     @Override
