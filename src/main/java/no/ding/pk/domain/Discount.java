@@ -1,9 +1,7 @@
 package no.ding.pk.domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,47 +18,47 @@ public class Discount {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-
+    
     @Column(nullable = false)
     private String salesOrg;
-
+    
     @Column(nullable = false)
     private String materialNumber;
-
+    
     @Column
     private String zone;
-
+    
     @Column
     private String deviceType;
-
+    
     @Column
     private String materialDesignation;
-
+    
     @Column
-    private double standardPrice;
-
+    private Double standardPrice;
+    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
-    private Set<DiscountLevel> discountLevels;
+    private List<DiscountLevel> discountLevels;
     
     public Discount() {
     }
     
     public Discount(String salesOrg, String materialNumber, String materialDesignation, String salesOffice,
-            double standardPrice) {
+    double standardPrice) {
         this.salesOrg = salesOrg;
         this.materialNumber = materialNumber;
         this.materialDesignation = materialDesignation;
         this.standardPrice = standardPrice;
     }
-
+    
     public Long getId() {
         return id;
     }
-
+    
     public void setId(Long id) {
         this.id = id;
     }
-
+    
     public String getSalesOrg() {
         return salesOrg;
     }
@@ -79,76 +77,75 @@ public class Discount {
     public void setMaterialDesignation(String materialDesignation) {
         this.materialDesignation = materialDesignation;
     }
-    public double getStandardPrice() {
+    public Double getStandardPrice() {
         return standardPrice;
     }
-    public void setStandardPrice(double standardPrice) {
+    public void setStandardPrice(Double standardPrice) {
         this.standardPrice = standardPrice;
     }
-    public Set<DiscountLevel> getDiscountLevelList() {
-        return discountLevels;
-    }
-    public void setDiscountLevels(Set<DiscountLevel> discountLevelList) {
+    public void setDiscountLevels(List<DiscountLevel> discountLevelList) {
         this.discountLevels = discountLevelList;
     }
-
+    
     public void setId(long id) {
         this.id = id;
     }
-
+    
     public String getZone() {
         return zone;
     }
-
+    
     public void setZone(String zone) {
         this.zone = zone;
     }
-
+    
     public String getDeviceType() {
         return deviceType;
     }
-
+    
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
     }
-
-    public Set<DiscountLevel> getDiscountLevels() {
+    
+    public List<DiscountLevel> getDiscountLevels() {
         return discountLevels;
     }
-
+    
     public void addDiscountLevel(DiscountLevel discountLevel) {
         discountLevel.setParent(this);
-
+        
         if(discountLevels == null) {
-            discountLevels = new HashSet<>();
+            discountLevels = new ArrayList<>();
         }
-
-        if(discountLevel.getDiscount() != null && discountLevel.getCalculatedDiscount() == null) {
-            discountLevel.setCalculatedDiscount(standardPrice - discountLevel.getDiscount());
-
-            double pct = (discountLevel.getDiscount() / standardPrice);
-
-            discountLevel.setPctDiscount(pct);
+        
+        if(standardPrice != null) {
+            if(discountLevel.getDiscount() != null && discountLevel.getCalculatedDiscount() == null) {
+                discountLevel.setCalculatedDiscount(standardPrice - discountLevel.getDiscount());
+                
+                double pct = (discountLevel.getDiscount() / standardPrice);
+                
+                discountLevel.setPctDiscount(pct);
+            }
+            
+            if(discountLevel.getDiscount() == null && discountLevel.getCalculatedDiscount() != null) {
+                discountLevel.setDiscount(standardPrice - discountLevel.getCalculatedDiscount());
+                
+                double pct = (discountLevel.getDiscount() / standardPrice);
+                
+                discountLevel.setPctDiscount(pct);
+            }
         }
-
-        if(discountLevel.getDiscount() == null && discountLevel.getCalculatedDiscount() != null) {
-            discountLevel.setDiscount(standardPrice - discountLevel.getCalculatedDiscount());
-
-            double pct = (discountLevel.getDiscount() / standardPrice);
-
-            discountLevel.setPctDiscount(pct);
-        }
-
+        
         discountLevels.add(discountLevel);
     }
-
+    
     @Override
     public String toString() {
         return "Discount [id=" + id + ", salesOrg=" + salesOrg + ", materialNumber=" + materialNumber
-                + ", materialDesignation=" + materialDesignation + ", standardPrice="
-                + standardPrice + ", discountLevels=" + discountLevels + "]";
+        + ", materialDesignation=" + materialDesignation + ", standardPrice="
+        + standardPrice + ", discountLevels=" + discountLevels + "]";
     }
-
+    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -158,33 +155,33 @@ public class Discount {
         result = prime * result + ((materialDesignation == null) ? 0 : materialDesignation.hashCode());
         return result;
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
-            return true;
+        return true;
         if (obj == null)
-            return false;
+        return false;
         if (getClass() != obj.getClass())
-            return false;
+        return false;
         Discount other = (Discount) obj;
         if (salesOrg == null) {
             if (other.salesOrg != null)
-                return false;
-        } else if (!salesOrg.equals(other.salesOrg))
             return false;
+        } else if (!salesOrg.equals(other.salesOrg))
+        return false;
         if (materialNumber == null) {
             if (other.materialNumber != null)
-                return false;
-        } else if (!materialNumber.equals(other.materialNumber))
             return false;
+        } else if (!materialNumber.equals(other.materialNumber))
+        return false;
         if (materialDesignation == null) {
             if (other.materialDesignation != null)
-                return false;
-        } else if (!materialDesignation.equals(other.materialDesignation))
             return false;
+        } else if (!materialDesignation.equals(other.materialDesignation))
+        return false;
         return true;
     }
-
+    
     
 }

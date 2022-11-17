@@ -89,7 +89,7 @@ public class DiscountServiceImplTest {
 
         Discount persisted = service.save(expected);
 
-        int initialAmountOfDiscountLevels = persisted.getDiscountLevelList().size();
+        int initialAmountOfDiscountLevels = persisted.getDiscountLevels().size();
 
         DiscountLevel dl = new DiscountLevel(9, 300.0, null, null);
 
@@ -97,7 +97,7 @@ public class DiscountServiceImplTest {
 
         persisted = service.save(persisted);
 
-        assertThat(persisted.getDiscountLevelList().size(), greaterThan(initialAmountOfDiscountLevels));
+        assertThat(persisted.getDiscountLevels().size(), greaterThan(initialAmountOfDiscountLevels));
     }
 
     @Test

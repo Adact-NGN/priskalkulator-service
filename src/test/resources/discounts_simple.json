@@ -1,0 +1,119 @@
+[
+    {
+        "salesOrg": "100",
+        "materialNumber": "113103",
+        "materialDesignation": "Hageavfall, trær og røtter",
+        "standardPrice": 1573.5,
+        "zone": "02",
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1573.5,
+                "pctDiscount": 0
+            },
+            {
+                "level": 2,
+                "discount": 79,
+                "calculatedDiscount": 1494.5,
+                "pctDiscount": 0.10
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1473.5,
+                "pctDiscount": 0.127
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1423.5,
+                "pctDiscount": 0.19
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 1373.5,
+                "pctDiscount": 0.254
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "materialNumber": "113104",
+        "materialDesignation": "Hageavfall, kvernet",
+        "standardPrice": 1194.5,
+        "zone": "01",
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1194.5,
+                "pctDiscount": 0
+            },
+            {
+                "level": 2,
+                "discount": 50,
+                "calculatedDiscount": 1144.5,
+                "pctDiscount": 0.042
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1094.5,
+                "pctDiscount": 0.084
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1044.5,
+                "pctDiscount": 0.126
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 994.5,
+                "pctDiscount": 0.167
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "materialNumber": "113104",
+        "materialDesignation": "Hageavfall, kvernet",
+        "standardPrice": 1194.5,
+        "zone": "02",
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1194.5,
+                "pctDiscount": 0
+            },
+            {
+                "level": 2,
+                "discount": 50,
+                "calculatedDiscount": 1144.5,
+                "pctDiscount": 0.042
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1094.5,
+                "pctDiscount": 0.084
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1044.5,
+                "pctDiscount": 0.126
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 994.5,
+                "pctDiscount": 0.167
+            }
+        ]
+    }
+]

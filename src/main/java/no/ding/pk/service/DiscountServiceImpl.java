@@ -4,6 +4,8 @@ import static no.ding.pk.repository.specifications.DiscountSpecifications.withZo
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +46,7 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public Discount save(Discount discount) {
-        discount.getDiscountLevelList().stream().forEach(dl -> discount.addDiscountLevel(dl));
+        discount.getDiscountLevels().stream().forEach(dl -> discount.addDiscountLevel(dl));
         return repository.save(discount);
     }
     
@@ -59,7 +61,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     private void updateDiscountLevels(Discount discount) {
-        discount.getDiscountLevelList().forEach(dl -> {
+        discount.getDiscountLevels().forEach(dl -> {
             if(dl.getParent() == null) {
                 discount.addDiscountLevel(dl);
             }
@@ -68,9 +70,20 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> saveAll(List<Discount> discounts) {
-        discounts.stream().forEach(d -> {
-            d.getDiscountLevelList().stream().forEach(dl -> d.addDiscountLevel(dl));
-        });
+        
+        for(Iterator<Discount> iterator = discounts.iterator(); iterator.hasNext();) {
+            Discount discount = iterator.next();
+            List<DiscountLevel> dlsToAdd = new ArrayList<>();
+            for(Iterator<DiscountLevel> dlIterator = discount.getDiscountLevels().iterator(); dlIterator.hasNext();) {
+                DiscountLevel dl = dlIterator.next();
+
+                dlsToAdd.add(dl);
+            }
+
+            for(DiscountLevel dl: dlsToAdd) {
+                discount.addDiscountLevel(dl);
+            }
+        }
         return repository.saveAll(discounts);
     }
 
