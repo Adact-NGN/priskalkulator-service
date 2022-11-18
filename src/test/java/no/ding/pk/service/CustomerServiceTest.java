@@ -3,16 +3,14 @@ package no.ding.pk.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.text.MatchesPattern.matchesPattern;
+import static org.hamcrest.core.StringContains.containsString;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Profile;

@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.hamcrest.core.Is;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -48,8 +47,6 @@ public class StandardPriceServiceImplTest {
 
         assertNotNull(result);
         assertThat(result, hasSize(greaterThan(0)));
-
-        JSONObject json = new JSONObject(result);
     }
 
     @Test

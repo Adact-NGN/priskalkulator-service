@@ -1,17 +1,13 @@
 package no.ding.pk.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.text.MatchesPattern.matchesPattern;
-
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
