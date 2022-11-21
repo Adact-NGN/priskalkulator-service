@@ -42,7 +42,20 @@ public class DiscountLevelController {
     @RequestParam("materialNumber") String materialNumber,
     @RequestParam("level") int level) {
         log.debug(String.format("Getting discount level for: salesOrg: %s materialNumber: %s level: %d", salesOrg, materialNumber, level));
-        return service.findDiscountBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, materialNumber, level);
+        return service.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, materialNumber, level);
+    }
+
+    /**
+     * Get a list of discount levels for a specific material.
+     * @param salesOrg Sales organization number
+     * @param materialNumber Material number
+     * @return A list of all the discount levels for a material, else empty list.
+     */
+    @GetMapping("/list")
+    public List<DiscountLevel> getAllDiscountLevelsForSpecificDiscount(@RequestParam("salesOrg") String salesOrg,
+    @RequestParam("materialNumber") String materialNumber) {
+        log.debug(String.format("Getting all discount levels for: salesOrg: %s materialNumber: %s", salesOrg, materialNumber));
+        return service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(salesOrg, materialNumber);
     }
 
     /**

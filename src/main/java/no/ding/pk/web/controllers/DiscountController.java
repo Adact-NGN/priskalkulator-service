@@ -30,6 +30,10 @@ public class DiscountController {
         this.service = service;
     }
     
+    /**
+     * Gets a list of all Discount objects.
+     * @return A list ov Discount objects.
+     */
     @GetMapping("/list")
     public List<Discount> getAllDiscounts() {
         return service.findAll();

@@ -128,4 +128,13 @@ public class DiscountServiceImplTest {
 
         assertThat(actual.size(), greaterThanOrEqualTo(3));
     }
+
+    @Test
+    public void shouldFindDiscountBySalesOrgAndMaterialNumber() {
+        service.saveAll(testData);
+        
+        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", "113103");
+
+        assertThat(actual.size(), greaterThanOrEqualTo(5));
+    }
 }

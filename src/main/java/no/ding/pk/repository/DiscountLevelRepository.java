@@ -18,4 +18,6 @@ public interface DiscountLevelRepository extends JpaRepository<DiscountLevel, Lo
     @Param("level") int level);
 
     List<DiscountLevel> findAllByParentSalesOrgAndParentMaterialNumberAndLevel(String salesOrg, String materialNumber, int level);
+
+    List<DiscountLevel> findAllByParentSalesOrgAndParentMaterialNumber(String salesOrg, String materialNumber);
 }

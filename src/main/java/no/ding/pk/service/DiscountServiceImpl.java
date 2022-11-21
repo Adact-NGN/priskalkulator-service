@@ -124,9 +124,16 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<DiscountLevel> findDiscountBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg,
+    public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg,
             String materialNumber, int level) {
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, level);
+    }
+
+    @Override
+    public List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg,
+            String materialNumber) {
+        // TODO Auto-generated method stub
+        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumber(salesOrg, materialNumber);
     }
     
 }
