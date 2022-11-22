@@ -7,6 +7,8 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import no.ding.pk.service.InMemoryCache;
+import no.ding.pk.service.MaterialInMemoryCache;
 import no.ding.pk.web.mappers.MapperService;
 
 @TestConfiguration

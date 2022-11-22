@@ -14,13 +14,13 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import no.ding.pk.config.SchedulingTestConfig;
 
 @Tag("unittest")
-@ActiveProfiles({ "test" })
+@ActiveProfiles({ "test", "unit-test" })
 @TestPropertySource(properties = {"cache.ttl=1000", "cache.max.amount.items=5000"})
-@SpringJUnitConfig(SchedulingTestConfig.class)
+@SpringJUnitConfig({SchedulingTestConfig.class})
 public class MaterialInMemoryCacheTest {
     
     @Autowired
-    private MaterialInMemoryCache<String, String, String> cache;
+    private InMemoryCache<String, String, String> cache;
 
     @Autowired private PropertyResolver propertySourceResolver;
 

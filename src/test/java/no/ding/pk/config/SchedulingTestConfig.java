@@ -15,6 +15,7 @@ import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
 import no.ding.pk.repository.UserRepository;
+import no.ding.pk.service.InMemoryCache;
 import no.ding.pk.service.MaterialInMemoryCache;
 import no.ding.pk.web.mappers.MapperService;
 
@@ -23,8 +24,14 @@ import no.ding.pk.web.mappers.MapperService;
 @Profile({ "unit-test" })
 @ComponentScan("no.ding.pk.service")
 public class SchedulingTestConfig {
+
+    // @Bean
+    // public InMemoryCache<String, String, String> memoryCache() {
+    //     return new MaterialInMemoryCache<>();
+    // }
+
     @Bean
-    public MaterialInMemoryCache<String, String, String> inMemoryCache() {
+    public InMemoryCache<String, String, String> inMemoryCache() {
         return new MaterialInMemoryCache<>();
     }
 
