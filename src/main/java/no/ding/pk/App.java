@@ -41,7 +41,6 @@ import no.ding.pk.web.dto.AdUserDTO;
 @PropertySource({
     "classpath:application.properties", 
     "classpath:sap.properties", 
-    // "classpath:db.properties", 
     "classpath:msal.properties"
 })
 public class App implements WebMvcConfigurer {
@@ -55,7 +54,6 @@ public class App implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedMethods("*");
-        // .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
     
     @Override
@@ -107,7 +105,6 @@ public class App implements WebMvcConfigurer {
         modelMapper.typeMap(AdUserDTO.class, User.class)
         .addMapping(AdUserDTO::getAdId, User::setAdId)
         .addMapping(AdUserDTO::getSureName, User::setSureName);
-        // .addMappings(mapper -> mapper.skip(User::setId));
         
         return modelMapper;
     }

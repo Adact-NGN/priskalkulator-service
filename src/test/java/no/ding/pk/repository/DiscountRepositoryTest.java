@@ -18,7 +18,6 @@ import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 
 @Transactional
-// @DataJpaTest
 @SpringBootTest
 @TestPropertySource("/h2-db.properties")
 public class DiscountRepositoryTest {
@@ -80,7 +79,6 @@ public class DiscountRepositoryTest {
         assertThat(dls, hasSize(5));
 
         List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, 2);
-        // List<DiscountLevel> actualList = repository.findDiscountLevelBySalesOrgAndSalesOfficeAndMaterialNumberAndLevel(salesOrg, salesOffice, materialNumber, 2);
 
         assertThat(actualList, hasSize(1));
         assertThat(actualList.get(0).getLevel(), is(2));

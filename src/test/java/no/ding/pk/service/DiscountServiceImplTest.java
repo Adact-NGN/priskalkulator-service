@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -74,7 +75,6 @@ public class DiscountServiceImplTest {
                 Discount discount = om.readValue(jsonObject.toString(), Discount.class);
                 testData.add(discount);
             } catch (JsonProcessingException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -142,7 +142,8 @@ public class DiscountServiceImplTest {
     public void shouldFindDiscountBySalesOrgAndMaterialNumber() {
         service.saveAll(testData);
         
-        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", "113103");
+        List<String> materialNumbers = Arrays.asList("113103");
+        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0));
 
         assertThat(actual.size(), greaterThanOrEqualTo(5));
     }

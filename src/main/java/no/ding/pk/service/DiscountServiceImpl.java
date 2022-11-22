@@ -115,7 +115,8 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber) {
-        return repository.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumber);
+        List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
+        return repository.findAllBySalesOrgAndMaterialNumberInList(salesOrg, materialNumbers);
     }
 
     @Override
@@ -131,9 +132,9 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg,
-            String materialNumber) {
-        // TODO Auto-generated method stub
-        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumber(salesOrg, materialNumber);
+            String materialNumbers) {
+        
+        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, Arrays.asList(materialNumbers.split(",")));
     }
     
 }

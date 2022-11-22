@@ -103,7 +103,6 @@ public class DiscountLevel {
         result = prime * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(pctDiscount);
         result = prime * result + (int) (temp ^ (temp >>> 32));
-        // result = prime * result + ((parent == null) ? 0 : parent.hashCode());
         return result;
     }
 
@@ -124,11 +123,6 @@ public class DiscountLevel {
             return false;
         if (Double.doubleToLongBits(pctDiscount) != Double.doubleToLongBits(other.pctDiscount))
             return false;
-        // if (parent == null) {
-        //     if (other.parent != null)
-        //         return false;
-        // } else if (!parent.equals(other.parent))
-        //     return false;
         return true;
     }
 

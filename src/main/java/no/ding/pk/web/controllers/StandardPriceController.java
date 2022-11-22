@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import no.ding.pk.service.StandardPriceServiceImpl;
 import no.ding.pk.web.dto.MaterialDTO;
 
-// @CrossOrigin(origins = "${allowed.cors.url}")
 @RestController
 @RequestMapping("/api/standard-price")
 public class StandardPriceController {

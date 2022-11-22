@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import no.ding.pk.domain.Discount;
@@ -14,5 +16,6 @@ public interface DiscountRepository extends JpaRepository<Discount, Long>, JpaSp
 
     List<Discount> findAllBySalesOrg(String salesOrg);
 
-    List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber);
+    @Query("select distinct d from Discount d JOIN FETCH d.discountLevels where d.salesOrg = :salesOrg and d.materialNumber in :materialNumbers")
+    List<Discount> findAllBySalesOrgAndMaterialNumberInList(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers);
 }

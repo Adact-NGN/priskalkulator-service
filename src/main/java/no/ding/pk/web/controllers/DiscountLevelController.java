@@ -46,10 +46,10 @@ public class DiscountLevelController {
     }
 
     /**
-     * Get a list of discount levels for a specific material.
+     * Get a list of discount levels for a specific material or a list of material numbers.
      * @param salesOrg Sales organization number
-     * @param materialNumber Material number
-     * @return A list of all the discount levels for a material, else empty list.
+     * @param materialNumber Material number or a comma separated number list.
+     * @return A list of all the discount levels for one or multiple materials, else empty list.
      */
     @GetMapping("/list")
     public List<DiscountLevel> getAllDiscountLevelsForSpecificDiscount(@RequestParam("salesOrg") String salesOrg,

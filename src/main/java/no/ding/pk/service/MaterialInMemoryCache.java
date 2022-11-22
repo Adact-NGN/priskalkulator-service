@@ -56,15 +56,15 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
             
             CacheObject<V> cacheObject = new CacheObject<>();
             cacheObject.value = value;
-
+            
             if(cacheMap.get(groupKey).containsKey(objectKey)) {
                 log.debug(String.format("Group %s already contains objectKey %s", groupKey, objectKey));
             }
-
+            
             if(cacheMap.get(groupKey).containsValue(cacheObject)) {
                 log.debug(String.format("Group %s already contains object: %s", groupKey, cacheObject.toString()));
             }
-
+            
             cacheMap.get(groupKey).put(objectKey, cacheObject);
         }
     }
@@ -143,7 +143,7 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
             groupDeleteKey = new HashMap<>();
             
             log.debug(String.format("Time to live is set to: %d", timeToLive));
-
+            
             for(K key : groupKeySet) {
                 Map<T, CacheObject<V>> objectGroup = cacheMap.get(key);
                 Set<T> objectGroupKeySet = objectGroup.keySet();
@@ -198,16 +198,4 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
         this.maxItems = maxItems;
     }
     
-    // protected class CacheObject<V> {
-        //     public long lastAccessed = System.currentTimeMillis();
-        //     public V value;
-        
-        //     public CacheObject() {
-            //     }
-            
-            //     protected CacheObject(V value) {
-                //         this.value = value;
-                //     }
-                // }
-            }
-            
+}

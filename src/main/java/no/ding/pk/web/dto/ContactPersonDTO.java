@@ -33,12 +33,6 @@ public class ContactPersonDTO {
     @JsonAlias("_Customers")
     private List<ContactPersonCustomerDTO> customers;
 
-    // [
-    //     {
-    //         "Customer": "126094"
-    //     }
-    // ]
-
     public String getContactPerson() {
         return contactPerson;
     }

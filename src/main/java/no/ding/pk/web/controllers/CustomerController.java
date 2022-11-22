@@ -20,7 +20,6 @@ import no.ding.pk.service.CustomerServiceImpl;
 import no.ding.pk.web.dto.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
 
-// @CrossOrigin(origins = "${allowed.cors.url}")
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {

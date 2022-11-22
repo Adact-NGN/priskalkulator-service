@@ -50,6 +50,11 @@ public class DiscountController {
     @RequestParam(value = "materialNumber", required = false) String materialNumber, @RequestParam(value = "zone", required = false) String zone) {
         return service.findAllBySalesOrgAndZoneAndMaterialNumber(salesOrg, zone, materialNumber);
     }
+
+    @GetMapping("/in-list/{salesOrg}")
+    public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg, @RequestParam(value = "materialNumbers") String materialNumbers) {
+        return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumbers);
+    }
     
     /**
      * Create a new Discount object and persist it to the database.

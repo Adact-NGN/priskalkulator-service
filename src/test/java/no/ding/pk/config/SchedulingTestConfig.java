@@ -25,11 +25,6 @@ import no.ding.pk.web.mappers.MapperService;
 @ComponentScan("no.ding.pk.service")
 public class SchedulingTestConfig {
 
-    // @Bean
-    // public InMemoryCache<String, String, String> memoryCache() {
-    //     return new MaterialInMemoryCache<>();
-    // }
-
     @Bean
     public InMemoryCache<String, String, String> inMemoryCache() {
         return new MaterialInMemoryCache<>();
