@@ -20,8 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import no.ding.pk.domain.User;
 
-@Ignore
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource("/application.properties")
 public class UserRepositoryTest {

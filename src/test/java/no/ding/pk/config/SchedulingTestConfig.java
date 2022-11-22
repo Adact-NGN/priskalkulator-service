@@ -20,7 +20,7 @@ import no.ding.pk.web.mappers.MapperService;
 
 @Configuration
 @EnableScheduling
-@Profile({ "test" })
+@Profile({ "unit-test" })
 @ComponentScan("no.ding.pk.service")
 public class SchedulingTestConfig {
     @Bean

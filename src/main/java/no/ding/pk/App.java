@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -116,6 +117,7 @@ public class App implements WebMvcConfigurer {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
 
+    @Profile("!test")
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
