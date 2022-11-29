@@ -1,5 +1,6 @@
 package no.ding.pk.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -7,10 +8,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
+@NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
 public class SalesRole {
     @Id
@@ -18,13 +24,20 @@ public class SalesRole {
     private Long id;
 
     @Column
-    private String roleName;
+    private String roleName; // sellerType
 
     @Column
     private String description;
 
     @Column
-    @OneToMany
+    private Integer defaultPowerOfAttorneyOa;
+
+    @Column
+    private Integer defaultPowerOfAttorneyFa;
+
+    @JsonManagedReference
+    @Column
+    @OneToMany()
     private List<User> userList;
 
     public SalesRole() {
@@ -55,17 +68,36 @@ public class SalesRole {
         this.description = description;
     }
 
+    public void addUser(User user) {
+        user.setSalesRole(this);
+        
+        if(userList == null) {
+            userList = new ArrayList<>();
+        }
+
+        userList.add(user);
+    }
+
+    public void removeUser(User user) {
+        if(userList.contains(user)) {
+            userList.remove(user);
+        }
+
+        user.setSalesRole(null);
+    }
+
     @Override
     public String toString() {
-        return "SalesRole [description=" + description + ", id=" + id + ", roleName=" + roleName + "]";
+        return "SalesRole [description=" + description + ", id=" + id + ", roleName=" + roleName + ", defaultPowerOfAttorneyOa="+ defaultPowerOfAttorneyOa + ", defaultPowerOfAtterneyFa="+ defaultPowerOfAttorneyFa + "]";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
         result = prime * result + ((roleName == null) ? 0 : roleName.hashCode());
+        result = prime * result + ((defaultPowerOfAttorneyOa == null) ? 0 : defaultPowerOfAttorneyOa.hashCode());
+        result = prime * result + ((defaultPowerOfAttorneyFa == null) ? 0 : defaultPowerOfAttorneyFa.hashCode());
         return result;
     }
 
@@ -78,18 +110,52 @@ public class SalesRole {
         if (getClass() != obj.getClass())
             return false;
         SalesRole other = (SalesRole) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
         if (roleName == null) {
             if (other.roleName != null)
                 return false;
         } else if (!roleName.equals(other.roleName))
             return false;
+        if (defaultPowerOfAttorneyOa == null) {
+            if (other.defaultPowerOfAttorneyOa != null)
+                return false;
+        } else if(!defaultPowerOfAttorneyOa.equals(other.defaultPowerOfAttorneyOa)) {
+            return false;
+        }
+        if (defaultPowerOfAttorneyFa == null) {
+            if (other.defaultPowerOfAttorneyFa != null)
+                return false;
+        } else if(!defaultPowerOfAttorneyFa.equals(other.defaultPowerOfAttorneyFa)) {
+            return false;
+        }
+
         return true;
     }
+
+    public Integer getDefaultPowerOfAttorneyOa() {
+        return defaultPowerOfAttorneyOa;
+    }
+
+    public void setDefaultPowerOfAttorneyOa(Integer defaultPowerOfAttorneyOa) {
+        this.defaultPowerOfAttorneyOa = defaultPowerOfAttorneyOa;
+    }
+
+    public Integer getDefaultPowerOfAttorneyFa() {
+        return defaultPowerOfAttorneyFa;
+    }
+
+    public void setDefaultPowerOfAttorneyFa(Integer defaultPowerOfAttorneyFa) {
+        this.defaultPowerOfAttorneyFa = defaultPowerOfAttorneyFa;
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+
+    
 
     
 }

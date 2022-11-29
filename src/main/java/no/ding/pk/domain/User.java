@@ -5,13 +5,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
+@NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
 public class User {
     
@@ -58,7 +62,9 @@ public class User {
     @Column
     private String email;
 
+    @JsonBackReference
     @ManyToOne(optional = true)
+    @JoinColumn
     private SalesRole salesRole;
 
     @Column
@@ -292,6 +298,67 @@ public class User {
                 + ", regionName=" + regionName + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney
                 + ", resourceNr=" + resourceNr + ", salesRole=" + salesRole + ", sureName=" + sureName + ", username="
                 + username + ", usernameAlias=" + usernameAlias + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((adId == null) ? 0 : adId.hashCode());
+        result = prime * result + ((orgNr == null) ? 0 : orgNr.hashCode());
+        result = prime * result + ((orgName == null) ? 0 : orgName.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        result = prime * result + ((usernameAlias == null) ? 0 : usernameAlias.hashCode());
+        result = prime * result + ((resourceNr == null) ? 0 : resourceNr.hashCode());
+        result = prime * result + ((email == null) ? 0 : email.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        User other = (User) obj;
+        if (adId == null) {
+            if (other.adId != null)
+                return false;
+        } else if (!adId.equals(other.adId))
+            return false;
+        if (orgNr == null) {
+            if (other.orgNr != null)
+                return false;
+        } else if (!orgNr.equals(other.orgNr))
+            return false;
+        if (orgName == null) {
+            if (other.orgName != null)
+                return false;
+        } else if (!orgName.equals(other.orgName))
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        if (usernameAlias == null) {
+            if (other.usernameAlias != null)
+                return false;
+        } else if (!usernameAlias.equals(other.usernameAlias))
+            return false;
+        if (resourceNr == null) {
+            if (other.resourceNr != null)
+                return false;
+        } else if (!resourceNr.equals(other.resourceNr))
+            return false;
+        if (email == null) {
+            if (other.email != null)
+                return false;
+        } else if (!email.equals(other.email))
+            return false;
+        return true;
     }
 
     

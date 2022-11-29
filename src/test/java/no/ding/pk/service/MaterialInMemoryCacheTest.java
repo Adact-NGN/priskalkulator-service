@@ -57,7 +57,7 @@ public class MaterialInMemoryCacheTest {
 
         System.out.println("Cache size is: " + cache.size("Ansatt"));
 
-        Thread.sleep(10000);
+        Thread.sleep(6000);
 
         System.out.println("Two objects added but timeToLive was reached. cache.size(): " + cache.size("Ansatt"));
 

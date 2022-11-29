@@ -1,6 +1,8 @@
 package no.ding.pk.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDTO {
     private Long id;
@@ -18,7 +20,8 @@ public class UserDTO {
     @JsonAlias("phone")
     private String phoneNumber;
     private String email;
-    private String salesRole;
+    @JsonBackReference
+    private SalesRoleDTO salesRole;
     private String associatedPlace;
 
     /**
@@ -124,10 +127,10 @@ public class UserDTO {
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getSalesRole() {
+    public SalesRoleDTO getSalesRole() {
         return salesRole;
     }
-    public void setSalesRole(String salesRole) {
+    public void setSalesRole(SalesRoleDTO salesRole) {
         this.salesRole = salesRole;
     }
     public String getAssociatedPlace() {
@@ -187,7 +190,7 @@ public class UserDTO {
                 + overallPowerOfAtterney + ", phoneNumber=" + phoneNumber + ", powerOfAtterneyFA=" + powerOfAtterneyFA
                 + ", powerOfAtterneyOA=" + powerOfAtterneyOA + ", regionName=" + regionName
                 + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney + ", resourceNr=" + resourceNr
-                + ", salesRole=" + salesRole + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
+                + ", salesRoleId=" + salesRole + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
                 + usernameAlias + "]";
     }
 

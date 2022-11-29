@@ -24,7 +24,7 @@ public class SalesOrgServiceTest {
 
     private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal";
 
-    private SalesOrgServiceImpl service = new SalesOrgServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", url, new ObjectMapper());
+    private SalesOrgServiceImpl service = new SalesOrgServiceImpl(url, new ObjectMapper());
     
     @Test
     void shouldGetAllSalesOrgFromSAP() {

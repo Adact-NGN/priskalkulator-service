@@ -1,0 +1,61 @@
+[
+    {
+        "adId": "dc804853-6a82-4022-8eb5-244fff724af2",
+        "associatedPlace": "Larvik",
+        "email": "kjetil.torvund.minde@ngn.no",
+        "emailRegionalManager": null,
+        "emailSalesManager": null,
+        "fullName": "Kjetil Torvund Minde",
+        "id": null,
+        "name": "Kjetil",
+        "orgName": null,
+        "orgNr": null,
+        "overallPowerOfAtterney": null,
+        "phone": "",
+        "powerOfAtterneyFA": 1,
+        "powerOfAtterneyOA": 1,
+        "resourceNr": "63940",
+        "regionalManagersPowerOfAtterney": null,
+        "regionName": null,
+        "salesRole": {
+            "id": null,
+            "roleName": "KV",
+            "description": "Kundeveileder",
+            "defaultPowerOfAttorneyOa": 1,
+            "defaultPowerOfAttorneyFa": 1,
+            "userList": null
+        },
+        "sureName": null
+    },
+    {
+        "adId":"7c6c0b5c-53de-4224-ac98-aa92c1aaa2ef",
+        "orgNr":null,
+        "orgName":null,
+        "regionName":null,
+        "sureName":"Nerum",
+        "name":"Kristin Jørgensen",
+        "username":null,
+        "usernameAlias":null,
+        "jobTitle":null,
+        "fullName":"Kristin Jørgensen Nærum",
+        "resourceNr":null,
+        "phoneNumber":"+4798232574",
+        "email":"kristin.nerum@ngn.no",
+        "salesRole":{
+            "id": null,
+            "roleName": "SA",
+            "description": "Salgskonsulent (rolle a)",
+            "defaultPowerOfAttorneyOa": 2,
+            "defaultPowerOfAttorneyFa": 2,
+            "userList": null
+        },
+        "associatedPlace":"Larvik",
+        "powerOfAtterneyOA":2,
+        "powerOfAtterneyFA":3,
+        "overallPowerOfAtterney":null,
+        "emailSalesManager":null,
+        "regionalManagersPowerOfAtterney":null,
+        "emailRegionalManager":null,
+        "department":null
+    }
+]

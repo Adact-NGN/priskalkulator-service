@@ -239,6 +239,4 @@ public class CustomerDTO {
     public void setAbcClassification(String abcClassification) {
         this.abcClassification = abcClassification;
     }
-    
-    
 }

@@ -2,8 +2,6 @@ package no.ding.pk.service;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
 
 import no.ding.pk.domain.Discount;

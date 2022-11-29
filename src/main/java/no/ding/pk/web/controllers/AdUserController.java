@@ -31,6 +31,11 @@ public class AdUserController {
         this.mapperService = mapperService;
     }
 
+    /**
+     * Get User informatjon from AD by user e-mail.
+     * @param email The e-mail to identify the user in AD.
+     * @return UserDTO object if fount in AD, else null.
+     */
     @GetMapping(value = "/mail/{email}", produces = "application/json")
     public UserDTO getAdUserByMail(@PathVariable("email") String email) {
         log.debug("Starting request to AD for user with email: " + email);
@@ -43,6 +48,11 @@ public class AdUserController {
         return mapperService.toUserDTO(user);
     }
 
+    /**
+     * Search for user with partial or complete email address.
+     * @param email Partial or complete email address to use in the search.
+     * @return List of all possible UserDTO object, else empty list of there where no hits.
+     */
     @GetMapping(produces = "application/json")
     public List<UserDTO> searchForUserByEmail(@RequestParam("email") String email) {
         log.debug("Searching for user with email: " + email);

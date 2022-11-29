@@ -30,18 +30,12 @@ public class SalesOrgServiceImpl implements SalesOrgService {
 
     private ObjectMapper objectMapper;
 
-    private String username;
-    private String password;
     private String salesOrgServiceUrl;
 
     SalesOrgServiceImpl(
-    @Value(value = "${sap.username}") String username,
-    @Value(value = "${sap.password}") String password,
     @Value(value = "${sap.api.salesorg.url}") String salesOrgServiceUrl,
     ObjectMapper objectMapper
     ) {
-        this.username = username;
-        this.password = password;
         this.salesOrgServiceUrl = salesOrgServiceUrl;
 
         this.objectMapper = objectMapper;
@@ -50,7 +44,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     @Override
     public List<SalesOrgDTO> getAll() {
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, new LinkedMultiValueMap<>());
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -71,7 +65,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
         log.debug("Request uri: " + request.uri().toString());
         log.debug("Request query: " + request.uri().getQuery().toString());
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -86,7 +80,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         params.add("$filter", String.format("%s eq '%s'", SalesOrgField.SalesOrganization.getValue(), salesOrg));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -101,7 +95,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         params.add("$filter", String.format("%s eq '%s'", SalesOrgField.SalesOffice.getValue(), salesOffice));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -116,7 +110,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         params.add("$filter", String.format("%s eq '%s'", SalesOrgField.PostalNumber.getValue(), postalNumber));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -131,7 +125,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         params.add("$filter", String.format("%s eq '%s'", SalesOrgField.SalesZone.getValue(), salesZone));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
@@ -146,7 +140,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         params.add("$filter", String.format("%s eq '%s'", SalesOrgField.City.getValue(), city));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
-        HttpResponse response = HttpRequestResponseUtil.getResponse(request);
+        HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);

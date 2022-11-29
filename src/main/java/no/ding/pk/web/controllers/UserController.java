@@ -42,47 +42,78 @@ public class UserController {
         this.mapperService = mapperService;
     }
     
+    /**
+     * List all users
+     * @return A list of all users, else empty.
+     */
     @GetMapping(path = "/list", produces = "application/json")
-    public List<UserDTO> list() {
+    public List<User> list() {
         List<User> userList = userService.findAll();
         
         if(!userList.isEmpty()) {
-            return mapperService.toUserDTOList(userList);
+            return userList;
         } else {
             return new ArrayList<>();
         }
     }
     
+    /**
+     * Get user by id.
+     * @param id the user id
+     * @return User object if found, else null.
+     */
     @GetMapping(path = "/id/{id}", produces = "application/json")
-    public UserDTO getById(@PathVariable("id") Long id) {
+    public User getById(@PathVariable("id") Long id) {
         log.debug("Got id: " + id);
         if(id != null) {
-            User user = userService.findUserByIdWithSalesRole(id);
-            if(user == null) {
+            Optional<User> optUser = userService.findById(id);
+            if(!optUser.isPresent()) {
                 log.info("Could not find a user with id: " + id);
                 return null;
             }
-            return mapperService.toUserDTO(user);
+            User user = optUser.get();
+            log.debug("Got user: " + user);
+
+            return user;
         }
         return null;
     }
     
+    /**
+     * Create new User object.
+     * @param userDTO User DTO object with values
+     * @return Newly created User object.
+     */
     @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
-    public UserDTO create(@RequestBody UserDTO userDTO) {
+    public User create(@RequestBody UserDTO userDTO) {
         User tempUser = mapperService.toUser(userDTO);
-        User createdUser = userService.save(tempUser);
+        User createdUser = userService.save(tempUser, null);
         
-        log.debug("Creating new user with id: " + createdUser.getId());
+        log.debug("Created new user with id: " + createdUser.getId());
+        if(createdUser.getSalesRole() != null) {
+            log.debug("User has sales role with id: " + Long.toString(createdUser.getSalesRole().getId()));
+        } else {
+            log.debug("User has not been assigned a Sales Role");
+        }
         
-        return mapperService.toUserDTO(createdUser);
+        return createdUser;
     }
     
+    /**
+     * Update existing user with new values.
+     * @param id User ID.
+     * @param userDTO New values to be set on the existing User object.
+     * @return Updated User object.
+     * @throws JsonMappingException
+     * @throws JsonProcessingException
+     */
     @PutMapping(path = "/save/{id}", consumes = "application/json", produces = "application/json")
-    public UserDTO save(@PathVariable("id") Long id, @RequestBody String userDTO) throws JsonMappingException, JsonProcessingException {
+    public User save(@PathVariable("id") Long id, @RequestBody String userDTO) throws JsonMappingException, JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
         log.debug("Object data: " + userDTO);
         
         if(id == null) {
+            log.error("Put request was given non existing user to update.");
             return null;
         }
         
@@ -93,32 +124,32 @@ public class UserController {
         log.debug("Found user: " + result.isPresent());
         
         if(!result.isPresent()) {
+            log.error("{} {}", "User with ID", id, "was not found");
             return null;
         }
         
-        User currentUser = null;
-        
-        if(result.isPresent()) {
-            currentUser = result.get();
-        }
+        User currentUser = result.get();
         
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectReader objectReader = objectMapper.readerForUpdating(currentUser);
         User updatedUser = objectReader.readValue(userDTO);
-        log.debug("Updated object: " + updatedUser.toString());
-        log.debug("Existing object: " + currentUser.toString());
+        log.debug("UserDTO: " + userDTO);
+        log.debug("updatedUser" + updatedUser);
         
-        log.debug(String.format("Old hash: %s - %s :New hash", System.identityHashCode(currentUser), System.identityHashCode(updatedUser)));
+        updatedUser = userService.save(updatedUser, id);
         
-        updatedUser = userService.save(updatedUser);
-        
-        return mapperService.toUserDTO(updatedUser);
+        return updatedUser;
     }
     
+    /**
+     * Delete User object by ID
+     * @param id The User ID for the user to be removed.
+     * @return True if User object was found and deleted, else false.
+     */
     @DeleteMapping(value = "/delete/{id}")
     public String delete(@PathVariable("id") Long id) {
         log.debug("Trying to delete user with id: " + id);
-
+        
         JSONObject returnJson = new JSONObject();
         if(userService.delete(id)) {
             returnJson.put("status", "200");

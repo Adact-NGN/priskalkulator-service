@@ -1,7 +1,6 @@
 package no.ding.pk.web.dto;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -21,7 +20,6 @@ public class LongToDateConverter extends StdConverter<String, Date> {
             millisSrc = matcher.group(1);
         }
         Long millis = Long.parseLong(millisSrc);
-        LocalDateTime localDateTime = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDateTime();
         return Date.from(Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toInstant());
     }
     

@@ -7,15 +7,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.web.dto.AdUserDTO;
+import no.ding.pk.web.dto.SalesRoleDTO;
 import no.ding.pk.web.dto.UserDTO;
 
 @Component
 public class MapperService {
 
     private ModelMapper modelMapper;
-    
+
     @Autowired
     public MapperService(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
@@ -30,7 +32,19 @@ public class MapperService {
     }
 
     public UserDTO toUserDTO(User user) {
+        if(user.getSalesRole() != null) {
+            return toUserDTO(user, user.getSalesRole());
+        }
         return modelMapper.map(user, UserDTO.class);
+    }
+
+    public UserDTO toUserDTO(User user, SalesRole salesRole) {
+        user.setSalesRole(null);
+        UserDTO result = modelMapper.map(user, UserDTO.class);
+        SalesRoleDTO salesRoleDTO =  modelMapper.map(salesRole, SalesRoleDTO.class);
+        result.setSalesRole(salesRoleDTO);
+        
+        return result;
     }
 
     public List<UserDTO> toUserDTOList(List<User> userList) {
@@ -46,6 +60,12 @@ public class MapperService {
     }
 
     public User toUser(UserDTO user) {
-        return modelMapper.map(user, User.class);
+        User mappedUser = modelMapper.map(user, User.class);
+
+        return mappedUser;
+    }
+
+    public SalesRoleDTO toSalesRoleDTO(SalesRole salesRole) {
+        return modelMapper.map(salesRole, SalesRoleDTO.class);
     }
 }

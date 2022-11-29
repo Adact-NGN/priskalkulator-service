@@ -31,8 +31,8 @@ public class DiscountController {
     }
     
     /**
-     * Gets a list of all Discount objects.
-     * @return A list ov Discount objects.
+     * A list of all the Discount objects.
+     * @return List of all Discount objects.
      */
     @GetMapping("/list")
     public List<Discount> getAllDiscounts() {

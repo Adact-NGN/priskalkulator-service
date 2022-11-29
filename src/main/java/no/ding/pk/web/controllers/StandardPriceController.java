@@ -26,6 +26,12 @@ public class StandardPriceController {
         this.service = priceService;
     }
     
+    /**
+     * Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office and Sales Organization.
+     * @param salesOffice The sales office to get the prices for.
+     * @param salesOrg The sales organization to get the prices for.
+     * @return
+     */
     @GetMapping(value = "/{salesoffice}/{salesorg}", produces = "application/json")
     public List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(@PathVariable("salesoffice") String salesOffice, @PathVariable("salesorg") String salesOrg) {
         List<MaterialDTO> materialList = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg);

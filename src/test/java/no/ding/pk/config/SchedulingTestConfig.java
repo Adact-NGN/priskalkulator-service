@@ -14,6 +14,7 @@ import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 
 import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
+import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.service.InMemoryCache;
 import no.ding.pk.service.MaterialInMemoryCache;
@@ -63,5 +64,10 @@ public class SchedulingTestConfig {
     @Bean
     public DiscountLevelRepository discountLevelRepository() {
         return mock(DiscountLevelRepository.class);
+    }
+
+    @Bean
+    public SalesRoleRepository salesRoleRepository() {
+        return mock(SalesRoleRepository.class);
     }
 }
