@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
 import no.ding.pk.repository.SalesRoleRepository;
 
 @Transactional

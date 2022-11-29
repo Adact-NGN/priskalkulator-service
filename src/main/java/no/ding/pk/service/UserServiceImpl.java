@@ -36,7 +36,18 @@ public class UserServiceImpl implements UserService {
 		
 		if(id == null) {
 			log.debug("A new user object was given. Persisting the whole object");
-			return repository.save(newUser);
+			Long salesRoleId = newUser.getSalesRole() != null ? newUser.getSalesRole().getId() : null;
+			User user = repository.save(newUser);
+
+			if(salesRoleId != null) {
+				SalesRole salesRole = salesRoleRepository.findByIdWithUserList(salesRoleId);
+
+				salesRole.addUser(user);
+
+				salesRoleRepository.save(salesRole);
+			}
+
+			return repository.save(user);
 		} else {
 			log.debug("Persisting object with id: {}", id);
 			Optional<User> optUser = repository.findById(id);
