@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -43,7 +44,7 @@ public class SalesOrgControllerTest {
 
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).params(params))
         .andDo(print()).andExpect(status().isOk())
-        .andExpect(content().contentType("application/json")).andReturn();
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
         assertThat(mvcResult.getResponse().getStatus(), is(200));
     }

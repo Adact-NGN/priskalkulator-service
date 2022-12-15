@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,7 @@ public class UserController {
      * List all users
      * @return A list of all users, else empty.
      */
-    @GetMapping(path = "/list", produces = "application/json")
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<User> list() {
         List<User> userList = userService.findAll();
         
@@ -62,7 +63,7 @@ public class UserController {
      * @param id the user id
      * @return User object if found, else null.
      */
-    @GetMapping(path = "/id/{id}", produces = "application/json")
+    @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getById(@PathVariable("id") Long id) {
         log.debug("Got id: " + id);
         if(id != null) {
@@ -84,7 +85,7 @@ public class UserController {
      * @param userDTO User DTO object with values
      * @return Newly created User object.
      */
-    @PostMapping(path = "/create", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public User create(@RequestBody UserDTO userDTO) {
         User tempUser = mapperService.toUser(userDTO);
         User createdUser = userService.save(tempUser, null);
@@ -107,7 +108,7 @@ public class UserController {
      * @throws JsonMappingException
      * @throws JsonProcessingException
      */
-    @PutMapping(path = "/save/{id}", consumes = "application/json", produces = "application/json")
+    @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public User save(@PathVariable("id") Long id, @RequestBody String userDTO) throws JsonMappingException, JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
         log.debug("Object data: " + userDTO);

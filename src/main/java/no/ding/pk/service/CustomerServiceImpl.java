@@ -210,6 +210,7 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (JsonProcessingException | JSONException e) {
             log.debug(e.getStackTrace().toString());
             log.debug(e.getMessage());
+            log.debug(customerDTOString);
             throw new Error("Failed to process JSON", e.getCause());
         }
     }

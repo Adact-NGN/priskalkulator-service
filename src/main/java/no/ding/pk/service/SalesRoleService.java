@@ -21,5 +21,4 @@ public interface SalesRoleService {
     List<SalesRole> saveAll(List<SalesRole> salesRoles);
 
     List<SalesRole> findSalesRoleForUser(Long userId);
-    
 }

@@ -36,17 +36,11 @@ public class UserServiceImpl implements UserService {
 		
 		if(id == null) {
 			log.debug("A new user object was given. Persisting the whole object");
-			Long salesRoleId = newUser.getSalesRole() != null ? newUser.getSalesRole().getId() : null;
+			
 			User user = repository.save(newUser);
-
-			if(salesRoleId != null) {
-				SalesRole salesRole = salesRoleRepository.findByIdWithUserList(salesRoleId);
-
-				salesRole.addUser(user);
-
-				salesRoleRepository.save(salesRole);
-			}
-
+			
+			setSalesRole(newUser.getSalesRole(), user);
+			
 			return repository.save(user);
 		} else {
 			log.debug("Persisting object with id: {}", id);
@@ -58,67 +52,44 @@ public class UserServiceImpl implements UserService {
 			}
 			
 			User user = optUser.get();
-			user.setAdId(newUser.getAdId());
-			user.setOrgNr(newUser.getOrgNr());
-			user.setOrgName(newUser.getOrgName());
-			user.setRegionName(newUser.getRegionName());
-			user.setSureName(newUser.getSureName());
-			user.setName(newUser.getName());
-			user.setUsername(newUser.getUsername());
-			user.setUsernameAlias(newUser.getUsernameAlias());
-			user.setJobTitle(newUser.getJobTitle());
-			user.setFullName(newUser.getFullName());
-			user.setResourceNr(newUser.getResourceNr());
-			user.setPhoneNumber(newUser.getPhoneNumber());
-			user.setEmail(newUser.getEmail());
-			user.setAssociatedPlace(newUser.getAssociatedPlace());
-			user.setPowerOfAtterneyOA(newUser.getPowerOfAtterneyOA());
-			user.setPowerOfAtterneyFA(newUser.getPowerOfAtterneyFA());
+			user.copy(newUser);
 			
-			user.setOverallPowerOfAtterney(newUser.getOverallPowerOfAtterney());
-			user.setEmailSalesManager(newUser.getEmailSalesManager());
-			
-			user.setRegionalManagersPowerOfAtterney(newUser.getRegionalManagersPowerOfAtterney());
-			
-			user.setEmailRegionalManager(newUser.getEmailRegionalManager());
-			
-			user.setDepartment(newUser.getDepartment());
-			
-			if(newUser.getSalesRole() == null && user.getSalesRole() != null) {
-				SalesRole salesRole = user.getSalesRole();
-				salesRole.removeUser(user);
-				
-				salesRoleRepository.save(salesRole);
-			} else if(!newUser.getSalesRole().equals(user.getSalesRole())) {
-				SalesRole currentSalesRole = user.getSalesRole();
-				SalesRole salesRoleFromRequest = getSalesRole(newUser);
-				
-				if(currentSalesRole != null) {
-					currentSalesRole.removeUser(user);
-					
-					salesRoleRepository.save(currentSalesRole);
-				}
-				
-				salesRoleFromRequest.addUser(user);
-				
-				salesRoleRepository.save(salesRoleFromRequest);
-			}
+			setSalesRole(newUser.getSalesRole(), user);
 			
 			return repository.save(user);
 		}
 		
 	}
 	
-	private SalesRole getSalesRole(User user) {
-		Optional<SalesRole> optSalesRole = null;
-		if(user.getSalesRole() != null) {
-			optSalesRole = salesRoleRepository.findById(user.getSalesRole().getId());
-			
-			if(optSalesRole.isPresent()) {
-				return optSalesRole.get();
-			}
+	private void setSalesRole(SalesRole salesRole, User user) {
+		SalesRole currentSalesRole = user != null && user.getSalesRole() != null ? user.getSalesRole() : null;
+		if(currentSalesRole != null) {
+			currentSalesRole = salesRoleRepository.findByRoleName(currentSalesRole.getRoleName());
 		}
-		return null;
+		SalesRole newSalesRole = salesRole != null ? salesRole : null;
+		if(newSalesRole != null) {
+			newSalesRole = salesRoleRepository.findByRoleName(newSalesRole.getRoleName());
+		}
+
+		if(currentSalesRole != null) {
+			currentSalesRole.removeUser(user);
+
+			salesRoleRepository.save(currentSalesRole);
+		}
+
+		if(newSalesRole != null) {
+			newSalesRole.addUser(user);
+
+			salesRoleRepository.save(newSalesRole);
+		}
+	}
+	
+	private SalesRole getSalesRole(User user) {
+		SalesRole salesRole = null;
+		if(user.getSalesRole() != null) {
+			salesRole = salesRoleRepository.findByRoleName(user.getSalesRole().getRoleName());
+		}
+		return salesRole;
 	}
 	
 	@Override
@@ -141,7 +112,7 @@ public class UserServiceImpl implements UserService {
 			log.debug("Could not delete User object");
 			return false;
 		}
-
+		
 		log.debug("User object with ID: {} was deleted.");
 		return true;
 	}

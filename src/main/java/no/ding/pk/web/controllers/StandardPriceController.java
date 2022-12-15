@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +33,7 @@ public class StandardPriceController {
      * @param salesOrg The sales organization to get the prices for.
      * @return
      */
-    @GetMapping(value = "/{salesoffice}/{salesorg}", produces = "application/json")
+    @GetMapping(value = "/{salesoffice}/{salesorg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(@PathVariable("salesoffice") String salesOffice, @PathVariable("salesorg") String salesOrg) {
         List<MaterialDTO> materialList = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg);
         log.debug(String.format("Amount returning: %d", materialList.size()));

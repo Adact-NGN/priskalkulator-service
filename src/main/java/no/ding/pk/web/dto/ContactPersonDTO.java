@@ -6,6 +6,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 public class ContactPersonDTO {
+    @JsonAlias("Customer")
+    private String customer;
     @JsonAlias("ContactPerson") //: "200039946",
     private String contactPerson;
     @JsonAlias("FirstName") //: "",
@@ -32,6 +34,20 @@ public class ContactPersonDTO {
     private String chagedTime;
     @JsonAlias("_Customers")
     private List<ContactPersonCustomerDTO> customers;
+
+    @JsonAlias("RelationshipNumber")
+    private String relationshipNumber;
+
+    @JsonAlias("ValidityEndDate")
+    private Date validityEndDate;
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
+    }
 
     public String getContactPerson() {
         return contactPerson;
@@ -111,7 +127,23 @@ public class ContactPersonDTO {
     public void setCustomers(List<ContactPersonCustomerDTO> customers) {
         this.customers = customers;
     }
-        
-           
+
+    public String getRelationshipNumber() {
+        return relationshipNumber;
+    }
+
+    public void setRelationshipNumber(String relationshipNumber) {
+        this.relationshipNumber = relationshipNumber;
+    }
+
+    public Date getValidityEndDate() {
+        return validityEndDate;
+    }
+
+    public void setValidityEndDate(Date validityEndDate) {
+        this.validityEndDate = validityEndDate;
+    }
+
+    
 }
     

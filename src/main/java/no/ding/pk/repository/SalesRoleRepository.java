@@ -1,6 +1,7 @@
 package no.ding.pk.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +15,9 @@ import no.ding.pk.domain.User;
 
 @Repository
 public interface SalesRoleRepository extends JpaRepository<SalesRole, Long>, JpaSpecificationExecutor<SalesRole> {
-    SalesRole findByRoleName(String roleName);
+
+    @Query("select sr from SalesRole sr LEFT JOIN FETCH sr.userList ul where sr.roleName = :roleName")
+    SalesRole findByRoleName(@Param("roleName") String roleName);
 
     @EntityGraph(value = "SalesRole.userList")
     @Query("select sr from SalesRole sr LEFT JOIN FETCH sr.userList ul where sr.id = :id")
@@ -24,7 +27,10 @@ public interface SalesRoleRepository extends JpaRepository<SalesRole, Long>, Jpa
     @Query("select sr.userList from SalesRole sr where sr.roleName = :roleName")
     List<User> findAllUsersByRoleName(@Param("roleName") String roleName);
 
-    @EntityGraph(value = "SalesRole.userList")
+    // @EntityGraph(value = "SalesRole.userList")
     @Query("SELECT sr FROM SalesRole sr LEFT JOIN FETCH sr.userList ul")
     List<SalesRole> findAllWithUserList();
+
+    @Query("SELECT sr FROM SalesRole sr LEFT JOIN FETCH sr.userList ul")
+    Optional<SalesRole> findById(@Param("id") Long id);
 }

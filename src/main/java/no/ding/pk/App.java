@@ -38,6 +38,7 @@ import no.ding.pk.web.dto.AdUserDTO;
 @EnableScheduling
 @EnableSwagger2
 @SpringBootApplication
+
 @PropertySource({
     "classpath:application.properties", 
     "classpath:sap.properties", 

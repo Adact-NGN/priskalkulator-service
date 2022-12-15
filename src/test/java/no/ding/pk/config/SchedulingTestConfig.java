@@ -16,6 +16,14 @@ import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.offer.CustomerTermsRepository;
+import no.ding.pk.repository.offer.MaterialPriceRepository;
+import no.ding.pk.repository.offer.MaterialRepository;
+import no.ding.pk.repository.offer.PriceOfferRepository;
+import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
+import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.repository.offer.SalesOfficeRepository;
+import no.ding.pk.repository.offer.ZoneRepository;
 import no.ding.pk.service.InMemoryCache;
 import no.ding.pk.service.MaterialInMemoryCache;
 import no.ding.pk.web.mappers.MapperService;
@@ -69,5 +77,45 @@ public class SchedulingTestConfig {
     @Bean
     public SalesRoleRepository salesRoleRepository() {
         return mock(SalesRoleRepository.class);
+    }
+
+    @Bean
+    public PriceOfferRepository priceOfferRepository() {
+        return mock(PriceOfferRepository.class);
+    }
+
+    @Bean
+    public PriceOfferTemplateRepository priceOfferTemplateRepository() {
+        return mock(PriceOfferTemplateRepository.class);
+    }
+
+    @Bean
+    public SalesOfficeRepository salesOfficeRepository() {
+        return mock(SalesOfficeRepository.class);
+    }
+
+    @Bean
+    public CustomerTermsRepository customerTermsRepository() {
+        return mock(CustomerTermsRepository.class);
+    }
+
+    @Bean
+    public MaterialPriceRepository materialPriceRepository() {
+        return mock(MaterialPriceRepository.class);
+    }
+
+    @Bean
+    public MaterialRepository materialRepository() {
+        return mock(MaterialRepository.class);
+    }
+
+    @Bean
+    public PriceRowRepository priceRowRepository() {
+        return mock(PriceRowRepository.class);
+    }
+
+    @Bean
+    public ZoneRepository zoneRepository() {
+        return mock(ZoneRepository.class);
     }
 }

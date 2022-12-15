@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -158,7 +159,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Bearer " + result.accessToken());
-        conn.setRequestProperty("Accept","application/json");
+        conn.setRequestProperty("Accept",MediaType.APPLICATION_JSON_VALUE);
 
         int httpResponseCode = conn.getResponseCode();
         if(httpResponseCode == HTTPResponse.SC_OK) {
@@ -206,7 +207,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Bearer " + result.accessToken());
-        conn.setRequestProperty("Accept","application/json");
+        conn.setRequestProperty("Accept", MediaType.APPLICATION_JSON_VALUE);
 
         int httpResponseCode = conn.getResponseCode();
         if(httpResponseCode == HTTPResponse.SC_OK) {

@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +37,7 @@ public class AdUserController {
      * @param email The e-mail to identify the user in AD.
      * @return UserDTO object if fount in AD, else null.
      */
-    @GetMapping(value = "/mail/{email}", produces = "application/json")
+    @GetMapping(value = "/mail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getAdUserByMail(@PathVariable("email") String email) {
         log.debug("Starting request to AD for user with email: " + email);
         User user = adService.getUserByEmail(email);
@@ -53,7 +54,7 @@ public class AdUserController {
      * @param email Partial or complete email address to use in the search.
      * @return List of all possible UserDTO object, else empty list of there where no hits.
      */
-    @GetMapping(produces = "application/json")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserDTO> searchForUserByEmail(@RequestParam("email") String email) {
         log.debug("Searching for user with email: " + email);
 
