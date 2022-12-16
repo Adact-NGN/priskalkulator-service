@@ -1,5 +1,7 @@
 package no.ding.pk.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,7 +68,7 @@ public class User {
     @Column
     private String phoneNumber;
     
-    @Column
+    @Column(unique = true)
     private String email;
     
     @JsonBackReference

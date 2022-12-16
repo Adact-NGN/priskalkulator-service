@@ -22,8 +22,10 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
+import no.ding.pk.repository.SalesRoleRepository;
 
+@Transactional
 @SpringBootTest
 @TestPropertySource("/h2-db.properties")
 public class UserServiceTest {
@@ -44,7 +48,7 @@ public class UserServiceTest {
     private UserService service;
     
     @Autowired
-    private SalesRoleService salesRoleService;
+    private SalesRoleRepository salesRoleRepository;
     
     private List<User> testData;
     
@@ -82,18 +86,21 @@ public class UserServiceTest {
         
     }
     
-    // @Transactional
     @Test
     public void shouldPersistUserWithSalesRole() {
-        SalesRole salesRole = salesRoleService.findSalesRoleByRoleName(testData.get(0).getSalesRole().getRoleName());
+        SalesRole salesRole = salesRoleRepository.findByRoleName(testData.get(0).getSalesRole().getRoleName());
         
         if(salesRole == null) {
             salesRole = testData.get(0).getSalesRole();
             
-            salesRole = salesRoleService.save(salesRole);
+            salesRole = salesRoleRepository.save(salesRole);
         }
         
-        User userObject = testData.get(0);
+        User userObject = service.findByEmail(testData.get(0).getEmail());
+
+        if(userObject == null) {
+            userObject = testData.get(0);
+        }
         userObject.setSalesRole(salesRole);
         
         userObject = service.save(userObject, userObject.getId());
@@ -104,7 +111,7 @@ public class UserServiceTest {
         
         User actualUser = actual.get();
         
-        SalesRole salesRoleEntity = salesRoleService.findSalesRoleByRoleName(actualUser.getSalesRole().getRoleName());
+        SalesRole salesRoleEntity = salesRoleRepository.findByRoleName(actualUser.getSalesRole().getRoleName());
         
         assertThat(salesRoleEntity, is(notNullValue()));
         
@@ -113,35 +120,40 @@ public class UserServiceTest {
     
     @Test
     public void shouldRemoveSalesRoleFromUser() {
-        SalesRole salesRole = SalesRole.builder()
-        .roleName("KV")
-        .description("Kundeveileder")
-        .defaultPowerOfAttorneyFa(1)
-        .defaultPowerOfAttorneyOa(1)
-        .build();
+        SalesRole salesRole = salesRoleRepository.findByRoleName("KV");
         
-        salesRole = salesRoleService.save(salesRole);
+        if(salesRole == null) {
+            salesRole = SalesRole.builder()
+            .roleName("KV")
+            .description("Kundeveileder")
+            .defaultPowerOfAttorneyFa(1)
+            .defaultPowerOfAttorneyOa(1)
+            .build();
+            
+            salesRole = salesRoleRepository.save(salesRole);
+        }
         
-        User userObject = testData.get(0);
+        User userObject = service.findByEmail(testData.get(0).getEmail());
+
+        if(userObject == null) {
+            userObject = testData.get(0);
+        }
+
         userObject.setSalesRole(salesRole);
-        
+
         userObject = service.save(userObject, userObject.getId());
         
-        Optional<User> optUser = service.findById(userObject.getId());
+        assertThat(userObject.getSalesRole(), notNullValue());
+
+        User deepCopy = SerializationUtils.clone(userObject);
         
-        assertThat(optUser.isPresent(), is(true));
+        deepCopy.setSalesRole(null);
         
-        User actualUser = optUser.get();
+        userObject = service.save(deepCopy, deepCopy.getId());
         
-        assertThat(actualUser.getSalesRole(), notNullValue());
+        assertThat(userObject.getSalesRole(), nullValue());
         
-        actualUser.setSalesRole(null);
-        
-        actualUser = service.save(actualUser, userObject.getId());
-        
-        assertThat(actualUser.getSalesRole(), nullValue());
-        
-        List<SalesRole> salesRoleList = salesRoleService.getAllSalesRoles();
+        List<SalesRole> salesRoleList = salesRoleRepository.findAll();
         
         assertThat(salesRoleList, hasSize(greaterThan(0)));
         
@@ -152,25 +164,37 @@ public class UserServiceTest {
     
     @Test
     public void shouldChangeSalesRoleForUser() {
-        SalesRole firstSalesRole = SalesRole.builder()
-        .roleName("KV")
-        .description("Kundeveileder")
-        .defaultPowerOfAttorneyFa(1)
-        .defaultPowerOfAttorneyOa(1)
-        .build();
+        SalesRole firstSalesRole = salesRoleRepository.findByRoleName("KV");
         
-        firstSalesRole = salesRoleService.save(firstSalesRole);
+        if(firstSalesRole == null) {
+            firstSalesRole = SalesRole.builder()
+            .roleName("KV")
+            .description("Kundeveileder")
+            .defaultPowerOfAttorneyFa(1)
+            .defaultPowerOfAttorneyOa(1)
+            .build();
+            
+            firstSalesRole = salesRoleRepository.save(firstSalesRole);
+        }
         
-        SalesRole otherSalesRole = SalesRole.builder()
-        .roleName("SA")
-        .description("Salgskonsulent (rolle a)")
-        .defaultPowerOfAttorneyFa(2)
-        .defaultPowerOfAttorneyOa(2)
-        .build();
+        SalesRole otherSalesRole = salesRoleRepository.findByRoleName("SA");
         
-        otherSalesRole = salesRoleService.save(otherSalesRole);
+        if(otherSalesRole == null) {
+            otherSalesRole = SalesRole.builder()
+            .roleName("SA")
+            .description("Salgskonsulent (rolle a)")
+            .defaultPowerOfAttorneyFa(2)
+            .defaultPowerOfAttorneyOa(2)
+            .build();
+            
+            otherSalesRole = salesRoleRepository.save(otherSalesRole);
+        }
         
-        User userObject = testData.get(0);
+        User userObject = service.findByEmail(testData.get(0).getEmail());
+
+        if(userObject == null) {
+            userObject = testData.get(0);
+        }
         userObject.setSalesRole(firstSalesRole);
         
         userObject.setPowerOfAtterneyFA(1);
@@ -188,13 +212,16 @@ public class UserServiceTest {
         assertThat(actualUser.getPowerOfAtterneyFA(), equalTo(1));
         assertThat(actualUser.getPowerOfAtterneyFA(), equalTo(1));
         
-        actualUser.setSalesRole(otherSalesRole);
-        actualUser.setPowerOfAtterneyFA(2);
-        actualUser.setPowerOfAtterneyOA(2);
+        User newUserObject = SerializationUtils.clone(actualUser);
+        newUserObject.setId(userObject.getId());
         
-        actualUser.setSureName("Minde");
+        newUserObject.setSalesRole(otherSalesRole);
+        newUserObject.setPowerOfAtterneyFA(2);
+        newUserObject.setPowerOfAtterneyOA(2);
         
-        actualUser = service.save(actualUser, actualUser.getId());
+        newUserObject.setSureName("Minde");
+        
+        actualUser = service.save(newUserObject, newUserObject.getId());
         
         optUser = service.findById(userObject.getId());
         
@@ -206,15 +233,15 @@ public class UserServiceTest {
         assertThat(actualUser.getPowerOfAtterneyOA(), equalTo(2));
         assertThat(actualUser.getSureName(), equalTo("Minde"));
         
-        List<SalesRole> salesRoleList = salesRoleService.getAllSalesRoles();
+        List<SalesRole> salesRoleList = salesRoleRepository.findAll();
         
         assertThat(salesRoleList, hasSize(greaterThan(0)));
         
-        firstSalesRole = salesRoleService.findSalesRoleByRoleName(firstSalesRole.getRoleName());
+        firstSalesRole = salesRoleRepository.findByRoleName(firstSalesRole.getRoleName());
         
         assertThat(firstSalesRole.getUserList(), hasSize(0));
         
-        otherSalesRole = salesRoleService.findSalesRoleByRoleName(otherSalesRole.getRoleName());
+        otherSalesRole = salesRoleRepository.findByRoleName(otherSalesRole.getRoleName());
         
         assertThat(otherSalesRole.getUserList(), hasSize(1));
     }

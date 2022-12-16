@@ -12,4 +12,5 @@ public interface UserService {
     User save(User user, Long id);
     boolean delete(Long id);
     User removeSalesRoleFromUser(User user);
+    User findByEmail(String salesEmployeeEmail);
 }

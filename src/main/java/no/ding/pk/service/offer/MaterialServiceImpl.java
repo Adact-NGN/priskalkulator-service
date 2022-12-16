@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ import no.ding.pk.repository.offer.MaterialRepository;
 @Transactional
 @Service
 public class MaterialServiceImpl implements MaterialService {
+
+    private static final Logger log = LoggerFactory.getLogger(MaterialServiceImpl.class);
     
     private MaterialRepository repository;
     private MaterialPriceService materialPriceService;
@@ -28,46 +33,37 @@ public class MaterialServiceImpl implements MaterialService {
     
     @Override
     public Material save(Material material) {
+
+        log.debug("Searching for material with number: {}", material.getMaterialNumber());
+        List<Material> materialList = repository.findAll();
+        Material entity = repository.findByMaterialNumber(material.getMaterialNumber());
         
-        MaterialPrice materialPrice = null;
-        if(material.getMaterialStandardPrice() != null) {
-            materialPrice = materialPriceService.save(material.getMaterialStandardPrice());
+        if(entity == null) {
+            entity = new Material();
+        }
+        
+        MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
+
+        if(materialPriceEntity == null) {
+            materialPriceEntity = material.getMaterialStandardPrice();
+        } else {
+            materialPriceEntity.copy(material.getMaterialStandardPrice());
         }
         
         if(material.getMaterialNumber() == null) {
             throw new RuntimeException("Received material without a material number.");
         }
         
-        Material entity = getMaterialByMaterialNumber(material.getMaterialNumber());
-        
-        if(entity == null && material.getId() != null) {
-            Optional<Material> optMaterial = repository.findById(material.getId());
-            
-            if(optMaterial.isPresent()) {
-                entity = optMaterial.get();
-            }
-        }
-        
         entity.setMaterialNumber(material.getMaterialNumber());
         entity.setDesignation(material.getDesignation());
         entity.setDeviceType(material.getDeviceType());
-        if(materialPrice != null && materialPrice.getId() != null) {
-            entity.setMaterialStandardPrice(materialPrice);
+        if(materialPriceEntity != null) {
+            entity.setMaterialStandardPrice(materialPriceEntity);
         }
         entity.setPricingUnit(material.getPricingUnit());
         entity.setQuantumUnit(material.getQuantumUnit());
         
         return repository.save(material);
-    }
-
-    private Material getMaterialByMaterialNumber(String materialNumber) {
-        Material material = repository.findByMaterialNumber(materialNumber);
-
-        if(material == null) {
-            return new Material();
-        }
-
-        return material;
     }
     
     @Override

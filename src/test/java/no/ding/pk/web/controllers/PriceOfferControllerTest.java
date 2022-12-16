@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,68 +36,83 @@ import no.ding.pk.service.UserService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/h2-db.properties")
 public class PriceOfferControllerTest {
-
+    
     @LocalServerPort
     private int serverPort;
     
     @Autowired
     private TestRestTemplate restTemplate;
-
+    
     @Autowired
     private UserService userService;
-
+    
     private User salesEmployee;
     private User approver;
-
-    @BeforeEach
+    
     public void setup() {
-        User salesEmployee = User.builder()
-        .adId("ad-id-wegarijo-arha-rh-arha")
-        .jobTitle("Salgskonsulent")
-        .fullName("Wolfgang Amadeus Mozart")
-        .email("Wolfgang@farris-bad.no")
-        .associatedPlace("Larvik")
-        .department("Hvitsnippene")
-        .build();
+        
+        String salesEmployeeEmail = "Wolfgang@farris-bad.no";
+        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+        
+        if(salesEmployee == null) {
+            salesEmployee = User.builder()
+            .adId("ad-id-wegarijo-arha-rh-arha")
+            .jobTitle("Salgskonsulent")
+            .fullName("Wolfgang Amadeus Mozart")
+            .email(salesEmployeeEmail)
+            .associatedPlace("Larvik")
+            .department("Hvitsnippene")
+            .build();
+            
+            salesEmployee = userService.save(salesEmployee, null);
+        }
+        this.salesEmployee = userService.findByEmail(salesEmployeeEmail);
+        
+        String approverEmail = "alexander.brox@ngn.no";
+        User approver = userService.findByEmail(approverEmail);
 
-        this.salesEmployee = userService.save(salesEmployee, null);
+        if(approver == null) {
+            approver = User.builder()
+            .adId("ad-ww-wegarijo-arha-rh-arha")
+            .associatedPlace("Oslo")
+            .email(approverEmail)
+            .department("Salg")
+            .fullName("Alexander Brox")
+            .name("Alexander")
+            .sureName("Brox")
+            .jobTitle("Markedskonsulent")
+            .build();
 
-        User approver = User.builder()
-        .adId("ad-ww-wegarijo-arha-rh-arha")
-        .associatedPlace("Oslo")
-        .email("alexander.brox@ngn.no")
-        .department("Salg")
-        .fullName("Alexander Brox")
-        .name("Alexander")
-        .sureName("Brox")
-        .jobTitle("Markedskonsulent")
-        .build();
-
-        this.approver = userService.save(approver, null);
+            approver = userService.save(approver, null);
+        }
+        
+        
+        this.approver = approver;
     }
-
+    
     @Test
     public void shouldPersistPriceOffer() throws Exception {
+        setup();
         PriceOffer priceOffer = (PriceOffer) createCompleteOffer();
-
+        
         ResponseEntity<String> responseEntity = this.restTemplate
         .postForEntity("http://localhost:" + serverPort + "/api/v1/price-offer/create", priceOffer, String.class);
-
+        
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
     }
-
+    
     private Offer createCompleteOffer() {
         Terms customerTerms = Terms.builder()
         .agreementStartDate(new Date())
         .contractTerm("Generelle vilkår")
         .additionForAdminFee(false)
         .build();
-
+        
         MaterialPrice materialPrice = MaterialPrice.builder()
         .materialNumber("50101")
         .standardPrice(1131.0)
         .build();
-
+        
         Material material = Material.builder()
         .materialNumber("50101")
         .designation("Lift - Utsett")
@@ -103,11 +120,11 @@ public class PriceOfferControllerTest {
         .quantumUnit("ST")
         .materialStandardPrice(materialPrice)
         .build();
-
+        
         PriceRow priceRow = PriceRow.builder()
         .customerPrice(1000.0)
         .discountPct(0.02)
-        // .material(material)
+        .material(material)
         .showPriceInOffer(true)
         .manualPrice(900.0)
         .priceLevel(1)
@@ -115,10 +132,10 @@ public class PriceOfferControllerTest {
         .amount(1)
         .priceIncMva(1125.0)
         .build();
-
+        
         List<PriceRow> priceRowList = new ArrayList<>();
         priceRowList.add(priceRow);
-
+        
         Zone zone = Zone.builder()
         .postalCode("1601")
         .postalName(null)
@@ -126,15 +143,15 @@ public class PriceOfferControllerTest {
         .isStandardZone(true)
         .materialList(priceRowList)
         .build();
-
+        
         List<Zone> zoneList = new ArrayList<>();
         zoneList.add(zone);
-
+        
         MaterialPrice wastePrice = MaterialPrice.builder()
         .materialNumber("119901")
         .standardPrice(2456.00)
         .build();
-
+        
         Material waste = Material.builder()
         .materialNumber("119901")
         .designation("Restavfall")
@@ -142,7 +159,7 @@ public class PriceOfferControllerTest {
         .quantumUnit("KG")
         .materialStandardPrice(wastePrice)
         .build();
-
+        
         PriceRow wastePriceRow = PriceRow.builder()
         .customerPrice(2456.0)
         .discountPct(0.02)
@@ -154,10 +171,10 @@ public class PriceOfferControllerTest {
         .amount(1)
         .priceIncMva(2448.0)
         .build();
-
+        
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
-
+        
         SalesOffice salesOffice = SalesOffice.builder()
         .city("FREDRIKSTAD")
         .name("Sarpsborg/Fredrikstad")
@@ -167,10 +184,10 @@ public class PriceOfferControllerTest {
         .zoneList(zoneList)
         .materialList(wastePriceRowList)
         .build();
-
+        
         List<SalesOffice> salesOfficeList = new ArrayList<>();
         salesOfficeList.add(salesOffice);
-
+        
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
         .customerNumber("5162")
         .salesOfficeList(salesOfficeList)
@@ -180,7 +197,7 @@ public class PriceOfferControllerTest {
         .approved(false)
         .customerTerms(customerTerms)
         .build();
-
+        
         return priceOffer;
     }
 }

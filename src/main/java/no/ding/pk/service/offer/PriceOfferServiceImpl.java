@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import no.ding.pk.service.UserService;
 @Transactional
 @Service
 public class PriceOfferServiceImpl implements PriceOfferService {
+
+    Logger log = LoggerFactory.getLogger(PriceOfferServiceImpl.class);
     
     private PriceOfferRepository repository;
     
@@ -72,8 +76,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 entity.setSalesOfficeList(salesOffices);
             }
         }
-
+        
         if(newPriceOffer.getSalesEmployee() != null) {
+            log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
             User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
             
             if(salesEmployee == null) {
@@ -86,33 +91,26 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         
         if(newPriceOffer.getApprover() != null) {
             User approver = checkUserObject(newPriceOffer.getApprover());
-        
+            
             if(approver != null) {
                 newPriceOffer.setApprover(approver);
             }
         }
-                
+        
         if(newPriceOffer.getCustomerTerms() != null) {
             Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
-        
+            
             newPriceOffer.setCustomerTerms(customerTerms);
         }
-                    
+        
         return repository.save(entity);
     }
-                
+    
     private User checkUserObject(User user) {
-        if(user.getId() == null) {
-            return null;
-        }
+        User salesEmployee = userService.findByEmail(user.getEmail());
+        log.debug("Result from service: {}", salesEmployee);
         
-        Optional<User> optSalesEmployee = userService.findById(user.getId());
-        
-        if(!optSalesEmployee.isPresent()) {
-            return null;
-        }
-        
-        return optSalesEmployee.get();
+        return salesEmployee;
     }
     
     @Override
@@ -126,4 +124,3 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
     
 }
-            

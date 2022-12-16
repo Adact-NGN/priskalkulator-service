@@ -142,5 +142,11 @@ public class UserServiceImpl implements UserService {
 		salesRoleRepository.save(userSalesRole);
 		return user;
 	}
+
+	@Override
+	public User findByEmail(String employeeEail) {
+		log.debug("Search for User with email: {}", employeeEail);
+		return repository.findByEmailIgnoreCase(employeeEail);
+	}
 	
 }

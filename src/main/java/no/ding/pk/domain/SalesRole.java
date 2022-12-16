@@ -1,5 +1,6 @@
 package no.ding.pk.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
-public class SalesRole {
+public class SalesRole implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -45,7 +46,7 @@ public class SalesRole {
     @JsonManagedReference
     @Column
     @OneToMany(mappedBy = "salesRole")
-    private List<User> userList = new ArrayList<>();
+    @Builder.Default private List<User> userList = new ArrayList<>();
     
     public Long getId() {
         return id;

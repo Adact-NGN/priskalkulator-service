@@ -9,6 +9,7 @@ import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +20,7 @@ import no.ding.pk.domain.Auditable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// @EntityListeners(PingAuditListener.class)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "material_price")
 public class MaterialPrice extends Auditable {
@@ -32,4 +33,8 @@ public class MaterialPrice extends Auditable {
 
     @Column
     private Double standardPrice;
+
+    public void copy(MaterialPrice materialStandardPrice) {
+        this.standardPrice = materialStandardPrice.getStandardPrice();
+    }
 }

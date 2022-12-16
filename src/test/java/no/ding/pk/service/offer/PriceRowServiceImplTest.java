@@ -8,6 +8,8 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,27 +21,44 @@ import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 
 @SpringBootTest
+@Transactional
 @TestPropertySource("/h2-db.properties")
 public class PriceRowServiceImplTest {
 
     @Autowired
     private PriceRowService service;
 
+    @Autowired
+    private MaterialService materialService;
+
+    @Autowired
+    private MaterialPriceService mpService;
+
     @Test
     void testSaveAll() {
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-        .materialNumber("119901")
-        .standardPrice(2456.00)
-        .build();
+        String materialNumber = "119901";
 
-        Material waste = Material.builder()
-        .materialNumber("119901")
-        .designation("Restavfall")
-        .pricingUnit(1000)
-        .quantumUnit("KG")
-        .materialStandardPrice(wastePrice)
-        .build();
+        MaterialPrice wastePrice = mpService.findByMaterialNumber(materialNumber);
+        
+        if(wastePrice == null) {
+            wastePrice = MaterialPrice.builder()
+            .materialNumber(materialNumber)
+            .standardPrice(2456.00)
+            .build();
+        }
+
+        Material waste = materialService.findByMaterialNumber(materialNumber);
+
+        if(waste == null) {
+            waste = Material.builder()
+            .materialNumber(materialNumber)
+            .designation("Restavfall")
+            .pricingUnit(1000)
+            .quantumUnit("KG")
+            .materialStandardPrice(wastePrice)
+            .build();
+        }
 
         PriceRow wastePriceRow = PriceRow.builder()
         .customerPrice(2456.0)
