@@ -23,13 +23,11 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,14 +35,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.SpringFoxConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
-import springfox.documentation.spring.web.plugins.Docket;
 
 @SpringBootTest
 @Import(SpringFoxConfig.class)
 @ActiveProfiles({"test"})
 @TestPropertySource("/h2-db.properties")
 public class DiscountServiceImplTest {
-    
+
+    @Qualifier("discountServiceImpl")
     @Autowired
     private DiscountService service;
 
@@ -142,8 +140,8 @@ public class DiscountServiceImplTest {
     public void shouldFindDiscountBySalesOrgAndMaterialNumber() {
         service.saveAll(testData);
         
-        List<String> materialNumbers = Arrays.asList("113103");
-        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0));
+        List<String> materialNumbers = List.of("113103");
+        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0), null);
 
         assertThat(actual.size(), greaterThanOrEqualTo(5));
     }
