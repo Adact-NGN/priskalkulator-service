@@ -4,13 +4,10 @@ import static no.ding.pk.repository.specifications.DiscountSpecifications.withZo
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,30 +25,26 @@ public class DiscountServiceImpl implements DiscountService {
 
     private final static Logger log = LoggerFactory.getLogger(DiscountServiceImpl.class);
 
-    private DiscountRepository repository;
-    private DiscountLevelRepository discountLevelRepository;
+    private final DiscountRepository repository;
+    private final DiscountLevelRepository discountLevelRepository;
     
     @Autowired
     public DiscountServiceImpl(DiscountRepository repository, DiscountLevelRepository discountLevelRepository) {
         this.repository = repository;
         this.discountLevelRepository = discountLevelRepository;
     }
-    
-    @Override
-    public List<DiscountLevel> findDiscountBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg,
-    String materialNumber, String salesOffice, int level) {
-        return discountLevelRepository.findBySalesOrgAndMaterialNumberAndLevel(salesOrg, materialNumber, level);
-    }
 
     @Override
     public Discount save(Discount discount) {
-        addDiscountLevelsToDiscounList(Arrays.asList(discount));
+        log.debug("Saving discount object ...");
+        addDiscountLevelsToDiscountList(Collections.singletonList(discount));
 
         return repository.save(discount);
     }
     
     @Override
     public Discount update(Long id, Discount discount) {
+        log.debug("Updating discount object, id:{}", id);
         Optional<Discount> opt = repository.findById(id);
         if(opt.isPresent()) {
             updateDiscountLevels(discount);
@@ -70,22 +63,17 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> saveAll(List<Discount> discounts) {
-        addDiscountLevelsToDiscounList(discounts);
+        log.debug("Saving {} amount of Discount objects.", discounts.size());
+        addDiscountLevelsToDiscountList(discounts);
         
         return repository.saveAll(discounts);
     }
 
-    private void addDiscountLevelsToDiscounList(List<Discount> discounts) {
-        for(Iterator<Discount> iterator = discounts.iterator(); iterator.hasNext();) {
-            Discount discount = iterator.next();
-            List<DiscountLevel> dlsToAdd = new ArrayList<>();
-            for(Iterator<DiscountLevel> dlIterator = discount.getDiscountLevels().iterator(); dlIterator.hasNext();) {
-                DiscountLevel dl = dlIterator.next();
+    private void addDiscountLevelsToDiscountList(List<Discount> discounts) {
+        for (Discount discount : discounts) {
+            List<DiscountLevel> dlsToAdd = new ArrayList<>(discount.getDiscountLevels());
 
-                dlsToAdd.add(dl);
-            }
-
-            for(DiscountLevel dl: dlsToAdd) {
+            for (DiscountLevel dl : dlsToAdd) {
                 discount.addDiscountLevel(dl);
             }
         }
@@ -107,11 +95,6 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllBySalesOrg(String salesOrg) {
-        return repository.findAllBySalesOrg(salesOrg);
-    }
-
-    @Override
     public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber) {
         List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
         return repository.findAllBySalesOrgAndMaterialNumberInList(salesOrg, materialNumbers);
@@ -124,15 +107,18 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg,
-            String materialNumber, int level) {
+            String materialNumber, Integer level) {
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, level);
     }
 
     @Override
     public List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg,
-            String materialNumbers) {
-        
-        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, Arrays.asList(materialNumbers.split(",")));
+                                                                                           String materialNumbers, String zone) {
+        List<String> materialNumberList = Arrays.asList(materialNumbers.split(","));
+        if(!StringUtils.isBlank(zone) && StringUtils.isNumeric(zone)) {
+            return discountLevelRepository.findAllByParentSalesOrgAndParentZoneAndParentMaterialNumberInList(salesOrg, zone, materialNumberList);
+        }
+        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, materialNumberList);
     }
     
 }

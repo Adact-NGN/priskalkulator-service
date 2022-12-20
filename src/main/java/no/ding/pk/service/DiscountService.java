@@ -9,7 +9,6 @@ import no.ding.pk.domain.DiscountLevel;
 
 @Service
 public interface DiscountService {
-    List<DiscountLevel> findDiscountBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String materialNumber, String salesOffice, int level);
 
     Discount save(Discount discount);
 
@@ -21,14 +20,12 @@ public interface DiscountService {
 
     List<Discount> findAll();
 
-    List<Discount> findAllBySalesOrg(String salesOrg);
-
     List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber);
 
     List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber);
 
     List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String materialNumber,
-            int level);
+            Integer level);
 
-    List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg, String materialNumbers);
+    List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg, String materialNumbers, String zone);
 }
