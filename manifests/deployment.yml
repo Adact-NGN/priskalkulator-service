@@ -10,12 +10,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ding-ip-app-pk
+      app: ding-ip-app-pk-service
       tier: backend
   template: 
     metadata:
       labels:
-        app: ding-ip-app-pk
+        app: ding-ip-app-pk-service
         tier: backend
     spec:
       containers:
