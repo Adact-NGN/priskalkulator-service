@@ -2,19 +2,20 @@ apiVersion : apps/v1
 kind: Deployment
 metadata:
   name: ding-ip-app-pk-service
-  labels:
-    app: ding-ip-app-pk-service
-    tier: backend
+#  labels:
+#    app: ding-ip-app-pk-service
+#    tier: backend
 spec:
   progressDeadlineSeconds: 3600
   replicas: 1
   selector:
     matchLabels:
-      app: ding-ip-app-pk-service
+      app: ding-ip-app-pk
+      tier: backend
   template: 
     metadata:
       labels:
-        app: ding-ip-app-pk-service
+        app: ding-ip-app-pk
         tier: backend
     spec:
       containers:
