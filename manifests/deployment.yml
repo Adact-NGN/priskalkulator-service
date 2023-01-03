@@ -19,7 +19,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: ding-ip-app-pk-service
+        - name: ding-ip-app-pk
           image: dingipacr.azurecr.io/ding-ip-app-pk-service
           imagePullPolicy: Always
           # resources:
