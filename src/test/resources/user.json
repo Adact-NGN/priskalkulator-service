@@ -10,12 +10,12 @@
         "name": "Kjetil",
         "orgName": null,
         "orgNr": null,
-        "overallPowerOfAtterney": null,
+        "overallPowerOfAttorney": null,
         "phone": "",
-        "powerOfAtterneyFA": 1,
-        "powerOfAtterneyOA": 1,
+        "powerOfAttorneyFA": 1,
+        "powerOfAttorneyOA": 1,
         "resourceNr": "63940",
-        "regionalManagersPowerOfAtterney": null,
+        "regionalManagersPowerOfAttorney": null,
         "regionName": null,
         "salesRole": {
             "id": null,
@@ -50,11 +50,11 @@
             "userList": null
         },
         "associatedPlace":"Larvik",
-        "powerOfAtterneyOA":2,
-        "powerOfAtterneyFA":3,
-        "overallPowerOfAtterney":null,
+        "powerOfAttorneyOA":2,
+        "powerOfAttorneyFA":3,
+        "overallPowerOfAttorney":null,
         "emailSalesManager":null,
-        "regionalManagersPowerOfAtterney":null,
+        "regionalManagersPowerOfAttorney":null,
         "emailRegionalManager":null,
         "department":null
     }

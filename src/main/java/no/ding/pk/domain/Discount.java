@@ -159,27 +159,27 @@ public class Discount {
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
-        return true;
+            return true;
         if (obj == null)
-        return false;
+            return false;
         if (getClass() != obj.getClass())
-        return false;
+            return false;
         Discount other = (Discount) obj;
         if (salesOrg == null) {
             if (other.salesOrg != null)
-            return false;
+                return false;
         } else if (!salesOrg.equals(other.salesOrg))
-        return false;
+            return false;
         if (materialNumber == null) {
             if (other.materialNumber != null)
-            return false;
+                return false;
         } else if (!materialNumber.equals(other.materialNumber))
         return false;
         if (materialDesignation == null) {
             if (other.materialDesignation != null)
-            return false;
+                return false;
         } else if (!materialDesignation.equals(other.materialDesignation))
-        return false;
+            return false;
         return true;
     }
     

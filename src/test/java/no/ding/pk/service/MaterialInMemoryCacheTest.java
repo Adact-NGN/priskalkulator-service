@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -22,6 +23,7 @@ public class MaterialInMemoryCacheTest {
     @Autowired
     private InMemoryCache<String, String, String> cache;
 
+//    @Qualifier("propertyResolver")
     @Autowired private PropertyResolver propertySourceResolver;
 
     @Test

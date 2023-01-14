@@ -3,13 +3,16 @@ package no.ding.pk.service;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ import no.ding.pk.web.enums.SalesOrgField;
 @Service
 public class SalesOrgServiceImpl implements SalesOrgService {
 
-    private static Logger log = LoggerFactory.getLogger(SalesOrgServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(SalesOrgServiceImpl.class);
 
     private ObjectMapper objectMapper;
 
@@ -34,7 +37,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
 
     SalesOrgServiceImpl(
     @Value(value = "${sap.api.salesorg.url}") String salesOrgServiceUrl,
-    ObjectMapper objectMapper
+    @Autowired ObjectMapper objectMapper
     ) {
         this.salesOrgServiceUrl = salesOrgServiceUrl;
 
@@ -158,10 +161,27 @@ public class SalesOrgServiceImpl implements SalesOrgService {
 
         List<SalesOrgDTO> salesOrgDTOs = new ArrayList<>();
 
+        Map<String, Integer> zoneCountMap = new HashMap<>();
+
         for(int i = 0; i < result.length(); i++) {
             SalesOrgDTO salesOrgDTO = jsonToSalesOrgDTO(result.get(i).toString());
+
+            String salesOffice = salesOrgDTO.getSalesOffice();
+            if(!zoneCountMap.containsKey(salesOffice)) {
+                zoneCountMap.put(salesOffice, 1);
+            } else {
+                int currentAmount = zoneCountMap.get(salesOffice);
+                zoneCountMap.put(salesOffice, currentAmount + 1);
+            }
+
             salesOrgDTOs.add(salesOrgDTO);
         }
+
+//        salesOrgDTOs.stream().
+//
+//        for(int i = 0; i < salesOrgDTOs.size(); i++) {
+//            int amountOfZones
+//        }
 
         return salesOrgDTOs;
     }

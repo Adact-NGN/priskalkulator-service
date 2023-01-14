@@ -40,25 +40,26 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 
                 SalesOffice entity = new SalesOffice();
                 
-                if(salesOffice.getId() != null) {
-                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
-                    
-                    if(optSalesOffice.isPresent()) {
-                        entity = optSalesOffice.get();
-                    }
-                }
+//                if(salesOffice.getId() != null) {
+//                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
+//
+//                    if(optSalesOffice.isPresent()) {
+//                        entity = optSalesOffice.get();
+//                    }
+//                }
                 
                 entity.setCustomerNumber(salesOffice.getCustomerNumber());
                 entity.setSalesOrg(salesOffice.getSalesOrg());
-                entity.setName(salesOffice.getName());
+                entity.setSalesOffice(salesOffice.getSalesOffice());
+                entity.setSalesOfficeName(salesOffice.getSalesOfficeName());
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
                 
-                if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
-                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList());
+                // if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
+                //     List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList());
                     
-                    entity.setMaterialList(materialList);
-                }
+                //     entity.setMaterialList(materialList);
+                // }
                 
                 if(salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
                     List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList());
@@ -72,13 +73,13 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                     entity.setRentalList(rentalMaterialList);
                 }
                 
-                if(salesOffice.getZoneList() != null && salesOffice.getZoneList().size() > 0) {
-                    List<Zone> zones = zoneService.saveAll(salesOffice.getZoneList());
+                if(salesOffice.getZones() != null && salesOffice.getZones().size() > 0) {
+                    List<Zone> zones = zoneService.saveAll(salesOffice.getZones());
                     
-                    entity.setZoneList(zones);
+                    entity.setZones(zones);
                 }
                 
-                entity = repository.save(entity);
+                // entity = repository.save(entity);
                 
                 returnList.add(entity);
             }

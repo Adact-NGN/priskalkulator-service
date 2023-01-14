@@ -29,64 +29,45 @@ public class Terms {
     private Long id;
 
     @Column
-    private String contractTerm;
-
-    @Column
-    private Date agreementStartDate;
-
-    @Column
-    private Date agreementEndDate;
-
-    @Column
-    private String metalPricing;
-
-    @Column
-    private Date metalSetDateForOffer;
-
-    @Column
-    private String paymentCondition;
-
-    @Column
-    private String invoiceInterval;
-
+    private Boolean additionForAdminFee;
     @Column
     private Boolean additionForRoadTax;
 
     @Column
-    private Boolean additionForAdminFee;
-
+    private Date agreementEndDate;
     @Column
-    private Boolean newOrEstablishedCustomer;
-
-    // NG price terms addition
+    private Date agreementStartDate;
     @Column
-    private String quarterlyAdjustment;
+    private String contractTerm;
 
     @Column
     private Boolean customerRequireNotification; // false,
-
-    @Column
-    private String notificationMailAddress;
-
-    @Column
-    private Integer requiredNumberOfDaysNotice;
-
-    @Column
-    private Integer monthsToFreezeCustomerFromAdjustments; // 6,
-
-    @Column
-    private String indexWaste;
-
     @Column
     private String indexRent;
-
     @Column
     private String indexTransport;
-
-    // Customer terms addition
+    @Column
+    private String indexWaste;
+    @Column
+    private String invoiceInterval;
+    @Column
+    private String metalPricing;
+    @Column
+    private Date metalSetDateForOffer;
+    @Column
+    private Integer monthsToFreezeCustomerFromAdjustments; // 6,
+    @Column
+    private String newOrEstablishedCustomer;
+    @Column
+    private String notificationMailAddress;
+    @Column
+    private String paymentCondition;
     @Column
     private Date priceAdjustmentDate;
-    
+    @Column
+    private String quarterlyAdjustment;
+    @Column
+    private Integer requiredNumberOfDaysNotice;
     @Column
     private String specialConditionAction;
 }

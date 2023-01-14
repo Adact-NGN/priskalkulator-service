@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,7 +53,7 @@ public class PriceRowServiceImplTest {
             waste = Material.builder()
             .materialNumber(materialNumber)
             .designation("Restavfall")
-            .pricingUnit(1000)
+            .priceUnit(1000)
             .quantumUnit("KG")
             .materialStandardPrice(wastePrice)
             .build();
@@ -66,8 +65,8 @@ public class PriceRowServiceImplTest {
         .material(waste)
         .showPriceInOffer(true)
         .manualPrice(2400.0)
-        .priceLevel(1)
-        .priceLevelPrice(56.0)
+        .discountLevel(1)
+        .discountLevelPrice(56.0)
         .amount(1)
         .priceIncMva(2448.0)
         .build();

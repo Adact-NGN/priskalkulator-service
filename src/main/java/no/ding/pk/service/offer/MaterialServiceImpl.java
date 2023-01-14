@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +40,7 @@ public class MaterialServiceImpl implements MaterialService {
         if(entity == null) {
             entity = new Material();
         }
-        
-        MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
 
-        if(materialPriceEntity == null) {
-            materialPriceEntity = material.getMaterialStandardPrice();
-        } else {
-            materialPriceEntity.copy(material.getMaterialStandardPrice());
-        }
-        
         if(material.getMaterialNumber() == null) {
             throw new RuntimeException("Received material without a material number.");
         }
@@ -57,11 +48,22 @@ public class MaterialServiceImpl implements MaterialService {
         entity.setMaterialNumber(material.getMaterialNumber());
         entity.setDesignation(material.getDesignation());
         entity.setDeviceType(material.getDeviceType());
+
+        MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
+
+        if(materialPriceEntity == null) {
+            materialPriceEntity = material.getMaterialStandardPrice();
+        } else if(material.getMaterialStandardPrice() != null){
+            materialPriceEntity.copy(material.getMaterialStandardPrice());
+        }
+
         if(materialPriceEntity != null) {
             entity.setMaterialStandardPrice(materialPriceEntity);
         }
-        entity.setPricingUnit(material.getPricingUnit());
+
+        entity.setPriceUnit(material.getPriceUnit());
         entity.setQuantumUnit(material.getQuantumUnit());
+        entity.setSalesZone(material.getSalesZone());
         
         return repository.save(material);
     }

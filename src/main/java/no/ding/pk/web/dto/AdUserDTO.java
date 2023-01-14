@@ -53,25 +53,25 @@ public class AdUserDTO {
      * Fullmaktsnivå Vanlig Avfall
      */
     @JsonProperty(required = false)
-    private Integer powerOfAtterneyOA;
+    private Integer powerOfAttorneyOA;
 
     /**
      * Fullmaktsnivå Farlig Avfall
      */
     @JsonProperty(required = false)
-    private Integer powerOfAtterneyFA;
+    private Integer powerOfAttorneyFA;
 
     /**
      * Overordnet fullmaktsinnehaver (salgssjef)
      */
     @JsonProperty(required = false)
-    private String overallPowerOfAtterney;
+    private String overallPowerOfAttorney;
 
     @JsonProperty(required = false)
     private String emailSalesManager;
 
     @JsonProperty(required = false)
-    private String regionalManagersPowerOfAtterney;
+    private String regionalManagersPowerOfAttorney;
 
     @JsonProperty(required = false)
     private String emailRegionalManager;
@@ -148,28 +148,28 @@ public class AdUserDTO {
         this.associatedPlace = associatedPlace;
     }
 
-    public Integer getPowerOfAtterneyOA() {
-        return powerOfAtterneyOA;
+    public Integer getPowerOfAttorneyOA() {
+        return powerOfAttorneyOA;
     }
 
-    public void setPowerOfAtterneyOA(Integer powerOfAtterneyOA) {
-        this.powerOfAtterneyOA = powerOfAtterneyOA;
+    public void setPowerOfAttorneyOA(Integer powerOfAttorneyOA) {
+        this.powerOfAttorneyOA = powerOfAttorneyOA;
     }
 
-    public Integer getPowerOfAtterneyFA() {
-        return powerOfAtterneyFA;
+    public Integer getPowerOfAttorneyFA() {
+        return powerOfAttorneyFA;
     }
 
-    public void setPowerOfAtterneyFA(Integer powerOfAtterneyFA) {
-        this.powerOfAtterneyFA = powerOfAtterneyFA;
+    public void setPowerOfAttorneyFA(Integer powerOfAttorneyFA) {
+        this.powerOfAttorneyFA = powerOfAttorneyFA;
     }
 
-    public String getOverallPowerOfAtterney() {
-        return overallPowerOfAtterney;
+    public String getOverallPowerOfAttorney() {
+        return overallPowerOfAttorney;
     }
 
-    public void setOverallPowerOfAtterney(String overallPowerOfAtterney) {
-        this.overallPowerOfAtterney = overallPowerOfAtterney;
+    public void setOverallPowerOfAttorney(String overallPowerOfAttorney) {
+        this.overallPowerOfAttorney = overallPowerOfAttorney;
     }
 
     public String getEmailSalesManager() {
@@ -180,12 +180,12 @@ public class AdUserDTO {
         this.emailSalesManager = emailSalesManager;
     }
 
-    public String getRegionalManagersPowerOfAtterney() {
-        return regionalManagersPowerOfAtterney;
+    public String getRegionalManagersPowerOfAttorney() {
+        return regionalManagersPowerOfAttorney;
     }
 
-    public void setRegionalManagersPowerOfAtterney(String regionalManagersPowerOfAtterney) {
-        this.regionalManagersPowerOfAtterney = regionalManagersPowerOfAtterney;
+    public void setRegionalManagersPowerOfAttorney(String regionalManagersPowerOfAttorney) {
+        this.regionalManagersPowerOfAttorney = regionalManagersPowerOfAttorney;
     }
 
     public String getEmailRegionalManager() {

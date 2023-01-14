@@ -27,15 +27,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     
     private PriceOfferRepository repository;
     
-    private SalesOfficeRepository salesOfficeRepository;
-    
     private SalesOfficeService salesOfficeService;
-    
-    private PriceRowService priceRowService;
-    
-    private MaterialService materialService;
-    
-    private MaterialPriceService materialPriceService;
     
     private UserService userService;
     
@@ -47,63 +39,51 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     MaterialPriceService materialPriceService, UserService userService,
     CustomerTermsService customerTermsService) {
         this.repository = repository;
-        this.salesOfficeRepository = salesOfficeRepository;
         this.salesOfficeService = salesOfficeService;
-        this.priceRowService = priceRowService;
-        this.materialService = materialService;
-        this.materialPriceService = materialPriceService;
         this.userService = userService;
         this.customerTermsService = customerTermsService;
     }
     
     @Override
     public PriceOffer save(PriceOffer newPriceOffer) {
-        PriceOffer entity = new PriceOffer();
+        log.debug("New PriceOffer {}", newPriceOffer);
+
+        // if(newPriceOffer.getSalesOfficeList() != null) {
+        //     // Use traditional for-loop to avoid Concurrency Exception
+        //     if(newPriceOffer.getSalesOfficeList().size() > 0) {
+        //         List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList());
+
+        //         newPriceOffer.setSalesOfficeList(salesOffices);
+        //     }
+        // }
+
+        // if(newPriceOffer.getSalesEmployee() != null) {
+        //     log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
+        //     User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
+
+        //     if(salesEmployee == null) {
+        //         // TODO: Create own exception
+        //         throw new RuntimeException("No sales employee provided!");
+        //     }
+
+        //     newPriceOffer.setSalesEmployee(salesEmployee);
+        // }
+
+        // if(newPriceOffer.getApprover() != null) {
+        //     User approver = checkUserObject(newPriceOffer.getApprover());
+
+        //     if(approver != null) {
+        //         newPriceOffer.setApprover(approver);
+        //     }
+        // }
+
+        // if(newPriceOffer.getCustomerTerms() != null) {
+        //     Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
+
+        //     newPriceOffer.setCustomerTerms(customerTerms);
+        // }
         
-        if(newPriceOffer.getId() != null) {
-            Optional<PriceOffer> optPriceOffer = repository.findById(newPriceOffer.getId());
-            
-            if(optPriceOffer.isPresent()) {
-                entity = optPriceOffer.get();
-            }
-        }
-        
-        if(newPriceOffer.getSalesOfficeList() != null) {
-            // Use traditional for-loop to avoid Concurrency Exception
-            if(newPriceOffer.getSalesOfficeList() != null && newPriceOffer.getSalesOfficeList().size() > 0) {
-                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList());
-                
-                entity.setSalesOfficeList(salesOffices);
-            }
-        }
-        
-        if(newPriceOffer.getSalesEmployee() != null) {
-            log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
-            User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
-            
-            if(salesEmployee == null) {
-                // TODO: Create own exception
-                throw new RuntimeException("No sales employee provided!");
-            }
-            
-            entity.setSalesEmployee(salesEmployee);
-        }
-        
-        if(newPriceOffer.getApprover() != null) {
-            User approver = checkUserObject(newPriceOffer.getApprover());
-            
-            if(approver != null) {
-                newPriceOffer.setApprover(approver);
-            }
-        }
-        
-        if(newPriceOffer.getCustomerTerms() != null) {
-            Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
-            
-            newPriceOffer.setCustomerTerms(customerTerms);
-        }
-        
-        return repository.save(entity);
+        return repository.save(newPriceOffer);
     }
     
     private User checkUserObject(User user) {

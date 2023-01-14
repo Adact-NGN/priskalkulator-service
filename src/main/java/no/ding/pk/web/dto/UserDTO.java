@@ -27,19 +27,19 @@ public class UserDTO {
     /**
      * Fullmaktsnivå Vanlig Avfall
      */
-    private Integer powerOfAtterneyOA;
+    private Integer powerOfAttorneyOA;
 
     /**
      * Fullmaktsnivå Farlig Avfall
      */
-    private Integer powerOfAtterneyFA;
+    private Integer powerOfAttorneyFA;
 
     /**
      * Overordnet fullmaktsinnehaver (salgssjef)
      */
-    private String overallPowerOfAtterney;
+    private String overallPowerOfAttorney;
     private String emailSalesManager;
-    private String regionalManagersPowerOfAtterney;
+    private String regionalManagersPowerOfAttorney;
     private String emailRegionalManager;
     private String department;
 
@@ -139,23 +139,23 @@ public class UserDTO {
     public void setAssociatedPlace(String associatedPlace) {
         this.associatedPlace = associatedPlace;
     }
-    public Integer getPowerOfAtterneyOA() {
-        return powerOfAtterneyOA;
+    public Integer getPowerOfAttorneyOA() {
+        return powerOfAttorneyOA;
     }
-    public void setPowerOfAtterneyOA(Integer powerOfAtterneyOA) {
-        this.powerOfAtterneyOA = powerOfAtterneyOA;
+    public void setPowerOfAttorneyOA(Integer powerOfAttorneyOA) {
+        this.powerOfAttorneyOA = powerOfAttorneyOA;
     }
-    public Integer getPowerOfAtterneyFA() {
-        return powerOfAtterneyFA;
+    public Integer getPowerOfAttorneyFA() {
+        return powerOfAttorneyFA;
     }
-    public void setPowerOfAtterneyFA(Integer powerOfAtterneyFA) {
-        this.powerOfAtterneyFA = powerOfAtterneyFA;
+    public void setPowerOfAttorneyFA(Integer powerOfAttorneyFA) {
+        this.powerOfAttorneyFA = powerOfAttorneyFA;
     }
-    public String getOverallPowerOfAtterney() {
-        return overallPowerOfAtterney;
+    public String getOverallPowerOfAttorney() {
+        return overallPowerOfAttorney;
     }
-    public void setOverallPowerOfAtterney(String overallPowerOfAtterney) {
-        this.overallPowerOfAtterney = overallPowerOfAtterney;
+    public void setOverallPowerOfAttorney(String overallPowerOfAttorney) {
+        this.overallPowerOfAttorney = overallPowerOfAttorney;
     }
     public String getEmailSalesManager() {
         return emailSalesManager;
@@ -163,11 +163,11 @@ public class UserDTO {
     public void setEmailSalesManager(String emailSalesManager) {
         this.emailSalesManager = emailSalesManager;
     }
-    public String getRegionalManagersPowerOfAtterney() {
-        return regionalManagersPowerOfAtterney;
+    public String getRegionalManagersPowerOfAttorney() {
+        return regionalManagersPowerOfAttorney;
     }
-    public void setRegionalManagersPowerOfAtterney(String regionalManagersPowerOfAtterney) {
-        this.regionalManagersPowerOfAtterney = regionalManagersPowerOfAtterney;
+    public void setRegionalManagersPowerOfAttorney(String regionalManagersPowerOfAttorney) {
+        this.regionalManagersPowerOfAttorney = regionalManagersPowerOfAttorney;
     }
     public String getEmailRegionalManager() {
         return emailRegionalManager;
@@ -186,10 +186,10 @@ public class UserDTO {
         return "UserDTO [adId=" + adId + ", associatedPlace=" + associatedPlace + ", department=" + department
                 + ", email=" + email + ", emailRegionalManager=" + emailRegionalManager + ", emailSalesManager="
                 + emailSalesManager + ", fullName=" + fullName + ", id=" + id + ", jobTitle=" + jobTitle + ", name="
-                + name + ", orgName=" + orgName + ", orgNr=" + orgNr + ", overallPowerOfAtterney="
-                + overallPowerOfAtterney + ", phoneNumber=" + phoneNumber + ", powerOfAtterneyFA=" + powerOfAtterneyFA
-                + ", powerOfAtterneyOA=" + powerOfAtterneyOA + ", regionName=" + regionName
-                + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney + ", resourceNr=" + resourceNr
+                + name + ", orgName=" + orgName + ", orgNr=" + orgNr + ", overallPowerOfAttorney="
+                + overallPowerOfAttorney + ", phoneNumber=" + phoneNumber + ", powerOfAttorneyFA=" + powerOfAttorneyFA
+                + ", powerOfAttorneyOA=" + powerOfAttorneyOA + ", regionName=" + regionName
+                + ", regionalManagersPowerOfAttorney=" + regionalManagersPowerOfAttorney + ", resourceNr=" + resourceNr
                 + ", salesRoleId=" + salesRole + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
                 + usernameAlias + "]";
     }

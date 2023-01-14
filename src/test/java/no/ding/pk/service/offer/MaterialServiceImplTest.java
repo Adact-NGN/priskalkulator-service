@@ -7,7 +7,6 @@ import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
@@ -47,7 +46,7 @@ public class MaterialServiceImplTest {
             waste = Material.builder()
             .materialNumber(materialNumber)
             .designation("Restavfall")
-            .pricingUnit(1000)
+            .priceUnit(1000)
             .quantumUnit("KG")
             .build();
         }

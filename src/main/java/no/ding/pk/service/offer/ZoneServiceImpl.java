@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,10 @@ import no.ding.pk.repository.offer.ZoneRepository;
 @Service
 public class ZoneServiceImpl implements ZoneService {
 
-    private ZoneRepository repository;
-    private PriceRowService priceRowService;
+    private static Logger log = LoggerFactory.getLogger(ZoneServiceImpl.class);
+
+    private final ZoneRepository repository;
+    private final PriceRowService priceRowService;
 
     @Autowired
     public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService) {
@@ -43,22 +47,23 @@ public class ZoneServiceImpl implements ZoneService {
                 }
             }
 
-            entity.setNumber(zone.getNumber());
+            entity.setZoneId(zone.getZoneId());
             entity.setPostalCode(zone.getPostalCode());
             entity.setPostalName(zone.getPostalName());
             entity.setIsStandardZone(zone.getIsStandardZone());
 
-            if(zone.getMaterialList() != null && zone.getMaterialList().size() > 0) {
-                List<PriceRow> materials = priceRowService.saveAll(zone.getMaterialList());
+            if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows());
 
-                entity.setMaterialList(materials);
+                entity.setPriceRows(materials);
             }
 
-            entity = repository.save(zone);
+//            entity = repository.save(zone);
 
             returnZoneList.add(entity);
         }
 
+        log.debug("Persisted {} amount of Zones", returnZoneList.size());
         return returnZoneList;
     }
     

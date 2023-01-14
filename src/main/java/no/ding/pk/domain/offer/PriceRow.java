@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -17,10 +18,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import no.ding.pk.domain.Auditable;
 
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -38,7 +41,7 @@ public class PriceRow extends Auditable {
     @Column
     private Double discountPct;
 
-    @ManyToOne()
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "material_id", referencedColumnName = "id")
     private Material material;
 
@@ -49,10 +52,10 @@ public class PriceRow extends Auditable {
     private Double manualPrice;
 
     @Column
-    private Integer priceLevel;
+    private Integer discountLevel;
     
     @Column
-    private Double priceLevelPrice;
+    private Double discountLevelPrice;
 
     @Column
     private Double standardPrice;

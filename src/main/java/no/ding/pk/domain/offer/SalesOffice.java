@@ -2,23 +2,21 @@ package no.ding.pk.domain.offer;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -40,7 +38,7 @@ public class SalesOffice {
     private String salesOffice;
 
     @Column
-    private String name;
+    private String salesOfficeName;
 
     @Column
     private String postalNumber;
@@ -48,15 +46,22 @@ public class SalesOffice {
     @Column
     private String city;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "material_list_id")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> materialList;
 
-    @OneToMany
-    private List<Zone> zoneList;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Zone> zones;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "transport_list_id")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> transportServiceList;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "rental_list_id")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> rentalList;
 }

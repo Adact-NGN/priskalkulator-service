@@ -22,6 +22,9 @@ public class SalesOrgDTO {
     @JsonAlias("SalesZone")
     private String salesZone;
 
+    @JsonAlias("AmountOfZones")
+    private Integer amountOfZones;
+
     public String getSalesOrganization() {
         return salesOrganization;
     }
@@ -68,6 +71,14 @@ public class SalesOrgDTO {
 
     public void setSalesZone(String salesZone) {
         this.salesZone = salesZone;
+    }
+
+    public Integer getAmountOfZones() {
+        return amountOfZones;
+    }
+
+    public void setAmountOfZones(Integer amountOfZones) {
+        this.amountOfZones = amountOfZones;
     }
 
     @Override

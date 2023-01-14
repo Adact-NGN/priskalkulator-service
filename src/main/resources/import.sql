@@ -1,14 +1,6 @@
 use pk_poal_db_dev;
 
-create table if not exists sales_roles
-(
-    id                           bigint       not null
-        primary key,
-    default_power_of_attorney_fa int          null,
-    default_power_of_attorney_oa int          null,
-    description                  varchar(255) null,
-    role_name                    varchar(255) null
-);
+create table if not exists sales_roles(id bigint not null primary key, default_power_of_attorney_fa int null, default_power_of_attorney_oa int null, description varchar(255) null, role_name varchar(255) null);
 
 INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (1, 1, 1, 'Kundeveileder', 'KV');
 INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (2, 2, 2, 'Salgskonsulent (rolle a)', 'SA');

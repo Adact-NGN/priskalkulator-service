@@ -1,19 +1,12 @@
 package no.ding.pk.repository.offer;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.shaded.json.JSONObject;
 
-import no.ding.pk.config.H2TestConfig;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
@@ -106,7 +99,7 @@ public class PriceOfferRepositoryTest {
         Material material = Material.builder()
         .materialNumber("50101")
         .designation("Lift - Utsett")
-        .pricingUnit(1)
+        .priceUnit(1)
         .quantumUnit("ST")
         .materialStandardPrice(materialPrice)
         .build();
@@ -117,8 +110,8 @@ public class PriceOfferRepositoryTest {
         .material(material)
         .showPriceInOffer(true)
         .manualPrice(900.0)
-        .priceLevel(1)
-        .priceLevelPrice(100.0)
+        .discountLevel(1)
+        .discountLevelPrice(100.0)
         .amount(1)
         .priceIncMva(1125.0)
         .build();
@@ -129,9 +122,9 @@ public class PriceOfferRepositoryTest {
         Zone zone = Zone.builder()
         .postalCode("1601")
         .postalName(null)
-        .number("0000000001")
+        .zoneId("0000000001")
         .isStandardZone(true)
-        .materialList(priceRowList)
+        .priceRows(priceRowList)
         .build();
 
         List<Zone> zoneList = new ArrayList<>();
@@ -145,7 +138,7 @@ public class PriceOfferRepositoryTest {
         Material waste = Material.builder()
         .materialNumber("119901")
         .designation("Restavfall")
-        .pricingUnit(1000)
+        .priceUnit(1000)
         .quantumUnit("KG")
         .materialStandardPrice(wastePrice)
         .build();
@@ -156,8 +149,8 @@ public class PriceOfferRepositoryTest {
         .material(waste)
         .showPriceInOffer(true)
         .manualPrice(2400.0)
-        .priceLevel(1)
-        .priceLevelPrice(56.0)
+        .discountLevel(1)
+        .discountLevelPrice(56.0)
         .amount(1)
         .priceIncMva(2448.0)
         .build();
@@ -167,11 +160,11 @@ public class PriceOfferRepositoryTest {
 
         SalesOffice salesOffice = SalesOffice.builder()
         .city("FREDRIKSTAD")
-        .name("Sarpsborg/Fredrikstad")
+        .salesOfficeName("Sarpsborg/Fredrikstad")
         .salesOffice("127")
         .salesOrg("100")
         .postalNumber("1601")
-        .zoneList(zoneList)
+        .zones(zoneList)
         .materialList(wastePriceRowList)
         .build();
 
@@ -221,7 +214,7 @@ public class PriceOfferRepositoryTest {
         Material material = Material.builder()
         .materialNumber("50101")
         .designation("Lift - Utsett")
-        .pricingUnit(1)
+        .priceUnit(1)
         .quantumUnit("ST")
         .materialStandardPrice(materialPrice)
         .build();
@@ -232,8 +225,8 @@ public class PriceOfferRepositoryTest {
         .material(material)
         .showPriceInOffer(true)
         .manualPrice(900.0)
-        .priceLevel(1)
-        .priceLevelPrice(100.0)
+        .discountLevel(1)
+        .discountLevelPrice(100.0)
         .amount(1)
         .priceIncMva(1125.0)
         .build();
@@ -244,9 +237,9 @@ public class PriceOfferRepositoryTest {
         Zone zone = Zone.builder()
         .postalCode("1601")
         .postalName(null)
-        .number("0000000001")
+        .zoneId("0000000001")
         .isStandardZone(true)
-        .materialList(priceRowList)
+        .priceRows(priceRowList)
         .build();
 
         List<Zone> zoneList = new ArrayList<>();
@@ -260,7 +253,7 @@ public class PriceOfferRepositoryTest {
         Material waste = Material.builder()
         .materialNumber("119901")
         .designation("Restavfall")
-        .pricingUnit(1000)
+        .priceUnit(1000)
         .quantumUnit("KG")
         .materialStandardPrice(wastePrice)
         .build();
@@ -271,8 +264,8 @@ public class PriceOfferRepositoryTest {
         .material(waste)
         .showPriceInOffer(true)
         .manualPrice(2400.0)
-        .priceLevel(1)
-        .priceLevelPrice(56.0)
+        .discountLevel(1)
+        .discountLevelPrice(56.0)
         .amount(1)
         .priceIncMva(2448.0)
         .build();
@@ -282,11 +275,11 @@ public class PriceOfferRepositoryTest {
 
         SalesOffice salesOffice = SalesOffice.builder()
         .city("FREDRIKSTAD")
-        .name("Sarpsborg/Fredrikstad")
+        .salesOfficeName("Sarpsborg/Fredrikstad")
         .salesOffice("127")
         .salesOrg("100")
         .postalNumber("1601")
-        .zoneList(zoneList)
+        .zones(zoneList)
         .materialList(wastePriceRowList)
         .build();
 

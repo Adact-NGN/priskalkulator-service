@@ -3,25 +3,15 @@ package no.ding.pk.domain.offer;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import no.ding.pk.domain.Auditable;
 import no.ding.pk.domain.User;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Getter
 @Setter
 @MappedSuperclass
@@ -33,12 +23,13 @@ public class Offer extends Auditable {
     @Column
     private String customerNumber;
 
-    @OneToMany()
-    // @JoinColumn(name = "salesOffice_id")
+    @Column
+    private String customerName;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<SalesOffice> salesOfficeList;
 
     @OneToOne(optional = false)
-    // @JoinColumn(name = "salesEmployee_id")
     private User salesEmployee;
 
     @Column
@@ -49,7 +40,7 @@ public class Offer extends Auditable {
     private User approver;
 
     @Column
-    private Boolean approved;
+    private Boolean isApproved;
 
     @Column
     private Date approvalDate;

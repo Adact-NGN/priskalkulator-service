@@ -38,43 +38,47 @@ public class PriceRowServiceImpl implements PriceRowService {
         for(int i = 0; i < priceRowList.size(); i++) {
             PriceRow materialPriceRow = priceRowList.get(i);
             
-            PriceRow entity = new PriceRow();
+            // PriceRow entity = new PriceRow();
             
-            if(materialPriceRow.getId() != null) {
-                Optional<PriceRow> optPriceRow = repository.findById(materialPriceRow.getId());
+            // if(materialPriceRow.getId() != null) {
+            //     log.debug("Getting existing PriceRow");
+            //     Optional<PriceRow> optPriceRow = repository.findById(materialPriceRow.getId());
                 
-                if(optPriceRow.isPresent()) {
-                    entity = optPriceRow.get();
-                }
-            }
+            //     if(optPriceRow.isPresent()) {
+            //         log.debug("Found PriceRow with id: {}", materialPriceRow.getId());
+            //         entity = optPriceRow.get();
+            //     }
+            // }
             
-            entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
-            entity.setDiscountPct(materialPriceRow.getDiscountPct());
-            entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
-            entity.setManualPrice(materialPriceRow.getManualPrice());
-            entity.setPriceLevel(materialPriceRow.getPriceLevel());
-            entity.setStandardPrice(materialPriceRow.getStandardPrice());
-            entity.setAmount(materialPriceRow.getAmount());
-            entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
+            // entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
+            // entity.setDiscountPct(materialPriceRow.getDiscountPct());
+            // entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
+            // entity.setManualPrice(materialPriceRow.getManualPrice());
+            // entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
+            // entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
+            // entity.setStandardPrice(materialPriceRow.getStandardPrice());
+            // entity.setAmount(materialPriceRow.getAmount());
+            // entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
             
-            if(materialPriceRow.getMaterial() != null) {
-                
-                Material material = materialService.save(materialPriceRow.getMaterial());
-                
-                log.debug(String.format("Id from persisted operation: %d", material.getId()));
-                Optional<Material> optMaterial = materialService.findById(material.getId());
-                
-                log.debug("Returned material: " + optMaterial.get());
-                if(optMaterial.isPresent()) {
-                    entity.setMaterial(optMaterial.get());
-                }
-            }
+            // if(materialPriceRow.getMaterial() != null) {
+
+                // entity.setMaterial(materialPriceRow.getMaterial());
+//                Material material = materialService.save(materialPriceRow.getMaterial());
+//
+//                log.debug(String.format("Id from persisted operation: %d", material.getId()));
+//                Optional<Material> optMaterial = materialService.findById(material.getId());
+//
+//                log.debug("Returned material: " + optMaterial.get());
+//                if(optMaterial.isPresent()) {
+//                    entity.setMaterial(optMaterial.get());
+//                }
+            // }
             
-            entity = repository.save(entity);
-            
-            returnList.add(entity);
+//            entity = repository.save(entity);
+            returnList.add(materialPriceRow);
         }
         
+        log.debug("Persisted {} amount of PriceRows", returnList.size());
         return returnList;
     }
     

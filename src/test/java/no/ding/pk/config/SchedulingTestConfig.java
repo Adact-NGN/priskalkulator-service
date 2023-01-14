@@ -2,6 +2,7 @@ package no.ding.pk.config;
 
 import static org.mockito.Mockito.mock;
 
+import no.ding.pk.service.sap.SapMaterialService;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -57,6 +58,11 @@ public class SchedulingTestConfig {
     @Bean
     public MapperService mapperService() {
         return mock(MapperService.class);
+    }
+
+    @Bean
+    public SapMaterialService materialService() {
+        return mock(SapMaterialService.class);
     }
 
     @Bean

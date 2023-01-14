@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,8 +196,8 @@ public class UserServiceTest {
         }
         userObject.setSalesRole(firstSalesRole);
         
-        userObject.setPowerOfAtterneyFA(1);
-        userObject.setPowerOfAtterneyOA(1);
+        userObject.setPowerOfAttorneyFA(1);
+        userObject.setPowerOfAttorneyOA(1);
         
         userObject = service.save(userObject, null);
         
@@ -209,15 +208,15 @@ public class UserServiceTest {
         User actualUser = optUser.get();
         
         assertThat(actualUser.getSalesRole(), equalTo(firstSalesRole));
-        assertThat(actualUser.getPowerOfAtterneyFA(), equalTo(1));
-        assertThat(actualUser.getPowerOfAtterneyFA(), equalTo(1));
+        assertThat(actualUser.getPowerOfAttorneyFA(), equalTo(1));
+        assertThat(actualUser.getPowerOfAttorneyFA(), equalTo(1));
         
         User newUserObject = SerializationUtils.clone(actualUser);
         newUserObject.setId(userObject.getId());
         
         newUserObject.setSalesRole(otherSalesRole);
-        newUserObject.setPowerOfAtterneyFA(2);
-        newUserObject.setPowerOfAtterneyOA(2);
+        newUserObject.setPowerOfAttorneyFA(2);
+        newUserObject.setPowerOfAttorneyOA(2);
         
         newUserObject.setSureName("Minde");
         
@@ -229,8 +228,8 @@ public class UserServiceTest {
         
         actualUser = optUser.get();
         
-        assertThat(actualUser.getPowerOfAtterneyFA(), equalTo(2));
-        assertThat(actualUser.getPowerOfAtterneyOA(), equalTo(2));
+        assertThat(actualUser.getPowerOfAttorneyFA(), equalTo(2));
+        assertThat(actualUser.getPowerOfAttorneyOA(), equalTo(2));
         assertThat(actualUser.getSureName(), equalTo("Minde"));
         
         List<SalesRole> salesRoleList = salesRoleRepository.findAll();

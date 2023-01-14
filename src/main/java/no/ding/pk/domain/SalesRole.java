@@ -94,7 +94,7 @@ public class SalesRole implements Serializable {
     
     @Override
     public String toString() {
-        return "SalesRole [description=" + description + ", id=" + id + ", roleName=" + roleName + ", defaultPowerOfAttorneyOa="+ defaultPowerOfAttorneyOa + ", defaultPowerOfAtterneyFa="+ defaultPowerOfAttorneyFa + "]";
+        return "SalesRole [description=" + description + ", id=" + id + ", roleName=" + roleName + ", defaultPowerOfAttorneyOa="+ defaultPowerOfAttorneyOa + ", defaultPowerOfAttorneyFa="+ defaultPowerOfAttorneyFa + "]";
     }
     
     @Override
@@ -111,31 +111,31 @@ public class SalesRole implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
-        return true;
+            return true;
         if (obj == null)
-        return false;
+            return false;
         if (getClass() != obj.getClass())
-        return false;
+            return false;
         SalesRole other = (SalesRole) obj;
         if (roleName == null) {
             if (other.roleName != null)
-            return false;
+                return false;
         } else if (!roleName.equals(other.roleName))
-        return false;
+            return false;
         if(description == null) {
             if(other.description != null)    
-            return false;
+                return false;
         } else if(!description.equals(other.description))
         return false;
         if (defaultPowerOfAttorneyOa == null) {
             if (other.defaultPowerOfAttorneyOa != null)
-            return false;
+                return false;
         } else if(!defaultPowerOfAttorneyOa.equals(other.defaultPowerOfAttorneyOa)) {
             return false;
         }
         if (defaultPowerOfAttorneyFa == null) {
             if (other.defaultPowerOfAttorneyFa != null)
-            return false;
+                return false;
         } else if(!defaultPowerOfAttorneyFa.equals(other.defaultPowerOfAttorneyFa)) {
             return false;
         }

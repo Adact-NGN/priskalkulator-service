@@ -31,7 +31,8 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
+    @Column
     private String adId;
     
     @Column
@@ -72,7 +73,7 @@ public class User implements Serializable {
     private String email;
     
     @JsonBackReference
-    @ManyToOne(optional = true)
+    @ManyToOne()
     @JoinColumn(name = "saleRole_id")
     private SalesRole salesRole;
     
@@ -83,25 +84,25 @@ public class User implements Serializable {
     * Fullmaktsnivå Vanlig Avfall
     */
     @Column
-    private Integer powerOfAtterneyOA;
+    private Integer powerOfAttorneyOA;
     
     /**
     * Fullmaktsnivå Farlig Avfall
     */
     @Column
-    private Integer powerOfAtterneyFA;
+    private Integer powerOfAttorneyFA;
     
     /**
     * Overordnet fullmaktsinnehaver (salgssjef)
     */
     @Column
-    private String overallPowerOfAtterney;
+    private String overallPowerOfAttorney;
     
     @Column
     private String emailSalesManager;
     
     @Column
-    private String regionalManagersPowerOfAtterney;
+    private String regionalManagersPowerOfAttorney;
     
     @Column
     private String emailRegionalManager;
@@ -245,28 +246,28 @@ public class User implements Serializable {
         this.associatedPlace = associatedPlace;
     }
     
-    public Integer getPowerOfAtterneyOA() {
-        return powerOfAtterneyOA;
+    public Integer getPowerOfAttorneyOA() {
+        return powerOfAttorneyOA;
     }
     
-    public void setPowerOfAtterneyOA(Integer powerOfAtterneyOA) {
-        this.powerOfAtterneyOA = powerOfAtterneyOA;
+    public void setPowerOfAttorneyOA(Integer powerOfAttorneyOA) {
+        this.powerOfAttorneyOA = powerOfAttorneyOA;
     }
     
-    public Integer getPowerOfAtterneyFA() {
-        return powerOfAtterneyFA;
+    public Integer getPowerOfAttorneyFA() {
+        return powerOfAttorneyFA;
     }
     
-    public void setPowerOfAtterneyFA(Integer powerOfAtterneyFA) {
-        this.powerOfAtterneyFA = powerOfAtterneyFA;
+    public void setPowerOfAttorneyFA(Integer powerOfAttorneyFA) {
+        this.powerOfAttorneyFA = powerOfAttorneyFA;
     }
     
-    public String getOverallPowerOfAtterney() {
-        return overallPowerOfAtterney;
+    public String getOverallPowerOfAttorney() {
+        return overallPowerOfAttorney;
     }
     
-    public void setOverallPowerOfAtterney(String overallPowerOfAtterney) {
-        this.overallPowerOfAtterney = overallPowerOfAtterney;
+    public void setOverallPowerOfAttorney(String overallPowerOfAttorney) {
+        this.overallPowerOfAttorney = overallPowerOfAttorney;
     }
     
     public String getEmailSalesManager() {
@@ -277,12 +278,12 @@ public class User implements Serializable {
         this.emailSalesManager = emailSalesManager;
     }
     
-    public String getRegionalManagersPowerOfAtterney() {
-        return regionalManagersPowerOfAtterney;
+    public String getRegionalManagersPowerOfAttorney() {
+        return regionalManagersPowerOfAttorney;
     }
     
-    public void setRegionalManagersPowerOfAtterney(String regionalManagersPowerOfAtterney) {
-        this.regionalManagersPowerOfAtterney = regionalManagersPowerOfAtterney;
+    public void setRegionalManagersPowerOfAttorney(String regionalManagersPowerOfAttorney) {
+        this.regionalManagersPowerOfAttorney = regionalManagersPowerOfAttorney;
     }
     
     public String getEmailRegionalManager() {
@@ -298,9 +299,9 @@ public class User implements Serializable {
         return "User [adId=" + adId + ", associatedPlace=" + associatedPlace + ", email=" + email
         + ", emailRegionalManager=" + emailRegionalManager + ", emailSalesManager=" + emailSalesManager
         + ", fullName=" + fullName + ", id=" + id + ", name=" + name + ", orgName=" + orgName + ", orgNr="
-        + orgNr + ", overallPowerOfAtterney=" + overallPowerOfAtterney + ", phoneNumber=" + phoneNumber
-        + ", powerOfAtterneyFA=" + powerOfAtterneyFA + ", powerOfAtterneyOA=" + powerOfAtterneyOA
-        + ", regionName=" + regionName + ", regionalManagersPowerOfAtterney=" + regionalManagersPowerOfAtterney
+        + orgNr + ", overallPowerOfAttorney=" + overallPowerOfAttorney + ", phoneNumber=" + phoneNumber
+        + ", powerOfAttorneyFA=" + powerOfAttorneyFA + ", powerOfAttorneyOA=" + powerOfAttorneyOA
+        + ", regionName=" + regionName + ", regionalManagersPowerOfAttorney=" + regionalManagersPowerOfAttorney
         + ", resourceNr=" + resourceNr + ", salesRole=" + salesRole + ", sureName=" + sureName + ", username="
         + username + ", usernameAlias=" + usernameAlias + "]";
     }
@@ -322,47 +323,47 @@ public class User implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
-        return true;
+            return true;
         if (obj == null)
-        return false;
+            return false;
         if (getClass() != obj.getClass())
-        return false;
+            return false;
         User other = (User) obj;
         if (adId == null) {
             if (other.adId != null)
-            return false;
+                return false;
         } else if (!adId.equals(other.adId))
-        return false;
+            return false;
         if (orgNr == null) {
             if (other.orgNr != null)
-            return false;
+                return false;
         } else if (!orgNr.equals(other.orgNr))
-        return false;
+            return false;
         if (orgName == null) {
             if (other.orgName != null)
-            return false;
+                return false;
         } else if (!orgName.equals(other.orgName))
-        return false;
+            return false;
         if (username == null) {
             if (other.username != null)
-            return false;
+                return false;
         } else if (!username.equals(other.username))
-        return false;
+            return false;
         if (usernameAlias == null) {
             if (other.usernameAlias != null)
-            return false;
+                return false;
         } else if (!usernameAlias.equals(other.usernameAlias))
-        return false;
+            return false;
         if (resourceNr == null) {
             if (other.resourceNr != null)
-            return false;
+                return false;
         } else if (!resourceNr.equals(other.resourceNr))
         return false;
         if (email == null) {
             if (other.email != null)
-            return false;
+                return false;
         } else if (!email.equals(other.email))
-        return false;
+            return false;
         return true;
     }
     
@@ -385,13 +386,13 @@ public class User implements Serializable {
         this.setPhoneNumber(other.getPhoneNumber());
         this.setEmail(other.getEmail());
         this.setAssociatedPlace(other.getAssociatedPlace());
-        this.setPowerOfAtterneyOA(other.getPowerOfAtterneyOA());
-        this.setPowerOfAtterneyFA(other.getPowerOfAtterneyFA());
+        this.setPowerOfAttorneyOA(other.getPowerOfAttorneyOA());
+        this.setPowerOfAttorneyFA(other.getPowerOfAttorneyFA());
         
-        this.setOverallPowerOfAtterney(other.getOverallPowerOfAtterney());
+        this.setOverallPowerOfAttorney(other.getOverallPowerOfAttorney());
         this.setEmailSalesManager(other.getEmailSalesManager());
         
-        this.setRegionalManagersPowerOfAtterney(other.getRegionalManagersPowerOfAtterney());
+        this.setRegionalManagersPowerOfAttorney(other.getRegionalManagersPowerOfAttorney());
         
         this.setEmailRegionalManager(other.getEmailRegionalManager());
         
