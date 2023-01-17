@@ -54,34 +54,34 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setSalesOfficeName(salesOffice.getSalesOfficeName());
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
-                
-                // if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
-                //     List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList());
-                    
-                //     entity.setMaterialList(materialList);
-                // }
-                
+
+                if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
+                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList());
+
+                    salesOffice.setMaterialList(materialList);
+                }
+
                 if(salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
                     List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList());
-                    
-                    entity.setTransportServiceList(transportServiceMaterialList);
+
+                    salesOffice.setTransportServiceList(transportServiceMaterialList);
                 }
-                
+
                 if(salesOffice.getRentalList() != null && salesOffice.getRentalList().size() > 0) {
                     List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList());
-                    
-                    entity.setRentalList(rentalMaterialList);
+
+                    salesOffice.setRentalList(rentalMaterialList);
                 }
-                
+
                 if(salesOffice.getZones() != null && salesOffice.getZones().size() > 0) {
                     List<Zone> zones = zoneService.saveAll(salesOffice.getZones());
-                    
-                    entity.setZones(zones);
+
+                    salesOffice.setZones(zones);
                 }
-                
-                // entity = repository.save(entity);
-                
-                returnList.add(entity);
+
+//                entity = repository.save(entity);
+
+                returnList.add(salesOffice);
             }
         }
         return returnList;

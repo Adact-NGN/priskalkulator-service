@@ -21,8 +21,8 @@ public class UserServiceImpl implements UserService {
 	
 	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 	
-	private UserRepository repository;
-	private SalesRoleRepository salesRoleRepository;
+	private final UserRepository repository;
+	private final SalesRoleRepository salesRoleRepository;
 	
 	
 	@Autowired
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 			log.debug("Persisting object with id: {}", id);
 			Optional<User> optUser = repository.findById(id);
 			
-			if(!optUser.isPresent()) {
+			if(optUser.isEmpty()) {
 				log.debug("Could not find User object with id: {}", id);
 				return null;
 			}
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 		if(currentSalesRole != null) {
 			currentSalesRole = salesRoleRepository.findByRoleName(currentSalesRole.getRoleName());
 		}
-		SalesRole newSalesRole = salesRole != null ? salesRole : null;
+		SalesRole newSalesRole = salesRole;
 		if(newSalesRole != null) {
 			newSalesRole = salesRoleRepository.findByRoleName(newSalesRole.getRoleName());
 		}
@@ -77,9 +77,8 @@ public class UserServiceImpl implements UserService {
 			salesRoleRepository.save(currentSalesRole);
 		}
 
-		if(newSalesRole != null) {
+		if(newSalesRole != null && user != null) {
 			newSalesRole.addUser(user);
-
 			salesRoleRepository.save(newSalesRole);
 		}
 	}
@@ -96,7 +95,7 @@ public class UserServiceImpl implements UserService {
 	public boolean delete(Long id) {
 		log.debug("Deleting user with id: {}", id);
 		if(id == null) {
-			log.debug("Givend id was null. Aborting operation.");
+			log.debug("Given id was null. Aborting operation.");
 			return false;
 		}
 		
@@ -113,7 +112,7 @@ public class UserServiceImpl implements UserService {
 			return false;
 		}
 		
-		log.debug("User object with ID: {} was deleted.");
+		log.debug("User object with ID: {} was deleted.", id);
 		return true;
 	}
 	

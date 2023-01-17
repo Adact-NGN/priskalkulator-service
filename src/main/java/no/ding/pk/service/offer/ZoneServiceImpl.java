@@ -36,31 +36,32 @@ public class ZoneServiceImpl implements ZoneService {
 
         for(int i = 0; i < zoneList.size(); i++) {
             Zone zone = zoneList.get(i);
+            log.debug("Zone {}", zone);
 
-            Zone entity = new Zone();
-
-            if(zone.getId() != null) {
-                Optional<Zone> optZone = repository.findById(zone.getId());
-
-                if(optZone.isPresent()) {
-                    entity = optZone.get();
-                }
-            }
-
-            entity.setZoneId(zone.getZoneId());
-            entity.setPostalCode(zone.getPostalCode());
-            entity.setPostalName(zone.getPostalName());
-            entity.setIsStandardZone(zone.getIsStandardZone());
+//            Zone entity = new Zone();
+//
+//            if(zone.getId() != null) {
+//                Optional<Zone> optZone = repository.findById(zone.getId());
+//
+//                if(optZone.isPresent()) {
+//                    entity = optZone.get();
+//                }
+//            }
+//
+//            entity.setZoneId(zone.getZoneId());
+//            entity.setPostalCode(zone.getPostalCode());
+//            entity.setPostalName(zone.getPostalName());
+//            entity.setIsStandardZone(zone.getIsStandardZone());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows());
 
-                entity.setPriceRows(materials);
+                zone.setPriceRows(materials);
             }
 
 //            entity = repository.save(zone);
 
-            returnZoneList.add(entity);
+            returnZoneList.add(zone);
         }
 
         log.debug("Persisted {} amount of Zones", returnZoneList.size());

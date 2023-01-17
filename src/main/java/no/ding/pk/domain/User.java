@@ -236,6 +236,11 @@ public class User implements Serializable {
     
     public void setSalesRole(SalesRole salesRole) {
         this.salesRole = salesRole;
+
+        if(salesRole != null) {
+            this.powerOfAttorneyOA = salesRole.getDefaultPowerOfAttorneyOa();
+            this.powerOfAttorneyFA = salesRole.getDefaultPowerOfAttorneyFa();
+        }
     }
     
     public String getAssociatedPlace() {

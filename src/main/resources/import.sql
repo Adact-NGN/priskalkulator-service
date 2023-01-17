@@ -10,3 +10,4 @@ INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_atto
 INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 6, 'Salgsleder/salgssjef lokalt', 'SL');
 INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (7, 6, 6, 'Salgssjef divisjon', 'SD');
 INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (8, 6, 6, 'Distriktssjef', 'DR');
+INSERT INTO sales_roles (id, default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (9, 6, 6, 'Superadmin', 'Admin');

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 @Entity
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
@@ -45,7 +48,7 @@ public class SalesRole implements Serializable {
     
     @JsonManagedReference
     @Column
-    @OneToMany(mappedBy = "salesRole")
+    @OneToMany(mappedBy = "salesRole", cascade = CascadeType.MERGE)
     @Builder.Default private List<User> userList = new ArrayList<>();
     
     public Long getId() {
@@ -84,9 +87,7 @@ public class SalesRole implements Serializable {
     
     public void removeUser(User user) {
         if(userList != null) {
-            if(userList.contains(user)) {
-                userList.remove(user);
-            }
+            userList.remove(user);
             
             user.setSalesRole(null);
         }

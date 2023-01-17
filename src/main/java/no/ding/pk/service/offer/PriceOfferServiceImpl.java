@@ -46,42 +46,42 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     
     @Override
     public PriceOffer save(PriceOffer newPriceOffer) {
-        log.debug("New PriceOffer {}", newPriceOffer);
+        log.debug("Received PriceOffer {}", newPriceOffer);
 
-        // if(newPriceOffer.getSalesOfficeList() != null) {
-        //     // Use traditional for-loop to avoid Concurrency Exception
-        //     if(newPriceOffer.getSalesOfficeList().size() > 0) {
-        //         List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList());
+//        if(newPriceOffer.getSalesOfficeList() != null) {
+//            // Use traditional for-loop to avoid Concurrency Exception
+//            if(newPriceOffer.getSalesOfficeList().size() > 0) {
+//                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList());
+//
+//                newPriceOffer.setSalesOfficeList(salesOffices);
+//            }
+//        }
 
-        //         newPriceOffer.setSalesOfficeList(salesOffices);
-        //     }
-        // }
+        if(newPriceOffer.getSalesEmployee() != null) {
+            log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
+            User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
 
-        // if(newPriceOffer.getSalesEmployee() != null) {
-        //     log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
-        //     User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
+            if(salesEmployee == null) {
+                // TODO: Create own exception
+                throw new RuntimeException("No sales employee provided!");
+            }
 
-        //     if(salesEmployee == null) {
-        //         // TODO: Create own exception
-        //         throw new RuntimeException("No sales employee provided!");
-        //     }
+            newPriceOffer.setSalesEmployee(salesEmployee);
+        }
 
-        //     newPriceOffer.setSalesEmployee(salesEmployee);
-        // }
+        if(newPriceOffer.getApprover() != null) {
+            User approver = checkUserObject(newPriceOffer.getApprover());
 
-        // if(newPriceOffer.getApprover() != null) {
-        //     User approver = checkUserObject(newPriceOffer.getApprover());
+            if(approver != null) {
+                newPriceOffer.setApprover(approver);
+            }
+        }
 
-        //     if(approver != null) {
-        //         newPriceOffer.setApprover(approver);
-        //     }
-        // }
+        if(newPriceOffer.getCustomerTerms() != null) {
+            Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
 
-        // if(newPriceOffer.getCustomerTerms() != null) {
-        //     Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
-
-        //     newPriceOffer.setCustomerTerms(customerTerms);
-        // }
+            newPriceOffer.setCustomerTerms(customerTerms);
+        }
         
         return repository.save(newPriceOffer);
     }
@@ -102,5 +102,19 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public List<PriceOffer> findAll() {
         return repository.findAll();
     }
-    
+
+    @Override
+    public boolean delete(Long id) {
+        Optional<PriceOffer> priceOffer = repository.findById(id);
+
+        if(priceOffer.isEmpty()) {
+            log.debug("Could not find PriceOffer with id: {}", id);
+            return false;
+        }
+
+        repository.delete(priceOffer.get());
+
+        return !repository.existsById(id);
+    }
+
 }

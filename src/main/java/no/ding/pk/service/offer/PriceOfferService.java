@@ -12,5 +12,6 @@ public interface PriceOfferService {
     Optional<PriceOffer> findById(Long id);
 
     List<PriceOffer> findAll();
-    
+
+    boolean delete(Long id);
 }
