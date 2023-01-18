@@ -74,7 +74,6 @@ public class User implements Serializable {
     
     @JsonBackReference
     @ManyToOne()
-    @JoinColumn(name = "saleRole_id")
     private SalesRole salesRole;
     
     @Column

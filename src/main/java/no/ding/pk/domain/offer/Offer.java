@@ -29,13 +29,14 @@ public class Offer extends Auditable {
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<SalesOffice> salesOfficeList;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "salesEmployeeId")
     private User salesEmployee;
 
     @Column
     private Boolean needsApproval;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "approverUser_id")
     private User approver;
 
