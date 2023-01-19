@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 
 import no.ding.pk.domain.SalesRole;
@@ -18,6 +20,7 @@ import no.ding.pk.domain.User;
 
 @DataJpaTest
 @TestPropertySource("/h2-db.properties")
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class SalesRoleRepositoryTest {
     
     @Autowired

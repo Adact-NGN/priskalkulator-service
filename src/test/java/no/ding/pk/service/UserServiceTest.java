@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.TestPropertySource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -40,6 +42,7 @@ import no.ding.pk.repository.SalesRoleRepository;
 
 @Transactional
 @SpringBootTest
+@DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
 @TestPropertySource("/h2-db.properties")
 public class UserServiceTest {
     
