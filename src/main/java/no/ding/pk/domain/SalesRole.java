@@ -48,7 +48,7 @@ public class SalesRole implements Serializable {
     
     @JsonManagedReference
     @Column
-    @OneToMany(mappedBy = "salesRole", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "salesRole", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @Builder.Default private List<User> userList = new ArrayList<>();
     
     public Long getId() {
