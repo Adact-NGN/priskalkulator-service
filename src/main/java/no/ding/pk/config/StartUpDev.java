@@ -27,7 +27,7 @@ import java.util.List;
 @Profile("dev")
 @Component
 public class StartUpDev {
-
+        
         private static final Logger log = LoggerFactory.getLogger(StartUpDev.class);
         
         private UserService userService;
@@ -44,47 +44,60 @@ public class StartUpDev {
         @Transactional
         @PostConstruct
         public void postConstruct() {
-
-                User alex = userService.save(User.builder()
-                .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-                .name("Alexander")
-                .sureName("Brox")
-                .fullName("Alexander Brox")
-                .orgNr("100")
-                .resourceNr("63874")
-                .associatedPlace("Oslo")
-                .phoneNumber("95838638")
-                .email("alexander.brox@ngn.no")
-                .jobTitle("Markedskonsulent")
-                .powerOfAttorneyOA(5)
-                .powerOfAttorneyFA(3)
-                .build()
-                , null);
-
+                
+                User alex = userService.findByEmail("alexander.brox@ngn.no");
+                
+                if(alex == null){
+                        alex = userService.save(User.builder()
+                        .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
+                        .name("Alexander")
+                        .sureName("Brox")
+                        .fullName("Alexander Brox")
+                        .orgNr("100")
+                        .resourceNr("63874")
+                        .associatedPlace("Oslo")
+                        .phoneNumber("95838638")
+                        .email("alexander.brox@ngn.no")
+                        .jobTitle("Markedskonsulent")
+                        .powerOfAttorneyOA(5)
+                        .powerOfAttorneyFA(3)
+                        .build()
+                        , null);
+                }
+                
                 SalesRole marketConsultant = salesRoleService.findSalesRoleByRoleName("KN");
-                marketConsultant.addUser(alex);
-                marketConsultant = salesRoleService.save(marketConsultant);
-
+                
+                if(marketConsultant.getUserList() != null && !marketConsultant.getUserList().contains(alex)) {
+                        marketConsultant.addUser(alex);
+                        marketConsultant = salesRoleService.save(marketConsultant);
+                }
+                
                 log.debug("Market consultant Sales Role: {}", marketConsultant);
-
-                User salesEmployee = User.builder()
-                .adId("ad-id-wegarijo-arha-rh-arha")
-                .jobTitle("Komponist")
-                .fullName("Wolfgang Amadeus Mozart")
-                .email("Wolfgang@farris-bad.no")
-                .associatedPlace("Larvik")
-                .department("Hvitsnippene")
-                .build();
-
-                salesEmployee = userService.save(salesEmployee, null);
-
+                
+                User salesEmployee = userService.findByEmail("Wolfgang@farris-bad.no");
+                
+                if(salesEmployee == null) {
+                        salesEmployee = User.builder()
+                        .adId("ad-id-wegarijo-arha-rh-arha")
+                        .orgNr("100")
+                        .jobTitle("Komponist")
+                        .fullName("Wolfgang Amadeus Mozart")
+                        .email("Wolfgang@farris-bad.no")
+                        .associatedPlace("Larvik")
+                        .department("Hvitsnippene")
+                        .build();
+                        
+                        salesEmployee = userService.save(salesEmployee, null);
+                }
+                
                 SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName("SA");
-                salesConsultant.addUser(salesEmployee);
-                salesConsultant = salesRoleService.save(salesConsultant);
-
+                
+                if(salesConsultant.getUserList() != null && !salesConsultant.getUserList().contains(salesEmployee)) {
+                        salesConsultant.addUser(salesEmployee);
+                        salesConsultant = salesRoleService.save(salesConsultant);
+                }
+                
                 log.debug("Sales consultant Sales Role: {}", salesConsultant);
-
-
                 
                 Terms customerTerms = Terms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())

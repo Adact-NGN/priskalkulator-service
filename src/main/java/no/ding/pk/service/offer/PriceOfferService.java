@@ -7,7 +7,7 @@ import no.ding.pk.domain.offer.PriceOffer;
 
 public interface PriceOfferService {
 
-    PriceOffer save(PriceOffer newPriceOffer);
+    PriceOffer save(PriceOffer updatedPriceOffer);
 
     Optional<PriceOffer> findById(Long id);
 

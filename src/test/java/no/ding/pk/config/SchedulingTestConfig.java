@@ -29,6 +29,8 @@ import no.ding.pk.service.InMemoryCache;
 import no.ding.pk.service.MaterialInMemoryCache;
 import no.ding.pk.web.mappers.MapperService;
 
+import javax.persistence.EntityManagerFactory;
+
 @Configuration
 @EnableScheduling
 @Profile({ "unit-test" })
@@ -123,5 +125,10 @@ public class SchedulingTestConfig {
     @Bean
     public ZoneRepository zoneRepository() {
         return mock(ZoneRepository.class);
+    }
+
+    @Bean
+    public EntityManagerFactory entityManagerFactory() {
+        return mock(EntityManagerFactory.class);
     }
 }

@@ -49,7 +49,7 @@ public class Offer extends Auditable {
     @Column
     private Date dateIssued;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     @JoinColumn(name = "customerTerms_id")
     private Terms customerTerms;
 }

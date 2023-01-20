@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import no.ding.pk.domain.Auditable;
 import org.hibernate.Hibernate;
 
@@ -19,6 +20,7 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,7 +31,7 @@ public class MaterialPrice extends Auditable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String materialNumber;
 
     @Column

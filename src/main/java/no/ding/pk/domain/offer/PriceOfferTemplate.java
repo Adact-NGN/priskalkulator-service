@@ -23,12 +23,14 @@ import no.ding.pk.domain.User;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "price_offer_template")
 public class PriceOfferTemplate extends Offer implements Serializable {
-    
+
     @Builder(builderMethodName = "priceOfferTemplateBuilder")
     public PriceOfferTemplate(Long id, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued,
-            Terms customerTerms) {
+                              Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued,
+                              Terms customerTerms) {
         super(id, customerNumber, customerName, salesOfficeList, salesEmployee, needsApproval, approver, approved, approvalDate,
                 dateIssued, customerTerms);
     }
 }
+
+

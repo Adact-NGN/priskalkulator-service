@@ -1,7 +1,10 @@
 package no.ding.pk.service.offer;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -23,38 +26,39 @@ public class MaterialServiceImplTest {
     
     @Autowired
     private MaterialPriceService mpService;
+
+    private void createMaterial() {
+        String materialNumber = "119901";
+
+        MaterialPrice wastePrice = MaterialPrice.builder()
+        .materialNumber(materialNumber)
+        .standardPrice(2456.00)
+        .build();
+        
+        Material waste = Material.builder()
+        .designation("Restavfall")
+        .materialNumber(materialNumber)
+        .priceUnit(1000)
+        .quantumUnit("KG")
+        .materialGroup("9912")
+        .materialGroupDesignation("Bl. næringsavfall")
+        .materialType("ZWAF")
+        .materialTypeDescription("Avfallsmateriale")
+        .materialStandardPrice(wastePrice)
+        .build();
+
+        service.save(waste);
+    }
     
     @Test
     void shouldPersistMaterialWithMaterialPrice() {
+
+        createMaterial();
         
         String materialNumber = "119901";
         
-        MaterialPrice wastePrice = mpService.findByMaterialNumber(materialNumber);
-        
-        if(wastePrice == null) {
-            wastePrice = MaterialPrice.builder()
-            .materialNumber(materialNumber)
-            .standardPrice(2456.00)
-            .build();
-            
-            wastePrice = mpService.save(wastePrice);
-        }
-        
-        Material waste = service.findByMaterialNumber(materialNumber);
-        
-        if(waste == null) {
-            waste = Material.builder()
-            .materialNumber(materialNumber)
-            .designation("Restavfall")
-            .priceUnit(1000)
-            .quantumUnit("KG")
-            .build();
-        }
+        Material actual = service.findByMaterialNumber(materialNumber);
 
-        waste.setMaterialStandardPrice(wastePrice);
-        
-        Material actual = service.save(waste);
-        
         assertThat(actual.getId(), notNullValue());
         assertThat(actual.getMaterialStandardPrice(), notNullValue());
         assertThat(actual.getMaterialStandardPrice().getId(), notNullValue());

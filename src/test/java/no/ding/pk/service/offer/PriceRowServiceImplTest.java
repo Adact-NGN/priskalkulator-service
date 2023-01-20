@@ -7,7 +7,6 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.Test;
@@ -48,7 +47,6 @@ public class PriceRowServiceImplTest {
         }
 
         Material waste = materialService.findByMaterialNumber(materialNumber);
-
         if(waste == null) {
             waste = Material.builder()
             .materialNumber(materialNumber)

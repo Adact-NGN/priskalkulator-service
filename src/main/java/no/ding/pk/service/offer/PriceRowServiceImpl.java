@@ -1,34 +1,42 @@
 package no.ding.pk.service.offer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.repository.offer.PriceRowRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.repository.offer.PriceRowRepository;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
 public class PriceRowServiceImpl implements PriceRowService {
     
-    private static Logger log = LoggerFactory.getLogger(PriceRowServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(PriceRowServiceImpl.class);
     
-    private PriceRowRepository repository;
-    
-    private MaterialService materialService;
+    private final PriceRowRepository repository;
+
+    private final MaterialPriceService materialPriceService;
+
+    @PersistenceUnit
+    private EntityManagerFactory emFactory;
     
     
     @Autowired
-    public PriceRowServiceImpl(PriceRowRepository priceRowRepository, MaterialService materialService) {
+    public PriceRowServiceImpl(PriceRowRepository priceRowRepository,
+                               MaterialPriceService materialPriceService, EntityManagerFactory emFactory) {
         this.repository = priceRowRepository;
-        this.materialService = materialService;
+        this.materialPriceService = materialPriceService;
+        this.emFactory = emFactory;
     }
     
     @Override
@@ -36,13 +44,13 @@ public class PriceRowServiceImpl implements PriceRowService {
         List<PriceRow> returnList = new ArrayList<>();
         for(int i = 0; i < priceRowList.size(); i++) {
             PriceRow materialPriceRow = priceRowList.get(i);
-
+            
             log.debug("Price Row: {}", materialPriceRow);
             
             PriceRow entity = new PriceRow();
             
             if(materialPriceRow.getId() != null) {
-                log.debug("Creating new PriceRow");
+                log.debug("Getting existing PriceRow");
                 Optional<PriceRow> optPriceRow = repository.findById(materialPriceRow.getId());
                 
                 if(optPriceRow.isPresent()) {
@@ -50,39 +58,81 @@ public class PriceRowServiceImpl implements PriceRowService {
                 }
             }
             
-//            entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
-//            entity.setDiscountPct(materialPriceRow.getDiscountPct());
-//            entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
-//            entity.setManualPrice(materialPriceRow.getManualPrice());
-//            entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
-//            entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
-//            entity.setStandardPrice(materialPriceRow.getStandardPrice());
-//            entity.setAmount(materialPriceRow.getAmount());
-//            entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
+            entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
+            entity.setDiscountPct(materialPriceRow.getDiscountPct());
+            entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
+            entity.setManualPrice(materialPriceRow.getManualPrice());
+            entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
+            entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
+            entity.setStandardPrice(materialPriceRow.getStandardPrice());
+            entity.setAmount(materialPriceRow.getAmount());
+            entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
             
             if(materialPriceRow.getMaterial() != null) {
-                log.debug("PriceRow->Material: {}", materialPriceRow.getMaterial());
-                entity.setMaterial(materialPriceRow.getMaterial());
+                Material material = materialPriceRow.getMaterial();
+                log.debug("PriceRow->Material: {}", material);
 
+                EntityManager em = emFactory.createEntityManager();
+                log.debug("Is material attached: {}", em.contains(material));
+                
+                if(material.getId() == null) {
 
-//                Material material = materialService.save(materialPriceRow.getMaterial());
-//
-//                log.debug(String.format("Id from persisted operation: %d", material.getId()));
-//                Optional<Material> optMaterial = materialService.findById(material.getId());
-//
-//                log.debug("Returned material: " + optMaterial.get());
-//                if(optMaterial.isPresent()) {
-//                    entity.setMaterial(optMaterial.get());
-//                }
+                    em.getTransaction().begin();
+                    List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                    em.getTransaction().commit();
+                    em.close();
+//                    Material persistedMaterial = materialService.findByMaterialNumber(material.getMaterialNumber());
+                    
+                    if(materials != null && materials.size() > 0) {
+                        Material persistedMaterial = (Material) materials.get(0);
+//                    if(persistedMaterial != null) {
+                        log.debug("Got Material: {}", persistedMaterial);
+                        updateMaterial(persistedMaterial, material);
+                        
+                        MaterialPrice persistedMaterialPrice = materialPriceService.findByMaterialNumber(persistedMaterial.getMaterialNumber());
+                        
+                        updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
+                        
+                        persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
+                        
+                        entity.setMaterial(persistedMaterial);
+                    } else {
+                        entity.setMaterial(material);   
+                    }
+
+                } else {
+                    entity.setMaterial(material);
+                }
+                
             }
-            
-//            entity = repository.save(entity);
             
             returnList.add(entity);
         }
         
-        log.debug("Persisted {} amount of PriceRows", returnList.size());
+        log.debug("Collected {} amount of PriceRows", returnList.size());
         return returnList;
+    }
+    
+    private void updateMaterial(Material to, Material from) {
+        log.debug("To: {}, from: {}", to, from);
+        to.setDesignation(from.getDesignation());
+        to.setMaterialGroup(from.getMaterialGroup());
+        to.setMaterialGroupDesignation(from.getMaterialGroupDesignation());
+        to.setMaterialType(from.getMaterialType());
+        to.setMaterialTypeDescription(from.getMaterialTypeDescription());
+        to.setDeviceType(from.getDeviceType());
+        
+        to.setCurrency(from.getCurrency());
+        to.setPriceUnit(from.getPriceUnit());
+        to.setQuantumUnit(from.getQuantumUnit());
+        to.setSalesZone(from.getSalesZone());
+    }
+    
+    private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {
+        log.debug("To: {}, from: {}", to, from);
+        to.setStandardPrice(from.getStandardPrice());
+        to.setValidFrom(from.getValidFrom());
+        to.setValidTo(from.getValidTo());
     }
     
 }

@@ -19,11 +19,12 @@ import no.ding.pk.config.SchedulingTestConfig;
 @TestPropertySource(properties = {"cache.ttl=1000", "cache.max.amount.items=5000"})
 @SpringJUnitConfig({SchedulingTestConfig.class})
 public class MaterialInMemoryCacheTest {
-    
+
     @Autowired
     private InMemoryCache<String, String, String> cache;
 
-//    @Qualifier("propertyResolver")
+    //    @Qualifier("propertyResolver")
+    @Qualifier("environment")
     @Autowired private PropertyResolver propertySourceResolver;
 
     @Test

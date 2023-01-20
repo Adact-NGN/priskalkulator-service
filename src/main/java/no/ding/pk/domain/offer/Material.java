@@ -15,8 +15,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import java.io.Serializable;
 import java.util.Objects;
 
 @Setter
@@ -25,9 +29,15 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@NamedQueries({
+        @NamedQuery(
+                name = "findMaterialByMaterialNumber",
+                query = "from Material m where m.materialNumber = :materialNumber"
+        )
+})
 @Entity
 @Table(name = "materials")
-public class Material {
+public class Material implements Serializable {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,7 +64,7 @@ public class Material {
     @Column
     private String deviceType;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private MaterialPrice materialStandardPrice;
 
     @Column

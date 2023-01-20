@@ -11,13 +11,16 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.TermsTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import javax.transaction.Transactional;
 
@@ -30,7 +33,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest
-@Transactional
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
 class PriceOfferServiceImplTest {
     @Autowired
@@ -42,40 +45,14 @@ class PriceOfferServiceImplTest {
     @Autowired
     private SalesRoleService salesRoleService;
 
-    void persistSalesRoles() {
-        SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
-
-        if(knSalesRole == null) {
-            knSalesRole = SalesRole.builder()
-                    .roleName("KN")
-                    .description("KAM nasjonalt")
-                    .defaultPowerOfAttorneyOa(5)
-                    .defaultPowerOfAttorneyFa(5)
-                    .build();
-
-            knSalesRole = salesRoleService.save(knSalesRole);
-            System.out.println(knSalesRole);
-        }
-
-        SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
-        if(saSalesRole == null) {
-            saSalesRole = SalesRole.builder()
-                    .roleName("SA")
-                    .description("Salgskonsulent (rolle a)")
-                    .defaultPowerOfAttorneyOa(2)
-                    .defaultPowerOfAttorneyFa(2)
-                    .build();
-
-            saSalesRole = salesRoleService.save(saSalesRole);
-
-            System.out.println(saSalesRole);
-        }
-    }
+    @Autowired
+    private MaterialService materialService;
 
     @Test
     public void shouldPersistPriceOffer() throws JsonProcessingException {
 
         persistSalesRoles();
+        createMaterial();
 
         User alex = userService.findByEmail("alexander.brox@ngn.no");
 
@@ -234,5 +211,59 @@ class PriceOfferServiceImplTest {
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
+    }
+
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    private void createMaterial() {
+        String materialNumber = "119901";
+
+        MaterialPrice wastePrice = MaterialPrice.builder()
+        .materialNumber(materialNumber)
+        .standardPrice(2456.00)
+        .build();
+        
+        Material waste = Material.builder()
+        .designation("Restavfall")
+        .materialNumber(materialNumber)
+        .priceUnit(1000)
+        .quantumUnit("KG")
+        .materialGroup("9912")
+        .materialGroupDesignation("Bl. næringsavfall")
+        .materialType("ZWAF")
+        .materialTypeDescription("Avfallsmateriale")
+        .materialStandardPrice(wastePrice)
+        .build();
+
+        materialService.save(waste);
+    }
+
+    private void persistSalesRoles() {
+        SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
+
+        if(knSalesRole == null) {
+            knSalesRole = SalesRole.builder()
+                    .roleName("KN")
+                    .description("KAM nasjonalt")
+                    .defaultPowerOfAttorneyOa(5)
+                    .defaultPowerOfAttorneyFa(5)
+                    .build();
+
+            knSalesRole = salesRoleService.save(knSalesRole);
+            System.out.println(knSalesRole);
+        }
+
+        SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
+        if(saSalesRole == null) {
+            saSalesRole = SalesRole.builder()
+                    .roleName("SA")
+                    .description("Salgskonsulent (rolle a)")
+                    .defaultPowerOfAttorneyOa(2)
+                    .defaultPowerOfAttorneyFa(2)
+                    .build();
+
+            saSalesRole = salesRoleService.save(saSalesRole);
+
+            System.out.println(saSalesRole);
+        }
     }
 }

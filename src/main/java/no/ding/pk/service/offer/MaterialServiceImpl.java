@@ -33,16 +33,16 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     public Material save(Material material) {
 
+        if(material.getMaterialNumber() == null) {
+            throw new RuntimeException("Received material without a material number.");
+        }
+
         log.debug("Searching for material with number: {}", material.getMaterialNumber());
         List<Material> materialList = repository.findAll();
         Material entity = repository.findByMaterialNumber(material.getMaterialNumber());
         
         if(entity == null) {
             entity = new Material();
-        }
-
-        if(material.getMaterialNumber() == null) {
-            throw new RuntimeException("Received material without a material number.");
         }
         
         entity.setMaterialNumber(material.getMaterialNumber());

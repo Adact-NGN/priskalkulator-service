@@ -1,5 +1,6 @@
 package no.ding.pk.service.offer;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -47,6 +48,12 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
     @Override
     public MaterialPrice findByMaterialNumber(String materialNumber) {
         return repository.findByMaterialNumber(materialNumber);
+    }
+
+    @Override
+    public List<MaterialPrice> findAll() {
+        // TODO Auto-generated method stub
+        return repository.findAll();
     }
     
 }
