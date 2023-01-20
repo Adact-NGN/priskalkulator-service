@@ -53,16 +53,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public PriceOffer save(PriceOffer newPriceOffer) {
         log.debug("Received PriceOffer {}", newPriceOffer);
 
-        if(newPriceOffer.getSalesEmployee() != null) {
-            log.debug("Sales Employee object provided with email: {}", newPriceOffer.getSalesEmployee().getEmail());
-            User salesEmployee = checkUserObject(newPriceOffer.getSalesEmployee());
-            log.debug("User: {}", salesEmployee);
+        User salesEmployee = checkAndGetSalesEmployee(newPriceOffer.getSalesEmployee());
 
-            if (salesEmployee == null) {
-                // TODO: Create own exception
-                throw new RuntimeException("No sales employee provided!");
-            }
-        }
 
         PriceOffer entity;
 
@@ -72,10 +64,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(optEntity.isPresent()) {
                 entity = optEntity.get();
             } else {
-                entity = createNewPriceOffer(newPriceOffer.getSalesEmployee());
+                entity = createNewPriceOffer(salesEmployee);
             }
         } else {
-            entity = createNewPriceOffer(newPriceOffer.getSalesEmployee());
+            entity = createNewPriceOffer(salesEmployee);
         }
 
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
@@ -112,6 +104,23 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private User checkAndGetSalesEmployee(User salesEmployee) {
+        if (salesEmployee == null) {
+            throw new RuntimeException("No sales employee provided!");
+        } else {
+            log.debug("Sales Employee object provided with email: {}", salesEmployee.getEmail());
+            User persistedSalesEmployee = checkUserObject(salesEmployee);
+            log.debug("User: {}", salesEmployee);
+
+            if (persistedSalesEmployee == null) {
+                // TODO: Create own exception
+                throw new RuntimeException("No sales employee provided!");
+            }
+
+            return persistedSalesEmployee;
+        }
     }
 
     private User checkUserObject(User user) {
