@@ -6,6 +6,6 @@ import no.ding.pk.domain.offer.PriceRow;
 
 public interface PriceRowService {
 
-    List<PriceRow> saveAll(List<PriceRow> materialList);
+    List<PriceRow> saveAll(List<PriceRow> materialList, String salesOrg, String salesOffice);
 
 }

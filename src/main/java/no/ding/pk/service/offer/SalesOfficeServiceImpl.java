@@ -56,25 +56,25 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setCity(salesOffice.getCity());
 
                 if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
-                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList());
+                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
 
                     salesOffice.setMaterialList(materialList);
                 }
 
                 if(salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
-                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList());
+                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
 
                     salesOffice.setTransportServiceList(transportServiceMaterialList);
                 }
 
                 if(salesOffice.getRentalList() != null && salesOffice.getRentalList().size() > 0) {
-                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList());
+                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
 
                     salesOffice.setRentalList(rentalMaterialList);
                 }
 
                 if(salesOffice.getZones() != null && salesOffice.getZones().size() > 0) {
-                    List<Zone> zones = zoneService.saveAll(salesOffice.getZones());
+                    List<Zone> zones = zoneService.saveAll(salesOffice.getZones(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
 
                     salesOffice.setZones(zones);
                 }

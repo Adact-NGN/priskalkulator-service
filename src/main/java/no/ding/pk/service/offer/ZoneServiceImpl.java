@@ -31,7 +31,7 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public List<Zone> saveAll(List<Zone> zoneList) {
+    public List<Zone> saveAll(List<Zone> zoneList, String salesOrg, String salesOffice) {
         List<Zone> returnZoneList = new ArrayList<>();
 
         for(int i = 0; i < zoneList.size(); i++) {
@@ -54,7 +54,7 @@ public class ZoneServiceImpl implements ZoneService {
 //            entity.setIsStandardZone(zone.getIsStandardZone());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
-                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows());
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice);
 
                 zone.setPriceRows(materials);
             }

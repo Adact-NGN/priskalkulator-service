@@ -27,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.utils.RequestHeaderUtil;
 import no.ding.pk.web.dto.MaterialDTO;
 import no.ding.pk.web.enums.MaterialField;
@@ -59,83 +60,150 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         this.inMemoryCache = inMemoryCache;
     }
     
+    @Override
     public List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg) {
         if(inMemoryCache.size(salesOffice) == 0 || inMemoryCache.isExpired()) {
-            inMemoryCache.cleanUp();
             log.debug("Cache is empty or expired, fetching new items.");
-            HttpClient client = HttpClient.newBuilder()
-            .build();
             
-            String filterQuery = String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
-            MaterialField.SalesOffice.getValue(), salesOffice, 
-            MaterialField.SalesOrganization.getValue(), salesOrg, 
-            MaterialField.MaterialExpired.getValue());
+            String filterQuery = createFilterQuery(salesOffice, salesOrg);
             
             log.debug(String.format("Filter query: %s", filterQuery));
             
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("$filter", filterQuery);
-            params.add("$format", "json");
-            
-            UriComponents url = UriComponentsBuilder
-            .fromUriString(standardPriceSapUrl)
-            .queryParams(params)
-            .build();
-            
-            log.debug("Created URL with URL prams: " + url.toUri().toString());
-            
-            HttpRequest request = HttpRequest.newBuilder()
-            .GET()
-            .uri(url.toUri())
-            .header(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword))
-            .build();
-            
-            log.debug("Created request: " + request.toString());
-            
-            HttpResponse<String> response;
-            
-            try {
-                response = client.send(request, BodyHandlers.ofString());
-            } catch (IOException | InterruptedException e) {
-                throw new Error(e.getMessage(), e);
-            }
-            
-            List<MaterialDTO> standardPriceDTOList = jsonToMaterialDTO(response);
-
-            log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
-            for(MaterialDTO material : standardPriceDTOList) {
-                StringBuffer objectKey = new StringBuffer();
-                objectKey.append(material.getMaterial());
-
-                if(!StringUtils.isBlank(material.getDeviceType())) {
-                    objectKey.append("_").append(material.getDeviceType());
-                }
-                inMemoryCache.put(salesOffice, objectKey.toString(), material);
-            }
-            int amountAddedForSalesOffice = inMemoryCache.size(salesOffice);
-            log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
+            buildUpStandardPriceCache(salesOffice, filterQuery);
             
             log.debug("Returning from new cache");
-            return inMemoryCache.getAll(salesOffice);
-        } else {
-            return inMemoryCache.getAll(salesOffice);
         }
+        
+        return inMemoryCache.getAll(salesOffice);        
+    }
+    
+    
+    
+    @Override
+    public MaterialPrice getStandardPriceForMaterial(String materialNumber, String salesOrg, String salesOffice) {
+        
+        if(inMemoryCache.size(salesOffice) == 0 || inMemoryCache.isExpired()) {
+            log.debug("Cache is empty or expired, fetching new items.");
+            
+            String filterQuery = createFilterQuery(salesOffice, salesOrg, materialNumber);
+            
+            log.debug(String.format("Filter query: %s", filterQuery));
+            
+            buildUpStandardPriceCache(salesOffice, filterQuery);
+            
+            log.debug("Returning from new cache");
+        }
+        
+        MaterialDTO materialDTO = inMemoryCache.getAll(salesOffice).stream().filter(material -> materialNumber.equals(material.getMaterial())).findAny().orElse(null);
+        
+        if(materialDTO != null) {
+            return materialDtoToMaterialPrice(materialNumber, materialDTO);
+        }
+        
+        return null;
+    }
+    
+    private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialDTO materialDTO) {
+        return MaterialPrice.builder()
+        .materialNumber(materialNumber)
+        .standardPrice(Double.parseDouble(materialDTO.getStandardPrice()))
+        .validFrom(materialDTO.getValidFrom())
+        .validTo(materialDTO.getValidTo())
+        .build();
+    }
+    
+    private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
+        inMemoryCache.cleanUp();
+        
+        HttpRequest request = createRequest(filterQuery);
+        
+        log.debug("Created request: " + request.toString());
+        
+        HttpResponse<String> response = sendRequest(request);
+        
+        List<MaterialDTO> standardPriceDTOList = jsonToMaterialDTO(response);
+        
+        addMaterialsToCache(salesOffice, standardPriceDTOList);
+    }
+    
+    private String createFilterQuery(String salesOffice, String salesOrg) {
+        return createFilterQuery(salesOffice, salesOrg, null);
+    }
+    
+    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber) {
+        StringBuilder filterQuery = new StringBuilder();
+        filterQuery.append(
+        String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
+        MaterialField.SalesOffice.getValue(), salesOffice, 
+        MaterialField.SalesOrganization.getValue(), salesOrg, 
+        MaterialField.MaterialExpired.getValue()
+        ));
+        
+        if(StringUtils.isNotBlank(materialNumber)) {
+            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.Material.getValue(), materialNumber));
+        }
+        return filterQuery.toString();
+    }
+    
+    private HttpRequest createRequest(String filterQuery) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("$filter", filterQuery);
+        params.add("$format", "json");
+        
+        UriComponents url = UriComponentsBuilder
+        .fromUriString(standardPriceSapUrl)
+        .queryParams(params)
+        .build();
+        
+        log.debug("Created URL with URL prams: " + url.toUri().toString());
+        
+        return HttpRequest.newBuilder()
+        .GET()
+        .uri(url.toUri())
+        .header(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword))
+        .build();
+    }
+    
+    private HttpResponse<String> sendRequest(HttpRequest request) {
+        HttpClient client = HttpClient.newBuilder()
+        .build();
+        
+        try {
+            return client.send(request, BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new Error(e.getMessage(), e);
+        }
+    }
+    
+    private void addMaterialsToCache(String salesOffice, List<MaterialDTO> standardPriceDTOList) {
+        log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
+        for(MaterialDTO material : standardPriceDTOList) {
+            StringBuffer objectKey = new StringBuffer();
+            objectKey.append(material.getMaterial());
+            
+            if(!StringUtils.isBlank(material.getDeviceType())) {
+                objectKey.append("_").append(material.getDeviceType());
+            }
+            inMemoryCache.put(salesOffice, objectKey.toString(), material);
+        }
+        int amountAddedForSalesOffice = inMemoryCache.size(salesOffice);
+        log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
     }
     
     private List<MaterialDTO> jsonToMaterialDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
-
+        
         if(jsonObject.has("error")) {
             JSONObject errorObject = jsonObject.getJSONObject("error");
-
+            
             log.debug("code: " + errorObject.getString("code"));
             log.debug("message" + errorObject.getJSONObject("message").getString("value"));
         }
-
+        
         JSONArray results = jsonObject.getJSONObject("d").getJSONArray("results");
         log.debug(String.format("JSON array contains %d elements", results.length()));
         List<MaterialDTO> standardPriceDTOList = new ArrayList<>();
-
+        
         int amountOfSuccessfullMaps = 0;
         int amountOfUnSuccessfullMaps = 0;
         for(int i = 0; i < results.length(); i++) {
@@ -149,9 +217,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 throw new Error("Failed to process JSON", e.getCause());
             }
         }
-
+        
         log.debug(String.format("Amount of successful maps: %d", amountOfSuccessfullMaps));
         log.debug(String.format("Amount of unsuccessful maps: %d", amountOfUnSuccessfullMaps));
         return standardPriceDTOList;
     }
+    
+    
 }

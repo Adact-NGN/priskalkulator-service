@@ -4,6 +4,8 @@ import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.service.StandardPriceService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +26,27 @@ public class PriceRowServiceImpl implements PriceRowService {
     private static final Logger log = LoggerFactory.getLogger(PriceRowServiceImpl.class);
     
     private final PriceRowRepository repository;
-
+    
     private final MaterialPriceService materialPriceService;
 
+    private final StandardPriceService standardPriceService;
+    
     @PersistenceUnit
     private EntityManagerFactory emFactory;
     
     
     @Autowired
     public PriceRowServiceImpl(PriceRowRepository priceRowRepository,
-                               MaterialPriceService materialPriceService, EntityManagerFactory emFactory) {
+    MaterialPriceService materialPriceService, EntityManagerFactory emFactory,
+    StandardPriceService standardPriceService) {
         this.repository = priceRowRepository;
         this.materialPriceService = materialPriceService;
         this.emFactory = emFactory;
+        this.standardPriceService = standardPriceService;
     }
     
     @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList) {
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice) {
         List<PriceRow> returnList = new ArrayList<>();
         for(int i = 0; i < priceRowList.size(); i++) {
             PriceRow materialPriceRow = priceRowList.get(i);
@@ -71,35 +77,39 @@ public class PriceRowServiceImpl implements PriceRowService {
             if(materialPriceRow.getMaterial() != null) {
                 Material material = materialPriceRow.getMaterial();
                 log.debug("PriceRow->Material: {}", material);
-
+                
                 EntityManager em = emFactory.createEntityManager();
                 log.debug("Is material attached: {}", em.contains(material));
                 
                 if(material.getId() == null) {
-
+                    
                     em.getTransaction().begin();
                     List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
                     em.getTransaction().commit();
                     em.close();
-//                    Material persistedMaterial = materialService.findByMaterialNumber(material.getMaterialNumber());
+                    //                    Material persistedMaterial = materialService.findByMaterialNumber(material.getMaterialNumber());
                     
                     if(materials != null && materials.size() > 0) {
                         Material persistedMaterial = (Material) materials.get(0);
-//                    if(persistedMaterial != null) {
                         log.debug("Got Material: {}", persistedMaterial);
                         updateMaterial(persistedMaterial, material);
                         
                         MaterialPrice persistedMaterialPrice = materialPriceService.findByMaterialNumber(persistedMaterial.getMaterialNumber());
                         
-                        updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
-                        
-                        persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
+                        if(persistedMaterialPrice != null) {
+                            updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
+                            persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
+                        } else {
+                            log.debug("No MaterialPrice for Material, getting standard price for material: {}", material.getMaterialNumber());
+                            MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
+                            persistedMaterial.setMaterialStandardPrice(stdPrice);
+                        }
                         
                         entity.setMaterial(persistedMaterial);
                     } else {
                         entity.setMaterial(material);   
                     }
-
+                    
                 } else {
                     entity.setMaterial(material);
                 }

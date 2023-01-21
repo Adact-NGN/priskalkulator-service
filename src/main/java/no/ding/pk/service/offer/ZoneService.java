@@ -6,6 +6,6 @@ import no.ding.pk.domain.offer.Zone;
 
 public interface ZoneService {
 
-    List<Zone> saveAll(List<Zone> zoneList);
+    List<Zone> saveAll(List<Zone> zoneList, String string, String string2);
 
 }

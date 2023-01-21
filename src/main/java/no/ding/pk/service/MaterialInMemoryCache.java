@@ -54,15 +54,17 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
                 cacheMap.put(groupKey, new LinkedHashMap<T, CacheObject<V>>());
             }
             
+            if(cacheMap.get(groupKey).containsKey(objectKey)) {
+                log.debug(String.format("Group %s already contains objectKey %s", groupKey, objectKey));
+                return;
+            }
+            
             CacheObject<V> cacheObject = new CacheObject<>();
             cacheObject.value = value;
             
-            if(cacheMap.get(groupKey).containsKey(objectKey)) {
-                log.debug(String.format("Group %s already contains objectKey %s", groupKey, objectKey));
-            }
-            
             if(cacheMap.get(groupKey).containsValue(cacheObject)) {
                 log.debug(String.format("Group %s already contains object: %s", groupKey, cacheObject.toString()));
+                return;
             }
             
             cacheMap.get(groupKey).put(objectKey, cacheObject);
@@ -71,11 +73,7 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
     
     public V get(K groupKey, T key) {
         synchronized (cacheMap) {
-            if(!cacheMap.containsKey(groupKey)) {
-                return null;
-            }
-            
-            if(!cacheMap.get(groupKey).containsKey(key)) {
+            if(!cacheMap.containsKey(groupKey) || !cacheMap.get(groupKey).containsKey(key)) {
                 return null;
             }
             
@@ -130,14 +128,13 @@ public class MaterialInMemoryCache<K, T, V> implements InMemoryCache<K, T, V>  {
         long now = System.currentTimeMillis();
         Map<K, List<T>> groupDeleteKey = null;
         
-        
-        if(cacheMap.size() > 0) {
-            log.debug("Cachemap has size: " + cacheMap.size());
-        } else {
-            log.debug("Cachemap is empty");
-        }
-        
         synchronized (cacheMap) {
+            if(cacheMap.size() > 0) {
+                log.debug("Cachemap has size: " + cacheMap.size());
+            } else {
+                log.debug("Cachemap is empty");
+            }
+            
             Set<K> groupKeySet = cacheMap.keySet();
             log.debug(String.format("Keyset size is %d with content %s", groupKeySet.size(), groupKeySet.toString()));
             groupDeleteKey = new HashMap<>();

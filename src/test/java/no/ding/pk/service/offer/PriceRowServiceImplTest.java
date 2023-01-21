@@ -72,7 +72,7 @@ public class PriceRowServiceImplTest {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104");
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
