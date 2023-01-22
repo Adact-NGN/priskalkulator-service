@@ -38,20 +38,20 @@ public class ZoneServiceImpl implements ZoneService {
             Zone zone = zoneList.get(i);
             log.debug("Zone {}", zone);
 
-//            Zone entity = new Zone();
-//
-//            if(zone.getId() != null) {
-//                Optional<Zone> optZone = repository.findById(zone.getId());
-//
-//                if(optZone.isPresent()) {
-//                    entity = optZone.get();
-//                }
-//            }
-//
-//            entity.setZoneId(zone.getZoneId());
-//            entity.setPostalCode(zone.getPostalCode());
-//            entity.setPostalName(zone.getPostalName());
-//            entity.setIsStandardZone(zone.getIsStandardZone());
+           Zone entity = new Zone();
+
+           if(zone.getId() != null) {
+               Optional<Zone> optZone = repository.findById(zone.getId());
+
+               if(optZone.isPresent()) {
+                   entity = optZone.get();
+               }
+           }
+
+           entity.setZoneId(zone.getZoneId());
+           entity.setPostalCode(zone.getPostalCode());
+           entity.setPostalName(zone.getPostalName());
+           entity.setIsStandardZone(zone.getIsStandardZone());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice);
