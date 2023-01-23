@@ -51,7 +51,7 @@ public class PriceRowServiceImplTest {
             waste = Material.builder()
             .materialNumber(materialNumber)
             .designation("Restavfall")
-            .priceUnit(1000)
+            .pricingUnit(1000)
             .quantumUnit("KG")
             .materialStandardPrice(wastePrice)
             .build();

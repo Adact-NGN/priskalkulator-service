@@ -99,7 +99,7 @@ public class PriceOfferRepositoryTest {
         Material material = Material.builder()
         .materialNumber("50101")
         .designation("Lift - Utsett")
-        .priceUnit(1)
+        .pricingUnit(1)
         .quantumUnit("ST")
         .materialStandardPrice(materialPrice)
         .build();
@@ -138,7 +138,7 @@ public class PriceOfferRepositoryTest {
         Material waste = Material.builder()
         .materialNumber("119901")
         .designation("Restavfall")
-        .priceUnit(1000)
+        .pricingUnit(1000)
         .quantumUnit("KG")
         .materialStandardPrice(wastePrice)
         .build();
@@ -214,7 +214,7 @@ public class PriceOfferRepositoryTest {
         Material material = Material.builder()
         .materialNumber("50101")
         .designation("Lift - Utsett")
-        .priceUnit(1)
+        .pricingUnit(1)
         .quantumUnit("ST")
         .materialStandardPrice(materialPrice)
         .build();
@@ -253,7 +253,7 @@ public class PriceOfferRepositoryTest {
         Material waste = Material.builder()
         .materialNumber("119901")
         .designation("Restavfall")
-        .priceUnit(1000)
+        .pricingUnit(1000)
         .quantumUnit("KG")
         .materialStandardPrice(wastePrice)
         .build();

@@ -61,7 +61,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setMaterialStandardPrice(materialPriceEntity);
         }
 
-        entity.setPriceUnit(material.getPriceUnit());
+        entity.setPricingUnit(material.getPricingUnit());
         entity.setQuantumUnit(material.getQuantumUnit());
         entity.setSalesZone(material.getSalesZone());
         

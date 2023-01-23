@@ -5,7 +5,9 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.Data;
 
+@Data
 @JsonIgnoreProperties(value = { "__metadata" })
 public class MaterialDTO  {
     @JsonDeserialize(converter = LongToDateConverter.class)
@@ -30,7 +32,7 @@ public class MaterialDTO  {
     @JsonAlias({"Valuta"}) //: "",
     private String currency;
     @JsonAlias({"Prisenhet", "PricingUnit"}) //: "1000",
-    private String priceUnit;
+    private String pricingUnit;
     @JsonAlias({"Kvantumsenhet", "QuantumUnit"}) //: "KG",
     private String quantumUnit;
 
@@ -110,11 +112,11 @@ public class MaterialDTO  {
     public void setCurrency(String currency) {
         this.currency = currency;
     }
-    public String getPriceUnit() {
-        return priceUnit;
+    public String getPricingUnit() {
+        return pricingUnit;
     }
-    public void setPriceUnit(String priceUnit) {
-        this.priceUnit = priceUnit;
+    public void setPricingUnit(String pricingUnit) {
+        this.pricingUnit = pricingUnit;
     }
     public String getQuantumUnit() {
         return quantumUnit;
@@ -174,7 +176,7 @@ public class MaterialDTO  {
         result = prime * result + ((zone == null) ? 0 : zone.hashCode());
         result = prime * result + ((scaleQuantum == null) ? 0 : scaleQuantum.hashCode());
         result = prime * result + ((currency == null) ? 0 : currency.hashCode());
-        result = prime * result + ((priceUnit == null) ? 0 : priceUnit.hashCode());
+        result = prime * result + ((pricingUnit == null) ? 0 : pricingUnit.hashCode());
         result = prime * result + ((quantumUnit == null) ? 0 : quantumUnit.hashCode());
         result = prime * result + ((validTo == null) ? 0 : validTo.hashCode());
         result = prime * result + ((productGroup == null) ? 0 : productGroup.hashCode());
@@ -237,10 +239,10 @@ public class MaterialDTO  {
                 return false;
         } else if (!currency.equals(other.currency))
             return false;
-        if (priceUnit == null) {
-            if (other.priceUnit != null)
+        if (pricingUnit == null) {
+            if (other.pricingUnit != null)
                 return false;
-        } else if (!priceUnit.equals(other.priceUnit))
+        } else if (!pricingUnit.equals(other.pricingUnit))
             return false;
         if (quantumUnit == null) {
             if (other.quantumUnit != null)

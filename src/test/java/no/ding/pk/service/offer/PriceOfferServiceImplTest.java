@@ -111,7 +111,7 @@ class PriceOfferServiceImplTest {
                 .materialNumber("119901")
                 .designation("Restavfall")
                 .materialGroupDesignation("Bl. næringsavfall")
-                .priceUnit(1000)
+                .pricingUnit(1000)
                 .quantumUnit("KG")
                 .materialStandardPrice(residualWasteMaterialStdPrice)
                 .build();
@@ -136,7 +136,7 @@ class PriceOfferServiceImplTest {
                 .materialNumber("50101")
                 .designation("Lift - Utsett")
                 .materialGroupDesignation("Tjeneste")
-                .priceUnit(1)
+                .pricingUnit(1)
                 .quantumUnit("ST")
                 .materialStandardPrice(zoneMaterialStandardPrice)
                 .build();
@@ -225,7 +225,7 @@ class PriceOfferServiceImplTest {
         Material waste = Material.builder()
         .designation("Restavfall")
         .materialNumber(materialNumber)
-        .priceUnit(1000)
+        .pricingUnit(1000)
         .quantumUnit("KG")
         .materialGroup("9912")
         .materialGroupDesignation("Bl. næringsavfall")

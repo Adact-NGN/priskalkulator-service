@@ -71,10 +71,13 @@ public class Material implements Serializable {
     private String currency;
 
     @Column
-    private Integer priceUnit;
+    private Integer pricingUnit;
 
     @Column
     private String quantumUnit; // KG, STK etc.
+
+    @Column
+    private String scaleQuantum;
 
     @Column
     private String salesZone;

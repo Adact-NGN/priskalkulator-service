@@ -38,7 +38,7 @@ public class MaterialServiceImplTest {
         Material waste = Material.builder()
         .designation("Restavfall")
         .materialNumber(materialNumber)
-        .priceUnit(1000)
+        .pricingUnit(1000)
         .quantumUnit("KG")
         .materialGroup("9912")
         .materialGroupDesignation("Bl. næringsavfall")

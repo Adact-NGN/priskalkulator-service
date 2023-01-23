@@ -133,7 +133,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setDeviceType(from.getDeviceType());
         
         to.setCurrency(from.getCurrency());
-        to.setPriceUnit(from.getPriceUnit());
+        to.setPricingUnit(from.getPricingUnit());
         to.setQuantumUnit(from.getQuantumUnit());
         to.setSalesZone(from.getSalesZone());
     }

@@ -113,7 +113,7 @@ public class StartUpDev {
                 .materialNumber("119901")
                 .designation("Restavfall")
                 .materialGroupDesignation("Bl. næringsavfall")
-                .priceUnit(1000)
+                .pricingUnit(1000)
                 .quantumUnit("KG")
                 .materialStandardPrice(residualWasteMaterialStdPrice)
                 .build();
@@ -138,7 +138,7 @@ public class StartUpDev {
                 .materialNumber("50101")
                 .designation("Lift - Utsett")
                 .materialGroupDesignation("Tjeneste")
-                .priceUnit(1)
+                .pricingUnit(1)
                 .quantumUnit("ST")
                 .materialStandardPrice(zoneMaterialStandardPrice)
                 .build();
