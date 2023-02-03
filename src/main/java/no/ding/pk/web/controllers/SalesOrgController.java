@@ -66,7 +66,8 @@ public class SalesOrgController {
         } else {
             paramsList = new String[]{salesOrg, salesOffice, postalNumber, salesZone, city};
         }
-
+        
+        List<SalesOrgField> fieldList = SalesOrgField.fieldList();
         
         boolean isAllBlank = true;
         for(String param : paramsList) {
@@ -82,7 +83,6 @@ public class SalesOrgController {
             log.debug("Got the parameters: " + paramsList.toString());
         }
 
-        List<String> fieldList = SalesOrgField.fieldList();
 
         StringBuilder queryBuilder = new StringBuilder();
 
@@ -97,8 +97,23 @@ public class SalesOrgController {
             String param = paramsList[i];
 
             if(StringUtils.isNotBlank(param)) {
+                String fieldType = fieldList.get(i).getType();
+
+                log.debug("Parameter: {} fieldType: {}", param, fieldType);
+
+                if(StringUtils.equals(fieldType, "numeric") && !StringUtils.isNumeric(param)) {
+                    continue;
+                }
+
+                log.debug("Parameter ({}) and parameter type ({}) matches. Add to query.", param, fieldType);
+
+                // if(StringUtils.equals(fieldType, "string") && !StringUtils.isAlphanumericSpace(param)) {
+                //     continue;
+                // }
+
+                String field = fieldList.get(i).getValue();
                 addAndToQuery(queryBuilder, logicDivider);
-                String field = fieldList.get(i);
+
                 queryBuilder.append(field).append(" eq ").append(String.format("'%s'", param));
             }
         }

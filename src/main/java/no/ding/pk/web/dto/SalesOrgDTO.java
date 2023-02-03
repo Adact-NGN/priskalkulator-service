@@ -7,7 +7,7 @@ public class SalesOrgDTO {
     @JsonAlias("SalesOrganization")
     private String salesOrganization;
 
-    @JsonAlias("PostalNumber")
+    @JsonAlias({"PostalNumber", "PostalCode"})
     private String postalNumber;
 
     @JsonAlias("SalesOfficeName")

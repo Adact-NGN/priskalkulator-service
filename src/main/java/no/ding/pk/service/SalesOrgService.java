@@ -13,7 +13,7 @@ public interface SalesOrgService {
 
     List<SalesOrgDTO> getAllBySalesOffice(String salesOffice);
 
-    List<SalesOrgDTO> getAllByPostalNumber(String postalNumber);
+    List<SalesOrgDTO> getAllByPostalNumber(String postalCode);
 
     List<SalesOrgDTO> getAllBySalesZone(String salesZone);
 

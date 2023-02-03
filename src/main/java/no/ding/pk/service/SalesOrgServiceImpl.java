@@ -108,9 +108,9 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     }
 
     @Override
-    public List<SalesOrgDTO> getAllByPostalNumber(String postalNumber) {
+    public List<SalesOrgDTO> getAllByPostalNumber(String postalCode) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", String.format("%s eq '%s'", SalesOrgField.PostalNumber.getValue(), postalNumber));
+        params.add("$filter", String.format("%s eq '%s'", SalesOrgField.PostalCode.getValue(), postalCode));
 
         HttpRequest request = HttpRequestResponseUtil.createGetRequest(salesOrgServiceUrl, params);
         HttpResponse<String> response = HttpRequestResponseUtil.getResponse(request);
@@ -155,6 +155,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     private List<SalesOrgDTO> responseToDtoList(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         log.debug(String.format("JSON object size: %d", jsonObject.length()));
+        log.debug("JSON content {}", jsonObject);
         JSONArray result = jsonObject.getJSONArray("value");
 
         log.debug(String.format("Got %d amount of objects in JSON array", result.length()));
@@ -176,12 +177,6 @@ public class SalesOrgServiceImpl implements SalesOrgService {
 
             salesOrgDTOs.add(salesOrgDTO);
         }
-
-//        salesOrgDTOs.stream().
-//
-//        for(int i = 0; i < salesOrgDTOs.size(); i++) {
-//            int amountOfZones
-//        }
 
         return salesOrgDTOs;
     }
