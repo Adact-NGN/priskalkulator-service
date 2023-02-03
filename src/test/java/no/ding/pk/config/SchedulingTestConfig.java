@@ -2,7 +2,11 @@ package no.ding.pk.config;
 
 import static org.mockito.Mockito.mock;
 
+import no.ding.pk.service.converters.PdfService;
 import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.service.template.HandlebarsTemplateService;
+import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -130,5 +134,15 @@ public class SchedulingTestConfig {
     @Bean
     public EntityManagerFactory entityManagerFactory() {
         return mock(EntityManagerFactory.class);
+    }
+
+    @Bean
+    public HandlebarsTemplateService handlebarsTemplateService() {
+        return new HandlebarsTemplateServiceImpl("priceOfferTemplate");
+    }
+
+    @Bean
+    public PdfService pdfService() {
+        return mock(PdfService.class);
     }
 }

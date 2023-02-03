@@ -184,6 +184,12 @@ fabric.properties
 .idea/vcs.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/dataSources.xml
+
+*.pdf
+
+.idea/*
+
+.git-old/*
 .git-old/COMMIT_EDITMSG
 .git-old/config
 .git-old/description
@@ -2739,3 +2745,5 @@ fabric.properties
 .git-old/refs/remotes/origin/develop
 .git-old/refs/remotes/origin/HEAD
 .git-old/refs/remotes/origin/feature/secrets-for-kubernetes
+/src/main/resources/META-INF/additional-spring-configuration-metadata.json
+/dependency-tree.txt

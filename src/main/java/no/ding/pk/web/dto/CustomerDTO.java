@@ -5,7 +5,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(value = { "AbcKlassifisering" })
 public class CustomerDTO {
     @JsonAlias("Kundenummer")

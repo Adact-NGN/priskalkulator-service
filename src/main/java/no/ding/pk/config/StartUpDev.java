@@ -10,8 +10,11 @@ import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.SalesRoleService;
+import no.ding.pk.service.StandardPriceService;
 import no.ding.pk.service.UserService;
+import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.PriceOfferService;
+import no.ding.pk.web.dto.MaterialDTO;
 import no.ding.pk.web.enums.TermsTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,12 +38,20 @@ public class StartUpDev {
         private UserService userService;
         private PriceOfferService priceOfferService;
         private SalesRoleService salesRoleService;
+        private StandardPriceService priceService;
+        private MaterialService materialService;
         
         @Autowired
-        public StartUpDev(UserService userService, PriceOfferService priceOfferService, SalesRoleService salesRoleService) {
+        public StartUpDev(UserService userService,
+        PriceOfferService priceOfferService,
+        SalesRoleService salesRoleService,
+        StandardPriceService priceService,
+        MaterialService materialService) {
                 this.userService = userService;
                 this.priceOfferService = priceOfferService;
                 this.salesRoleService = salesRoleService;
+                this.priceService = priceService;
+                this.materialService = materialService;
         }
         
         @Transactional
@@ -104,64 +117,42 @@ public class StartUpDev {
                 .agreementStartDate(new Date())
                 .build();
                 
+                List<MaterialDTO> materialDTOs = priceService.getStdPricesForSalesOfficeAndSalesOrg("100", "100");
                 
-                MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder()
-                .materialNumber("119901")
-                .standardPrice(2456.0)
-                .build();
-                Material residualWasteMaterial = Material.builder()
-                .materialNumber("119901")
-                .designation("Restavfall")
-                .materialGroupDesignation("Bl. næringsavfall")
-                .pricingUnit(1000)
-                .quantumUnit("KG")
-                .materialStandardPrice(residualWasteMaterialStdPrice)
-                .build();
-                PriceRow priceRow = PriceRow.builder()
-                .customerPrice(2456.0)
-                .discountPct(0.02)
-                .showPriceInOffer(true)
-                .manualPrice(2400.0)
-                .discountLevel(1)
-                .discountLevelPrice(56.0)
-                .amount(1)
-                .priceIncMva(2448.0)
-                .material(residualWasteMaterial)
-                .build();
-                List<PriceRow> materialList = List.of(priceRow);
+                List<String> materialNumberList = List.of("119901", "122110", "132201");
+                List<PriceRow> materialList = createPriceRowList(materialNumberList, materialDTOs); // List.of(priceRow);
                 
-                MaterialPrice zoneMaterialStandardPrice = MaterialPrice.builder()
-                .materialNumber("50101")
-                .standardPrice(1131.0)
-                .build();
-                Material zoneMaterial = Material.builder()
-                .materialNumber("50101")
-                .designation("Lift - Utsett")
-                .materialGroupDesignation("Tjeneste")
-                .pricingUnit(1)
-                .quantumUnit("ST")
-                .materialStandardPrice(zoneMaterialStandardPrice)
-                .build();
-                PriceRow zonePriceRow = PriceRow.builder()
-                .customerPrice(1000.0)
-                .discountPct(0.02)
-                .showPriceInOffer(true)
-                .manualPrice(900.0)
-                .discountLevel(1)
-                .discountLevelPrice(100.0)
-                .amount(1)
-                .priceIncMva(1125.0)
-                .material(zoneMaterial)
-                .build();
-                List<PriceRow> zoneMaterialList = List.of(zonePriceRow);
-                Zone zone = Zone.builder()
-                .zoneId("0000000001")
-                .postalCode("1601")
-                .postalName("FREDRIKSTAD")
-                .isStandardZone(true)
-                .priceRows(zoneMaterialList)
-                .build();
-                List<Zone> zoneList = List.of(zone);
+                List<String> zone0MaterialNumberList = List.of("50201", "50203", "50101", "50102", "50104");
+                List<PriceRow> zone0MaterialList = createPriceRowList(zone0MaterialNumberList, materialDTOs);
+                Zone zone0 = createZone("0000000001", "1601", "FREDRIKSTAD", true, zone0MaterialList);
+                
+                List<String> zone1MaterialNumberList = List.of("50201", "50203", "50101", "50102", "50104");
+                List<PriceRow> zone1MaterialList = createPriceRowList(zone1MaterialNumberList, materialDTOs);
+                Zone zone1 = createZone("0000000002", "1601", "FREDRIKSTAD", false, zone1MaterialList);
+                
+                List<Zone> zoneList = List.of(zone0, zone1);
+                
+                String flatbedTransport = "50305";
+                PriceRow flatBedMaterial = createPriceRow(materialDTOs, flatbedTransport);
+                List<String> flatBedCombinedMaterialNumbers = List.of("50321", "B-0660");
+                List<PriceRow> flatBedCombinedMaterialList = createPriceRowList(flatBedCombinedMaterialNumbers, materialDTOs);
+                
+                flatBedMaterial.setCombinedMaterials(flatBedCombinedMaterialList);
+                
+                String compressionTruckTransport = "50405";
+                PriceRow compressionMaterial = createPriceRow(materialDTOs, compressionTruckTransport);
+                List<String> compressionTruckTransportCombinedMaterialNumbers = List.of("50421", "B-0140", "C-10CL");
+                List<PriceRow> compressionTruckTransportCombinedMaterialList = createPriceRowList(compressionTruckTransportCombinedMaterialNumbers, materialDTOs);
+                
+                compressionMaterial.setCombinedMaterials(compressionTruckTransportCombinedMaterialList);
+                
+                List<PriceRow> transportMaterialList = new ArrayList<>();
+                transportMaterialList.add(flatBedMaterial);
+                transportMaterialList.add(compressionMaterial);
+                
+                List<String> rentMaterialNumberList = List.of("B-0660", "C-10CL", "C-35K", "B-0B-E");
+                List<PriceRow> rentalMaterialList = createPriceRowList(rentMaterialNumberList, materialDTOs);
+                
                 SalesOffice salesOffice = SalesOffice.builder()
                 .salesOrg("100")
                 .salesOffice("127")
@@ -169,6 +160,8 @@ public class StartUpDev {
                 .postalNumber("1601")
                 .city("FREDRIKSTAD")
                 .materialList(materialList)
+                .transportServiceList(transportMaterialList)
+                .rentalList(rentalMaterialList)
                 .zones(zoneList)
                 .build();
                 
@@ -184,5 +177,83 @@ public class StartUpDev {
                 .build();
                 
                 priceOfferService.save(priceOffer);
+        }
+        
+        private List<PriceRow> createPriceRowList(List<String> materialNumberList, List<MaterialDTO> materialDTOs) {
+                List<PriceRow> returnList = new ArrayList<>();
+                
+                for(int i = 0; i < materialNumberList.size(); i++) {
+                        String materialNumber = materialNumberList.get(i);
+                        
+                        PriceRow priceRow = createPriceRow(materialDTOs, materialNumber);
+                        returnList.add(priceRow);
+                }
+                
+                return returnList;
+        }
+        
+        private PriceRow createPriceRow(List<MaterialDTO> materialDTOs, String materialNumber) {
+                MaterialDTO materialDTO = materialDTOs.stream().filter(obj -> obj.getMaterial().equalsIgnoreCase(materialNumber)).findAny().orElse(null);
+                log.debug("Found materialDTO: {}", materialDTO);
+                MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, Double.parseDouble(materialDTO.getStandardPrice()));
+                Material material = createMaterial(materialNumber, materialDTO, residualWasteMaterialStdPrice);
+                
+                material = materialService.save(material);
+                
+                return createPriceRow(Double.parseDouble(materialDTO.getStandardPrice()), 0.02, true, Double.parseDouble(materialDTO.getStandardPrice()), 1, 56.0, 1, Double.parseDouble(materialDTO.getStandardPrice()), material);
+        }
+        
+        private Zone createZone(String zoneId, String postalCode, String postalName, boolean isStandardZone, List<PriceRow> zoneMaterialList) {
+                return Zone.builder()
+                .zoneId(zoneId)
+                .postalCode(postalCode)
+                .postalName(postalName)
+                .isStandardZone(isStandardZone)
+                .priceRows(zoneMaterialList)
+                .build();
+        }
+        
+        private PriceRow createPriceRow(Double customerPrice,
+        Double discountPct,
+        boolean showPriceInOffer,
+        Double manualPrice,
+        int discountLevel,
+        Double discountLevelPrice,
+        int amount,
+        Double priceIncMva,
+        Material residualWasteMaterial) {
+                return PriceRow.builder()
+                .customerPrice(customerPrice)
+                .discountPct(discountPct)
+                .showPriceInOffer(showPriceInOffer)
+                .manualPrice(manualPrice)
+                .discountLevel(discountLevel)
+                .discountLevelPrice(discountLevelPrice)
+                .amount(amount)
+                .priceIncMva(priceIncMva)
+                .material(residualWasteMaterial)
+                .build();
+        }
+        
+        private Material createMaterial(String material, MaterialDTO materialDTO,
+        MaterialPrice residualWasteMaterialStdPrice) {
+                log.debug("MaterialDTO PricingUnit: {} -> {}", materialDTO.getPricingUnit(), Integer.parseInt(materialDTO.getPricingUnit()));
+                return Material.builder()
+                .materialNumber(material)
+                .designation(materialDTO.getDesignation())
+                .materialGroupDesignation(materialDTO.getMaterialTypeDesignation())
+                .materialTypeDescription(materialDTO.getMaterialTypeDesignation())
+                .pricingUnit(Integer.parseInt(materialDTO.getPricingUnit()))
+                .scaleQuantum(materialDTO.getScaleQuantum())
+                .quantumUnit(materialDTO.getQuantumUnit())
+                .materialStandardPrice(residualWasteMaterialStdPrice)
+                .build();
+        }
+        
+        private MaterialPrice createMaterialStdPrice(String materialNumber, Double standardPrice) {
+                return MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(standardPrice)
+                .build();
         }
 }

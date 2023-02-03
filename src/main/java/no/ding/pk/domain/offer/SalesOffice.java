@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -46,7 +47,8 @@ public class SalesOffice {
     @Column
     private String city;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany()
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "material_list_id")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> materialList;
@@ -55,12 +57,14 @@ public class SalesOffice {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Zone> zones;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany()
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "transport_list_id")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> transportServiceList;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany()
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "rental_list_id")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> rentalList;

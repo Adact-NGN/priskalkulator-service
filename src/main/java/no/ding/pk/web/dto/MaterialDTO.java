@@ -50,7 +50,7 @@ public class MaterialDTO  {
     @JsonAlias({"Materialtype", "MaterialType"}) //: "DIEN",
     private String materialType;
     @JsonAlias({"Materialbeskrivelse", "MaterialTypeDescription"}) //: "Tjeneste"
-    private String materialDesignation;
+    private String materialTypeDesignation;
     
     public Date getValidFrom() {
         return validFrom;
@@ -156,11 +156,11 @@ public class MaterialDTO  {
     public void setMaterialType(String materialType) {
         this.materialType = materialType;
     }
-    public String getMaterialDesignation() {
-        return materialDesignation;
+    public String getMaterialTypeDesignation() {
+        return materialTypeDesignation;
     }
-    public void setMaterialDesignation(String materialDesignation) {
-        this.materialDesignation = materialDesignation;
+    public void setMaterialTypeDesignation(String materialTypeDesignation) {
+        this.materialTypeDesignation = materialTypeDesignation;
     }
 
     @Override
@@ -182,7 +182,7 @@ public class MaterialDTO  {
         result = prime * result + ((productGroup == null) ? 0 : productGroup.hashCode());
         result = prime * result + ((productGroupDesignation == null) ? 0 : productGroupDesignation.hashCode());
         result = prime * result + ((materialType == null) ? 0 : materialType.hashCode());
-        result = prime * result + ((materialDesignation == null) ? 0 : materialDesignation.hashCode());
+        result = prime * result + ((materialTypeDesignation == null) ? 0 : materialTypeDesignation.hashCode());
         return result;
     }
     @Override
@@ -269,10 +269,10 @@ public class MaterialDTO  {
                 return false;
         } else if (!materialType.equals(other.materialType))
             return false;
-        if (materialDesignation == null) {
-            if (other.materialDesignation != null)
+        if (materialTypeDesignation == null) {
+            if (other.materialTypeDesignation != null)
                 return false;
-        } else if (!materialDesignation.equals(other.materialDesignation))
+        } else if (!materialTypeDesignation.equals(other.materialTypeDesignation))
             return false;
         return true;
     }

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import no.ding.pk.repository.offer.MaterialRepository;
 @Transactional
 @Service
 public class MaterialServiceImpl implements MaterialService {
-
+    
     private static final Logger log = LoggerFactory.getLogger(MaterialServiceImpl.class);
     
     private MaterialRepository repository;
@@ -32,40 +33,86 @@ public class MaterialServiceImpl implements MaterialService {
     
     @Override
     public Material save(Material material) {
-
+        
         if(material.getMaterialNumber() == null) {
             throw new RuntimeException("Received material without a material number.");
         }
-
+        
         log.debug("Searching for material with number: {}", material.getMaterialNumber());
-        List<Material> materialList = repository.findAll();
         Material entity = repository.findByMaterialNumber(material.getMaterialNumber());
         
         if(entity == null) {
+            log.debug("Didn't find a material with the number: {}", material.getMaterialNumber());
+            log.debug("Creating a new one...");
             entity = new Material();
+            entity.setMaterialNumber(material.getMaterialNumber());
+        } else {
+            log.debug("Found material...");
+        }
+
+        if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
+            entity.setPricingUnit(material.getPricingUnit());
+        } else if(material.getPricingUnit() != null) {
+            entity.setPricingUnit(material.getPricingUnit());
         }
         
-        entity.setMaterialNumber(material.getMaterialNumber());
-        entity.setDesignation(material.getDesignation());
-        entity.setDeviceType(material.getDeviceType());
+        if(!StringUtils.equals(entity.getDesignation(), material.getDesignation())) {
+            entity.setDesignation(material.getDesignation());
+        }
 
+        if(!StringUtils.equals(entity.getMaterialGroup(), material.getMaterialGroup())) {
+            entity.setMaterialGroup(material.getMaterialGroup());
+        }
+
+        if(!StringUtils.equals(entity.getMaterialGroupDesignation(), material.getMaterialGroupDesignation())) {
+            entity.setMaterialGroupDesignation(material.getMaterialGroupDesignation());
+        }
+
+        if(!StringUtils.equals(entity.getMaterialType(), material.getMaterialType())) {
+            entity.setMaterialType(material.getMaterialType());
+        }
+
+        if(!StringUtils.equals(entity.getMaterialTypeDescription(), material.getMaterialTypeDescription())) {
+            entity.setMaterialTypeDescription(material.getMaterialTypeDescription());
+        }
+        
+        if(!StringUtils.equals(entity.getDeviceType(), material.getDesignation())) {
+            entity.setDeviceType(material.getDeviceType());
+        }
+        
         MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
-
+        
         if(materialPriceEntity == null) {
             materialPriceEntity = material.getMaterialStandardPrice();
         } else if(material.getMaterialStandardPrice() != null){
             materialPriceEntity.copy(material.getMaterialStandardPrice());
         }
-
+        
         if(materialPriceEntity != null) {
             entity.setMaterialStandardPrice(materialPriceEntity);
         }
 
-        entity.setPricingUnit(material.getPricingUnit());
-        entity.setQuantumUnit(material.getQuantumUnit());
-        entity.setSalesZone(material.getSalesZone());
+        if(!StringUtils.equals(entity.getCurrency(), material.getCurrency())) {
+            entity.setCurrency(material.getCurrency());
+        }
         
-        return repository.save(material);
+        if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
+            entity.setPricingUnit(material.getPricingUnit());
+        }
+        
+        if(!StringUtils.equals(entity.getQuantumUnit(), material.getQuantumUnit())) {
+            entity.setQuantumUnit(material.getQuantumUnit());
+        }
+
+        if(!StringUtils.equals(entity.getScaleQuantum(), material.getScaleQuantum())) {
+            entity.setScaleQuantum(material.getScaleQuantum());
+        }
+        
+        if(!StringUtils.equals(entity.getSalesZone(), material.getSalesZone())) {
+            entity.setSalesZone(material.getSalesZone());
+        }
+        
+        return repository.save(entity);
     }
     
     @Override

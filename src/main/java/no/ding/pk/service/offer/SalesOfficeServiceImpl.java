@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import no.ding.pk.repository.offer.SalesOfficeRepository;
 @Transactional
 @Service
 public class SalesOfficeServiceImpl implements SalesOfficeService {
+
+    private static final Logger log = LoggerFactory.getLogger(SalesOfficeServiceImpl.class);
     
     private SalesOfficeRepository repository;
     
@@ -37,16 +41,20 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
         if(salesOfficeList != null && salesOfficeList.size() > 0) {
             for(int j = 0; j < salesOfficeList.size(); j++) {
                 SalesOffice salesOffice = salesOfficeList.get(j);
+
+                if(salesOffice == null) {
+                    continue;
+                }
                 
                 SalesOffice entity = new SalesOffice();
                 
-//                if(salesOffice.getId() != null) {
-//                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
-//
-//                    if(optSalesOffice.isPresent()) {
-//                        entity = optSalesOffice.get();
-//                    }
-//                }
+                if(salesOffice.getId() != null) {
+                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
+                    
+                    if(optSalesOffice.isPresent()) {
+                        entity = optSalesOffice.get();
+                    }
+                }
                 
                 entity.setCustomerNumber(salesOffice.getCustomerNumber());
                 entity.setSalesOrg(salesOffice.getSalesOrg());
@@ -54,34 +62,43 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setSalesOfficeName(salesOffice.getSalesOfficeName());
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
-
+                
                 if(salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
+                    log.debug("Adding Sales office material list");
                     List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
+                    
+                    entity.setMaterialList(materialList);
 
-                    salesOffice.setMaterialList(materialList);
+                    log.debug("Finished adding Sales office material list");
                 }
-
+                
                 if(salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
+                    log.debug("Adding transport service material list");
                     List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
-
-                    salesOffice.setTransportServiceList(transportServiceMaterialList);
+                    
+                    entity.setTransportServiceList(transportServiceMaterialList);
+                    log.debug("Finished adding transport materials");
                 }
-
+                
                 if(salesOffice.getRentalList() != null && salesOffice.getRentalList().size() > 0) {
+                    log.debug("Adding rental service material list");
                     List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
-
-                    salesOffice.setRentalList(rentalMaterialList);
+                    
+                    entity.setRentalList(rentalMaterialList);
+                    log.debug("Finished adding rental materials");
                 }
-
+                
                 if(salesOffice.getZones() != null && salesOffice.getZones().size() > 0) {
+                    log.debug("Adding zones service material list");
                     List<Zone> zones = zoneService.saveAll(salesOffice.getZones(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
-
-                    salesOffice.setZones(zones);
+                    
+                    entity.setZones(zones);
+                    log.debug("Finished adding zones");
                 }
-
-//                entity = repository.save(entity);
-
-                returnList.add(salesOffice);
+                
+                //                entity = repository.save(entity);
+                
+                returnList.add(entity);
             }
         }
         return returnList;

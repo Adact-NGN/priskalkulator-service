@@ -1,0 +1,785 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="no" lang="no">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Hvordan jeg ønsker det skal se ut (1)</title>
+    <meta name="author" content="Bjarne Skeisvoll Jacobsen;Ronny Olavesen" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous" type="application/javascript">
+    </script>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            text-indent: 0;
+        }
+
+        .s1 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 7.5pt;
+        }
+
+        h1 {
+            color: #F36B20;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 15pt;
+        }
+
+        .s2 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: italic;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 7.5pt;
+        }
+
+        .s3 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: italic;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 7.5pt;
+        }
+
+        .h2 {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 7.5pt;
+        }
+
+        p {
+            color: black;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: none;
+            font-size: 7.5pt;
+            margin: 0pt;
+        }
+
+        a {
+            color: #00F;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: underline;
+            font-size: 7.5pt;
+        }
+
+        .s4 {
+            color: #00F;
+            font-family: Arial, sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            text-decoration: underline;
+            font-size: 7.5pt;
+        }
+
+        table,
+        tbody {
+            vertical-align: top;
+            overflow: visible;
+        }
+    </style>
+</head>
+<body>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse" cellspacing="0">
+    <tr style="height:9pt">
+        <td class="s1" style="width:56pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Kunde:</p></td>
+        <td><p class="s1">{{ priceOfferObject.customer.name1 }}</p></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:56pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Kontaktperson:</p>
+        </td>
+        <td></td>
+        <td style="width:133pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Kontaktperson Norsk Gjenvinning AS:</p>
+        </td>
+        <td><p class="s1">{{ priceOfferObject.salesEmployee.fullName }}</p></td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:56pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Mobilnummer:</p>
+        </td>
+        <td class="s1"></td>
+        <td style="width:133pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Mobilnummer:</p>
+        </td>
+        <td class="s1">{{ priceOfferObject.salesEmployee.phoneNumber }}</td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:56pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Mailadresse:</p>
+        </td>
+        <td></td>
+        <td class="s1" style="width:56pt">
+            E-postadresse:
+        </td>
+        <td class="s1">{{ priceOfferObject.salesEmployee.email }}</td>
+    </tr>
+    <tr style="height:9pt">
+    </tr>
+</table>
+
+<p style="padding-left: 5pt;text-indent: 0pt;text-align: left;">
+    <span style=" color: black; font-family:&quot;Times New Roman&quot;, serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 10pt;"></span>
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:3pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:52pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 7pt;text-align: left;">Utstedt:</p>
+        </td>
+        <td style="width:64pt">
+            <p class="s1" style="padding-left: 23pt;text-indent: 0pt;line-height: 7pt;text-align: left;">09.11.2022</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;" />
+<div class="row">
+    <div class="col">
+        <h1 style="padding-top: 4pt;padding-left: 9pt;text-indent: 0pt;text-align: left;">Tilbud</h1>
+    </div>
+    <div  class="col-3 align-items-center s1" style="color: black; padding: 5px;"> Utstedt:
+        {{ priceOfferObject.dateIssued }} </div>
+</div>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:6.695pt" cellspacing="0">
+    <tr style="height:13pt">
+        <td style="width:63pt;border-top-style:solid;border-top-width:1pt;border-top-color:#F36B20;border-left-style:solid;border-left-width:1pt;border-left-color:#F36B20;border-bottom-style:solid;border-bottom-width:1pt;border-bottom-color:#F36B20">
+            <p class="s1" style="padding-top: 2pt;padding-left: 21pt;text-indent: 0pt;text-align: left;">Material</p>
+        </td>
+        <td style="width:179pt;border-top-style:solid;border-top-width:1pt;border-top-color:#F36B20;border-bottom-style:solid;border-bottom-width:1pt;border-bottom-color:#F36B20">
+            <p class="s1" style="padding-top: 2pt;padding-left: 14pt;text-indent: 0pt;text-align: left;">Betegnelse</p>
+        </td>
+        <td style="width:154pt;border-top-style:solid;border-top-width:1pt;border-top-color:#F36B20;border-bottom-style:solid;border-bottom-width:1pt;border-bottom-color:#F36B20">
+            <p class="s1" style="padding-top: 2pt;padding-right: 14pt;text-indent: 0pt;text-align: right;">Pris</p>
+        </td>
+        <td style="width:44pt;border-top-style:solid;border-top-width:1pt;border-top-color:#F36B20;border-bottom-style:solid;border-bottom-width:1pt;border-bottom-color:#F36B20">
+            <p class="s1" style="padding-top: 2pt;padding-left: 14pt;padding-right: 20pt;text-indent: 0pt;text-align: center;">Pr</p>
+        </td>
+        <td style="width:106pt;border-top-style:solid;border-top-width:1pt;border-top-color:#F36B20;border-bottom-style:solid;border-bottom-width:1pt;border-bottom-color:#F36B20;border-right-style:solid;border-right-width:1pt;border-right-color:#F36B20">
+            <p class="s1" style="padding-top: 2pt;padding-left: 22pt;text-indent: 0pt;text-align: left;">Enhet</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:5.74pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:481pt" colspan="5">
+            <p class="s2" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Sarpsborg/Fredrikstad</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:481pt" colspan="5">
+            <p class="s1" style="padding-left: 22pt;text-indent: 0pt;line-height: 8pt;text-align: left;">AVFALLSTYPE</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:63pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">119901</p>
+        </td>
+        <td style="width:211pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Restavfall</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 12pt;text-indent: 0pt;line-height: 8pt;text-align: right;">2 235,00</p>
+        </td>
+        <td style="width:51pt">
+            <p class="s1" style="padding-left: 12pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1000</p>
+        </td>
+        <td style="width:35pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">KG</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:63pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">122110</p>
+        </td>
+        <td style="width:211pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Bølgepapp</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 12pt;text-indent: 0pt;line-height: 8pt;text-align: right;">0,00</p>
+        </td>
+        <td style="width:51pt">
+            <p class="s1" style="padding-left: 12pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1000</p>
+        </td>
+        <td style="width:35pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">KG</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:63pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">132201</p>
+        </td>
+        <td style="width:211pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Farget glassemballasje med metall</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 12pt;text-indent: 0pt;line-height: 8pt;text-align: right;">799,00</p>
+        </td>
+        <td style="width:51pt">
+            <p class="s1" style="padding-left: 12pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1000</p>
+        </td>
+        <td style="width:35pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">KG</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:25.78pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:460pt" colspan="5">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">TRANSPORT SONE 1</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50201</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Krok - Utsett</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 155,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50203</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Krok - tømming</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 799,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50101</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Utsett</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">758,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50102</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Bytting</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 271,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50104</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Innhenting</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 271,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:25.78pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:460pt" colspan="5">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">TRANSPORT SONE 2</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50201</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Krok - Utsett</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 500,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50203</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Krok - tømming</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">2 000,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50101</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Utsett</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">900,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50102</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Bytting</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 500,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:41pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50104</p>
+        </td>
+        <td style="width:181pt">
+            <p class="s1" style="padding-left: 17pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Lift - Innhenting</p>
+        </td>
+        <td style="width:156pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">1 500,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:25.78pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:460pt" colspan="5">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">FLATVOGN TRANSPORT</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50305</p>
+        </td>
+        <td style="width:217pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Flatvogn - Oppmøte</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">729,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50321</p>
+        </td>
+        <td style="width:217pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">+ Flatvogn - henting pr sekk</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">77,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">B-0660</p>
+        </td>
+        <td style="width:217pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">+ Utsett/Bytte/Retur Beholder - 660L</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">336,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:25.78pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:460pt" colspan="5">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">KOMPRIMATORBIL TRANSPORT</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50405</p>
+        </td>
+        <td style="width:213pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Komprimatorbil - Oppmøte</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">454,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">50421</p>
+        </td>
+        <td style="width:213pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">+ Komprimatorbil - Henting pr sekk</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">79,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">B-0140</p>
+        </td>
+        <td style="width:213pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">+ Tømming Beholder - 140L</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">213,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">C-10CL</p>
+        </td>
+        <td style="width:213pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">+ Tømming Container - 10CL</p>
+        </td>
+        <td style="width:121pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">213,00</p>
+        </td>
+        <td style="width:45pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:37pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">ST</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:25.78pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">LEIE</p>
+        </td>
+        <td style="width:216pt">
+            <p style="text-indent: 0pt;text-align: left;">
+                <br />
+            </p>
+        </td>
+        <td style="width:118pt">
+            <p style="text-indent: 0pt;text-align: left;">
+                <br />
+            </p>
+        </td>
+        <td style="width:43pt">
+            <p style="text-indent: 0pt;text-align: left;">
+                <br />
+            </p>
+        </td>
+        <td style="width:42pt">
+            <p style="text-indent: 0pt;text-align: left;">
+                <br />
+            </p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">B-0660</p>
+        </td>
+        <td style="width:216pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Beholder - 660L</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">9,00</p>
+        </td>
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:42pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">DAG</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">C-10CL</p>
+        </td>
+        <td style="width:216pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Container - 10 m3 (combi) - Lukket</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">27,00</p>
+        </td>
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:42pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">DAG</p>
+        </td>
+    </tr>
+    <tr style="height:10pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">C-35K</p>
+        </td>
+        <td style="width:216pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Container - 35 m3 (krok) Åpen</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">57,00</p>
+        </td>
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:42pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">DAG</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:44pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">B-0B-E</p>
+        </td>
+        <td style="width:216pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Bur - til EE-avfall 160x120x120</p>
+        </td>
+        <td style="width:118pt">
+            <p class="s1" style="padding-right: 15pt;text-indent: 0pt;line-height: 8pt;text-align: right;">9,00</p>
+        </td>
+        <td style="width:43pt">
+            <p class="s1" style="padding-left: 15pt;text-indent: 0pt;line-height: 8pt;text-align: left;">1</p>
+        </td>
+        <td style="width:42pt">
+            <p class="s1" style="padding-right: 2pt;text-indent: 0pt;line-height: 8pt;text-align: right;">DAG</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p class="s3" style="padding-left: 8pt;text-indent: 0pt;text-align: left;">Alle priser er eks.MVA</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p class="s3" style="padding-left: 8pt;text-indent: 0pt;text-align: left;">Merk: Aksept må meldes tilbake til undertegnede før prisene kan gjøres gjeldende</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="padding-left: 6pt;text-indent: 0pt;text-align: left;">
+    <span class="h2" style=" background-color: #BDBDBD;"> LINK TIL GENERELLE VILKÅR OG ANNEN VEILEDNING </span>
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:5.74pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:417pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Følg linker til våre hjemmesider for nyttig veiledning om leveringskriterier, og hvordan du som avfallsprodusent kan bidra til</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:417pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">at ressursene i avfallet ivaretas best mulig. Se også generelle avtalevilkår.</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<table style="border-collapse:collapse;margin-left:5.74pt" cellspacing="0">
+    <tr style="height:9pt">
+        <td style="width:421pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Etter 01.05.2016 skal alt farlig avfall deklareres via Avfallsdeklarering.no. Følg link for mer informasjon om E-deklarering, og</p>
+        </td>
+    </tr>
+    <tr style="height:9pt">
+        <td style="width:421pt">
+            <p class="s1" style="padding-left: 2pt;text-indent: 0pt;line-height: 8pt;text-align: left;">om hvordan Norsk Gjenvinning kan bistå din bedrift med å oppfylle kravene.</p>
+        </td>
+    </tr>
+</table>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="padding-left: 8pt;text-indent: 0pt;text-align: left;">Alle avfallsprodusenter oppfordres til å gjøre seg kjent med avfallsforskriften, se egen link til lovdata under.</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="padding-left: 8pt;text-indent: 0pt;text-align: left;">
+    <a href="https://www.norskgjenvinning.no/ressurser/generelle-vilkaar/" style=" color: black; font-family:Arial, sans-serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 7.5pt;" target="_blank">Generelle avtalevilkår: </a>
+    <a href="https://www.norskgjenvinning.no/ressurser/generelle-vilkaar/" target="_blank">https://www.norskgjenvinning.no/ressurser/generelle-vilkaar/</a>
+</p>
+
+
+<p style="padding-left: 5pt;text-indent: 0pt;text-align: left;">
+    <span style=" color: black; font-family:Arial, sans-serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 10pt;"></span>
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+
+
+<table style="border-collapse:collapse;margin-left:6.695pt" cellspacing="0">
+
+    <tr style="height:9pt">
+        <td>
+            <p class="s1" style="padding-left: 1pt;text-indent: 0pt;line-height: 8pt;text-align: left;">Hva kan ikke kastes i containeren?:</p>
+        </td>
+        <td>
+            <p style=";line-height: 8pt;text-align: left;">
+                <a href="https://www.norskgjenvinning.no/ressurser/regler-for-hva-som-kan-kastes-i-container/" class="s4">https://www.norskgjenvinning.no/ressurser/regler-for-hva-som-kan-kastes-i-container/</a>
+            </p>
+        </td>
+    </tr>
+</table>
+<p style="padding-top: 9pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">
+    <a href="https://www.norskgjenvinning.no/tjenester/avfallstyper//" style=" color: black; font-family:Arial, sans-serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 7.5pt;" target="_blank">Informasjon om avfallstyper: </a>
+    <a href="https://www.norskgjenvinning.no/tjenester/avfallstyper//" target="_blank">https://www.norskgjenvinning.no/tjenester/avfallstyper//</a>
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="padding-top: 4pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">
+    <a href="https://lovdata.no/dokument/SF/forskrift/2004-06-01-930" style=" color: black; font-family:Arial, sans-serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 7.5pt;" target="_blank">Avfallsforskriften (lovdata.no): </a>
+    <a href="https://lovdata.no/dokument/SF/forskrift/2004-06-01-930" target="_blank">https://lovdata.no/dokument/SF/forskrift/2004-06-01-930</a>
+</p>
+<p style="text-indent: 0pt;text-align: left;">
+    <br />
+</p>
+<p style="padding-top: 4pt;padding-left: 8pt;text-indent: 0pt;text-align: left;">
+    <a href="https://www.norskgjenvinning.no/edeklarering/" style=" color: black; font-family:Arial, sans-serif; font-style: normal; font-weight: normal; text-decoration: none; font-size: 7.5pt;" target="_blank">Les mer om E-deklarering: </a>
+    <a href="https://www.norskgjenvinning.no/edeklarering/" target="_blank">https://www.norskgjenvinning.no/edeklarering/</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{{#block "materialTableGroup"}}
+{{# each materialGroupsHandler._materialGroups}}
+    <tr class="ng-star-inserted">
+         <td  class="all-caps ng-star-inserted" style="text-align: left;" colspan="0"></td>
+         <td  class="all-caps ng-star-inserted" style="text-align: left;" colspan="5">
+          {{materialType}}</td>
+     </tr>
+
+     {{#each list}}
+     <td colspan="0" class="ng-star-inserted">
+     </td>
+     <td colspan="0" class="ng-star-inserted"
+         style="text-align: left;">{{ material }}</td>
+     <td colspan="0" class="ng-star-inserted"
+         style="text-align: left;">{{ materialDesignation }}</td>
+     <td colspan="0" class="ng-star-inserted"
+         style="text-align: right;">{{ manualPrice }}</td>
+     <td colspan="0" class="ng-star-inserted"
+         style="text-align: center;">{{ priceUnit }}</td>
+     <td colspan="0" class="ng-star-inserted"
+         style="text-align: center;">{{ quantumUnit }}</td>
+     </tr>
+     {{/each}}
+     {{/each}}
+     {{/block}}

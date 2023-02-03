@@ -9,8 +9,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import no.ding.pk.domain.Auditable;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -66,4 +72,12 @@ public class PriceRow extends Auditable {
     @Column
     private Double priceIncMva;
 
+    @OneToMany
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<PriceRow> combinedMaterials;
+
+    public boolean hasCombinedMaterials() {
+        return combinedMaterials != null && !combinedMaterials.isEmpty();
+    }
 }

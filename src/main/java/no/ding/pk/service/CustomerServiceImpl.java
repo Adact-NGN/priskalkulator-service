@@ -220,6 +220,8 @@ public class CustomerServiceImpl implements CustomerService {
         .fromUriString(customerSapServiceUrl)
         .queryParams(params)
         .build();
+
+        log.debug("Requesting SAP using username: {}", sapUsername);
         
         return HttpRequest.newBuilder()
         .GET()

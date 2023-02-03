@@ -55,7 +55,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         User salesEmployee = checkAndGetSalesEmployee(newPriceOffer.getSalesEmployee());
 
-
         PriceOffer entity;
 
         if(newPriceOffer.getId() != null) {

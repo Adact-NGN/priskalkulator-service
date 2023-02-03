@@ -57,8 +57,10 @@ public class PriceOfferController {
                 log.info("Could not find a price offer with id: " + id);
                 return null;
             }
-            
-            return optPriceOffer.get();
+            PriceOffer priceOffer = optPriceOffer.get();
+
+            log.debug("Returning priceOffer: {}", priceOffer);
+            return priceOffer;
         }
         
         return null;
