@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.sap;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

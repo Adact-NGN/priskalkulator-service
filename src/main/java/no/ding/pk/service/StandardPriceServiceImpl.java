@@ -1,6 +1,5 @@
 package no.ding.pk.service;
 
-import java.io.Console;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -9,6 +8,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.utils.RequestHeaderUtil;
-import no.ding.pk.web.dto.MaterialDTO;
 import no.ding.pk.web.enums.MaterialField;
 
 @Service
@@ -45,14 +44,14 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     private ObjectMapper objectMapper;
     
-    private InMemoryCache<String, String, MaterialDTO> inMemoryCache;
+    private InMemoryCache<String, String, MaterialStdPriceDTO> inMemoryCache;
     
     @Autowired
     public StandardPriceServiceImpl(
     @Value(value = "${sap.username}") String sapUsername, 
     @Value("${sap.password}") String sapPassword,
     ObjectMapper objectMapper,
-    InMemoryCache<String, String, MaterialDTO> inMemoryCache
+    InMemoryCache<String, String, MaterialStdPriceDTO> inMemoryCache
     ) {
         this.sapUsername = sapUsername;
         this.sapPassword = sapPassword;
@@ -61,7 +60,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
     
     @Override
-    public List<MaterialDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg) {
+    public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg) {
         if(inMemoryCache.size(salesOffice) == 0 || inMemoryCache.isExpired()) {
             log.debug("Cache is empty or expired, fetching new items.");
             
@@ -94,21 +93,21 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             log.debug("Returning from new cache");
         }
         
-        MaterialDTO materialDTO = inMemoryCache.getAll(salesOffice).stream().filter(material -> materialNumber.equals(material.getMaterial())).findAny().orElse(null);
+        MaterialStdPriceDTO materialStdPriceDTO = inMemoryCache.getAll(salesOffice).stream().filter(material -> materialNumber.equals(material.getMaterial())).findAny().orElse(null);
         
-        if(materialDTO != null) {
-            return materialDtoToMaterialPrice(materialNumber, materialDTO);
+        if(materialStdPriceDTO != null) {
+            return materialDtoToMaterialPrice(materialNumber, materialStdPriceDTO);
         }
         
         return null;
     }
     
-    private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialDTO materialDTO) {
+    private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder()
         .materialNumber(materialNumber)
-        .standardPrice(Double.parseDouble(materialDTO.getStandardPrice()))
-        .validFrom(materialDTO.getValidFrom())
-        .validTo(materialDTO.getValidTo())
+        .standardPrice(Double.parseDouble(materialStdPriceDTO.getStandardPrice()))
+        .validFrom(materialStdPriceDTO.getValidFrom())
+        .validTo(materialStdPriceDTO.getValidTo())
         .build();
     }
     
@@ -121,7 +120,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         
         HttpResponse<String> response = sendRequest(request);
         
-        List<MaterialDTO> standardPriceDTOList = jsonToMaterialDTO(response);
+        List<MaterialStdPriceDTO> standardPriceDTOList = jsonToMaterialDTO(response);
         
         addMaterialsToCache(salesOffice, standardPriceDTOList);
     }
@@ -175,9 +174,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
     }
     
-    private void addMaterialsToCache(String salesOffice, List<MaterialDTO> standardPriceDTOList) {
+    private void addMaterialsToCache(String salesOffice, List<MaterialStdPriceDTO> standardPriceDTOList) {
         log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
-        for(MaterialDTO material : standardPriceDTOList) {
+        for(MaterialStdPriceDTO material : standardPriceDTOList) {
             StringBuffer objectKey = new StringBuffer();
             objectKey.append(material.getMaterial());
             
@@ -190,7 +189,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
     }
     
-    private List<MaterialDTO> jsonToMaterialDTO(HttpResponse<String> response) {
+    private List<MaterialStdPriceDTO> jsonToMaterialDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         
         if(jsonObject.has("error")) {
@@ -202,13 +201,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         
         JSONArray results = jsonObject.getJSONObject("d").getJSONArray("results");
         log.debug(String.format("JSON array contains %d elements", results.length()));
-        List<MaterialDTO> standardPriceDTOList = new ArrayList<>();
+        List<MaterialStdPriceDTO> standardPriceDTOList = new ArrayList<>();
         
         int amountOfSuccessfullMaps = 0;
         int amountOfUnSuccessfullMaps = 0;
         for(int i = 0; i < results.length(); i++) {
             try {
-                MaterialDTO stdPriceDTO = objectMapper.readValue(results.get(i).toString(), MaterialDTO.class);
+                MaterialStdPriceDTO stdPriceDTO = objectMapper.readValue(results.get(i).toString(), MaterialStdPriceDTO.class);
                 standardPriceDTOList.add(stdPriceDTO);
                 amountOfSuccessfullMaps++;
             } catch (JsonProcessingException | JSONException e) {

@@ -3,8 +3,10 @@ package no.ding.pk.web.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.ding.pk.service.SalesOrgService;
-import no.ding.pk.web.dto.SalesOrgDTO;
 import no.ding.pk.web.enums.SalesOrgField;
 
 @RestController
@@ -25,10 +26,13 @@ public class SalesOrgController {
     private static final Logger log = LoggerFactory.getLogger(SalesOrgController.class);
 
     private SalesOrgService service;
+
+    private ModelMapper modelMapper;
     
     @Autowired
-    public SalesOrgController(SalesOrgService service) {
+    public SalesOrgController(SalesOrgService service, ModelMapper modelMapper) {
         this.service = service;
+        this.modelMapper = modelMapper;
     }
     
     /**

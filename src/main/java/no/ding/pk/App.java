@@ -3,6 +3,7 @@ package no.ding.pk;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -33,7 +34,6 @@ import com.microsoft.aad.msal4j.ClientCredentialFactory;
 import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 
 import no.ding.pk.domain.User;
-import no.ding.pk.web.dto.AdUserDTO;
 
 @EnableScheduling
 @EnableSwagger2
@@ -97,17 +97,6 @@ public class App implements WebMvcConfigurer {
         objectMapper.registerModule(new Hibernate5Module());
 
         return objectMapper;
-    }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        modelMapper.typeMap(AdUserDTO.class, User.class)
-        .addMapping(AdUserDTO::getAdId, User::setAdId)
-        .addMapping(AdUserDTO::getSureName, User::setSureName);
-        
-        return modelMapper;
     }
 
     @Bean

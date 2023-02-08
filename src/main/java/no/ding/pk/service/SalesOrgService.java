@@ -1,8 +1,9 @@
 package no.ding.pk.service;
 
+import no.ding.pk.web.dto.sap.SalesOrgDTO;
+
 import java.util.List;
 
-import no.ding.pk.web.dto.SalesOrgDTO;
 
 public interface SalesOrgService {
     List<SalesOrgDTO> getAll();

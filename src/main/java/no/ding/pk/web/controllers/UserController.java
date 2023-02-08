@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectReader;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
-import no.ding.pk.web.dto.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 
 @RestController

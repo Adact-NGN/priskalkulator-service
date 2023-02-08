@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.sap;
 
 import java.util.Date;
 import java.util.List;

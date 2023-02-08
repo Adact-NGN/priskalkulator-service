@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.sap;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 

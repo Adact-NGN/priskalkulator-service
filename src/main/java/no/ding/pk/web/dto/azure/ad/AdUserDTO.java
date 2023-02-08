@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.azure.ad;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

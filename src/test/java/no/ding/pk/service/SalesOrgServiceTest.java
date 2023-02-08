@@ -6,6 +6,7 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -16,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import no.ding.pk.web.dto.SalesOrgDTO;
 
 @Disabled
 @Tag("integrationtest")

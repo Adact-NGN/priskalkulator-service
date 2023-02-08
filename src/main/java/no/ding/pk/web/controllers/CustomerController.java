@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.CustomerDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import no.ding.pk.service.CustomerServiceImpl;
-import no.ding.pk.web.dto.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
 
 @RestController

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +23,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.utils.HttpRequestResponseUtil;
-import no.ding.pk.web.dto.ContactPersonDTO;
 
 @Service
 public class ContactPersonServiceImpl implements ContactPersonService {

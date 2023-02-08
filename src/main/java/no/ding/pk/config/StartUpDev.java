@@ -14,7 +14,7 @@ import no.ding.pk.service.StandardPriceService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.PriceOfferService;
-import no.ding.pk.web.dto.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.TermsTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +117,7 @@ public class StartUpDev {
                 .agreementStartDate(new Date())
                 .build();
                 
-                List<MaterialDTO> materialDTOs = priceService.getStdPricesForSalesOfficeAndSalesOrg("100", "100");
+                List<MaterialStdPriceDTO> materialDTOs = priceService.getStdPricesForSalesOfficeAndSalesOrg("100", "100");
                 
                 List<String> materialNumberList = List.of("119901", "122110", "132201");
                 List<PriceRow> materialList = createPriceRowList(materialNumberList, materialDTOs); // List.of(priceRow);
@@ -179,7 +179,7 @@ public class StartUpDev {
                 priceOfferService.save(priceOffer);
         }
         
-        private List<PriceRow> createPriceRowList(List<String> materialNumberList, List<MaterialDTO> materialDTOs) {
+        private List<PriceRow> createPriceRowList(List<String> materialNumberList, List<MaterialStdPriceDTO> materialDTOs) {
                 List<PriceRow> returnList = new ArrayList<>();
                 
                 for(int i = 0; i < materialNumberList.size(); i++) {
@@ -192,8 +192,8 @@ public class StartUpDev {
                 return returnList;
         }
         
-        private PriceRow createPriceRow(List<MaterialDTO> materialDTOs, String materialNumber) {
-                MaterialDTO materialDTO = materialDTOs.stream().filter(obj -> obj.getMaterial().equalsIgnoreCase(materialNumber)).findAny().orElse(null);
+        private PriceRow createPriceRow(List<MaterialStdPriceDTO> materialDTOs, String materialNumber) {
+                MaterialStdPriceDTO materialDTO = materialDTOs.stream().filter(obj -> obj.getMaterial().equalsIgnoreCase(materialNumber)).findAny().orElse(null);
                 log.debug("Found materialDTO: {}", materialDTO);
                 MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, Double.parseDouble(materialDTO.getStandardPrice()));
                 Material material = createMaterial(materialNumber, materialDTO, residualWasteMaterialStdPrice);
@@ -235,8 +235,8 @@ public class StartUpDev {
                 .build();
         }
         
-        private Material createMaterial(String material, MaterialDTO materialDTO,
-        MaterialPrice residualWasteMaterialStdPrice) {
+        private Material createMaterial(String material, MaterialStdPriceDTO materialDTO,
+                                        MaterialPrice residualWasteMaterialStdPrice) {
                 log.debug("MaterialDTO PricingUnit: {} -> {}", materialDTO.getPricingUnit(), Integer.parseInt(materialDTO.getPricingUnit()));
                 return Material.builder()
                 .materialNumber(material)

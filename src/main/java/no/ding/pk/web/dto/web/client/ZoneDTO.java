@@ -1,6 +1,7 @@
 package no.ding.pk.web.dto.web.client;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import no.ding.pk.domain.offer.PriceRow;
 import java.util.List;
 
 @ToString
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,5 +22,5 @@ public class ZoneDTO {
     String postalCode;
     String postalName;
     Boolean isStandardZone;
-    List<PriceRow> priceRows;
+    List<PriceRowDTO> priceRows;
 }

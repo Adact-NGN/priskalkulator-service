@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.web.dto.web.client.SalesRoleDTO;
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,8 +35,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.web.dto.SalesRoleDTO;
-import no.ding.pk.web.dto.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 
 @SpringBootTest

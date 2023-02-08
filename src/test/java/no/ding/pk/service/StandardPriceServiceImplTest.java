@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.dto.web.client.MaterialDTO;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -22,7 +24,6 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import no.ding.pk.web.dto.MaterialDTO;
 
 @Disabled
 @Tag("integrationtest")
@@ -36,7 +37,7 @@ public class StandardPriceServiceImplTest {
     @BeforeEach
     public void setup() {
         this.workingDir = Path.of("", "src/test/resources");
-        InMemoryCache<String, String, MaterialDTO> inMemoryCache = new MaterialInMemoryCache<>();
+        InMemoryCache<String, String, MaterialStdPriceDTO> inMemoryCache = new MaterialInMemoryCache<>();
         service = new StandardPriceServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", new ObjectMapper(), inMemoryCache);//mock(InMemoryCache.class));
     }
 
@@ -45,7 +46,7 @@ public class StandardPriceServiceImplTest {
         String salesOffice = "104";
         String salesOrg = "100";
         
-        List<MaterialDTO> result = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg);
+        List<MaterialStdPriceDTO> result = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg);
 
         assertNotNull(result);
         assertThat(result, hasSize(greaterThan(0)));
@@ -56,7 +57,7 @@ public class StandardPriceServiceImplTest {
         Path resPath = workingDir.resolve("single-standardprice.json");
         String jsonFile = Files.readString(resPath);
         ObjectMapper objectMapper = new ObjectMapper();
-        MaterialDTO stdPriceDTO = objectMapper.readValue(jsonFile, MaterialDTO.class);
+        MaterialStdPriceDTO stdPriceDTO = objectMapper.readValue(jsonFile, MaterialStdPriceDTO.class);
 
         assertThat(stdPriceDTO.getMaterial(), Is.is("50101"));
     }

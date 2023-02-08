@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import java.util.List;
 
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserAzureAdService;
-import no.ding.pk.web.dto.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 
 @RestController

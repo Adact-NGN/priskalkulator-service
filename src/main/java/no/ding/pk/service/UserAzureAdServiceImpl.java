@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import javax.management.RuntimeErrorException;
 import javax.net.ssl.HttpsURLConnection;
 
+import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.utils.LocalJSONUtils;
-import no.ding.pk.web.dto.AdUserDTO;
 import no.ding.pk.web.mappers.MapperService;
 
 @Service

@@ -1,8 +1,9 @@
 package no.ding.pk.service;
 
+import no.ding.pk.web.dto.sap.CustomerDTO;
+
 import java.util.List;
 
-import no.ding.pk.web.dto.CustomerDTO;
 
 public interface CustomerService {
     /**

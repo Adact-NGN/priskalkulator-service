@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import no.ding.pk.web.dto.ContactPersonDTO;
 
 @Disabled
 @Tag("integrationtest")

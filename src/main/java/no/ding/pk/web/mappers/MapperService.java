@@ -3,20 +3,20 @@ package no.ding.pk.web.mappers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import no.ding.pk.web.dto.azure.ad.AdUserDTO;
+import no.ding.pk.web.dto.web.client.SalesRoleDTO;
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.web.dto.AdUserDTO;
-import no.ding.pk.web.dto.SalesRoleDTO;
-import no.ding.pk.web.dto.UserDTO;
 
 @Component
 public class MapperService {
 
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public MapperService(ModelMapper modelMapper) {
@@ -28,7 +28,7 @@ public class MapperService {
     }
 
     public List<User> toUserList(List<AdUserDTO> adUserList) {
-        return ((List<User>) adUserList.stream().map(this::toUser).collect(Collectors.toList()));
+        return adUserList.stream().map(this::toUser).collect(Collectors.toList());
     }
 
     public UserDTO toUserDTO(User user) {

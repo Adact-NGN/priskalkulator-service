@@ -43,11 +43,17 @@ public class Material implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String materialNumber;
+    @Column
+    private String currency;
 
     @Column
     private String designation;
+
+    @Column
+    private String deviceType;
+
+    @Column(unique = true, nullable = false)
+    private String materialNumber;
 
     @Column
     private String materialGroup;
@@ -61,14 +67,8 @@ public class Material implements Serializable {
     @Column
     private String materialTypeDescription;
 
-    @Column
-    private String deviceType;
-
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     private MaterialPrice materialStandardPrice;
-
-    @Column
-    private String currency;
 
     @Column
     private Integer pricingUnit;

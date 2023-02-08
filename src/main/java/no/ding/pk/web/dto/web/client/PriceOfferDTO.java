@@ -1,6 +1,7 @@
 package no.ding.pk.web.dto.web.client;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @ToString
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,12 +23,12 @@ public class PriceOfferDTO {
     private Long id;
     private String customerNumber;
     private String customerName;
-    private List<SalesOffice> salesOfficeList;
+    private List<SalesOfficeDTO> salesOfficeList;
     private Date dateUpdated;
     private Date dateCreated;
-    private User salesEmployee;
+    private UserDTO salesEmployee;
     private Date approvalDate;
-    private User approver;
+    private UserDTO approver;
     private Boolean isApproved;
     private Boolean needsApproval;
     private Terms customerTerms;

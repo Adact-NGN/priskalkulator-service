@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.utils.HttpRequestResponseUtil;
-import no.ding.pk.web.dto.SalesOrgDTO;
 import no.ding.pk.web.enums.SalesOrgField;
 
 @Service

@@ -1,8 +1,9 @@
 package no.ding.pk.service;
 
+import no.ding.pk.web.dto.sap.ContactPersonDTO;
+
 import java.util.List;
 
-import no.ding.pk.web.dto.ContactPersonDTO;
 
 public interface ContactPersonService {
     /**

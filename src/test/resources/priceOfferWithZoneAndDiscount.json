@@ -1,0 +1,165 @@
+{
+  "customerNumber": "102520",
+  "customerName": "Vest-Telemark Rørleggerforretning AS",
+  "salesOfficeList": [
+    {
+      "salesOrg": "100",
+      "salesOffice": "104",
+      "salesOfficeName": "Skien",
+      "materialList": [
+        {
+          "discountPct": null,
+          "material": {
+            "materialNumber": "111101",
+            "designation": "Matavfall",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "priceLevel": {
+            "id": 2969,
+            "level": 2,
+            "discount": 0.1,
+            "calculatedDiscount": null,
+            "pctDiscount": null
+          },
+          "priceLevelPrice": 0.1,
+          "standardPrice": 1199,
+          "priceIncMva": -1,
+          "discountLevel": {
+            "id": 2969,
+            "level": 2,
+            "discount": 0.1,
+            "calculatedDiscount": null,
+            "pctDiscount": null
+          }
+        },
+        {
+          "material": {
+            "materialNumber": "111102",
+            "designation": "Matavfall, emballert",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": {
+            "materialNumber": "111103",
+            "designation": "Matavfall, tørt",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": {
+            "materialNumber": "111104",
+            "designation": "Matavfall til biogass",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": {
+            "materialNumber": "111105",
+            "designation": "Matavfall, emballert til biogass",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": {
+            "materialNumber": "171111",
+            "designation": "Landbruksfolie",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "KG"
+          },
+          "standardPrice": 519,
+          "priceIncMva": -1
+        },
+        {
+          "material": {
+            "materialNumber": "PR-1111",
+            "designation": "Rullestativ til papp - stor 80x130x75cm",
+            "deviceType": "",
+            "currency": "",
+            "quantumUnit": "ST"
+          },
+          "standardPrice": 1684,
+          "priceIncMva": -1
+        }
+      ],
+      "zones": [
+        {
+          "zoneId": "2",
+          "postalCode": "3943",
+          "postalName": "PORSGRUNN",
+          "isStandardZone": true,
+          "priceRows": [
+            {
+              "discountPct": null,
+              "material": {
+                "materialNumber": "50201",
+                "designation": "Krok - Utsett",
+                "deviceType": "",
+                "currency": "",
+                "quantumUnit": "ST",
+                "salesZone": "2"
+              },
+              "priceLevel": {
+                "id": 424,
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+              },
+              "priceLevelPrice": 0.1,
+              "standardPrice": 1364,
+              "priceIncMva": -1,
+              "discountLevel": {
+                "id": 424,
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+              }
+            }
+          ]
+        }
+      ],
+      "transportServiceList": [],
+      "rentalList": []
+    }
+  ],
+  "salesEmployee": {
+    "id": 2,
+    "name": "Alexander Brox",
+    "phoneNumber": "95838638",
+    "email": "alexander.brox@ngn.no"
+  },
+  "customerTerms": {
+    "agreementStartDate": "2023-02-05T17:50:49.353Z",
+    "paymentCondition": "",
+    "invoiceInterval": "",
+    "additionForRoadTax": false,
+    "additionForAdminFee": false,
+    "newOrEstablishedCustomer": "Ny kunde",
+    "customerRequireNotification": false,
+    "notificationMailAddress": "",
+    "indexWaste": "07251 - Forsyning av vatn. avløps- og renovasjonsverksemd - Indeks for totale arbeidskraftkostnader",
+    "indexRent": "12535 - Totalkostnadsindeks for lastebiltransport",
+    "indexTransport": "12535 - Totalkostnadsindeks for lastebiltransport"
+  }
+}

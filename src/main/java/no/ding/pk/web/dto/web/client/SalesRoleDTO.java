@@ -1,9 +1,21 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.web.client;
 
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@ToString
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SalesRoleDTO {
     private Long id;
     private String roleName; // sellerType

@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.web.dto.sap.CustomerDTO;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -20,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import no.ding.pk.web.dto.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
 
 @Disabled

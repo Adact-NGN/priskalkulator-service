@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.converters;
 
 import java.time.Instant;
 import java.time.ZoneId;

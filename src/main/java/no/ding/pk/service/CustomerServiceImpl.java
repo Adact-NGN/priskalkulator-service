@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import no.ding.pk.web.dto.sap.CustomerDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -30,7 +31,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import no.ding.pk.utils.RequestHeaderUtil;
-import no.ding.pk.web.dto.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
 
 @Service

@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto;
+package no.ding.pk.web.dto.sap;
 
 import java.util.Date;
 
@@ -6,10 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import no.ding.pk.web.dto.converters.LongToDateConverter;
 
 @Data
 @JsonIgnoreProperties(value = { "__metadata" })
-public class MaterialDTO  {
+public class MaterialStdPriceDTO {
     @JsonDeserialize(converter = LongToDateConverter.class)
     @JsonAlias({"Gyldigfra", "ValidFrom"}) //: "/Date(1663027200000)/",
     private Date validFrom;
@@ -193,7 +194,7 @@ public class MaterialDTO  {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        MaterialDTO other = (MaterialDTO) obj;
+        MaterialStdPriceDTO other = (MaterialStdPriceDTO) obj;
         if (validFrom == null) {
             if (other.validFrom != null)
                 return false;

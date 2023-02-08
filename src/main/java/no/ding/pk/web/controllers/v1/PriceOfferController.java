@@ -1,10 +1,23 @@
 package no.ding.pk.web.controllers.v1;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.domain.offer.SalesOffice;
+import no.ding.pk.service.offer.PriceOfferService;
+import no.ding.pk.web.dto.web.client.DiscountLevelDTO;
+import no.ding.pk.web.dto.web.client.MaterialDTO;
+import no.ding.pk.web.dto.web.client.MaterialDiscountDTO;
 import no.ding.pk.web.dto.web.client.PriceOfferDTO;
+import no.ding.pk.web.dto.web.client.PriceRowDTO;
+
+import org.modelmapper.Converter;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +31,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.service.offer.PriceOfferService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/price-offer")
@@ -32,12 +41,19 @@ public class PriceOfferController {
     
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
     
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
+    private final PriceOfferService service;
+
+    private final ModelMapper modelMapper;
+
     @Autowired
-    private PriceOfferService service;
-    
+    public PriceOfferController(ObjectMapper objectMapper, PriceOfferService service, ModelMapper modelMapper) {
+        this.objectMapper = objectMapper;
+        this.service = service;
+        this.modelMapper = modelMapper;
+    }
+
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOffer> list() {
         List<PriceOffer> priceOfferList = service.findAll();
@@ -53,7 +69,7 @@ public class PriceOfferController {
     public PriceOffer getById(@PathVariable("id") Long id) {
         if(id != null) {
             Optional<PriceOffer> optPriceOffer = service.findById(id);
-            if(!optPriceOffer.isPresent()) {
+            if(optPriceOffer.isEmpty()) {
                 log.info("Could not find a price offer with id: " + id);
                 return null;
             }
@@ -65,20 +81,24 @@ public class PriceOfferController {
         
         return null;
     }
-    
+
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOffer create(@RequestBody String newPriceOffer) throws JsonMappingException, JsonProcessingException {
-        log.debug("Got new Price offer object: " + newPriceOffer);
+    public PriceOffer create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
+        log.debug("Got new Price offer object: " + priceOfferDTO);
         
-        PriceOffer priceOffer = objectMapper.readValue(newPriceOffer, PriceOffer.class);
+        PriceOffer priceOffer = convertToEntity(priceOfferDTO);
         
         log.debug("Resulting priceOffer");
         log.debug(priceOffer.toString());
         return service.save(priceOffer);
     }
-    
+
+    private PriceOffer convertToEntity(PriceOfferDTO priceOfferDto) {
+        return modelMapper.map(priceOfferDto, PriceOffer.class);
+    }
+
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOffer save(@PathVariable("id") Long id, @RequestBody String plainPriceOfferDTO) throws JsonMappingException, JsonProcessingException {
+    public PriceOffer save(@PathVariable("id") Long id, @RequestBody String plainPriceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: " + id);
         log.debug("Values received for PriceOffer: {}", plainPriceOfferDTO);
         
@@ -89,8 +109,8 @@ public class PriceOfferController {
         
         Optional<PriceOffer> result = service.findById(id);
         
-        if(!result.isPresent()) {
-            log.debug("{} {}", "Price offer with ID", id, "was not found");
+        if(result.isEmpty()) {
+            log.debug("{} {} {}", "Price offer with ID", id, "was not found");
             return null;
         }
 

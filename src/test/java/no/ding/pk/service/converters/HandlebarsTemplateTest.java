@@ -33,8 +33,8 @@ import no.ding.pk.config.SchedulingTestConfig;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.template.HandlebarsTemplateService;
 import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
-import no.ding.pk.web.dto.CustomerDTO;
 
+import no.ding.pk.web.dto.sap.CustomerDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
