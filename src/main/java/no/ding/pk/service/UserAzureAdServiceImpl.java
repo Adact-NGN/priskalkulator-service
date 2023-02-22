@@ -44,34 +44,36 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
     private String adUserInfoSelectList;
 
     private String scope;
-    
+
     private ConfidentialClientApplication app;
     private ObjectMapper objectMapper;
     private MapperService mapperService;
 
+    private LocalJSONUtils localJSONUtils;
+
     @Autowired
     public UserAzureAdServiceImpl(ConfidentialClientApplication app,
-    ObjectMapper objectMapper,
-    MapperService mapperService) {
+                                  ObjectMapper objectMapper,
+                                  MapperService mapperService,
+                                  LocalJSONUtils localJSONUtils) {
         this.app = app;
         this.objectMapper = objectMapper;
         this.mapperService = mapperService;
+        this.localJSONUtils = localJSONUtils;
     }
-
-    
 
     public List<User> getUsersList() {
         String userListFromGraph;
         try {
             userListFromGraph = executeUserGraphRequest(null, List.of(adUserInfoSelectList.split(",")));
         } catch (IOException e) {
-            log.error("Exception thrown of type: ", e.getClass());
-            log.error("Exception message: ", e.getMessage());
+            log.error("Exception thrown of type: {}", e.getClass());
+            log.error("Exception message: {}", e.getMessage());
 
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        LocalJSONUtils.checkForValidJSON(userListFromGraph);
+        localJSONUtils.checkForValidJSON(userListFromGraph);
 
         List<AdUserDTO> adUserDtoList = jsonToAdUserDTOList(userListFromGraph);
 
@@ -94,18 +96,18 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
     }
 
     public User getUserByEmail(String email) {
-        
+
         String userJson;
         try {
             userJson = executeUserGraphRequest(Collections.singletonList(email), List.of(adUserInfoSelectList.split(",")));
         } catch (IOException e) {
-            log.error("Exception thrown of type: ", e.getClass());
-            log.error("Exception message: ", e.getMessage());
+            log.error("Exception thrown of type: {}", e.getClass());
+            log.error("Exception message: {}", e.getMessage());
 
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        LocalJSONUtils.checkForValidJSON(userJson);
+        localJSONUtils.checkForValidJSON(userJson);
 
         AdUserDTO user = jsonToAdUserDTO(userJson);
 
@@ -118,13 +120,13 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
         try {
             userSearch = executeUserSearchRequest(email, List.of(adUserInfoSelectList.split(",")));
         } catch (IOException e) {
-            log.error("Exception thrown of type: ", e.getClass());
-            log.error("Exception message: ", e.getMessage());
+            log.error("Exception thrown of type: {}", e.getClass());
+            log.error("Exception message: {}", e.getMessage());
 
             throw new RuntimeErrorException(new Error("Could not establish connection with Graph API."));
         }
 
-        LocalJSONUtils.checkForValidJSON(userSearch);
+        localJSONUtils.checkForValidJSON(userSearch);
 
         List<AdUserDTO> adUserDTO = jsonToAdUserDTOList(userSearch);
 
@@ -136,8 +138,8 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
         try {
             return objectMapper.readValue(userJson, AdUserDTO.class);
         } catch (JsonProcessingException e) {
-            log.error("Exception thrown of type: ", e.getClass());
-            log.error("Exception message: ", e.getMessage());
+            log.error("Exception thrown of type: {}", e.getClass());
+            log.error("Exception message: {}", e.getMessage());
 
             throw new RuntimeErrorException(new Error("Could not deserialize JSON to object."));
         }
@@ -154,7 +156,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
         IAuthenticationResult result = getAccessTokenByClientCredentialGrant();
         URL url = new URL(graphUrl);
-        log.debug("Created search URL: " + url.toString());
+        log.debug("Created search URL: {}", url);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
         conn.setRequestMethod("GET");
@@ -183,7 +185,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
     }
 
     private String executeUserGraphRequest(List<String> parameters, List<String> selectList) throws IOException {
-        
+
         String graphUrl = graphBaseUrl + "/users";
 
         if(parameters != null && !parameters.isEmpty()) {
@@ -202,7 +204,7 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
         IAuthenticationResult result = getAccessTokenByClientCredentialGrant();
         URL url = new URL(graphUrl);
-        log.debug("Created URL: " + url.toString());
+        log.debug("Created URL: {}", url);
         HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
 
         conn.setRequestMethod("GET");
@@ -231,20 +233,20 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
     }
 
     private IAuthenticationResult getAccessTokenByClientCredentialGrant() {
-    	
-    	// With client credentials flows the scope is ALWAYS of the shape "resource/.default", as the
+
+        // With client credentials flows the scope is ALWAYS of the shape "resource/.default", as the
         // application permissions need to be set statically (in the portal), and then granted by a tenant administrator
         ClientCredentialParameters clientCredentialParam = ClientCredentialParameters.builder(
-                Collections.singleton(scope))
+                        Collections.singleton(scope))
                 .build();
-    	
+
         CompletableFuture<IAuthenticationResult> future = app.acquireToken(clientCredentialParam);
         log.debug("Acquiring access token");
         try {
             return future.get();
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Exception thrown of type: ", e.getClass());
-            log.error("Exception message: ", e.getMessage());
+            log.error("Exception thrown of type: {}", e.getClass());
+            log.error("Exception message: {}", e.getMessage());
 
             throw new RuntimeErrorException(new Error("Could not get Access token."));
         }

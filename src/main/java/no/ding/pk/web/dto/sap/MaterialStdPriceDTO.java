@@ -5,10 +5,21 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import no.ding.pk.web.dto.converters.LongToDateConverter;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @JsonIgnoreProperties(value = { "__metadata" })
 public class MaterialStdPriceDTO {
     @JsonDeserialize(converter = LongToDateConverter.class)
@@ -52,7 +63,10 @@ public class MaterialStdPriceDTO {
     private String materialType;
     @JsonAlias({"Materialbeskrivelse", "MaterialTypeDescription"}) //: "Tjeneste"
     private String materialTypeDesignation;
-    
+
+    @JsonAlias({"MaterialData"})
+    private MaterialDTO materialData;
+
     public Date getValidFrom() {
         return validFrom;
     }

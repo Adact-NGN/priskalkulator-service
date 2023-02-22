@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import org.apache.commons.lang3.BooleanUtils;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.service.SalesOrgService;
+import no.ding.pk.service.sap.SalesOrgService;
 import no.ding.pk.web.enums.SalesOrgField;
 
 @RestController
@@ -103,6 +104,10 @@ public class SalesOrgController {
             if(StringUtils.isNotBlank(param)) {
                 String fieldType = fieldList.get(i).getType();
 
+                if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
+                    param = param.toUpperCase();
+                }
+
                 log.debug("Parameter: {} fieldType: {}", param, fieldType);
 
                 if(StringUtils.equals(fieldType, "numeric") && !StringUtils.isNumeric(param)) {
@@ -111,18 +116,14 @@ public class SalesOrgController {
 
                 log.debug("Parameter ({}) and parameter type ({}) matches. Add to query.", param, fieldType);
 
-                // if(StringUtils.equals(fieldType, "string") && !StringUtils.isAlphanumericSpace(param)) {
-                //     continue;
-                // }
-
-                String field = fieldList.get(i).getValue();
+                String field = fieldList.get(i).getName();
                 addAndToQuery(queryBuilder, logicDivider);
 
                 queryBuilder.append(field).append(" eq ").append(String.format("'%s'", param));
             }
         }
 
-        log.debug("Calling service with query: " + queryBuilder.toString());
+        log.debug("Calling service with query: " + queryBuilder);
 
         return service.findByQuery(queryBuilder.toString(), skipTokens);
     }

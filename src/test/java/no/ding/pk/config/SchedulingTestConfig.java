@@ -3,16 +3,21 @@ package no.ding.pk.config;
 import static org.mockito.Mockito.mock;
 
 import no.ding.pk.service.converters.PdfService;
+import no.ding.pk.service.offer.PriceRowService;
+import no.ding.pk.service.offer.SalesOfficeService;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.template.HandlebarsTemplateService;
 import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
 
+import no.ding.pk.utils.SapHttpClient;
+import no.ding.pk.web.dto.sap.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.aad.msal4j.ConfidentialClientApplication;
@@ -29,21 +34,22 @@ import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
 import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.repository.offer.SalesOfficeRepository;
 import no.ding.pk.repository.offer.ZoneRepository;
-import no.ding.pk.service.InMemoryCache;
-import no.ding.pk.service.MaterialInMemoryCache;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.web.mappers.MapperService;
 
 import javax.persistence.EntityManagerFactory;
 
 @Configuration
-@EnableScheduling
 @Profile({ "unit-test" })
 @ComponentScan("no.ding.pk.service")
 public class SchedulingTestConfig {
 
+    @Value("${cache.max.amount.items:5000}") private Integer capacity;
+
     @Bean
-    public InMemoryCache<String, String, String> inMemoryCache() {
-        return new MaterialInMemoryCache<>();
+    public InMemory3DCache<String, String, String> inMemoryCache() {
+        return new PingInMemory3DCache<>(capacity);
     }
 
     @Bean
@@ -144,5 +150,30 @@ public class SchedulingTestConfig {
     @Bean
     public PdfService pdfService() {
         return mock(PdfService.class);
+    }
+
+    @Bean
+    public SalesOfficeService salesOfficeService() {
+        return mock(SalesOfficeService.class);
+    }
+
+    @Bean
+    public PriceRowService priceRowService() {
+        return mock(PriceRowService.class);
+    }
+
+    @Bean
+    public SapHttpClient sapHttpClient() {
+        return mock(SapHttpClient.class);
+    }
+
+    @Bean
+    public InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache() {
+        return mock(InMemory3DCache.class);
+    }
+
+    @Bean
+    public InMemory3DCache<String, String, MaterialDTO> materialInMemoryCache() {
+        return mock(InMemory3DCache.class);
     }
 }

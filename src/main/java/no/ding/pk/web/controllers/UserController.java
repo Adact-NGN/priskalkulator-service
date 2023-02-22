@@ -124,8 +124,8 @@ public class UserController {
         
         log.debug("Found user: " + result.isPresent());
         
-        if(!result.isPresent()) {
-            log.error("{} {}", "User with ID", id, "was not found");
+        if(result.isEmpty()) {
+            log.error("{} {} {}", "User with ID", id, "was not found");
             return null;
         }
         

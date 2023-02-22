@@ -4,7 +4,7 @@ import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
-import no.ding.pk.service.StandardPriceService;
+import no.ding.pk.service.sap.StandardPriceService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

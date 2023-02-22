@@ -167,7 +167,7 @@ public class CustomerServiceImpl implements CustomerService {
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToCustomerDTOList(response);
         } else {
-            log.error(response.body());
+            log.error("Response code {}", response.statusCode());
         }
         return new ArrayList<>();
     }

@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
+import org.springframework.context.annotation.PropertySources;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -67,8 +68,7 @@ public class App implements WebMvcConfigurer {
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
         
         ObjectMapper objectMapper = objectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        
+
         messageConverter.setObjectMapper(objectMapper);
         return messageConverter;
     }
@@ -95,6 +95,7 @@ public class App implements WebMvcConfigurer {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Hibernate5Module());
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         return objectMapper;
     }

@@ -1,9 +1,6 @@
 package no.ding.pk.web.controllers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import no.ding.pk.service.sap.ContactPersonService;
 import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.service.ContactPersonService;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/contact-person")

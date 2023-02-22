@@ -10,16 +10,16 @@ public enum SalesOrgField {
     City("City", "string"),
     SkipTokens("skiptokens", "numeric");
     
-    private String value;
-    private String type;
+    private final String name;
+    private final String type;
     
-    SalesOrgField(String value, String type) {
-        this.value = value;
+    SalesOrgField(String name, String type) {
+        this.name = name;
         this.type = type;
     }
     
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
     public String getType() {

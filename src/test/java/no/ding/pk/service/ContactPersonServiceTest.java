@@ -10,16 +10,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.ding.pk.service.sap.ContactPersonService;
+import no.ding.pk.service.sap.ContactPersonServiceImpl;
+import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
@@ -35,11 +39,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ContactPersonServiceTest {
     
     private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts";
-    
-    private ContactPersonService service = new ContactPersonServiceImpl(url, new ObjectMapper());
+
+    @Autowired
+    private SapHttpClient sapHttpClient;
+
+    private ContactPersonService service;
     
     @BeforeEach
     public void setup() {
+        service = new ContactPersonServiceImpl(url, new ObjectMapper(), sapHttpClient);
     }
     
     @Test
@@ -69,7 +77,7 @@ public class ContactPersonServiceTest {
         String absolutePath = file.getAbsolutePath();
         System.out.println(absolutePath);
         
-        String json = IOUtils.toString(new FileInputStream(file), "UTF-8");
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
         
         ObjectMapper objectMapper = new ObjectMapper();
         

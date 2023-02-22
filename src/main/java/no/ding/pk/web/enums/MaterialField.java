@@ -7,6 +7,7 @@ public enum MaterialField {
     Material("Material"), //: 50000,
     MaterialDescription("MaterialDescription"), //: Mal for tjenester,
     DeviceCategory("DeviceCategory"),
+    DistributionChannel("DistributionChannel"),
     SalesZone("SalesZone"),
     ScaleQuantity("ScaleQuantity"), //: 0.000,
     StandardPrice("StandardPrice"), //: 0.00,
@@ -18,15 +19,23 @@ public enum MaterialField {
     MaterialGroup("MaterialGroup"),
     MaterialGroupDescription("MaterialGroupDescription"),
     MaterialType("MaterialType"),
-    MaterialTypeDescription("MaterialTypeDescription");
-    
-    private String value;
-    
+    MaterialTypeDescription("MaterialTypeDescription"),
+
+    // Fields specific for SAP Material API.
+    CategoryId("CategoryId"),
+    CategoryDescription("CategoryDescription"),
+    SubCategoryId("SubCategoryId"),
+    SubCategoryDescription("SubCategoryDescription"),
+    ClassId("ClassId"),
+    ClassDescription("ClassDescription");
+
+    private final String value;
+
     MaterialField(String value) {
         this.value = value;
     }
-    
-    
+
+
     public String getValue() {
         return value;
     }
