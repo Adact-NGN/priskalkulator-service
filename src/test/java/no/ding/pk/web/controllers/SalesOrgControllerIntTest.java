@@ -36,7 +36,7 @@ public class SalesOrgControllerIntTest {
     @Test
     public void shouldGetAllZonesForSalesOffice() throws Exception {
 
-        String url = "http://localhost:" + serverPort + "/api/v1/salesorg/100/104/Skien/zones";
+        String url = "http://localhost:" + serverPort + "/api/v1/salesorg/100/104/zones";
 
         ResponseEntity<String> responseEntity = this.restTemplate.getForEntity(url, String.class);
 

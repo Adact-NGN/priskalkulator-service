@@ -117,29 +117,26 @@ public class SalesOrgController {
         return service.findByQuery(queryBuilder.toString(), skipTokens);
     }
 
-    @GetMapping("/{salesOrg}/{salesOffice}/{salesOfficeName}/zones")
+    @GetMapping("/{salesOrg}/{salesOffice}/zones")
     List<SalesOrgDTO> getZonesForSalesOffice(
             @PathVariable("salesOrg") String salesOrg,
-            @PathVariable("salesOffice") String salesOffice,
-            @PathVariable("salesOfficeName") String salesOfficeName
-    ) {
+            @PathVariable("salesOffice") String salesOffice) {
         List<String> params = List
-                .of(salesOrg, salesOffice, salesOfficeName, "");
+                .of(salesOrg, salesOffice, "");
 
         List<SalesOrgField> fieldList = List
                 .of(SalesOrgField.SalesOrganization,
                         SalesOrgField.SalesOffice,
-                        SalesOrgField.SalesOfficeName,
                         SalesOrgField.SalesZone);
 
         StringBuilder queryBuilder = new StringBuilder();
 
         String logicDivider = " and ";
 
-        for(int i = 0; i < params.size() && i < fieldList.size(); i++) {
+        for(int i = 0; i < params.size(); i++) {
             String param = params.get(i);
 
-            if(StringUtils.isNotBlank(param)) {
+            if(param != null) {
                 String fieldType = fieldList.get(i).getType();
 
                 if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
