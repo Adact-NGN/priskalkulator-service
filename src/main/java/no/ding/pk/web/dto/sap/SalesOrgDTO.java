@@ -1,23 +1,25 @@
 package no.ding.pk.web.dto.sap;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
 
+@Data
 public class SalesOrgDTO {
 
     @JsonAlias("SalesOrganization")
     private String salesOrganization;
 
-    @JsonAlias({"PostalNumber", "PostalCode"})
-    private String postalNumber;
+    @JsonAlias("SalesOffice")
+    private String salesOffice;
 
     @JsonAlias("SalesOfficeName")
     private String salesOfficeName;
 
+    @JsonAlias({"PostalNumber", "PostalCode"})
+    private String postalCode;
+
     @JsonAlias("City")
     private String city;
-
-    @JsonAlias("SalesOffice")
-    private String salesOffice;
 
     @JsonAlias("SalesZone")
     private String salesZone;
@@ -33,12 +35,12 @@ public class SalesOrgDTO {
         this.salesOrganization = salesOrganization;
     }
 
-    public String getPostalNumber() {
-        return postalNumber;
+    public String getPostalCode() {
+        return postalCode;
     }
 
-    public void setPostalNumber(String postalNumber) {
-        this.postalNumber = postalNumber;
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
     public String getSalesOfficeName() {
@@ -86,7 +88,7 @@ public class SalesOrgDTO {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((salesOrganization == null) ? 0 : salesOrganization.hashCode());
-        result = prime * result + ((postalNumber == null) ? 0 : postalNumber.hashCode());
+        result = prime * result + ((postalCode == null) ? 0 : postalCode.hashCode());
         result = prime * result + ((salesOfficeName == null) ? 0 : salesOfficeName.hashCode());
         result = prime * result + ((city == null) ? 0 : city.hashCode());
         result = prime * result + ((salesOffice == null) ? 0 : salesOffice.hashCode());
@@ -108,10 +110,10 @@ public class SalesOrgDTO {
                 return false;
         } else if (!salesOrganization.equals(other.salesOrganization))
             return false;
-        if (postalNumber == null) {
-            if (other.postalNumber != null)
+        if (postalCode == null) {
+            if (other.postalCode != null)
                 return false;
-        } else if (!postalNumber.equals(other.postalNumber))
+        } else if (!postalCode.equals(other.postalCode))
             return false;
         if(salesOfficeName == null) {
             if(other.salesOfficeName != null)

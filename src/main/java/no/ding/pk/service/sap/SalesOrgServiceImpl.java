@@ -63,6 +63,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     public List<SalesOrgDTO> findByQuery(String query, Integer skipTokens) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", query);
+        params.add("$top", "5000");
 
         if(skipTokens != null && skipTokens > 0) {
             params.add("$skiptoken", skipTokens.toString());
@@ -158,7 +159,6 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     private List<SalesOrgDTO> responseToDtoList(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         log.debug(String.format("JSON object size: %d", jsonObject.length()));
-        log.debug("JSON content {}", jsonObject);
         JSONArray result = jsonObject.getJSONArray("value");
 
         log.debug(String.format("Got %d amount of objects in JSON array", result.length()));

@@ -40,7 +40,7 @@ public class SalesOrgControllerTest {
 
         params.add("salesOrg", "3933");
         params.add("salesOffice", "3933");
-        params.add("postalNumber", "3933");
+        params.add("postalCode", "3933");
         params.add("salesZone", "3933");
         params.add("city", "3933");
         params.add("skiptokens", "0");
@@ -52,4 +52,6 @@ public class SalesOrgControllerTest {
 
         assertThat(mvcResult.getResponse().getStatus(), is(200));
     }
+
+
 }

@@ -4,8 +4,9 @@ import java.util.List;
 
 public enum SalesOrgField {
     SalesOrganization("SalesOrganization", "numeric"),
-    SalesOffice("SalesOffice", "string"),
+    SalesOffice("SalesOffice", "numeric"),
     PostalCode("PostalCode", "numeric"),
+    SalesOfficeName("SalesOfficeName", "string"),
     SalesZone("SalesZone", "numeric"),
     City("City", "string"),
     SkipTokens("skiptokens", "numeric");

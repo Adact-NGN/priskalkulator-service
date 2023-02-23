@@ -38,6 +38,8 @@ public class StandardPriceController {
             @RequestParam(value = "zone", required = false) String zone
     ) {
         List<MaterialStdPriceDTO> materialList = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg, zone);
+
+
         log.debug(String.format("Amount returning: %d", materialList.size()));
         return materialList;
     }
