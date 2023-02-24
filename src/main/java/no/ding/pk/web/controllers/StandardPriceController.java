@@ -39,7 +39,6 @@ public class StandardPriceController {
     ) {
         List<MaterialStdPriceDTO> materialList = service.getStdPricesForSalesOfficeAndSalesOrg(salesOffice, salesOrg, zone);
 
-
         log.debug(String.format("Amount returning: %d", materialList.size()));
         return materialList;
     }

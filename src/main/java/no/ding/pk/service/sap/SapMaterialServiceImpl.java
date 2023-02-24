@@ -134,7 +134,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
-
+            log.debug("MaterialDTOList {}", materialDTOList.size());
             return materialDTOList;
         }
 

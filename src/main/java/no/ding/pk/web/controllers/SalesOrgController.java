@@ -44,7 +44,7 @@ public class SalesOrgController {
      * @param postalCode number value for postal number
      * @param salesZone number value for sales zone
      * @param city string value
-     * @param greedy wheter to use greedy or ungreedy query, 'or' or 'and'. Default greedy (true): or
+     * @param greedy whether to use greedy or un-greedy query, 'or' or 'and'. Default greedy (true): or
      * @return List of sales organizations, else empty list
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

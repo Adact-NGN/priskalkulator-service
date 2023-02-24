@@ -238,6 +238,8 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         if(StringUtils.isNotBlank(zone)) {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), zone));
+        } else {
+            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
         return filterQuery.toString();
     }
