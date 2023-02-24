@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import no.ding.pk.service.sap.SalesOrgService;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
+import no.ding.pk.web.dto.web.client.ZoneDTO;
 import no.ding.pk.web.enums.SalesOrgField;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = {"/api/salesorg", "/api/v1/salesorg"})
@@ -118,7 +120,7 @@ public class SalesOrgController {
     }
 
     @GetMapping("/{salesOrg}/{salesOffice}/zones")
-    List<SalesOrgDTO> getZonesForSalesOffice(
+    List<ZoneDTO> getZonesForSalesOffice(
             @PathVariable("salesOrg") String salesOrg,
             @PathVariable("salesOffice") String salesOffice) {
         List<String> params = List
@@ -173,7 +175,10 @@ public class SalesOrgController {
                 distinctSalesOrgMap.put(salesOrgDTO.getSalesZone(), salesOrgDTO);
             }
         });
-        return List.copyOf(distinctSalesOrgMap.values());
+        return distinctSalesOrgMap.values().stream().map(data -> ZoneDTO.builder()
+                .postalCode(data.getPostalCode())
+                .zoneId(data.getSalesZone().replace("0", ""))
+                .postalName(data.getCity()).build()).collect(Collectors.toList());
     }
 
     private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {

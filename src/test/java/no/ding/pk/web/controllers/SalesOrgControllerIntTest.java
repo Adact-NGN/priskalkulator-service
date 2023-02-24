@@ -1,7 +1,7 @@
 package no.ding.pk.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.ding.pk.web.dto.sap.SalesOrgDTO;
+import no.ding.pk.web.dto.web.client.ZoneDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -43,13 +43,13 @@ public class SalesOrgControllerIntTest {
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
         assertThat(responseEntity.getBody(), notNullValue());
 
-        List<SalesOrgDTO> salesOrgDTOList = new ArrayList<>();
+        List<ZoneDTO> salesOrgDTOList = new ArrayList<>();
         JSONArray jsonArray = new JSONArray(responseEntity.getBody());
 
         for(int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-            SalesOrgDTO salesOrgDTO = objectMapper.readValue(jsonObject.toString(), SalesOrgDTO.class);
+            ZoneDTO salesOrgDTO = objectMapper.readValue(jsonObject.toString(), ZoneDTO.class);
 
             salesOrgDTOList.add(salesOrgDTO);
         }
