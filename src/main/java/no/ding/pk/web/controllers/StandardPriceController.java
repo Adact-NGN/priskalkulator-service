@@ -1,15 +1,18 @@
 package no.ding.pk.web.controllers;
 
-import java.util.List;
-
+import no.ding.pk.service.sap.StandardPriceServiceImpl;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.service.sap.StandardPriceServiceImpl;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = {"/api/standard-price", "/api/v1/standard-price"})
@@ -29,6 +32,7 @@ public class StandardPriceController {
 
      * @param salesOrg The sales organization to get the prices for.
      * @param salesOffice The sales office to get the prices for.
+     * @param zone Set the zone number for only getting Material prices for a specific zone. @required
      * @return list of MaterialStdPriceDTO objects
      */
     @GetMapping(value = "/{salesorg}/{salesoffice}", produces = MediaType.APPLICATION_JSON_VALUE)
