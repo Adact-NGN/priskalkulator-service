@@ -1,9 +1,11 @@
 package no.ding.pk.web.controllers;
 
-import java.util.List;
-
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.service.SalesRoleService;
+import no.ding.pk.web.dto.web.client.SalesRoleDTO;
+import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,18 +15,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.service.SalesRoleService;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/sales-role")
+@RequestMapping({"/api/sales-role", "/api/v1/sales-role"})
 public class SalesRoleController {
 
-    private SalesRoleService service;
-    
+    private final Logger log = LoggerFactory.getLogger(SalesRoleController.class);
+
+    private final SalesRoleService service;
+
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public SalesRoleController(SalesRoleService service) {
+    public SalesRoleController(SalesRoleService service, ModelMapper modelMapper) {
         this.service = service;
+        this.modelMapper = modelMapper;
     }
 
     /**
@@ -32,8 +40,12 @@ public class SalesRoleController {
      * @return A list of SalesRoles.
      */
     @GetMapping("/list")
-    public List<SalesRole> getSalesRoleList() {
-        return service.getAllSalesRoles();
+    public List<SalesRoleDTO> getSalesRoleList() {
+        log.debug("Getting Sales Role list");
+        List<SalesRole> salesRoles = service.getAllSalesRoles();
+
+        log.debug("Returning {} amount of roles.", salesRoles.size());
+        return salesRoles.stream().map(mapToDTO()).collect(Collectors.toList());
     }
 
     /**
@@ -42,8 +54,8 @@ public class SalesRoleController {
      * @return Newly created SalesRole object.
      */
     @PostMapping()
-    public SalesRole saveSalesRole(@RequestBody SalesRole salesRole) {
-        return service.save(salesRole);
+    public SalesRoleDTO saveSalesRole(@RequestBody SalesRole salesRole) {
+        return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
     }
 
     /**
@@ -52,8 +64,8 @@ public class SalesRoleController {
      * @return A list of all the newly created SalesRole objects.
      */
     @PostMapping("/batch")
-    public List<SalesRole> saveBatchSalesRole(@RequestBody List<SalesRole> salesRoles) {
-        return service.saveAll(salesRoles);
+    public List<SalesRoleDTO> saveBatchSalesRole(@RequestBody List<SalesRole> salesRoles) {
+        return service.saveAll(salesRoles).stream().map(mapToDTO()).collect(Collectors.toList());
     }
 
     /**
@@ -62,8 +74,8 @@ public class SalesRoleController {
      * @return Updated SalesRole object.
      */
     @PutMapping("/{id}")
-    public SalesRole updateSalesRole(@RequestBody SalesRole salesRole) {
-        return service.save(salesRole);
+    public SalesRoleDTO updateSalesRole(@RequestBody SalesRole salesRole) {
+        return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
     }
 
     /**
@@ -72,7 +84,11 @@ public class SalesRoleController {
      * @return A list of SalesRoles connected to the user.
      */
     @GetMapping("/user/{userId}")
-    public List<SalesRole> getSalesRoleForUser(@PathVariable("userId") Long userId) {
-        return service.findSalesRoleForUser(userId);
+    public List<SalesRoleDTO> getSalesRoleForUser(@PathVariable("userId") Long userId) {
+        return service.findSalesRoleForUser(userId).stream().map(mapToDTO()).collect(Collectors.toList());
+    }
+
+    private Function<SalesRole, SalesRoleDTO> mapToDTO() {
+        return salesRole -> modelMapper.map(salesRole, SalesRoleDTO.class);
     }
 }

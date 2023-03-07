@@ -1,24 +1,21 @@
 package no.ding.pk.domain;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -66,7 +63,7 @@ public class User implements Serializable {
     private String resourceNr;
     
     @JsonAlias("phone")
-    @Column
+    @Column()
     private String phoneNumber;
     
     @Column(unique = true)
@@ -369,37 +366,5 @@ public class User implements Serializable {
         } else if (!email.equals(other.email))
             return false;
         return true;
-    }
-    
-    /**
-     * Copies all literal fields from input object.
-     * @param other The object to copy from
-     */
-    public void copy(User other) {
-        this.setAdId(other.getAdId());
-        this.setOrgNr(other.getOrgNr());
-        this.setOrgName(other.getOrgName());
-        this.setRegionName(other.getRegionName());
-        this.setSureName(other.getSureName());
-        this.setName(other.getName());
-        this.setUsername(other.getUsername());
-        this.setUsernameAlias(other.getUsernameAlias());
-        this.setJobTitle(other.getJobTitle());
-        this.setFullName(other.getFullName());
-        this.setResourceNr(other.getResourceNr());
-        this.setPhoneNumber(other.getPhoneNumber());
-        this.setEmail(other.getEmail());
-        this.setAssociatedPlace(other.getAssociatedPlace());
-        this.setPowerOfAttorneyOA(other.getPowerOfAttorneyOA());
-        this.setPowerOfAttorneyFA(other.getPowerOfAttorneyFA());
-        
-        this.setOverallPowerOfAttorney(other.getOverallPowerOfAttorney());
-        this.setEmailSalesManager(other.getEmailSalesManager());
-        
-        this.setRegionalManagersPowerOfAttorney(other.getRegionalManagersPowerOfAttorney());
-        
-        this.setEmailRegionalManager(other.getEmailRegionalManager());
-        
-        this.setDepartment(other.getDepartment());
     }
 }

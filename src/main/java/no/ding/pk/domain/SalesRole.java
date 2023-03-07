@@ -1,8 +1,13 @@
 package no.ding.pk.domain;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,19 +19,15 @@ import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Builder
 @Entity
+//@EqualsAndHashCode
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
 public class SalesRole implements Serializable {
@@ -41,14 +42,18 @@ public class SalesRole implements Serializable {
     private String description;
     
     @Column
+//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyOa;
     
     @Column
+//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyFa;
-    
+
     @JsonManagedReference
     @Column
     @OneToMany(mappedBy = "salesRole", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
+    @LazyCollection(LazyCollectionOption.FALSE)
+//    @EqualsAndHashCode.Exclude
     @Builder.Default private List<User> userList = new ArrayList<>();
     
     public Long getId() {
@@ -98,73 +103,22 @@ public class SalesRole implements Serializable {
         }
     }
     
-    @Override
-    public String toString() {
-        return "SalesRole [description=" + description + ", id=" + id + ", roleName=" + roleName + ", defaultPowerOfAttorneyOa="+ defaultPowerOfAttorneyOa + ", defaultPowerOfAttorneyFa="+ defaultPowerOfAttorneyFa + "]";
-    }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((roleName == null) ? 0 : roleName.hashCode());
-        result = prime * result + ((description == null) ? 0 : description.hashCode());
-        result = prime * result + ((defaultPowerOfAttorneyOa == null) ? 0 : defaultPowerOfAttorneyOa.hashCode());
-        result = prime * result + ((defaultPowerOfAttorneyFa == null) ? 0 : defaultPowerOfAttorneyFa.hashCode());
-        return result;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SalesRole other = (SalesRole) obj;
-        if (roleName == null) {
-            if (other.roleName != null)
-                return false;
-        } else if (!roleName.equals(other.roleName))
-            return false;
-        if(description == null) {
-            if(other.description != null)    
-                return false;
-        } else if(!description.equals(other.description))
-        return false;
-        if (defaultPowerOfAttorneyOa == null) {
-            if (other.defaultPowerOfAttorneyOa != null)
-                return false;
-        } else if(!defaultPowerOfAttorneyOa.equals(other.defaultPowerOfAttorneyOa)) {
-            return false;
-        }
-        if (defaultPowerOfAttorneyFa == null) {
-            if (other.defaultPowerOfAttorneyFa != null)
-                return false;
-        } else if(!defaultPowerOfAttorneyFa.equals(other.defaultPowerOfAttorneyFa)) {
-            return false;
-        }
-        
-        return true;
-    }
-    
     public Integer getDefaultPowerOfAttorneyOa() {
         return defaultPowerOfAttorneyOa;
     }
-    
+
     public void setDefaultPowerOfAttorneyOa(Integer defaultPowerOfAttorneyOa) {
         this.defaultPowerOfAttorneyOa = defaultPowerOfAttorneyOa;
     }
-    
+
     public Integer getDefaultPowerOfAttorneyFa() {
         return defaultPowerOfAttorneyFa;
     }
-    
+
     public void setDefaultPowerOfAttorneyFa(Integer defaultPowerOfAttorneyFa) {
         this.defaultPowerOfAttorneyFa = defaultPowerOfAttorneyFa;
     }
-    
+
     public List<User> getUserList() {
         if(userList == null) {
             userList = new ArrayList<>();
@@ -174,5 +128,32 @@ public class SalesRole implements Serializable {
     
     public void setUserList(List<User> userList) {
         this.userList = userList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SalesRole salesRole = (SalesRole) o;
+
+        return new EqualsBuilder().append(roleName, salesRole.roleName).append(description, salesRole.description).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(roleName).append(description).toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "roleName = " + roleName + ", " +
+                "description = " + description + ", " +
+                "defaultPowerOfAttorneyOa = " + defaultPowerOfAttorneyOa + ", " +
+                "defaultPowerOfAttorneyFa = " + defaultPowerOfAttorneyFa + ", " +
+                "userList.size() = " + userList.size() + ")";
     }
 }

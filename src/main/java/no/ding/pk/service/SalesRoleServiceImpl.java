@@ -1,22 +1,18 @@
 package no.ding.pk.service;
 
-import static no.ding.pk.repository.specifications.SalesRoleSpecification.hasUserWithId;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.repository.SalesRoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
-import no.ding.pk.repository.SalesRoleRepository;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+
+import static no.ding.pk.repository.specifications.SalesRoleSpecification.hasUserWithId;
 
 @Transactional
 @Service
@@ -35,11 +31,11 @@ public class SalesRoleServiceImpl implements SalesRoleService {
 
     @Override
     public SalesRole save(SalesRole salesRole) {
-//        SalesRole entity = repository.findByRoleName(salesRole.getRoleName());
-//
-//        if(entity == null) {
-//            return repository.save(salesRole);
-//        }
+        SalesRole entity = repository.findByRoleName(salesRole.getRoleName());
+
+        if(entity == null) {
+            return repository.save(salesRole);
+        }
 //
 //        entity = new SalesRole();
 //        entity.setDefaultPowerOfAttorneyFa(salesRole.getDefaultPowerOfAttorneyFa());

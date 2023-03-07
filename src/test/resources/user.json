@@ -17,14 +17,7 @@
         "resourceNr": "63940",
         "regionalManagersPowerOfAttorney": null,
         "regionName": null,
-        "salesRole": {
-            "id": null,
-            "roleName": "KV",
-            "description": "Kundeveileder",
-            "defaultPowerOfAttorneyOa": 1,
-            "defaultPowerOfAttorneyFa": 1,
-            "userList": null
-        },
+        "salesRoleId": 1,
         "sureName": null
     },
     {
@@ -41,14 +34,7 @@
         "resourceNr":null,
         "phoneNumber":"+4798232574",
         "email":"kristin.nerum@ngn.no",
-        "salesRole":{
-            "id": null,
-            "roleName": "SA",
-            "description": "Salgskonsulent (rolle a)",
-            "defaultPowerOfAttorneyOa": 2,
-            "defaultPowerOfAttorneyFa": 2,
-            "userList": null
-        },
+        "salesRoleId":2,
         "associatedPlace":"Larvik",
         "powerOfAttorneyOA":2,
         "powerOfAttorneyFA":3,

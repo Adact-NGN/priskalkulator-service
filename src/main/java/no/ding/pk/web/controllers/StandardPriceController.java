@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import no.ding.pk.service.sap.StandardPriceServiceImpl;
 
 @RestController
-@RequestMapping("/api/standard-price")
+@RequestMapping(value = {"/api/standard-price", "/api/v1/standard-price"})
 public class StandardPriceController {
 
     private final Logger log = LoggerFactory.getLogger(StandardPriceController.class);

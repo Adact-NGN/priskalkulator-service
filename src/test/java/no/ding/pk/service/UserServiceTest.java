@@ -1,26 +1,10 @@
 package no.ding.pk.service;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.core.IsNull.nullValue;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
+import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
@@ -29,21 +13,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
-import no.ding.pk.repository.SalesRoleRepository;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@Transactional
 @SpringBootTest
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
@@ -54,32 +47,33 @@ public class UserServiceTest {
     
     @Autowired
     private SalesRoleService salesRoleService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
     
     private List<User> testData;
     
     @BeforeEach
-    public void setup() throws FileNotFoundException, IOException {
+    public void setup() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
-        File file = new File(classLoader.getResource("user.json").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
         
         assertThat(file.exists(), is(true));
         
-        String json = IOUtils.toString(new FileInputStream(file), "UTF-8");
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
         
         assertThat("JSON is empty", json, not(emptyOrNullString()));
         
         testData = new ArrayList<>();
         
         JSONArray results = new JSONArray(json);
-        
-        ObjectMapper om = new ObjectMapper();
-        
+
         for(int i = 0; i < results.length(); i++) {
             JSONObject jsonObject = results.getJSONObject(i);
             
             try {
-                User discount = om.readValue(jsonObject.toString(), User.class);
+                User discount = objectMapper.readValue(jsonObject.toString(), User.class);
                 testData.add(discount);
             } catch (JsonProcessingException e) {
                 // TODO Auto-generated catch block
@@ -88,12 +82,37 @@ public class UserServiceTest {
         }
         
         assertThat("Test data is empty, reading in JSON file failed.", testData, not(empty()));
-        
+
+        SalesRole kv = salesRoleService.findSalesRoleByRoleName("KV");
+
+        if(kv == null) {
+            kv = SalesRole.builder()
+                    .roleName("KV")
+                    .description("Kundeveileder")
+                    .defaultPowerOfAttorneyOa(1)
+                    .defaultPowerOfAttorneyFa(1)
+                    .build();
+
+            salesRoleService.save(kv);
+        }
+
+        SalesRole kv2 = salesRoleService.findSalesRoleByRoleName("SA");
+
+        if(kv2 == null) {
+            kv2 = SalesRole.builder()
+                    .defaultPowerOfAttorneyFa(2)
+                    .defaultPowerOfAttorneyOa(2)
+                    .description("Salgskonsulent (rolle a)")
+                    .roleName("SA")
+                    .build();
+
+            salesRoleService.save(kv2);
+        }
     }
     
     @Test
     public void shouldPersistUserWithSalesRole() {
-        SalesRole salesRole = salesRoleService.findSalesRoleByRoleName(testData.get(0).getSalesRole().getRoleName());
+        SalesRole salesRole = salesRoleService.findSalesRoleByRoleName("KV");
         
         if(salesRole == null) {
             salesRole = testData.get(0).getSalesRole();
@@ -138,8 +157,6 @@ public class UserServiceTest {
             salesRole = salesRoleService.save(salesRole);
         }
 
-        int amountOfUsersInSalesRole = salesRole.getUserList() != null ? salesRole.getUserList().size() : 0;
-        
         User userObject = service.findByEmail(testData.get(0).getEmail());
 
         if(userObject == null) {
@@ -154,7 +171,7 @@ public class UserServiceTest {
 
         userObject = service.findById(userObject.getId()).get();
 
-        assertThat(userObject.getSalesRole(), notNullValue());
+        assertThat(userObject.getSalesRole(), equalTo(salesRole));
 
         salesRole.removeUser(userObject);
 

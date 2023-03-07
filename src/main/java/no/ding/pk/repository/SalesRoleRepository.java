@@ -1,8 +1,7 @@
 package no.ding.pk.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -10,8 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
+import java.util.List;
 
 @Repository
 public interface SalesRoleRepository extends JpaRepository<SalesRole, Long>, JpaSpecificationExecutor<SalesRole> {
@@ -27,10 +25,9 @@ public interface SalesRoleRepository extends JpaRepository<SalesRole, Long>, Jpa
     @Query("select sr.userList from SalesRole sr where sr.roleName = :roleName")
     List<User> findAllUsersByRoleName(@Param("roleName") String roleName);
 
-    // @EntityGraph(value = "SalesRole.userList")
     @Query("SELECT sr FROM SalesRole sr LEFT JOIN FETCH sr.userList ul")
     List<SalesRole> findAllWithUserList();
 
-    @Query("SELECT sr FROM SalesRole sr LEFT JOIN FETCH sr.userList ul")
-    Optional<SalesRole> findById(@Param("id") Long id);
+    @Query("SELECT sr FROM SalesRole sr where :user member sr.userList")
+    List<SalesRole> findAllByUserListContains(User user);
 }

@@ -1,10 +1,12 @@
 package no.ding.pk.web.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
+import no.ding.pk.service.SalesRoleService;
+import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.mappers.MapperService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,27 +21,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-
-import no.ding.pk.domain.User;
-import no.ding.pk.service.UserService;
-import no.ding.pk.web.mappers.MapperService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(value = {"/api/users", "/api/v1/users"})
 public class UserController {
     
-    private static Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     
-    private UserService userService;
-    private MapperService mapperService;
+    private final UserService userService;
+    private final SalesRoleService salesRoleService;
+    private final MapperService mapperService;
     
     @Autowired
-    public UserController(UserService userService, MapperService mapperService) {
+    public UserController(UserService userService, SalesRoleService salesRoleService, MapperService mapperService) {
         this.userService = userService;
+        this.salesRoleService = salesRoleService;
         this.mapperService = mapperService;
     }
     
@@ -64,18 +63,17 @@ public class UserController {
      * @return User object if found, else null.
      */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getById(@PathVariable("id") Long id) {
+    public UserDTO getById(@PathVariable("id") Long id) {
         log.debug("Got id: " + id);
         if(id != null) {
             Optional<User> optUser = userService.findById(id);
-            if(!optUser.isPresent()) {
+            if(optUser.isEmpty()) {
                 log.info("Could not find a user with id: " + id);
                 return null;
             }
             User user = optUser.get();
-            log.debug("Got user: " + user);
 
-            return user;
+            return mapperService.toUserDTO(user);
         }
         return null;
     }
@@ -86,32 +84,43 @@ public class UserController {
      * @return Newly created User object.
      */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User create(@RequestBody UserDTO userDTO) {
+    public UserDTO create(@RequestBody UserDTO userDTO) {
         User tempUser = mapperService.toUser(userDTO);
+        log.debug("Where we able to map the SalesRole: {}", tempUser.getSalesRole() != null);
         User createdUser = userService.save(tempUser, null);
         
         log.debug("Created new user with id: " + createdUser.getId());
         if(createdUser.getSalesRole() != null) {
-            log.debug("User has sales role with id: " + Long.toString(createdUser.getSalesRole().getId()));
+            log.debug("User has sales role with id: {}", createdUser.getSalesRole().getId());
         } else {
             log.debug("User has not been assigned a Sales Role");
         }
         
-        return createdUser;
+        return mapperService.toUserDTO(createdUser);
     }
-    
+
+    private void setSalesRole(UserDTO userDTO, User tempUser) {
+        if(userDTO.getSalesRoleId() != null) {
+            SalesRole salesRole = salesRoleService.findById(userDTO.getSalesRoleId());
+
+            if(salesRole != null) {
+                tempUser.setSalesRole(salesRole);
+            }
+        }
+    }
+
     /**
      * Update existing user with new values.
-     * @param id User ID.
+     *
+     * @param id      User ID.
      * @param userDTO New values to be set on the existing User object.
      * @return Updated User object.
-     * @throws JsonMappingException
      * @throws JsonProcessingException
      */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User save(@PathVariable("id") Long id, @RequestBody String userDTO) throws JsonMappingException, JsonProcessingException {
+    public UserDTO save(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) throws JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
-        log.debug("Object data: " + userDTO);
+//        log.debug("Object data: " + userDTO);
         
         if(id == null) {
             log.error("Put request was given non existing user to update.");
@@ -125,21 +134,14 @@ public class UserController {
         log.debug("Found user: " + result.isPresent());
         
         if(result.isEmpty()) {
-            log.error("{} {} {}", "User with ID", id, "was not found");
+            log.error("User with ID {} was not found", id);
             return null;
         }
-        
-        User currentUser = result.get();
-        
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectReader objectReader = objectMapper.readerForUpdating(currentUser);
-        User updatedUser = objectReader.readValue(userDTO);
-        log.debug("UserDTO: " + userDTO);
-        log.debug("updatedUser" + updatedUser);
-        
+
+        User updatedUser = mapperService.toUser(userDTO);
         updatedUser = userService.save(updatedUser, id);
         
-        return updatedUser;
+        return mapperService.toUserDTO(updatedUser);
     }
     
     /**

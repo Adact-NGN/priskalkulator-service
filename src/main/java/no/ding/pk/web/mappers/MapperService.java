@@ -32,23 +32,11 @@ public class MapperService {
     }
 
     public UserDTO toUserDTO(User user) {
-        if(user.getSalesRole() != null) {
-            return toUserDTO(user, user.getSalesRole());
-        }
         return modelMapper.map(user, UserDTO.class);
     }
 
-    public UserDTO toUserDTO(User user, SalesRole salesRole) {
-        user.setSalesRole(null);
-        UserDTO result = modelMapper.map(user, UserDTO.class);
-        SalesRoleDTO salesRoleDTO =  modelMapper.map(salesRole, SalesRoleDTO.class);
-        result.setSalesRole(salesRoleDTO);
-        
-        return result;
-    }
-
     public List<UserDTO> toUserDTOList(List<User> userList) {
-        return ((List<UserDTO>) userList.stream().map(this::toUserDTO).collect(Collectors.toList()));
+        return userList.stream().map(this::toUserDTO).collect(Collectors.toList());
     }
 
     public AdUserDTO toAdUserDto(User user) {
@@ -56,16 +44,21 @@ public class MapperService {
     }
 
     public List<AdUserDTO> toAdUserDTOList(List<User> userList) {
-        return ((List<AdUserDTO>) userList.stream().map(this::toAdUserDto).collect(Collectors.toList()));
+        return userList.stream().map(this::toAdUserDto).collect(Collectors.toList());
     }
 
     public User toUser(UserDTO user) {
-        User mappedUser = modelMapper.map(user, User.class);
 
-        return mappedUser;
+        return modelMapper.map(user, User.class);
     }
 
     public SalesRoleDTO toSalesRoleDTO(SalesRole salesRole) {
         return modelMapper.map(salesRole, SalesRoleDTO.class);
+    }
+
+    public <S, D> D map(S source, D destination) {
+        modelMapper.map(source, destination);
+
+        return destination;
     }
 }

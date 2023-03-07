@@ -1,5 +1,40 @@
 package no.ding.pk.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
+import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import no.ding.pk.service.SalesRoleService;
+import no.ding.pk.web.dto.web.client.UserDTO;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -10,36 +45,19 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import no.ding.pk.web.dto.web.client.SalesRoleDTO;
-import no.ding.pk.web.dto.web.client.UserDTO;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
-import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.web.mappers.MapperService;
-
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
 public class UserControllerTest {
+
+    @LocalServerPort
+    private int serverPort;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private UserController userController;
@@ -48,25 +66,23 @@ public class UserControllerTest {
     private SalesRoleService salesRoleService;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private UserRepository userRepository;
 
     @Autowired
-    private MapperService mapperService;
+    private SalesRoleRepository salesRoleRepository;
 
-    private List<User> testData;
+    private List<UserDTO> testData;
     private String requestPayload;
 
     @BeforeEach
-    public void setup() throws FileNotFoundException, IOException {
-
-
+    public void setup() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
-        File file = new File(classLoader.getResource("user.json").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
 
         assertThat(file.exists(), is(true));
 
-        String json = IOUtils.toString(new FileInputStream(file), "UTF-8");
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
         requestPayload = json;
 
         assertThat("JSON is empty", json, not(emptyOrNullString()));
@@ -79,7 +95,7 @@ public class UserControllerTest {
             JSONObject jsonObject = results.getJSONObject(i);
 
             try {
-                User discount = objectMapper.readValue(jsonObject.toString(), User.class);
+                UserDTO discount = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
                 testData.add(discount);
             } catch (JsonProcessingException e) {
                 // TODO Auto-generated catch block
@@ -89,29 +105,127 @@ public class UserControllerTest {
 
         assertThat("Test data is empty, reading in JSON file failed.", testData, not(empty()));
 
-    }
- 
-    @Test
-    public void shouldPersistUserWithSalesRole() throws JsonMappingException, JsonProcessingException {
-        SalesRole salesRole = testData.get(0).getSalesRole();
+        SalesRole kv = salesRoleService.findSalesRoleByRoleName("KV");
 
-        salesRole = salesRoleService.save(salesRole);
+        if(kv == null) {
+            kv = SalesRole.builder()
+                    .roleName("KV")
+                    .description("Kundeveileder")
+                    .defaultPowerOfAttorneyOa(1)
+                    .defaultPowerOfAttorneyFa(1)
+                    .build();
+
+            salesRoleService.save(kv);
+        }
+
+        SalesRole kv2 = salesRoleService.findSalesRoleByRoleName("SA");
+
+        if(kv2 == null) {
+            kv2 = SalesRole.builder()
+                    .defaultPowerOfAttorneyFa(2)
+                    .defaultPowerOfAttorneyOa(2)
+                    .description("Salgskonsulent (rolle a)")
+                    .roleName("SA")
+                    .build();
+
+            salesRoleService.save(kv2);
+        }
+    }
+
+    @Test
+    public void shouldPersistUserWithSalesRole() throws JsonProcessingException {
+        SalesRole salesRole = salesRoleService.getAllSalesRoles().get(0);
 
         JSONArray jsonArray = new JSONArray(requestPayload);
-
-        UserDTO userDTO = objectMapper.readValue(jsonArray.getJSONObject(0).toString(), UserDTO.class);
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
+        jsonObject.put("salesRoleId", salesRole.getId());
+        UserDTO userDTO = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
 
         assertThat(userDTO, notNullValue());
-        SalesRoleDTO salesRoleDTO = mapperService.toSalesRoleDTO(salesRole);
-        userDTO.setSalesRole(salesRoleDTO);
+//        userDTO.setSalesRole(salesRole.getId());
 
-        User actual = userController.create(userDTO);
+        ResponseEntity<UserDTO> actual = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class); // userController.create(userDTO);
 
-        assertThat(actual.getEmail(), equalTo(userDTO.getEmail()));
-        assertThat(actual.getSalesRole(), notNullValue());
+        assertThat(actual.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(actual.getBody(), notNullValue());
+
+        UserDTO actualBody = actual.getBody();
+        assertThat(actualBody.getEmail(), equalTo(userDTO.getEmail()));
+        assertThat(actualBody.getSalesRoleId(), notNullValue());
 
         salesRole = salesRoleService.findSalesRoleById(salesRole.getId());
 
         assertThat(salesRole.getUserList(), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldUpdateExistingUser() throws JsonProcessingException {
+        UserDTO userDTO = userController.create(testData.get(1));
+
+        ResponseEntity<UserDTO> response = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class);
+
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(response.getBody(), notNullValue());
+
+        userDTO = response.getBody();
+
+        String currentPhoneNumber = userDTO.getPhoneNumber();
+        userDTO.setPhoneNumber("91823764");
+
+//        userDTO = userController.save(userDTO.getId(), userDTO);
+        Map<String, String> urlVariables = new HashMap<>();
+        urlVariables.put("id", String.valueOf(userDTO.getId()));
+        restTemplate.put("http://localhost:" + serverPort + "/api/v1/users/save/{id}", userDTO, urlVariables);
+
+        ResponseEntity<UserDTO> actualResponse = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/users/id/" + userDTO.getId(), UserDTO.class);
+
+        assertThat(actualResponse.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(actualResponse.getBody(), notNullValue());
+
+        assertThat(actualResponse.getBody().getPhoneNumber(), not(equalTo(currentPhoneNumber)));
+    }
+
+    @Test
+    public void shouldAddCorrectSalesRoleFromDtoSalesRoleId() {
+        UserDTO userDTO = testData.get(0);
+
+        List<SalesRole> salesRoles = salesRoleRepository.findAll();
+
+        assertThat(salesRoles, hasSize(greaterThan(1)));
+
+        userDTO.setSalesRoleId(salesRoles.get(0).getId());
+
+        userDTO = userController.create(userDTO);
+
+        assertThat(userDTO.getId(), notNullValue());
+
+        Optional<User> optUser = userRepository.findById(userDTO.getId());
+        assertThat(optUser.isPresent(), is(true));
+
+        User user = optUser.get();
+
+        assertThat("User SalesRole is not set during creation.", user.getSalesRole(), notNullValue());
+    }
+
+    @Test
+    public void shouldAddSalesRoleWhenUpdatingUser() throws JsonProcessingException {
+        UserDTO userDTO = testData.get(0);
+
+        List<SalesRole> salesRoles = salesRoleRepository.findAll();
+
+        assertThat(salesRoles, hasSize(greaterThan(1)));
+
+        userDTO.setSalesRoleId(salesRoles.get(0).getId());
+
+        userDTO = userController.create(userDTO);
+
+        assertThat(userDTO.getId(), notNullValue());
+
+        Long previousSalesRoleId = userDTO.getSalesRoleId();
+        userDTO.setSalesRoleId(salesRoles.get(1).getId());
+
+        userDTO = userController.save(userDTO.getId(), userDTO);
+
+        assertThat(userDTO.getSalesRoleId(), not(equalTo(previousSalesRoleId)));
     }
 }
