@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.web.client.offer;
 
 
 import lombok.AllArgsConstructor;
@@ -20,16 +20,23 @@ public class PriceRowDTO {
     private Long id;
     private Double customerPrice;
     private Double discountPct;
-    private MaterialDTO material;
+    private String material;
+    private String materialDesignation;
     private boolean showPriceInOffer;
     private Double manualPrice;
-    private PriceLevelDTO priceLevel;
+    private Integer priceLevel;
     private Double priceLevelPrice;
     private Double standardPrice;
     private Integer amount;
     private Double priceIncMva;
     private Date dateUpdated;
     private Date dateCreated;
-    private DiscountLevelDTO discountLevel;
+    private Integer discountLevel;
     private PriceRowDTO combinedMaterials;
+    private String categoryId;
+    private String categoryDescription;
+    private String subCategoryId;
+    private String subCategoryDescription;
+    private String classId;
+    private String classDescription;
 }

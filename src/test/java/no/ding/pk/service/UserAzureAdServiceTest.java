@@ -1,29 +1,25 @@
 package no.ding.pk.service;
 
+import no.ding.pk.domain.User;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.List;
-
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import no.ding.pk.domain.User;
-
-@Ignore
+@Disabled(value = "Secret expires after 6 month and will invalidate this test suit.")
 @SpringBootTest
-@RunWith(SpringRunner.class)
 public class UserAzureAdServiceTest {
 
     @Autowired
-    UserAzureAdServiceImpl uaas;
+    private UserAzureAdServiceImpl uaas;
 
     @Test
     void shouldGetUserByEmail() {

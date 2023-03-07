@@ -1,19 +1,17 @@
 package no.ding.pk.service;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.domain.User;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
-import no.ding.pk.repository.SalesRoleRepository;
-import no.ding.pk.repository.UserRepository;
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -34,6 +32,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User save(User newUser, Long id) {
 		
+
 		if(id == null) {
 			log.debug("A new user object was given. Persisting the whole object");
 			

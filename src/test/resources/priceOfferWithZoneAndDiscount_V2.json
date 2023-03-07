@@ -1,0 +1,97 @@
+{
+  "customerNumber": "102520",
+  "customerName": "Vest-Telemark Rørleggerforretning AS",
+  "salesOfficeList": [
+    {
+      "salesOrg": "100",
+      "salesOffice": "104",
+      "salesOfficeName": "Skien",
+      "materialList": [
+        {
+          "discountPct": null,
+          "material":  "111101",
+          "priceLevel": 2,
+          "priceLevelPrice": 0.1,
+          "standardPrice": 1199,
+          "priceIncMva": -1,
+          "discountLevel": 2
+        },
+        {
+          "material": "111102",
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": "111103",
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": "111104",
+          "materialDesignation": "Matavfall til biogass",
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": "111105",
+          "materialDesignation": "Matavfall, emballert til biogass",
+          "standardPrice": 1199,
+          "priceIncMva": -1
+        },
+        {
+          "material": "171111",
+          "materialDesignation": "Landbruksfolie",
+          "standardPrice": 519,
+          "priceIncMva": -1
+        },
+        {
+          "material": "PR-1111",
+          "materialDesignation": "Rullestativ til papp - stor 80x130x75cm",
+          "standardPrice": 1684,
+          "priceIncMva": -1
+        }
+      ],
+      "zones": [
+        {
+          "zoneId": "2",
+          "postalCode": "3943",
+          "postalName": "PORSGRUNN",
+          "isStandardZone": true,
+          "priceRows": [
+            {
+              "discountPct": null,
+              "material": "50201",
+              "materialDesignation": "Krok - Utsett",
+              "priceLevel": 2,
+              "priceLevelPrice": 0.1,
+              "standardPrice": 1364,
+              "priceIncMva": -1,
+              "discountLevel": 2
+            }
+          ]
+        }
+      ],
+      "transportServiceList": [],
+      "rentalList": []
+    }
+  ],
+  "salesEmployee": {
+    "id": 2,
+    "name": "Alexander Brox",
+    "phoneNumber": "95838638",
+    "email": "alexander.brox@ngn.no"
+  },
+  "customerTerms": {
+    "agreementStartDate": "2023-02-05T17:50:49.353Z",
+    "paymentCondition": "",
+    "invoiceInterval": "",
+    "additionForRoadTax": false,
+    "additionForAdminFee": false,
+    "newOrEstablishedCustomer": "Ny kunde",
+    "customerRequireNotification": false,
+    "notificationMailAddress": "",
+    "indexWaste": "07251 - Forsyning av vatn. avløps- og renovasjonsverksemd - Indeks for totale arbeidskraftkostnader",
+    "indexRent": "12535 - Totalkostnadsindeks for lastebiltransport",
+    "indexTransport": "12535 - Totalkostnadsindeks for lastebiltransport"
+  }
+}

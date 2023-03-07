@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
 import org.hibernate.Hibernate;
 
 import javax.persistence.CascadeType;
@@ -19,7 +18,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -81,6 +79,19 @@ public class Material implements Serializable {
 
     @Column
     private String salesZone;
+
+    @Column
+    private String categoryId; // "
+    @Column
+    private String categoryDescription; // "
+    @Column
+    private String subCategoryId; // "
+    @Column
+    private String subCategoryDescription; // "
+    @Column
+    private String classId; // "
+    @Column
+    private String classDescription; // "
 
     @Override
     public boolean equals(Object o) {

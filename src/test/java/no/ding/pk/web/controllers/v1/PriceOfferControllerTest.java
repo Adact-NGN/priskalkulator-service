@@ -1,4 +1,4 @@
-package no.ding.pk.web.controllers;
+package no.ding.pk.web.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.User;
@@ -13,7 +13,6 @@ import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.SalesOfficeDTO;
-
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -29,16 +28,18 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/h2-db.properties")
@@ -103,7 +104,6 @@ public class PriceOfferControllerTest {
     @Test
     public void shouldPersistPriceOffer() throws Exception {
         setup();
-//        PriceOffer priceOffer = (PriceOffer) createCompleteOffer();
         PriceOfferDTO priceOffer = createCompleteOfferDto();
         
         ResponseEntity<String> responseEntity = this.restTemplate
@@ -171,14 +171,14 @@ public class PriceOfferControllerTest {
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File file = new File(classLoader.getResource("priceOfferWithZoneAndDiscount.json").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("priceOfferWithZoneAndDiscount.json")).getFile());
 
         assertThat(file.exists(), is(true));
 
         String absolutePath = file.getAbsolutePath();
         System.out.println(absolutePath);
 
-        String json = IOUtils.toString(new FileInputStream(file), "UTF-8");
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -271,8 +271,8 @@ public class PriceOfferControllerTest {
         
         List<SalesOffice> salesOfficeList = new ArrayList<>();
         salesOfficeList.add(salesOffice);
-        
-        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+
+        return PriceOffer.priceOfferBuilder()
         .customerNumber("5162")
         .salesOfficeList(salesOfficeList)
         .salesEmployee(salesEmployee)
@@ -281,7 +281,5 @@ public class PriceOfferControllerTest {
         .approved(false)
         .customerTerms(customerTerms)
         .build();
-        
-        return priceOffer;
     }
 }
