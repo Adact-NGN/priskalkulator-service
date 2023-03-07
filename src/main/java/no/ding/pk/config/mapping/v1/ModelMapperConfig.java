@@ -1,12 +1,15 @@
 package no.ding.pk.config.mapping.v1;
 
+import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.web.client.DiscountLevelDTO;
 import no.ding.pk.web.dto.web.client.MaterialDTO;
 import no.ding.pk.web.dto.web.client.PriceRowDTO;
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -16,13 +19,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Optional;
+
 @Configuration
 public class ModelMapperConfig {
 
     private static final Logger log = LoggerFactory.getLogger(ModelMapperConfig.class);
     
     @Bean
-    public ModelMapper modelMapper() {
+    public ModelMapper modelMapper(SalesRoleRepository salesRoleRepository) {
         log.debug("Creating model mapper.");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -35,7 +40,32 @@ public class ModelMapperConfig {
 
         priceRowDtoToPriceRowTypeMapping(modelMapper);
 
+        userToUserDtoTypeMapping(modelMapper);
+
+        userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
+
         return modelMapper;
+    }
+
+    private static void userToUserDtoTypeMapping(ModelMapper modelMapper) {
+        modelMapper.typeMap(User.class, UserDTO.class)
+                .addMappings(mapper -> mapper.map(src -> src.getSalesRole().getId(), UserDTO::setSalesRoleId));
+    }
+
+    private static void userDtoToUserTypeMapping(ModelMapper modelMapper, SalesRoleRepository salesRoleRepository) {
+        TypeMap<UserDTO, User> userDtoToUserTypeMap = modelMapper.createTypeMap(UserDTO.class, User.class);
+        Converter<Long, SalesRole> salesRoleIdToEntity = c -> {
+            if(c.getSource() != null) {
+                Optional<SalesRole> byId = salesRoleRepository.findById(c.getSource());
+
+                if(byId.isPresent())
+                    return byId.get();
+            }
+
+            return null;
+        };
+
+        userDtoToUserTypeMap.addMappings(mapper -> mapper.using(salesRoleIdToEntity).map(UserDTO::getSalesRoleId, User::setSalesRole));
     }
 
     private static void priceRowDtoToPriceRowTypeMapping(ModelMapper modelMapper) {

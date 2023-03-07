@@ -50,12 +50,11 @@ public class UserServiceImpl implements UserService {
 				return null;
 			}
 			
-			User user = optUser.get();
-			user.copy(newUser);
+//			User user = optUser.get();
+//
+//			setSalesRole(newUser.getSalesRole(), newUser);
 			
-			setSalesRole(newUser.getSalesRole(), user);
-			
-			return repository.save(user);
+			return repository.save(newUser);
 		}
 		
 	}

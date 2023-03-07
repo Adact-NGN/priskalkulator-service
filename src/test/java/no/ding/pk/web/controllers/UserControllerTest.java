@@ -142,6 +142,7 @@ public class UserControllerTest {
         UserDTO userDTO = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
 
         assertThat(userDTO, notNullValue());
+        assertThat(userDTO.getSalesRoleId(), notNullValue());
 //        userDTO.setSalesRole(salesRole.getId());
 
         ResponseEntity<UserDTO> actual = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class); // userController.create(userDTO);
@@ -159,7 +160,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void shouldUpdateExistingUser() throws JsonProcessingException {
+    public void shouldUpdateExistingUser() {
         UserDTO userDTO = userController.create(testData.get(1));
 
         ResponseEntity<UserDTO> response = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class);
