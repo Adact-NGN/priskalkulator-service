@@ -1,11 +1,10 @@
 package no.ding.pk.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface DiscountService {
@@ -22,7 +21,7 @@ public interface DiscountService {
 
     List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber);
 
-    List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber);
+    List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber, String zone);
 
     List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String materialNumber,
             Integer level);

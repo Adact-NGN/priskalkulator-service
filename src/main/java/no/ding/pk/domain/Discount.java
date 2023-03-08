@@ -1,7 +1,7 @@
 package no.ding.pk.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,6 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "discount_matrix")
@@ -38,6 +40,7 @@ public class Discount {
     private Double standardPrice;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<DiscountLevel> discountLevels;
     
     public Discount() {

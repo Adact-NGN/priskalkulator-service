@@ -1,7 +1,7 @@
 package no.ding.pk.web.controllers;
 
-import java.util.List;
-
+import no.ding.pk.domain.Discount;
+import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.domain.Discount;
-import no.ding.pk.service.DiscountService;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/discount")
+@RequestMapping(value = {"/api/discount", "/api/v1/discount"})
 public class DiscountController {
 
     private static final Logger log = LoggerFactory.getLogger(DiscountController.class);
@@ -49,7 +48,8 @@ public class DiscountController {
      */
     @GetMapping("/list/{salesOrg}")
     public List<Discount> getAllDiscountsForSalesOrg(@PathVariable("salesOrg") String salesOrg,
-                                                     @RequestParam(value = "materialNumber", required = false) String materialNumber, @RequestParam(value = "zone", required = false) String zone) {
+                                                     @RequestParam(value = "materialNumber", required = false) String materialNumber,
+                                                     @RequestParam(value = "zone", required = false) String zone) {
         return service.findAllBySalesOrgAndZoneAndMaterialNumber(salesOrg, zone, materialNumber);
     }
 
@@ -57,11 +57,15 @@ public class DiscountController {
      * Returns a list over all discounts for a given sales organization and for a list of material numbers.
      * @param salesOrg Sales organization number
      * @param materialNumbers Comma separated list of material numbers.
+     * @param zones Which zones to get discount for, not required.
      * @return A list of all discounts, else empty list
      */
     @GetMapping("/in-list/{salesOrg}")
-    public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg, @RequestParam(value = "materialNumbers") String materialNumbers) {
-        return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumbers);
+    public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg,
+                                                                             @RequestParam(value = "materialNumbers") String materialNumbers,
+                                                                             @RequestParam(value = "zones", required = false) String zones) {
+        log.debug("Getting discount levels for material {} and zone {} in sales org {}", materialNumbers, zones, salesOrg);
+        return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumbers, zones);
     }
 
     /**

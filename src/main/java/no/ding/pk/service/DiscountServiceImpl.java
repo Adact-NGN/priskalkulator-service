@@ -1,12 +1,9 @@
 package no.ding.pk.service;
 
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
-
-import java.util.*;
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.Discount;
+import no.ding.pk.domain.DiscountLevel;
+import no.ding.pk.repository.DiscountLevelRepository;
+import no.ding.pk.repository.DiscountRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.Discount;
-import no.ding.pk.domain.DiscountLevel;
-import no.ding.pk.repository.DiscountLevelRepository;
-import no.ding.pk.repository.DiscountRepository;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
 
 @Transactional
 @Service
@@ -95,8 +98,14 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber) {
+    public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber, String zones) {
         List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
+
+        if(StringUtils.isNotBlank(zones)) {
+            List <String> zoneList = Arrays.asList(zones.split(","));
+            return repository.findAllBySalesOrgAndZoneInAndMaterialNumberIn(salesOrg, zoneList, materialNumbers);
+        }
+
         return repository.findAllBySalesOrgAndMaterialNumberInList(salesOrg, materialNumbers);
     }
 
