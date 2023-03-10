@@ -86,6 +86,15 @@ public class DiscountRepositoryTest {
     }
 
     @Test
+    public void shouldGetDiscountForMaterialInListWithMultipleMaterials() {
+        List<Discount> materialList = repository.findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(salesOrg, List.of("50106","50107","50108","50109"));
+
+        List<Discount> distinctList = materialList.stream().distinct().collect(Collectors.toList());
+
+        assertThat(distinctList, hasSize(4));
+    }
+
+    @Test
     public void shouldNotGetDiscountForMaterialWithZones() {
         List<Discount> materialList = repository.findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(salesOrg, List.of(materialNumber));
 
