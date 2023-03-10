@@ -1,22 +1,10 @@
 package no.ding.pk.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.SpringFoxConfig;
+import no.ding.pk.domain.Discount;
+import no.ding.pk.domain.DiscountLevel;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,12 +17,20 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import no.ding.pk.config.SpringFoxConfig;
-import no.ding.pk.domain.Discount;
-import no.ding.pk.domain.DiscountLevel;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
 @SpringBootTest
 @Import(SpringFoxConfig.class)
@@ -49,7 +45,7 @@ public class DiscountServiceImplTest {
     private List<Discount> testData;
 
     @BeforeEach
-    public void setup() throws FileNotFoundException, IOException {
+    public void setup() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(classLoader.getResource("discounts_simple.json").getFile());

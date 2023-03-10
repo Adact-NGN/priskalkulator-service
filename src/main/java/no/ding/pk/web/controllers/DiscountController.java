@@ -64,7 +64,7 @@ public class DiscountController {
     public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg,
                                                                              @RequestParam(value = "materialNumbers") String materialNumbers,
                                                                              @RequestParam(value = "zones", required = false) String zones) {
-        log.debug("Getting discount levels for material {} and zone {} in sales org {}", materialNumbers, zones, salesOrg);
+        log.debug("Getting discount for material {} and zone {} in sales org {}", materialNumbers, zones, salesOrg);
         return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumbers, zones);
     }
 

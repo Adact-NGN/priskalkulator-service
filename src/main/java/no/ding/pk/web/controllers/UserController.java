@@ -96,6 +96,7 @@ public class UserController {
             log.debug("User has not been assigned a Sales Role");
         }
         
+
         return mapperService.toUserDTO(createdUser);
     }
 

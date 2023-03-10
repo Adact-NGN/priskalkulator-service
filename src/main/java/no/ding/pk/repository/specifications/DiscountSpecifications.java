@@ -1,8 +1,7 @@
 package no.ding.pk.repository.specifications;
 
-import org.springframework.data.jpa.domain.Specification;
-
 import no.ding.pk.domain.Discount;
+import org.springframework.data.jpa.domain.Specification;
 
 public class DiscountSpecifications {
 
@@ -16,7 +15,7 @@ public class DiscountSpecifications {
 
     public static Specification<Discount> withZone(String zone) {
         if(zone == null) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         } else {
             return (root, query, cb) -> cb.equal(root.get("zone"), zone);
         }
