@@ -10,9 +10,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,17 +66,17 @@ public class SalesOrgController {
             @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
             @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        String[] paramsList;
+        List<String> params;
         if(skipTokens != null) {
-            paramsList = new String[]{salesOrg, salesOffice, postalCode, salesZone, city, Integer.toString(skipTokens)};
+            params = List.of(salesOrg, salesOffice, postalCode, salesZone, city, Integer.toString(skipTokens));
         } else {
-            paramsList = new String[]{salesOrg, salesOffice, postalCode, salesZone, city};
+            params = List.of(salesOrg, salesOffice, postalCode, salesZone, city);
         }
 
         List<SalesOrgField> fieldList = SalesOrgField.fieldList();
 
         boolean isAllBlank = true;
-        for(String param : paramsList) {
+        for(String param : params) {
             if(!StringUtils.isBlank(param)) {
                 isAllBlank = false;
             }
@@ -77,7 +86,7 @@ public class SalesOrgController {
             log.debug("All request parameters where blank.");
             return new ArrayList<>();
         } else {
-            log.debug("Got the parameters: " + Arrays.toString(paramsList));
+            log.debug("Got the parameters: " + params);
         }
 
         StringBuilder queryBuilder = new StringBuilder();
@@ -89,8 +98,8 @@ public class SalesOrgController {
             logicDivider = " and ";
         }
 
-        for(int i = 0; i < paramsList.length && i < fieldList.size(); i++) {
-            String param = paramsList[i];
+        for(int i = 0; i < params.size() && i < fieldList.size(); i++) {
+            String param = params.get(i);
 
             if(StringUtils.isNotBlank(param)) {
                 String fieldType = fieldList.get(i).getType();
@@ -119,12 +128,19 @@ public class SalesOrgController {
         return service.findByQuery(queryBuilder.toString(), skipTokens);
     }
 
+    /**
+     * Get all zones for a Sales office
+     * @param salesOrg Sales organization for the sales office
+     * @param salesOffice Sales office number to lookup zones for.
+     * @param postalCode Set postal code to get the standard zone.
+     * @return A list of ZoneDTO, else empty list
+     */
     @GetMapping("/{salesOrg}/{salesOffice}/zones")
     List<ZoneDTO> getZonesForSalesOffice(
             @PathVariable("salesOrg") String salesOrg,
-            @PathVariable("salesOffice") String salesOffice) {
-        List<String> params = List
-                .of(salesOrg, salesOffice, "");
+            @PathVariable("salesOffice") String salesOffice,
+            @RequestParam(value = "postalCode", required = false) String postalCode) {
+        List<String> params = List.of(salesOrg, salesOffice, "");
 
         List<SalesOrgField> fieldList = List
                 .of(SalesOrgField.SalesOrganization,
@@ -138,7 +154,7 @@ public class SalesOrgController {
         for(int i = 0; i < params.size(); i++) {
             String param = params.get(i);
 
-            if(param != null) {
+            if(StringUtils.isNotBlank(param)) {
                 String fieldType = fieldList.get(i).getType();
 
                 if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
@@ -169,16 +185,44 @@ public class SalesOrgController {
 
         salesOrgDTOList.sort(Comparator.comparing(SalesOrgDTO::getSalesZone));
 
+        SalesOrgDTO standardZone = getStandardZoneForPostalCode(postalCode, salesOrgDTOList);
+
+        if(standardZone != null) {
+            salesOrgDTOList.add(0, standardZone);
+        }
+
         Map<String, SalesOrgDTO> distinctSalesOrgMap = new TreeMap<>();
         salesOrgDTOList.forEach(salesOrgDTO -> {
             if(StringUtils.isNotBlank(salesOrgDTO.getSalesZone()) && !distinctSalesOrgMap.containsKey(salesOrgDTO.getSalesZone())) {
                 distinctSalesOrgMap.put(salesOrgDTO.getSalesZone(), salesOrgDTO);
             }
         });
-        return distinctSalesOrgMap.values().stream().map(data -> ZoneDTO.builder()
-                .postalCode(data.getPostalCode())
-                .zoneId(data.getSalesZone().replace("0", ""))
-                .postalName(data.getCity()).build()).collect(Collectors.toList());
+        return distinctSalesOrgMap.values().stream().map(data -> {
+            boolean isStandardZone = standardZone != null && StringUtils.isNotBlank(data.getSalesZone()) && StringUtils.equals(data.getSalesZone(), standardZone.getSalesZone());
+            return ZoneDTO.builder()
+                    .isStandardZone(isStandardZone)
+                    .postalCode(data.getPostalCode())
+                    .zoneId(data.getSalesZone().replace("0", ""))
+                    .postalName(data.getCity()).build();
+        }).collect(Collectors.toList());
+    }
+
+    private SalesOrgDTO getStandardZoneForPostalCode(String postalCode, List<SalesOrgDTO> salesOrgDTOList) {
+        if(salesOrgDTOList.isEmpty()) {
+            return null;
+        }
+
+        List<SalesOrgDTO> standardZones = salesOrgDTOList.stream().filter(salesOrgDTO -> salesOrgDTO.getPostalCode().equals(postalCode)).collect(Collectors.toList());
+
+        if(standardZones.size() > 1) {
+            standardZones = standardZones.stream().filter(salesOrgDTO -> StringUtils.isNotBlank(salesOrgDTO.getSalesZone())).collect(Collectors.toList());
+        }
+
+        if(standardZones.size() >= 1) {
+            return standardZones.get(0);
+        }
+
+        return null;
     }
 
     private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {
