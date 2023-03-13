@@ -103,7 +103,7 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldGetDiscountForMaterialWithZones() {
-        List<Discount> discountList = repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(null)).and(withMaterialNumber(materialNumber))));
+        List<Discount> discountList = repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(null)).and(withMaterialNumber("50106"))));
 
         assertThat(discountList, hasSize(greaterThan(0)));
     }

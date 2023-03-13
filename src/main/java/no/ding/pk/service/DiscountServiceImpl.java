@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static no.ding.pk.repository.specifications.DiscountSpecifications.matchMaterialNumberInList;
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
 import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
@@ -108,7 +109,7 @@ public class DiscountServiceImpl implements DiscountService {
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(zones)).and(withMaterialNumber(materialNumber))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
     }
 
     @Override

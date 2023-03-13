@@ -115,5 +115,118 @@
                 "pctDiscount": 0.167
             }
         ]
+    },
+    {
+        "salesOrg": "100",
+        "materialNumber": "C-05L-L",
+        "zone": null,
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "materialNumber": "C-06L",
+        "zone": null,
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "materialNumber": "C-08L",
+        "zone": null,
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
     }
 ]

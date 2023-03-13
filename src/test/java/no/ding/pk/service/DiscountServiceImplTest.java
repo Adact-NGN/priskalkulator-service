@@ -20,8 +20,10 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,11 +50,11 @@ public class DiscountServiceImplTest {
     public void setup() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
-        File file = new File(classLoader.getResource("discounts_simple.json").getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource("discounts_simple.json")).getFile());
 
         assertThat(file.exists(), is(true));
 
-        String json = IOUtils.toString(new FileInputStream(file), "UTF-8");
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
 
         assertThat("JSON is empty", json, not(emptyOrNullString()));
 
@@ -118,9 +120,9 @@ public class DiscountServiceImplTest {
     public void shouldFindAllBySalesOrgZoneAndMaterialNumberWithSpecificationWhereZoneIsNull() {
         service.saveAll(testData);
 
-        List<Discount> actual = service.findAllBySalesOrgAndZoneAndMaterialNumber("100", null, "113104");
+        List<Discount> actual = service.findAllBySalesOrgAndZoneAndMaterialNumber("100", null, "C-05L-L");
 
-        assertThat(actual.size(), greaterThanOrEqualTo(2));
+        assertThat(actual.size(), greaterThanOrEqualTo(1));
     }
 
     @Test

@@ -3,6 +3,9 @@ package no.ding.pk.repository.specifications;
 import no.ding.pk.domain.Discount;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.Path;
+import java.util.List;
+
 public class DiscountSpecifications {
 
     public static Specification<Discount> withSalesOrg(String salesOrg) {
@@ -15,7 +18,7 @@ public class DiscountSpecifications {
 
     public static Specification<Discount> withZone(String zone) {
         if(zone == null) {
-            return (root, query, cb) -> cb.conjunction();
+            return (root, query, cb) -> cb.isNull(root.get("zone"));
         } else {
             return (root, query, cb) -> cb.equal(root.get("zone"), zone);
         }
@@ -27,5 +30,12 @@ public class DiscountSpecifications {
         } else {
             return (root, query, cb) -> cb.equal(root.get("materialNumber"), materialNumber);
         }
+    }
+
+    public static Specification<Discount> matchMaterialNumberInList(List<String> materialNumbers) {
+        return (root, query, criteriaBuilder) -> {
+            Path<Discount> materialNumber = root.get("materialNumber");
+            return materialNumber.in(materialNumbers);
+        };
     }
 }
