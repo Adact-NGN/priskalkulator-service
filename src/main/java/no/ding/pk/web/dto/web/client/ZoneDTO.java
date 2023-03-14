@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import no.ding.pk.domain.offer.PriceRow;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ZoneDTO {
     Long id;
-    String zoneId;
+    Integer zoneId;
     String postalCode;
     String postalName;
     Boolean isStandardZone;

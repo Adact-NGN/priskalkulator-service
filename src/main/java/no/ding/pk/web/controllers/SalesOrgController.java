@@ -191,18 +191,18 @@ public class SalesOrgController {
             salesOrgDTOList.add(0, standardZone);
         }
 
-        Map<String, SalesOrgDTO> distinctSalesOrgMap = new TreeMap<>();
+        Map<Integer, SalesOrgDTO> distinctSalesOrgMap = new TreeMap<>();
         salesOrgDTOList.forEach(salesOrgDTO -> {
-            if(StringUtils.isNotBlank(salesOrgDTO.getSalesZone()) && !distinctSalesOrgMap.containsKey(salesOrgDTO.getSalesZone())) {
+            if(salesOrgDTO.getSalesZone() != null && !distinctSalesOrgMap.containsKey(salesOrgDTO.getSalesZone())) {
                 distinctSalesOrgMap.put(salesOrgDTO.getSalesZone(), salesOrgDTO);
             }
         });
         return distinctSalesOrgMap.values().stream().map(data -> {
-            boolean isStandardZone = standardZone != null && StringUtils.isNotBlank(data.getSalesZone()) && StringUtils.equals(data.getSalesZone(), standardZone.getSalesZone());
+            boolean isStandardZone = standardZone != null && data.getSalesZone() != null && data.getSalesZone().equals(standardZone.getSalesZone());
             return ZoneDTO.builder()
                     .isStandardZone(isStandardZone)
                     .postalCode(data.getPostalCode())
-                    .zoneId(data.getSalesZone().replace("0", ""))
+                    .zoneId(data.getSalesZone())
                     .postalName(data.getCity()).build();
         }).collect(Collectors.toList());
     }
@@ -215,7 +215,7 @@ public class SalesOrgController {
         List<SalesOrgDTO> standardZones = salesOrgDTOList.stream().filter(salesOrgDTO -> salesOrgDTO.getPostalCode().equals(postalCode)).collect(Collectors.toList());
 
         if(standardZones.size() > 1) {
-            standardZones = standardZones.stream().filter(salesOrgDTO -> StringUtils.isNotBlank(salesOrgDTO.getSalesZone())).collect(Collectors.toList());
+            standardZones = standardZones.stream().filter(salesOrgDTO -> salesOrgDTO.getSalesZone() != null).collect(Collectors.toList());
         }
 
         if(standardZones.size() >= 1) {
