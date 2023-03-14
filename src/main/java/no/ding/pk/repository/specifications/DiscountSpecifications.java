@@ -17,7 +17,7 @@ public class DiscountSpecifications {
     }
 
     public static Specification<Discount> withZone(String zone) {
-        if(zone == null) {
+        if(zone == null || zone.equals("")) {
             return (root, query, cb) -> cb.isNull(root.get("zone"));
         } else {
             return (root, query, cb) -> cb.equal(root.get("zone"), zone);

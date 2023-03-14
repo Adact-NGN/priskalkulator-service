@@ -42,6 +42,18 @@ public class DiscountControllerTest {
     }
 
     @Test
+    public void shouldReturnListOfDiscountsForMaterialsWithEmptyZoneRequestParameter() {
+        String materials = "50106,50107";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("materialNumbers", materials);
+
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers={materialNumbers}&zones=", Discount[].class, params);
+
+        assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
+    }
+
+    @Test
     public void shouldNotReturnDiscountsForMaterialsWithZoneDifferentiatedPrices() {
         String materials = "50101,50102";
 
