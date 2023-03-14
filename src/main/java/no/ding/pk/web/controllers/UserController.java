@@ -1,9 +1,7 @@
 package no.ding.pk.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
@@ -32,13 +30,11 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     
     private final UserService userService;
-    private final SalesRoleService salesRoleService;
     private final MapperService mapperService;
     
     @Autowired
-    public UserController(UserService userService, SalesRoleService salesRoleService, MapperService mapperService) {
+    public UserController(UserService userService, MapperService mapperService) {
         this.userService = userService;
-        this.salesRoleService = salesRoleService;
         this.mapperService = mapperService;
     }
     
@@ -47,11 +43,11 @@ public class UserController {
      * @return A list of all users, else empty.
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<User> list() {
+    public List<UserDTO> list() {
         List<User> userList = userService.findAll();
         
         if(!userList.isEmpty()) {
-            return userList;
+            return mapperService.toUserDTOList(userList);
         } else {
             return new ArrayList<>();
         }
@@ -100,29 +96,18 @@ public class UserController {
         return mapperService.toUserDTO(createdUser);
     }
 
-    private void setSalesRole(UserDTO userDTO, User tempUser) {
-        if(userDTO.getSalesRoleId() != null) {
-            SalesRole salesRole = salesRoleService.findById(userDTO.getSalesRoleId());
-
-            if(salesRole != null) {
-                tempUser.setSalesRole(salesRole);
-            }
-        }
-    }
-
     /**
      * Update existing user with new values.
      *
      * @param id      User ID.
      * @param userDTO New values to be set on the existing User object.
      * @return Updated User object.
-     * @throws JsonProcessingException
+     * @throws JsonProcessingException thorwn when proccessing of JSON fails.
      */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO save(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) throws JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
-//        log.debug("Object data: " + userDTO);
-        
+
         if(id == null) {
             log.error("Put request was given non existing user to update.");
             return null;

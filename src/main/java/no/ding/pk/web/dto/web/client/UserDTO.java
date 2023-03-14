@@ -3,10 +3,6 @@ package no.ding.pk.web.dto.web.client;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.PropertyGenerator.class,
-//        property = "id"
-//)
 @Data
 public class UserDTO {
     private Long id;
