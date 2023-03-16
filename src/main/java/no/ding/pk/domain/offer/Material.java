@@ -11,9 +11,11 @@ import org.hibernate.Hibernate;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -66,6 +68,7 @@ public class Material implements Serializable {
     private String materialTypeDescription;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(foreignKey = @ForeignKey(name = "Fk_material_materialStdPrice"))
     private MaterialPrice materialStandardPrice;
 
     @Column

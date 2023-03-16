@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,7 +52,7 @@ public class Zone {
 
     @OneToMany()
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @JoinColumn(name = "zone_price_row_id")
+    @JoinColumn(name = "zone_price_row_id", foreignKey = @ForeignKey(name = "Fk_zone_priceRows"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> priceRows;
 }

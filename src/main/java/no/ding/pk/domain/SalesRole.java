@@ -32,7 +32,7 @@ import java.util.List;
 @Table(name = "sales_roles")
 public class SalesRole implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     @Column(unique = true)
@@ -53,7 +53,6 @@ public class SalesRole implements Serializable {
     @Column
     @OneToMany(mappedBy = "salesRole", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
-//    @EqualsAndHashCode.Exclude
     @Builder.Default private List<User> userList = new ArrayList<>();
     
     public Long getId() {

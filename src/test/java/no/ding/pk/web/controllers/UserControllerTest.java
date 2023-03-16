@@ -76,6 +76,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setup() throws IOException {
+//        initializeDiscounts(discountService, objectMapper);
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
@@ -143,7 +144,6 @@ public class UserControllerTest {
 
         assertThat(userDTO, notNullValue());
         assertThat(userDTO.getSalesRoleId(), notNullValue());
-//        userDTO.setSalesRole(salesRole.getId());
 
         ResponseEntity<UserDTO> actual = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class); // userController.create(userDTO);
 
@@ -173,7 +173,6 @@ public class UserControllerTest {
         String currentPhoneNumber = userDTO.getPhoneNumber();
         userDTO.setPhoneNumber("91823764");
 
-//        userDTO = userController.save(userDTO.getId(), userDTO);
         Map<String, String> urlVariables = new HashMap<>();
         urlVariables.put("id", String.valueOf(userDTO.getId()));
         restTemplate.put("http://localhost:" + serverPort + "/api/v1/users/save/{id}", userDTO, urlVariables);
@@ -188,7 +187,11 @@ public class UserControllerTest {
 
     @Test
     public void shouldAddCorrectSalesRoleFromDtoSalesRoleId() {
-        UserDTO userDTO = testData.get(0);
+        UserDTO userDTO = UserDTO.builder()
+                .name("Test2")
+                .sureName("Testesen2")
+                .email("test2.testesen2@testingco.com")
+                .build();
 
         List<SalesRole> salesRoles = salesRoleRepository.findAll();
 
@@ -210,7 +213,11 @@ public class UserControllerTest {
 
     @Test
     public void shouldAddSalesRoleWhenUpdatingUser() throws JsonProcessingException {
-        UserDTO userDTO = testData.get(0);
+        UserDTO userDTO = UserDTO.builder()
+                .name("Test")
+                .sureName("Testesen")
+                .email("test.testesen@testingco.com")
+                .build();
 
         List<SalesRole> salesRoles = salesRoleRepository.findAll();
 

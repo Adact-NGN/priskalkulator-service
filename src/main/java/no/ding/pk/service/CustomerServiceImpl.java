@@ -1,15 +1,10 @@
 package no.ding.pk.service;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.utils.RequestHeaderUtil;
 import no.ding.pk.web.dto.sap.CustomerDTO;
+import no.ding.pk.web.enums.SapCustomerField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -27,23 +22,26 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import no.ding.pk.utils.RequestHeaderUtil;
-import no.ding.pk.web.enums.SapCustomerField;
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
     
     private static final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
     
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
-    private String customerSapServiceUrl;
+    private final String customerSapServiceUrl;
     
-    private String sapUsername;
-    private String sapPassword;
+    private final String sapUsername;
+    private final String sapPassword;
     
     @Autowired
     public CustomerServiceImpl(

@@ -1,13 +1,18 @@
 package no.ding.pk.domain.offer;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.*;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import no.ding.pk.domain.Auditable;
-import no.ding.pk.domain.User;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,19 +31,8 @@ public class Offer extends Auditable {
     @Column
     private String customerName;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<SalesOffice> salesOfficeList;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "salesEmployeeId")
-    private User salesEmployee;
-
     @Column
     private Boolean needsApproval;
-
-    @ManyToOne
-    @JoinColumn(name = "approverUser_id")
-    private User approver;
 
     @Column
     private Boolean isApproved;
@@ -49,7 +43,4 @@ public class Offer extends Auditable {
     @Column
     private Date dateIssued;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    @JoinColumn(name = "customerTerms_id")
-    private Terms customerTerms;
 }

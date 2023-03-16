@@ -2,11 +2,9 @@ package no.ding.pk.service;
 
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface DiscountService {
 
     Discount save(Discount discount);

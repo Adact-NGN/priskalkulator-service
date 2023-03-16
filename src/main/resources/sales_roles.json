@@ -1,0 +1,56 @@
+[
+  {
+    "roleName": "KV",
+    "description": "Kundeveileder",
+    "defaultPowerOfAttorneyOa": 1,
+    "defaultPowerOfAttorneyFa": 1
+  },
+  {
+    "roleName": "SA",
+    "description": "Salgskonsulent (rolle a)",
+    "defaultPowerOfAttorneyOa": 2,
+    "defaultPowerOfAttorneyFa": 2
+  },
+  {
+    "roleName": "SB",
+    "description": "Salgskonsulent (rolle b)",
+    "defaultPowerOfAttorneyOa": 3,
+    "defaultPowerOfAttorneyFa": 3
+  },
+  {
+    "roleName": "KL",
+    "description": "KAM lokalt",
+    "defaultPowerOfAttorney_oa": 4,
+    "defaultPowerOfAttorney_fa": 4
+  },
+  {
+    "roleName": "KN",
+    "description": "KAM nasjonalt",
+    "defaultPowerOfAttorneyOa": 5,
+    "defaultPowerOfAttorney_fa": 5
+  },
+  {
+    "roleName": "SL",
+    "description": "Salgsleder/salgssjef lokalt",
+    "defaultPowerOfAttorneyOa": 6,
+    "defaultPowerOfAttorney_fa": 6
+  },
+  {
+    "roleName": "SD",
+    "description": "Salgssjef divisjon",
+    "defaultPowerOfAttorneyOa": 7,
+    "defaultPowerOfAttorney_fa": 7
+  },
+  {
+    "roleName": "DR",
+    "description": "Distriktssjef",
+    "defaultPowerOfAttorneyOa": 8,
+    "defaultPowerOfAttorney_fa": 8
+  },
+  {
+    "roleName": "Admin",
+    "description": "Superadmin",
+    "defaultPowerOfAttorneyOa": 9,
+    "defaultPowerOfAttorney_fa": 9
+  }
+]

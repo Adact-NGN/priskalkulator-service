@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -70,7 +72,8 @@ public class User implements Serializable {
     private String email;
     
     @JsonBackReference
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "salesRole_id", foreignKey = @ForeignKey(name = "Fk_user_sales_role"))
     private SalesRole salesRole;
     
     @Column

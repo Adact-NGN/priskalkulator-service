@@ -10,10 +10,10 @@ import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.PriceOfferService;
+import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.TermsTypes;
 import org.slf4j.Logger;
@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -80,7 +79,7 @@ public class StartUpDev {
 
                 SalesRole marketConsultant = salesRoleService.findSalesRoleByRoleName("KN");
 
-                if(marketConsultant.getUserList() != null && !marketConsultant.getUserList().contains(alex)) {
+                if(marketConsultant != null && marketConsultant.getUserList() != null && !marketConsultant.getUserList().contains(alex)) {
                         marketConsultant.addUser(alex);
                         marketConsultant = salesRoleService.save(marketConsultant);
                 }
@@ -105,7 +104,7 @@ public class StartUpDev {
 
                 SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName("SA");
 
-                if(salesConsultant.getUserList() != null && !salesConsultant.getUserList().contains(salesEmployee)) {
+                if(salesConsultant != null && salesConsultant.getUserList() != null && !salesConsultant.getUserList().contains(salesEmployee)) {
                         salesConsultant.addUser(salesEmployee);
                         salesConsultant = salesRoleService.save(salesConsultant);
                 }

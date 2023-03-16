@@ -4,6 +4,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,7 +49,8 @@ public class PriceRow extends Auditable {
     private Double discountPct;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "material_id", referencedColumnName = "id")
+    @JoinColumn(name = "material_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "Fk_priceRow_material"))
     private Material material;
 
     @Column
@@ -73,6 +75,7 @@ public class PriceRow extends Auditable {
     private Double priceIncMva;
 
     @OneToMany
+    @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> combinedMaterials;

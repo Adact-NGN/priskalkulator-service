@@ -1,18 +1,13 @@
 package no.ding.pk;
 
-import java.net.MalformedURLException;
-import java.util.List;
-
-import no.ding.pk.web.dto.azure.ad.AdUserDTO;
-import org.springframework.context.annotation.PropertySources;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.microsoft.aad.msal4j.ClientCredentialFactory;
+import com.microsoft.aad.msal4j.ConfidentialClientApplication;
+import no.ding.pk.domain.SalesRole;
+import no.ding.pk.service.SalesRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,23 +22,26 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
-import com.microsoft.aad.msal4j.ClientCredentialFactory;
-import com.microsoft.aad.msal4j.ConfidentialClientApplication;
-
-import no.ding.pk.domain.User;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @EnableScheduling
 @EnableSwagger2
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "no.ding.pk.*")
 
 @PropertySource({
-    "classpath:application.properties", 
-    "classpath:sap.properties", 
-    "classpath:msal.properties"
+        "classpath:application.properties",
+        "classpath:sap.properties",
+        "classpath:msal.properties"
 })
 public class App implements WebMvcConfigurer {
     private static final Logger log = LoggerFactory.getLogger(App.class);
@@ -51,28 +49,28 @@ public class App implements WebMvcConfigurer {
     {
         SpringApplication.run(App.class, args);
     }
-    
+
     // Allow CORS for all requests
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").allowedMethods("*");
     }
-    
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(jacksonMessageConverter());
         WebMvcConfigurer.super.configureMessageConverters(converters);
     }
-    
+
     private HttpMessageConverter<?> jacksonMessageConverter() {
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-        
+
         ObjectMapper objectMapper = objectMapper();
 
         messageConverter.setObjectMapper(objectMapper);
         return messageConverter;
     }
-    
+
     @Value("${CLIENT_ID}")
     private String clientId;
     @Value("${AUTHORITY}")
@@ -81,14 +79,14 @@ public class App implements WebMvcConfigurer {
     private String secret;
     @Value("${SCOPE}")
     private String scope;
-    
+
     @Bean
     public ConfidentialClientApplication confidentialClientApplication() throws MalformedURLException {
         log.debug("Building ConfidentialClientApplication with client id: " + clientId);
-        return ConfidentialClientApplication.builder(clientId, 
-        ClientCredentialFactory.createFromSecret(secret))
-        .authority(authority)
-        .build();
+        return ConfidentialClientApplication.builder(clientId,
+                        ClientCredentialFactory.createFromSecret(secret))
+                .authority(authority)
+                .build();
     }
 
     @Bean
@@ -101,15 +99,47 @@ public class App implements WebMvcConfigurer {
     }
 
     @Bean
-	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Profile("!test")
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-        .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
-        .paths(PathSelectors.any()).build();
+                .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
+                .paths(PathSelectors.any()).build();
+    }
+
+//    @Bean
+//    public CommandLineRunner cmdLineRunner(DiscountService discountService, SalesRoleService salesRoleService, ObjectMapper objectMapper) {
+//        return args -> {
+//            initializeDiscounts(discountService, objectMapper);
+//
+//            initializeSalesRoles(salesRoleService, objectMapper);
+//        };
+//    }
+
+
+
+    private static void initializeSalesRoles(SalesRoleService salesRoleService, ObjectMapper objectMapper) {
+        TypeReference<List<SalesRole>> salesRoleTypeRef = new TypeReference<>() {
+        };
+
+        List<String> existingSalesRolesNames = salesRoleService.getAllSalesRoles().stream().map(SalesRole::getRoleName).collect(Collectors.toList());
+
+        InputStream salesRoleInputStream = TypeReference.class.getResourceAsStream("/sales_roles.json");
+
+        try {
+            List<SalesRole> salesRoles = objectMapper.readValue(salesRoleInputStream, salesRoleTypeRef);
+
+            List<SalesRole> toPersist = salesRoles.stream().filter(salesRole -> !existingSalesRolesNames.contains(salesRole.getRoleName())).collect(Collectors.toList());
+            log.debug("Sales roles to persist: {}", toPersist.size());
+
+            salesRoleService.saveAll(toPersist);
+            log.debug("Sales roles saved");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
