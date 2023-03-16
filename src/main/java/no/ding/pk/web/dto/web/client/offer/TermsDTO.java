@@ -33,4 +33,5 @@ public class TermsDTO {
     private String quarterlyAdjustment;
     private Integer requiredNumberOfDaysNotice;
     private String specialConditionAction;
+    private String comment;
 }
