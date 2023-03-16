@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -107,7 +108,7 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldFindAllBySalesOrgZoneAndMaterialNumberWithSpecification() {
-        service.saveAll(testData);
+        addMissingDiscounts();
 
         List<Discount> actual = service.findAllBySalesOrgAndZoneAndMaterialNumber("100", "01", "113104");
 
@@ -118,7 +119,7 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldFindAllBySalesOrgZoneAndMaterialNumberWithSpecificationWhereZoneIsNull() {
-        service.saveAll(testData);
+        addMissingDiscounts();
 
         List<Discount> actual = service.findAllBySalesOrgAndZoneAndMaterialNumber("100", null, "C-05L-L");
 
@@ -127,7 +128,7 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldFindAllBySalesOrgZoneAndMaterialNumberWithSpecificationWhereZoneAndMaterialNumberIsNull() {
-        service.saveAll(testData);
+        addMissingDiscounts();
 
         List<Discount> actual = service.findAllBySalesOrgAndZoneAndMaterialNumber("100", null, null);
 
@@ -136,11 +137,21 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldFindDiscountBySalesOrgAndMaterialNumber() {
-        service.saveAll(testData);
-        
+        addMissingDiscounts();
+
         List<String> materialNumbers = List.of("113103");
         List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0), null);
 
         assertThat(actual.size(), greaterThanOrEqualTo(5));
+    }
+
+    private void addMissingDiscounts() {
+        List<String> toPersist = service.findAll().stream().map(Discount::getMaterialNumber).collect(Collectors.toList());
+
+        List<Discount> discounts = testData.stream().filter(discount -> !toPersist.contains(discount.getMaterialNumber())).collect(Collectors.toList());
+
+        if(discounts.size() > 0) {
+            service.saveAll(discounts);
+        }
     }
 }
