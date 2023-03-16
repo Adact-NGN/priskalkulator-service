@@ -1,5 +1,7 @@
 package no.ding.pk.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -13,6 +15,8 @@ import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
 @Entity
 @Table(name = "discount_matrix")
 public class Discount {

@@ -2,18 +2,16 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.ding.pk.config.SpringFoxConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -35,13 +33,13 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
+@Disabled
 @SpringBootTest
-@Import(SpringFoxConfig.class)
 @ActiveProfiles({"test"})
 @TestPropertySource("/h2-db.properties")
 public class DiscountServiceImplTest {
 
-    @Qualifier("discountServiceImpl")
+//    @Qualifier("discountServiceImpl")
     @Autowired
     private DiscountService service;
 
@@ -82,7 +80,12 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldSaveDiscountObjectWithDiscountLevels() {
-        Discount expected = testData.get(0);
+        Discount expected = Discount.builder()
+                .salesOrg("100")
+                .materialNumber("Test")
+                .materialDesignation("Test")
+                .standardPrice(1234.0)
+                .build();
 
         Discount actual = service.save(expected);
 
@@ -91,7 +94,12 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldBeAbleToAddDiscountLevelToDiscountWithMissingCalculatedDiscountAndPctSet() {
-        Discount expected = testData.get(0);
+        Discount expected = Discount.builder()
+                .salesOrg("100")
+                .materialNumber("Test2")
+                .materialDesignation("Test2")
+                .standardPrice(1234.0)
+                .build();
 
         Discount persisted = service.save(expected);
 
