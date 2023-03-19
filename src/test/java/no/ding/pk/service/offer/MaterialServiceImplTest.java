@@ -1,20 +1,15 @@
 package no.ding.pk.service.offer;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import jakarta.transaction.Transactional;
+import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.MaterialPrice;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.MaterialPrice;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest
 @Transactional
@@ -23,9 +18,6 @@ public class MaterialServiceImplTest {
     
     @Autowired
     private MaterialService service;
-    
-    @Autowired
-    private MaterialPriceService mpService;
 
     private void createMaterial() {
         String materialNumber = "119901";

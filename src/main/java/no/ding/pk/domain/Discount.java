@@ -2,16 +2,17 @@ package no.ding.pk.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "discount_matrix")
+@NoArgsConstructor
 public class Discount {
     @Id
     @GeneratedValue
@@ -45,17 +47,6 @@ public class Discount {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<DiscountLevel> discountLevels;
-    
-    public Discount() {
-    }
-    
-    public Discount(String salesOrg, String materialNumber, String materialDesignation, String salesOffice,
-    double standardPrice) {
-        this.salesOrg = salesOrg;
-        this.materialNumber = materialNumber;
-        this.materialDesignation = materialDesignation;
-        this.standardPrice = standardPrice;
-    }
     
     public Long getId() {
         return id;

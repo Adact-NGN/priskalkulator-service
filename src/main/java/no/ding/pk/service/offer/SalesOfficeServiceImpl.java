@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,11 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
 
     private static final Logger log = LoggerFactory.getLogger(SalesOfficeServiceImpl.class);
     
-    private SalesOfficeRepository repository;
+    private final SalesOfficeRepository repository;
     
-    private PriceRowService priceRowService;
+    private final PriceRowService priceRowService;
     
-    private ZoneService zoneService;
+    private final ZoneService zoneService;
     
     @Autowired
     public SalesOfficeServiceImpl(SalesOfficeRepository repository, PriceRowService priceRowService, ZoneService zoneService) {

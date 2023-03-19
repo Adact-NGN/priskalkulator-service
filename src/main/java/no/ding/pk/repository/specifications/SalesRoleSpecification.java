@@ -1,6 +1,6 @@
 package no.ding.pk.repository.specifications;
 
-import javax.persistence.criteria.Join;
+import jakarta.persistence.criteria.Join;
 
 import org.springframework.data.jpa.domain.Specification;
 

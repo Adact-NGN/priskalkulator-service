@@ -3,7 +3,7 @@ package no.ding.pk.service.offer;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import no.ding.pk.repository.offer.MaterialPriceRepository;
 @Service
 public class MaterialPriceServiceImpl implements MaterialPriceService {
 
-    private MaterialPriceRepository repository;
+    private final MaterialPriceRepository repository;
     
     @Autowired
     public MaterialPriceServiceImpl(MaterialPriceRepository repository) {

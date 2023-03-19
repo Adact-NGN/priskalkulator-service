@@ -38,7 +38,7 @@ import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.web.mappers.MapperService;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
 @Profile({ "unit-test" })

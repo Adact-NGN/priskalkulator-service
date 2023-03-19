@@ -1,6 +1,6 @@
 package no.ding.pk.config;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.mockito.Mockito;

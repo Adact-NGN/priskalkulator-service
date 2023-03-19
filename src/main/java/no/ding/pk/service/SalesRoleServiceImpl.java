@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +20,11 @@ public class SalesRoleServiceImpl implements SalesRoleService {
 
     private static final Logger log = LoggerFactory.getLogger(SalesRoleServiceImpl.class);
 
-    private SalesRoleRepository repository;
-    private UserService userService;
-    
+    private final SalesRoleRepository repository;
+
     @Autowired
-    public SalesRoleServiceImpl(SalesRoleRepository repository, UserService userService) {
+    public SalesRoleServiceImpl(SalesRoleRepository repository) {
         this.repository = repository;
-        this.userService = userService;
     }
 
     @Override
@@ -93,18 +91,13 @@ public class SalesRoleServiceImpl implements SalesRoleService {
     public SalesRole findById(Long id) {
         Optional<SalesRole> optSalesRole = repository.findById(id);
 
-        if(optSalesRole.isPresent()) {
-            return optSalesRole.get();
-        }
+        return optSalesRole.orElse(null);
 
-        return null;
     }
 
     @Override
     public SalesRole findSalesRoleById(Long id) {
-        SalesRole salesRole = repository.findByIdWithUserList(id);
-
-        return salesRole;
+        return repository.findByIdWithUserList(id);
     }
 
     @Override

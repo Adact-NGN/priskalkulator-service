@@ -1,6 +1,6 @@
 package no.ding.pk.service.offer;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
 @Service
 public class PriceOfferTemplateServiceImpl implements PriceOfferTemplateService {
 
-    private PriceOfferTemplateRepository repository;
+    private final PriceOfferTemplateRepository repository;
     
     @Autowired
     public PriceOfferTemplateServiceImpl(PriceOfferTemplateRepository repository) {

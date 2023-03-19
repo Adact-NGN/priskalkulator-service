@@ -2,7 +2,7 @@ package no.ding.pk.service.offer;
 
 import java.util.Optional;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import no.ding.pk.repository.offer.CustomerTermsRepository;
 @Service
 public class CustomerTermsServiceImpl implements CustomerTermsService {
 
-    private CustomerTermsRepository repository;
+    private final CustomerTermsRepository repository;
 
     @Autowired
     public CustomerTermsServiceImpl(CustomerTermsRepository repository) {
