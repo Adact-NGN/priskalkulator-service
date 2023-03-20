@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,17 +67,10 @@ public class SalesOrgController {
             @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
             @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        List<String> params;
-        if(skipTokens != null) {
-            params = List.of(salesOrg, salesOffice, postalCode, salesZone, city, Integer.toString(skipTokens));
-        } else {
-            params = List.of(salesOrg, salesOffice, postalCode, salesZone, city);
-        }
-
-        List<SalesOrgField> fieldList = SalesOrgField.fieldList();
+        Map<SalesOrgField, String> params = createParameterList(Integer.toString(skipTokens), salesOrg, salesOffice, postalCode, salesZone, city);
 
         boolean isAllBlank = true;
-        for(String param : params) {
+        for(String param : params.values()) {
             if(!StringUtils.isBlank(param)) {
                 isAllBlank = false;
             }
@@ -98,13 +92,13 @@ public class SalesOrgController {
             logicDivider = " and ";
         }
 
-        for(int i = 0; i < params.size() && i < fieldList.size(); i++) {
-            String param = params.get(i);
+        for (Map.Entry<SalesOrgField, String> entry : params.entrySet()) {
+            String param = entry.getValue();
 
             if(StringUtils.isNotBlank(param)) {
-                String fieldType = fieldList.get(i).getType();
+                String fieldType = entry.getKey().getType();
 
-                if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
+                if(Objects.equals(entry.getKey().getName(), SalesOrgField.City.getName())) {
                     param = param.toUpperCase();
                 }
 
@@ -116,7 +110,7 @@ public class SalesOrgController {
 
                 log.debug("Parameter ({}) and parameter type ({}) matches. Add to query.", param, fieldType);
 
-                String field = fieldList.get(i).getName();
+                String field = entry.getKey().getName();
                 addAndToQuery(queryBuilder, logicDivider);
 
                 queryBuilder.append(field).append(" eq ").append(String.format("'%s'", param));
@@ -126,6 +120,17 @@ public class SalesOrgController {
         log.debug("Calling service with query: " + queryBuilder);
 
         return service.findByQuery(queryBuilder.toString(), skipTokens);
+    }
+
+    private Map<SalesOrgField, String> createParameterList(String skipTokens, String... params) {
+        Map<SalesOrgField, String> returnMap = new LinkedHashMap<>();
+        for(int i = 0; i < params.length; i++) {
+            SalesOrgField field = SalesOrgField.fieldList().get(i);
+
+            returnMap.put(field, params[i]);
+        }
+
+        return returnMap;
     }
 
     /**

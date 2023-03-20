@@ -1,11 +1,5 @@
 package no.ding.pk.web.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import no.ding.pk.service.sap.SalesOrgService;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -18,6 +12,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @WebMvcTest(SalesOrgController.class)
@@ -53,5 +53,24 @@ public class SalesOrgControllerTest {
         assertThat(mvcResult.getResponse().getStatus(), is(200));
     }
 
+    @Test
+    public void shouldFindSalesOrgByPostalCodeWhitSkipTokens() throws Exception {
+        String uri = "/api/salesorg";
 
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
+        params.add("salesOrg", "3933");
+        params.add("salesOffice", "3933");
+        params.add("postalCode", "3933");
+        params.add("salesZone", "3933");
+        params.add("city", "3933");
+        params.add("skiptokens", "1");
+
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).params(params))
+                .andDo(print()).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
+
+        assertThat(mvcResult.getResponse().getStatus(), is(200));
+    }
 }

@@ -7,7 +7,6 @@ import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.utils.LogicExpression;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
-import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.LogicComparator;
 import no.ding.pk.web.enums.LogicOperator;
 import no.ding.pk.web.enums.MaterialField;
@@ -27,8 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
@@ -45,7 +42,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Autowired
     public SapMaterialServiceImpl(@Value(value = "${sap.api.material.url}") String materialServiceUrl,
                                   SapHttpClient sapHttpClient,
-                                LocalJSONUtils localJSONUtils,
+                                  LocalJSONUtils localJSONUtils,
                                   @Qualifier("materialInMemoryCache") InMemory3DCache<String, String, MaterialDTO> inMemoryCache) {
         this.materialServiceUrl = materialServiceUrl;
         this.sapHttpClient = sapHttpClient;
@@ -68,7 +65,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
     @Override
     public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String zone, String salesOrg,
-                                                                                  String salesOffice) {
+                                                                            String salesOffice) {
 
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
@@ -119,12 +116,10 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         Integer materialCount = getCountFromSap(salesOrg, null);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
 
+        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
+        String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
 
-        // if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired() || inMemoryCache.size(salesOrg) < materialCount) {
-            LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-            String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
-
-            MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
 
         HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
