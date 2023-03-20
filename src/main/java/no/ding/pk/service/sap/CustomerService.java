@@ -1,4 +1,4 @@
-package no.ding.pk.service;
+package no.ding.pk.service.sap;
 
 import no.ding.pk.web.dto.sap.CustomerDTO;
 

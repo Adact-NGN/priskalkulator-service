@@ -1,4 +1,4 @@
-package no.ding.pk.service;
+package no.ding.pk.service.sap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -21,7 +21,7 @@ public class ContactPersonController {
 
     private static final Logger log = LoggerFactory.getLogger(ContactPersonController.class);
 
-    private ContactPersonService service;
+    private final ContactPersonService service;
 
     @Autowired
     public ContactPersonController(ContactPersonService contactPersonService) {
