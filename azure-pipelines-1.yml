@@ -53,7 +53,7 @@ stages:
     displayName: Deploy
     pool:
       vmImage: $(vmImageName)
-    environment: 'dingipapppkservice-1239.default'
+    environment: 'dingipapppkservice-1239.ding-ip-app-pk-service-dev'
     strategy:
       runOnce:
         deploy:
