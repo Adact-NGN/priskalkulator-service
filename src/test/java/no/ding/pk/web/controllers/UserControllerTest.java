@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -235,5 +236,25 @@ public class UserControllerTest {
         userDTO = userController.save(userDTO.getId(), userDTO);
 
         assertThat(userDTO.getSalesRoleId(), not(equalTo(previousSalesRoleId)));
+    }
+
+    @Test
+    public void shouldFindUserByEmail() {
+        String email = "test.testesen@ngn.no";
+
+        User expected = User.builder()
+                .name("Test Testesen")
+                .email(email)
+                .build();
+
+        userRepository.save(expected);
+
+        Map<String, String> params = new TreeMap<>();
+        params.put("email", email);
+
+        ResponseEntity<UserDTO> actual = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/users/email/{email}",  UserDTO.class, params);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+        assertThat(actual.getBody().getEmail(), is(email));
     }
 }

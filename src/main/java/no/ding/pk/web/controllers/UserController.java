@@ -6,6 +6,7 @@ import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 import org.json.JSONObject;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,13 @@ public class UserController {
     
     private final UserService userService;
     private final MapperService mapperService;
+    private final ModelMapper modelMapper;
     
     @Autowired
-    public UserController(UserService userService, MapperService mapperService) {
+    public UserController(UserService userService, MapperService mapperService, ModelMapper modelMapper) {
         this.userService = userService;
         this.mapperService = mapperService;
+        this.modelMapper = modelMapper;
     }
     
     /**
@@ -150,5 +153,17 @@ public class UserController {
         returnJson.put("message", String.format("Could not delete user with id %d.", id));
         return returnJson.toString();
     }
-    
+
+    @GetMapping("/email/{email}")
+    public UserDTO getUserByEmail(@PathVariable("email") String email) {
+        log.debug("Trying to get user by email: {}", email);
+
+        User byEmail = userService.findByEmail(email);
+
+        if(byEmail != null) {
+            return mapperService.toUserDTO(byEmail);
+        }
+
+        throw new RuntimeException("No object to process");
+    }
 }
