@@ -64,10 +64,10 @@ public class SalesOrgController {
             @RequestParam(name = "postalCode", required = false) String postalCode,
             @RequestParam(name = "salesZone", required = false) String salesZone,
             @RequestParam(name = "city", required = false) String city,
-            @RequestParam(name = "skiptokens", required = false) Integer skipTokens,
+            @RequestParam(name = "skiptokens", required = false, defaultValue = "0") Integer skipTokens,
             @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
-        Map<SalesOrgField, String> params = createParameterList(Integer.toString(skipTokens), salesOrg, salesOffice, postalCode, salesZone, city);
+        Map<SalesOrgField, String> params = createParameterList(salesOrg, salesOffice, postalCode, salesZone, city);
 
         boolean isAllBlank = true;
         for(String param : params.values()) {
@@ -122,7 +122,7 @@ public class SalesOrgController {
         return service.findByQuery(queryBuilder.toString(), skipTokens);
     }
 
-    private Map<SalesOrgField, String> createParameterList(String skipTokens, String... params) {
+    private Map<SalesOrgField, String> createParameterList(String... params) {
         Map<SalesOrgField, String> returnMap = new LinkedHashMap<>();
         for(int i = 0; i < params.length; i++) {
             SalesOrgField field = SalesOrgField.fieldList().get(i);
