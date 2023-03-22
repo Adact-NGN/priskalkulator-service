@@ -67,6 +67,9 @@ public class SalesOrgController {
             @RequestParam(name = "skiptokens", required = false, defaultValue = "0") Integer skipTokens,
             @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
     ) {
+        log.debug("Searching for Sales org entity with parameters:");
+        log.debug("salesOrg: {}, salesOffice: {}, postalCode: {}, salesZone: {}, city: {}",
+                salesOrg, salesOffice, postalCode, salesZone, city);
         Map<SalesOrgField, String> params = createParameterList(salesOrg, salesOffice, postalCode, salesZone, city);
 
         boolean isAllBlank = true;

@@ -15,6 +15,7 @@ import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.enums.SalesRoleName;
 import no.ding.pk.web.enums.TermsTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,34 @@ public class StartUpDev {
         @PostConstruct
         public void postConstruct() {
 
+                User kjetil = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+                if(kjetil == null) {
+                        kjetil = userService.save(
+                                User.builder()
+                                .adId("dc804853-6a82-4022-8eb5-244fff724af2")
+                                        .name("Kjetil")
+                                        .sureName("Torvund Minde")
+                                        .fullName("Kjetil Torvund Minde")
+                                        .orgNr("100")
+                                        .orgName("Norsk Gjenvinning")
+                                        .associatedPlace("Larvik")
+                                        .phoneNumber("90135757")
+                                        .email("kjetil.torvund.minde@ngn.no")
+                                        .jobTitle("Systemutvikler")
+                                        .powerOfAttorneyFA(5)
+                                        .powerOfAttorneyOA(5)
+                                .build(),
+                                null);
+                }
+
+                SalesRole admin = salesRoleService.findSalesRoleByRoleName(SalesRoleName.Superadmin.name());
+
+                if(admin != null && admin.getUserList() != null && !admin.getUserList().contains(kjetil)) {
+                        admin.addUser(kjetil);
+                        admin = salesRoleService.save(admin);
+                }
+
                 User alex = userService.findByEmail("alexander.brox@ngn.no");
 
                 if(alex == null){
@@ -77,7 +106,7 @@ public class StartUpDev {
                                 , null);
                 }
 
-                SalesRole marketConsultant = salesRoleService.findSalesRoleByRoleName("KN");
+                SalesRole marketConsultant = salesRoleService.findSalesRoleByRoleName(SalesRoleName.Kundeveileder.name());
 
                 if(marketConsultant != null && marketConsultant.getUserList() != null && !marketConsultant.getUserList().contains(alex)) {
                         marketConsultant.addUser(alex);
@@ -102,7 +131,7 @@ public class StartUpDev {
                         salesEmployee = userService.save(salesEmployee, null);
                 }
 
-                SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName("SA");
+                SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName(SalesRoleName.SalgskonsulentRolleA.name());
 
                 if(salesConsultant != null && salesConsultant.getUserList() != null && !salesConsultant.getUserList().contains(salesEmployee)) {
                         salesConsultant.addUser(salesEmployee);
