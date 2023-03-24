@@ -16,4 +16,9 @@ public class HomeController {
     public String healthCheck() {
         return "OK!";
     }
+
+    @GetMapping(value = "/ssl-test")
+    public String inbound(){
+        return "Inbound TLS is working!!";
+    }
 }

@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,14 +29,15 @@ public class MaterialController {
         this.service = service;
     }
 
-    @GetMapping("/{salesOrg}/{material}")
+    @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public MaterialDTO getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
                                                          @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {}", material, salesOrg);
         return service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
     }
 
-    @GetMapping("/{salesOrg}/{salesOffice}/{material}")
+    @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
                                                                        @PathVariable(value = "salesOffice") String salesOffice,
                                                                        @PathVariable(value = "material") String material) {
@@ -43,7 +46,7 @@ public class MaterialController {
         return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, null, salesOrg, salesOffice);
     }
 
-    @GetMapping("/list/{salesOrg}")
+    @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialList(@PathVariable(value = "salesOrg") String salesOrg,
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,
                                              @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize) {
@@ -60,7 +63,7 @@ public class MaterialController {
      * @param pageSize page size to view. Default 5000
      * @return list of Materials with standard price
      */
-    @GetMapping("/list/{salesOrg}/{salesOffice}")
+    @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialsWithStdPrice(@PathVariable(value = "salesOrg") String salesOrg,
                                                       @PathVariable(value = "salesOffice") String salesOffice,
                                                       @RequestParam(value = "page", defaultValue = "0") Integer page,

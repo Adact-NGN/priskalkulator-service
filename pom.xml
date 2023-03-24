@@ -35,6 +35,18 @@
     <pdf.template.file.name>priceOfferTemplate</pdf.template.file.name>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.azure.spring</groupId>
+        <artifactId>spring-cloud-azure-dependencies</artifactId>
+        <version>4.6.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -51,21 +63,30 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-logging</artifactId>
-      <version>3.0.4</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </exclusion>
       </exclusions>
+
+    </dependency>
+
+    <!-- Security -->
+    <dependency>
+      <groupId>com.azure.spring</groupId>
+      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.azure.spring</groupId>
+      <artifactId>spring-cloud-azure-starter-keyvault</artifactId>
     </dependency>
 
     <!-- Include log4j2 -->
@@ -84,7 +105,7 @@
     <dependency>
       <groupId>com.microsoft.azure</groupId>
       <artifactId>msal4j</artifactId>
-      <version>1.13.0</version>
+      <version>1.13.5</version>
       <exclusions>
         <exclusion>
           <groupId>com.fasterxml.jackson.core</groupId>
@@ -138,11 +159,11 @@
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
-<dependency>
-  <groupId>commons-validator</groupId>
-  <artifactId>commons-validator</artifactId>
-  <version>1.7</version>
-</dependency>
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+      <version>1.7</version>
+    </dependency>
 
 
     <dependency>
@@ -369,6 +390,8 @@
         <filtering>true</filtering>
         <excludes>
           <exclude>*.pdf</exclude>
+          <exclude>**/*.p12</exclude>
+          <exclude>**/*.cer</exclude>
         </excludes>
       </resource>
     </resources>
@@ -482,6 +505,15 @@
     </profile>
     <profile>
       <id>prod</id>
+      <dependencies>
+        <!-- Azure Keyvault Certificate -->
+        <dependency>
+          <groupId>com.azure.spring</groupId>
+          <artifactId>azure-spring-boot-starter-keyvault-certificates</artifactId>
+          <version>3.14.0</version>
+        </dependency>
+        <!-- End Security-->
+      </dependencies>
       <properties>
         <active.profile>prod</active.profile>
         <allowed.cors.url>http://20.238.224.213</allowed.cors.url>

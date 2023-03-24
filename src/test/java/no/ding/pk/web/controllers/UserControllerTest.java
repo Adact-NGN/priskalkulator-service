@@ -109,6 +109,7 @@ public class UserControllerTest {
 
         SalesRole kv = salesRoleService.findSalesRoleByRoleName("KV");
 
+
         if(kv == null) {
             kv = SalesRole.builder()
                     .roleName("KV")

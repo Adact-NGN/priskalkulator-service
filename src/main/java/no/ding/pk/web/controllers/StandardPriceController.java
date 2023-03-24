@@ -29,7 +29,6 @@ public class StandardPriceController {
     
     /**
      * Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office and Sales Organization.
-
      * @param salesOrg The sales organization to get the prices for.
      * @param salesOffice The sales office to get the prices for.
      * @param zone Set the zone number for only getting Material prices for a specific zone. @required

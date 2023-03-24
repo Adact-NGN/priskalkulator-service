@@ -1,5 +1,6 @@
 package no.ding.pk;
 
+import com.azure.security.keyvault.secrets.SecretClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -79,6 +80,14 @@ public class App implements WebMvcConfigurer {
     private String secret;
     @Value("${SCOPE}")
     private String scope;
+
+    private final SecretClient secretClient;
+
+    public App(SecretClient secretClient) {
+        this.secretClient = secretClient;
+
+        log.debug(secretClient.getSecret("pk-datasource-username").getValue());
+    }
 
     @Bean
     public ConfidentialClientApplication confidentialClientApplication() throws MalformedURLException {
