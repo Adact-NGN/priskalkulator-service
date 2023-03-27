@@ -138,7 +138,7 @@ public class UserController {
      * @param id The User ID for the user to be removed.
      * @return True if User object was found and deleted, else false.
      */
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String delete(@PathVariable("id") Long id) {
         log.debug("Trying to delete user with id: " + id);
         
@@ -154,7 +154,7 @@ public class UserController {
         return returnJson.toString();
     }
 
-    @GetMapping("/email/{email}")
+    @GetMapping(path = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getUserByEmail(@PathVariable("email") String email) {
         log.debug("Trying to get user by email: {}", email);
 

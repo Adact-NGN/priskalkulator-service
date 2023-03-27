@@ -1,11 +1,12 @@
 package no.ding.pk.web.controllers;
 
-import java.util.List;
-
+import no.ding.pk.domain.DiscountLevel;
+import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.domain.DiscountLevel;
-import no.ding.pk.service.DiscountService;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/discount/level")
@@ -37,7 +37,7 @@ public class DiscountLevelController {
      * @param level Discount level
      * @return A list with all the discount levels returned for the criteria given, else empty list.
      */
-    @GetMapping()
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getSpecificDiscountLevel(@RequestParam("salesOrg") String salesOrg,
     @RequestParam("materialNumber") String materialNumber,
     @RequestParam(name = "level", required = false) Integer level) {
@@ -53,7 +53,7 @@ public class DiscountLevelController {
      * @param zone           Specify for which zone to get discount levels for.
      * @return A list of all the discount levels for one or multiple materials, else empty list.
      */
-    @GetMapping("/list")
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getAllDiscountLevelsForSpecificDiscount(@RequestParam("salesOrg") String salesOrg,
     @RequestParam("materialNumber") String materialNumber, @RequestParam(value = "zone", required = false) String zone) {
         log.debug(String.format("Getting all discount levels for: salesOrg: %s materialNumber: %s", salesOrg, materialNumber));
@@ -66,7 +66,7 @@ public class DiscountLevelController {
      * @param discountLevel New values for the DiscountLevel object.
      * @return The updated DiscountLevel object.
      */
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DiscountLevel updateDiscountLevel(@PathVariable("id") Long id, @RequestBody DiscountLevel discountLevel) {
         return service.updateDiscountLevel(id, discountLevel);
     }

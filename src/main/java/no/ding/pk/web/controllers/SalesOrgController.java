@@ -143,7 +143,7 @@ public class SalesOrgController {
      * @param postalCode Set postal code to get the standard zone.
      * @return A list of ZoneDTO, else empty list
      */
-    @GetMapping("/{salesOrg}/{salesOffice}/zones")
+    @GetMapping(path = "/{salesOrg}/{salesOffice}/zones", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ZoneDTO> getZonesForSalesOffice(
             @PathVariable("salesOrg") String salesOrg,
             @PathVariable("salesOffice") String salesOffice,

@@ -1,11 +1,9 @@
 package no.ding.pk.config;
 
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
-
 //@Configuration(proxyBeanMethods = false)
 //@EnableWebSecurity
 //@EnableMethodSecurity
-public class SecurityConfig extends WebSecurityConfiguration {
+public class SecurityConfig {
 
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {

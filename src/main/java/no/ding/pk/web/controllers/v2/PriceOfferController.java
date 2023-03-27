@@ -112,7 +112,7 @@ public class PriceOfferController {
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
 
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);
         return service.delete(id);

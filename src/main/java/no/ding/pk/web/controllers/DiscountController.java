@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,7 @@ public class DiscountController {
      * A list of all the Discount objects.
      * @return List of all Discount objects.
      */
-    @GetMapping("/list")
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscounts() {
         return service.findAll();
     }
@@ -46,7 +47,7 @@ public class DiscountController {
      * @param zone Which zone to get discount for, not required
      * @return A list of all discounts, else empty list
      */
-    @GetMapping("/list/{salesOrg}")
+    @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscountsForSalesOrg(@PathVariable("salesOrg") String salesOrg,
                                                      @RequestParam(value = "materialNumber", required = false) String materialNumber,
                                                      @RequestParam(value = "zone", required = false) String zone) {
@@ -60,7 +61,7 @@ public class DiscountController {
      * @param zones Which zones to get discount for, not required.
      * @return A list of all discounts, else empty list
      */
-    @GetMapping("/in-list/{salesOrg}")
+    @GetMapping(path = "/in-list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg,
                                                                              @RequestParam(value = "materialNumbers") String materialNumbers,
                                                                              @RequestParam(value = "zones", required = false) String zones) {
@@ -73,7 +74,7 @@ public class DiscountController {
      * @param discount - The Discount object.
      * @return The persisted Discount object with its own id.
      */
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Discount createDiscount(@RequestBody Discount discount) {
         log.debug("Creating Discount object.");
         return service.save(discount);
@@ -84,7 +85,7 @@ public class DiscountController {
      * @param discounts A list of Discount objects to be created.
      * @return A list of all the newly created Discount objects.
      */
-    @PostMapping("/batch")
+    @PostMapping(path = "/batch", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> createDiscounts(@RequestBody List<Discount> discounts) {
         log.debug("Batch creating Discount objects. Amount of items: " + discounts.size());
         return service.saveAll(discounts);
@@ -96,7 +97,7 @@ public class DiscountController {
      * @param discount New values for the existing Discount object.
      * @return The updated Discount object.
      */
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Discount updateDiscount(@PathVariable("id") Long id, @RequestBody Discount discount) {
         log.debug("Updating Disvount object with id: " + id);
         return service.update(id, discount);

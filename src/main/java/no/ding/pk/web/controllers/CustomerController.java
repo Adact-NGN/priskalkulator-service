@@ -1,10 +1,8 @@
 package no.ding.pk.web.controllers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import no.ding.pk.service.CustomerServiceImpl;
 import no.ding.pk.web.dto.sap.CustomerDTO;
+import no.ding.pk.web.enums.SapCustomerField;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -17,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import no.ding.pk.service.CustomerServiceImpl;
-import no.ding.pk.web.enums.SapCustomerField;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -45,7 +44,7 @@ public class CustomerController {
      * @param skipToken (<i>Optional</i>) Amount of items to skip for this request
      * @return List of customer object, else empty list.
      */
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> fetchAllCustomers(
     @RequestParam(value = "parentCompany") String parentCompany,
     @RequestParam(value = "customerType", required = false, defaultValue = "Betaler") String customerType,
@@ -75,7 +74,7 @@ public class CustomerController {
      * @param knr Customer number to search for.
      * @return List with single customer object, else empty list.
      */
-    @GetMapping(value = "/{knr}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{knr}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> getCustomerByCustomerNumber(@PathVariable("knr") String knr) {
         log.debug("Request received with params: knr=" + knr);
         return service.findCustomerByCustomerNumber(knr);

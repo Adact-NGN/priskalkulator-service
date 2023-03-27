@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +40,7 @@ public class SalesRoleController {
      * Get a list of Sales Roles.
      * @return A list of SalesRoles.
      */
-    @GetMapping("/list")
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> getSalesRoleList() {
         log.debug("Getting Sales Role list");
         List<SalesRole> salesRoles = service.getAllSalesRoles();
@@ -53,7 +54,7 @@ public class SalesRoleController {
      * @param salesRole Data for SalesRole
      * @return Newly created SalesRole object.
      */
-    @PostMapping()
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesRoleDTO saveSalesRole(@RequestBody SalesRole salesRole) {
         return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
     }
@@ -63,7 +64,7 @@ public class SalesRoleController {
      * @param salesRoles List of objects with data for new SalesRole objects.
      * @return A list of all the newly created SalesRole objects.
      */
-    @PostMapping("/batch")
+    @PostMapping(path = "/batch", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> saveBatchSalesRole(@RequestBody List<SalesRole> salesRoles) {
         return service.saveAll(salesRoles).stream().map(mapToDTO()).collect(Collectors.toList());
     }
@@ -73,7 +74,7 @@ public class SalesRoleController {
      * @param salesRole Data to update the SalesRole object with.
      * @return Updated SalesRole object.
      */
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesRoleDTO updateSalesRole(@RequestBody SalesRole salesRole) {
         return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
     }
@@ -83,7 +84,7 @@ public class SalesRoleController {
      * @param userId The ID to identify the user with.
      * @return A list of SalesRoles connected to the user.
      */
-    @GetMapping("/user/{userId}")
+    @GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> getSalesRoleForUser(@PathVariable("userId") Long userId) {
         return service.findSalesRoleForUser(userId).stream().map(mapToDTO()).collect(Collectors.toList());
     }

@@ -5,6 +5,7 @@ import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +35,7 @@ public class ContactPersonController {
      * @param skipToken Amount of items to skip for this request.
      * @return List of contact person objects, else empty list.
      */
-    @GetMapping("/list")
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ContactPersonDTO> getContactPersons(
         @RequestParam(value = "expand", required = false) String expand,
         @RequestParam(value = "skipToken", required = false) Integer skipToken) {
@@ -53,7 +54,7 @@ public class ContactPersonController {
      * @param contactPersonNumber Contact person number.
      * @return List with one contact person objects, else empty list.
      */
-    @GetMapping("/{cpn}")
+    @GetMapping(path = "/{cpn}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ContactPersonDTO> findContactPersonByNumber(@PathVariable("cpn") String contactPersonNumber) {
 
         log.debug(String.format("Request received with with params: %s", "cpn=" + contactPersonNumber));
