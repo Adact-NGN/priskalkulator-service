@@ -1,9 +1,9 @@
 package no.ding.pk.repository.specifications;
 
+import jakarta.persistence.criteria.Path;
 import no.ding.pk.domain.Discount;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.Path;
 import java.util.List;
 
 public class DiscountSpecifications {

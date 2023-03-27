@@ -2,6 +2,7 @@ package no.ding.pk.config;
 
 import static org.mockito.Mockito.mock;
 
+import jakarta.persistence.EntityManagerFactory;
 import no.ding.pk.service.converters.PdfService;
 import no.ding.pk.service.offer.PriceRowService;
 import no.ding.pk.service.offer.SalesOfficeService;
@@ -37,8 +38,6 @@ import no.ding.pk.repository.offer.ZoneRepository;
 import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.web.mappers.MapperService;
-
-import javax.persistence.EntityManagerFactory;
 
 @Configuration
 @Profile({ "unit-test" })

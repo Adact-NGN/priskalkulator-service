@@ -1,8 +1,7 @@
 package no.ding.pk.listener;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Order;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.TestExecutionListener;
 

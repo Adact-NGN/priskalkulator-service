@@ -1,5 +1,6 @@
 package no.ding.pk.service;
 
+import jakarta.transaction.Transactional;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.repository.DiscountLevelRepository;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

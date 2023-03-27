@@ -1,19 +1,17 @@
 package no.ding.pk.service.offer;
 
+import jakarta.transaction.Transactional;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.repository.offer.SalesOfficeRepository;
 import no.ding.pk.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManagerFactory;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 

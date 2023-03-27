@@ -3,9 +3,6 @@ package no.ding.pk.config.listeners;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
