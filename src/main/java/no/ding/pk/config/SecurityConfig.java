@@ -1,21 +1,31 @@
 package no.ding.pk.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity
-public class SecurityConfig {
+//@Configuration(proxyBeanMethods = false)
+//@EnableWebSecurity
+//@EnableMethodSecurity
+public class SecurityConfig extends WebSecurityConfiguration {
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.authorizeRequests()
+//                .anyRequest().authenticated()
+//                .and()
+//                .cors().disable()
+//                .apply(configurer);
+//    }
 
 //    @Bean
 //    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 //        return http
-//                .apply(AadWebApplicationConfiguration.)
-//                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+//                .apply(AadWebApplicationConfiguration.aadWebApplication())
+//                .and()
 //                .authorizeRequests().anyRequest().authenticated()
-//                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+//                .and()
+//                .authorizeHttpRequests().anyRequest().authenticated()
+//                .and()
+//                .oauth2Login().userInfoEndpoint().oidcUserService(oidcUserService)
 //                .and().build();
 //    }
 }

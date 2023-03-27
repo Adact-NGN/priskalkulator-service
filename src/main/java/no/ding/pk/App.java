@@ -26,7 +26,6 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,9 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @EnableScheduling
-@EnableSwagger2
 @SpringBootApplication(scanBasePackages = "no.ding.pk.*")
-
 @PropertySource({
         "classpath:application.properties",
         "classpath:sap.properties",
