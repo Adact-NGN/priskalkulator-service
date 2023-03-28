@@ -1,23 +1,11 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.service.offer.PriceOfferService;
-import no.ding.pk.web.dto.web.client.DiscountLevelDTO;
-import no.ding.pk.web.dto.web.client.MaterialDTO;
-import no.ding.pk.web.dto.web.client.MaterialDiscountDTO;
 import no.ding.pk.web.dto.web.client.PriceOfferDTO;
-import no.ding.pk.web.dto.web.client.PriceRowDTO;
-
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller for getting Price offers.
+ * @deprecated This controller will be removed in future releases. Use /api/v2/price-offer
+ */
 @RestController
 @RequestMapping("/api/v1/price-offer")
 public class PriceOfferController {

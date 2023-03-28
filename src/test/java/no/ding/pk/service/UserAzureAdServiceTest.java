@@ -4,7 +4,9 @@ import no.ding.pk.domain.User;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Disabled(value = "Secret expires after 6 month and will invalidate this test suit.")
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class UserAzureAdServiceTest {
 
     @Autowired

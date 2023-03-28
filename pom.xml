@@ -73,21 +73,21 @@
     </dependency>
 
     <!-- Security -->
-    <dependency>
-      <groupId>com.azure.spring</groupId>
-      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.azure.spring</groupId>-->
+<!--      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-      <version>3.0.4</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.boot</groupId>-->
+<!--      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
+<!--      <version>3.0.4</version>-->
+<!--    </dependency>-->
 
-    <dependency>
-      <groupId>com.azure.spring</groupId>
-      <artifactId>spring-cloud-azure-starter-keyvault</artifactId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.azure.spring</groupId>-->
+<!--      <artifactId>spring-cloud-azure-starter-keyvault</artifactId>-->
+<!--    </dependency>-->
 
     <!-- Include log4j2 -->
     <dependency>
@@ -117,7 +117,7 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>3.0.5</version>
+      <version>3.1.2</version>
     </dependency>
 
     <dependency>
@@ -500,6 +500,14 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>17</source>
+          <target>17</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>

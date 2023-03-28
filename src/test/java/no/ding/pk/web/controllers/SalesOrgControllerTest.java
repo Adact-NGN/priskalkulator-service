@@ -1,7 +1,6 @@
 package no.ding.pk.web.controllers;
 
 import no.ding.pk.service.sap.SalesOrgService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled
 @WebMvcTest(SalesOrgController.class)
 public class SalesOrgControllerTest {
 

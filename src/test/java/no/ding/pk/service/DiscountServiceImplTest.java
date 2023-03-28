@@ -2,6 +2,7 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.DiscountServiceConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 import org.apache.commons.io.IOUtils;
@@ -11,9 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,13 +33,11 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@Disabled
-@SpringBootTest
+@Disabled("Need to isolate the scope")
 @ActiveProfiles({"test"})
-@TestPropertySource("/h2-db.properties")
+@SpringJUnitConfig({DiscountServiceConfig.class})
 public class DiscountServiceImplTest {
 
-//    @Qualifier("discountServiceImpl")
     @Autowired
     private DiscountService service;
 
@@ -75,7 +73,6 @@ public class DiscountServiceImplTest {
         }
 
         assertThat("Test data is empty, reading in JSON file failed.", testData, not(empty()));
-
     }
 
     @Test
@@ -94,12 +91,14 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldBeAbleToAddDiscountLevelToDiscountWithMissingCalculatedDiscountAndPctSet() {
-        Discount expected = Discount.builder()
+        Discount expected = Discount.defaultBuilder()
                 .salesOrg("100")
                 .materialNumber("Test2")
                 .materialDesignation("Test2")
                 .standardPrice(1234.0)
                 .build();
+
+        expected.setDiscountLevels(new ArrayList<>());
 
         Discount persisted = service.save(expected);
 

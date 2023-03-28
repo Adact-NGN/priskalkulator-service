@@ -1,16 +1,10 @@
 package no.ding.pk;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
-import com.microsoft.aad.msal4j.ClientCredentialFactory;
-import com.microsoft.aad.msal4j.ConfidentialClientApplication;
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.service.SalesRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -27,11 +21,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "no.ding.pk.*")
@@ -68,24 +58,6 @@ public class App implements WebMvcConfigurer {
         return messageConverter;
     }
 
-    @Value("${CLIENT_ID}")
-    private String clientId;
-    @Value("${AUTHORITY}")
-    private String authority;
-    @Value("${SECRET}")
-    private String secret;
-    @Value("${SCOPE}")
-    private String scope;
-
-    @Bean
-    public ConfidentialClientApplication confidentialClientApplication() throws MalformedURLException {
-        log.debug("Building ConfidentialClientApplication with client id: " + clientId);
-        return ConfidentialClientApplication.builder(clientId,
-                        ClientCredentialFactory.createFromSecret(secret))
-                .authority(authority)
-                .build();
-    }
-
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -106,37 +78,5 @@ public class App implements WebMvcConfigurer {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
                 .paths(PathSelectors.any()).build();
-    }
-
-//    @Bean
-//    public CommandLineRunner cmdLineRunner(DiscountService discountService, SalesRoleService salesRoleService, ObjectMapper objectMapper) {
-//        return args -> {
-//            initializeDiscounts(discountService, objectMapper);
-//
-//            initializeSalesRoles(salesRoleService, objectMapper);
-//        };
-//    }
-
-
-
-    private static void initializeSalesRoles(SalesRoleService salesRoleService, ObjectMapper objectMapper) {
-        TypeReference<List<SalesRole>> salesRoleTypeRef = new TypeReference<>() {
-        };
-
-        List<String> existingSalesRolesNames = salesRoleService.getAllSalesRoles().stream().map(SalesRole::getRoleName).collect(Collectors.toList());
-
-        InputStream salesRoleInputStream = TypeReference.class.getResourceAsStream("/sales_roles.json");
-
-        try {
-            List<SalesRole> salesRoles = objectMapper.readValue(salesRoleInputStream, salesRoleTypeRef);
-
-            List<SalesRole> toPersist = salesRoles.stream().filter(salesRole -> !existingSalesRolesNames.contains(salesRole.getRoleName())).collect(Collectors.toList());
-            log.debug("Sales roles to persist: {}", toPersist.size());
-
-            salesRoleService.saveAll(toPersist);
-            log.debug("Sales roles saved");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

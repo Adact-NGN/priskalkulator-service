@@ -2,6 +2,8 @@ package no.ding.pk.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @Entity
 @Table(name = "discount_matrix")
@@ -47,14 +51,17 @@ public class Discount {
     private List<DiscountLevel> discountLevels;
     
     public Discount() {
+        discountLevels = new ArrayList<>();
     }
-    
-    public Discount(String salesOrg, String materialNumber, String materialDesignation, String salesOffice,
-    double standardPrice) {
+
+    @Builder(builderMethodName = "defaultBuilder")
+    public Discount(String salesOrg, String materialNumber, String materialDesignation,
+                    double standardPrice) {
         this.salesOrg = salesOrg;
         this.materialNumber = materialNumber;
         this.materialDesignation = materialDesignation;
         this.standardPrice = standardPrice;
+        discountLevels = new ArrayList<>();
     }
     
     public Long getId() {
@@ -113,9 +120,9 @@ public class Discount {
         this.deviceType = deviceType;
     }
     
-    public List<DiscountLevel> getDiscountLevels() {
-        return discountLevels;
-    }
+//    public List<DiscountLevel> getDiscountLevels() {
+//        return discountLevels;
+//    }
     
     public void addDiscountLevel(DiscountLevel discountLevel) {
         discountLevel.setParent(this);

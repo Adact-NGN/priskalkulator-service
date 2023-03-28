@@ -75,10 +75,12 @@ public class DiscountServiceImpl implements DiscountService {
 
     private void addDiscountLevelsToDiscountList(List<Discount> discounts) {
         for (Discount discount : discounts) {
-            List<DiscountLevel> dlsToAdd = new ArrayList<>(discount.getDiscountLevels());
+            if(discount.getDiscountLevels() != null && !discount.getDiscountLevels().isEmpty()) {
+                List<DiscountLevel> dlsToAdd = new ArrayList<>(discount.getDiscountLevels());
 
-            for (DiscountLevel dl : dlsToAdd) {
-                discount.addDiscountLevel(dl);
+                for (DiscountLevel dl : dlsToAdd) {
+                    discount.addDiscountLevel(dl);
+                }
             }
         }
     }

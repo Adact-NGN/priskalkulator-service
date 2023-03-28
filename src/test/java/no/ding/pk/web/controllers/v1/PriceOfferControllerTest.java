@@ -14,7 +14,6 @@ import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.SalesOfficeDTO;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-@Disabled
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/h2-db.properties")
 public class PriceOfferControllerTest {
