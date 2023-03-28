@@ -94,6 +94,14 @@ class PriceOfferControllerTest {
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
     }
 
+    @Test
+    public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() {
+        ResponseEntity<PriceOfferDTO> responseEntity = this.restTemplate
+                .postForEntity("http://localhost:" + serverPort + "/api/v2/price-offer/create", new PriceOfferDTO(), PriceOfferDTO.class);
+
+        assertThat(responseEntity.getStatusCode(), is(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();
 

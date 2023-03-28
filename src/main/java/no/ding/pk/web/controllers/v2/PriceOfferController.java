@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RestController(value = "priceOfferControllerV2")
 @RequestMapping("/api/v2/price-offer")
 public class PriceOfferController {
-    private static final Logger log = LoggerFactory.getLogger(no.ding.pk.web.controllers.v1.PriceOfferController.class);
+    private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
 
     private final ObjectMapper objectMapper;
 
@@ -81,6 +81,9 @@ public class PriceOfferController {
 
         log.debug("Resulting priceOffer");
         log.debug(priceOffer.toString());
+
+        priceOffer = service.save(priceOffer);
+
         return modelMapper.map(priceOffer, PriceOfferDTO.class);
     }
 
