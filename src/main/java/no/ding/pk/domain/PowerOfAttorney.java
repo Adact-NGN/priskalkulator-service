@@ -28,7 +28,7 @@ public class PowerOfAttorney {
     private Long id;
 
     @Column(unique = true)
-    private String salesOffice;
+    private Integer salesOffice;
 
     @Column
     private String salesOfficeName;

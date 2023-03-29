@@ -13,15 +13,17 @@ INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Distriktssjef', 'DR');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Superadmin', 'Admin');
 
-create table if not exists sale_office_power_of_attorney_matrix(id bigint not null primary key auto_increment,
-                                                                sales_office varchar(255) UNIQUE,
-                                                                sales_office_name varchar(255),
-                                                                region varchar(255),
-                                                                ordinary_waste_lvl_one_holder_id BIGINT       NULL,
-                                                                ordinary_waste_lvl_two_holder_id BIGINT       NULL,
-                                                                dangerous_waste_holder_id        BIGINT       NULL,
-                                                                CONSTRAINT pk_sale_office_power_of_attorney_matrix PRIMARY KEY (id)
-);
+# create table if not exists sale_office_power_of_attorney_matrix(id bigint not null primary key auto_increment,
+#                                                                 sales_office varchar(255),
+#                                                                 sales_office_name varchar(255),
+#                                                                 region varchar(255),
+#                                                                 ordinary_waste_lvl_one_holder_id BIGINT       NULL,
+#                                                                 ordinary_waste_lvl_two_holder_id BIGINT       NULL,
+#                                                                 dangerous_waste_holder_id        BIGINT       NULL
+#                                                                 CONSTRAINT pk_sale_office_power_of_attorney_matrix PRIMARY KEY (id)
+# );
+
+alter table sale_office_power_of_attorney_matrix add constraint unique_sales_office unique(sales_office);
 
 alter table sale_office_power_of_attorney_matrix modify column if exists id bigint not null primary key auto_increment;
 
