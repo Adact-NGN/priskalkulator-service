@@ -7,6 +7,7 @@ import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNot.not;
 
-
+@Disabled("SAP is down")
 @Tag("integrationtest")
 @Profile("itest")
 @ActiveProfiles("itest")

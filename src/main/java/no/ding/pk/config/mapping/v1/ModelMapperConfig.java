@@ -78,7 +78,7 @@ public class ModelMapperConfig {
                 return c.getSource().getEmail();
             }
 
-            return null;
+            return "";
         };
 
         modelMapper.createTypeMap(PowerOfAttorney.class, SalesOfficePowerOfAttorneyDTO.class)

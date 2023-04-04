@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/sales-office-power-of-attorney")
+@RequestMapping(path = "/api/v1/sales-office-power-of-attorney")
 public class SalesOfficePowerOfAttorneyController {
 
     private final static Logger log = LoggerFactory.getLogger(SalesOfficePowerOfAttorneyController.class);
@@ -69,7 +69,7 @@ public class SalesOfficePowerOfAttorneyController {
 
     @PutMapping(path = "/save/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO save(@PathVariable("id") Long id, @RequestBody SalesOfficePowerOfAttorneyDTO sopoaDTO) {
-        log.debug("Trying to update user with id {}", id);
+        log.debug("Trying to update poa with id {}", id);
 
         PowerOfAttorney poa = modelMapper.map(sopoaDTO, PowerOfAttorney.class);
 

@@ -10,6 +10,7 @@ import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.hamcrest.core.Is;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
+@Disabled("SAP is down")
 @Tag("integrationtest")
 @Profile("itest")
 @ActiveProfiles("itest")
