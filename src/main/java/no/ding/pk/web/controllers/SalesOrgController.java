@@ -65,11 +65,11 @@ public class SalesOrgController {
             @RequestParam(name = "salesZone", required = false) String salesZone,
             @RequestParam(name = "city", required = false) String city,
             @RequestParam(name = "skiptokens", required = false, defaultValue = "0") Integer skipTokens,
-            @RequestParam(name = "greedy", required = false, defaultValue = "true") String greedy
+            @RequestParam(name = "greedy", required = false, defaultValue = "true") Boolean greedy
     ) {
         log.debug("Searching for Sales org entity with parameters:");
-        log.debug("salesOrg: {}, salesOffice: {}, postalCode: {}, salesZone: {}, city: {}",
-                salesOrg, salesOffice, postalCode, salesZone, city);
+        log.debug("salesOrg: {}, salesOffice: {}, postalCode: {}, salesZone: {}, city: {}, greedy: {}",
+                salesOrg, salesOffice, postalCode, salesZone, city, greedy);
         Map<SalesOrgField, String> params = createParameterList(salesOrg, salesOffice, postalCode, salesZone, city);
 
         boolean isAllBlank = true;

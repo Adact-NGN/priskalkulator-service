@@ -70,10 +70,14 @@ public class SalesOfficePowerOfAttorneyController {
     @PutMapping(path = "/save/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO save(@PathVariable("id") Long id, @RequestBody SalesOfficePowerOfAttorneyDTO sopoaDTO) {
         log.debug("Trying to update poa with id {}", id);
+        log.debug("With values {}", sopoaDTO);
 
         PowerOfAttorney poa = modelMapper.map(sopoaDTO, PowerOfAttorney.class);
 
+        log.debug("Mapped object: {}", poa);
         poa = service.save(poa);
+
+        log.debug("Persisted object: {}", poa);
 
         return modelMapper.map(poa, SalesOfficePowerOfAttorneyDTO.class);
     }
