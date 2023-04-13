@@ -31,5 +31,4 @@ public class PriceOfferDTO {
     private Boolean needsApproval;
     private TermsDTO customerTerms;
     private Date dateIssued;
-
 }

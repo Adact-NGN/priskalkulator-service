@@ -5,14 +5,13 @@ import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.repository.offer.SalesOfficeRepository;
 import no.ding.pk.service.UserService;
+import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -60,11 +59,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(newPriceOffer.getId() != null) {
             Optional<PriceOffer> optEntity = repository.findById(newPriceOffer.getId());
 
-            if(optEntity.isPresent()) {
-                entity = optEntity.get();
-            } else {
-                entity = createNewPriceOffer(salesEmployee);
-            }
+            entity = optEntity.orElseGet(() -> createNewPriceOffer(salesEmployee));
         } else {
             entity = createNewPriceOffer(salesEmployee);
         }
@@ -107,7 +102,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private User checkAndGetSalesEmployee(User salesEmployee) {
         if (salesEmployee == null) {
-            throw new RuntimeException("No sales employee provided!");
+            throw new EmployeeNotProvidedException("No sales employee provided!");
         } else {
             log.debug("Sales Employee object provided with email: {}", salesEmployee.getEmail());
             User persistedSalesEmployee = checkUserObject(salesEmployee);
@@ -115,7 +110,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             if (persistedSalesEmployee == null) {
                 // TODO: Create own exception
-                throw new RuntimeException("No sales employee provided!");
+                throw new EmployeeNotProvidedException("No sales employee provided!");
             }
 
             return persistedSalesEmployee;

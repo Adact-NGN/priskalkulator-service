@@ -5,6 +5,7 @@ import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +40,7 @@ class PriceOfferControllerTest {
     @Autowired
     private ModelMapper modelMapper;
 
-    private User salesEmployee;
-    private User approver;
-
+    @BeforeEach
     public void setup() {
 
         String salesEmployeeEmail = "Wolfgang@farris-bad.no";
@@ -59,7 +58,6 @@ class PriceOfferControllerTest {
 
             salesEmployee = userService.save(salesEmployee, null);
         }
-        this.salesEmployee = userService.findByEmail(salesEmployeeEmail);
 
         String approverEmail = "alexander.brox@ngn.no";
         User approver = userService.findByEmail(approverEmail);
@@ -79,8 +77,6 @@ class PriceOfferControllerTest {
             approver = userService.save(approver, null);
         }
 
-
-        this.approver = approver;
     }
 
     @Test
@@ -96,8 +92,8 @@ class PriceOfferControllerTest {
 
     @Test
     public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() {
-        ResponseEntity<PriceOfferDTO> responseEntity = this.restTemplate
-                .postForEntity("http://localhost:" + serverPort + "/api/v2/price-offer/create", new PriceOfferDTO(), PriceOfferDTO.class);
+        ResponseEntity<String> responseEntity = this.restTemplate
+                .postForEntity("http://localhost:" + serverPort + "/api/v2/price-offer/create", PriceOfferDTO.builder().build(), String.class);
 
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.INTERNAL_SERVER_ERROR));
     }

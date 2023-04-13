@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.web.dto.web.client.UserDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,6 +56,9 @@ public class UserServiceTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ModelMapper modelMapper;
     
     private List<User> testData;
     
@@ -77,8 +82,9 @@ public class UserServiceTest {
             JSONObject jsonObject = results.getJSONObject(i);
             
             try {
-                User discount = objectMapper.readValue(jsonObject.toString(), User.class);
-                testData.add(discount);
+                UserDTO discount = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
+                User user = modelMapper.map(discount, User.class);
+                testData.add(user);
             } catch (JsonProcessingException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
