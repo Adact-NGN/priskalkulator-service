@@ -110,6 +110,7 @@ public class UserController {
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO save(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) throws JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
+        log.debug("Values in {}", userDTO);
 
         if(id == null) {
             log.error("Put request was given non existing user to update.");
@@ -128,7 +129,10 @@ public class UserController {
         }
 
         User updatedUser = mapperService.toUser(userDTO);
+        log.debug("DTO to entity mapping results: {}", updatedUser);
         updatedUser = userService.save(updatedUser, id);
+
+        log.debug("Persisted user {}", updatedUser);
         
         return mapperService.toUserDTO(updatedUser);
     }
