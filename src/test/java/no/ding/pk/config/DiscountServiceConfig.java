@@ -9,11 +9,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
-import java.util.random.RandomGenerator;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Random;
 
 @Profile("test")
 @TestConfiguration
@@ -31,8 +32,10 @@ public class DiscountServiceConfig {
         DiscountRepository mock = mock(DiscountRepository.class);
         when(mock.save(any())).thenAnswer(invocationOnMock -> {
             Discount input = (Discount) invocationOnMock.getArguments()[0];
+            Random random = new Random();
+            long id = random.nextLong();
             return Discount.builder()
-                    .id(RandomGenerator.getDefault().nextLong())
+                    .id(id)
                     .salesOrg(input.getSalesOrg())
                     .materialNumber(input.getMaterialNumber())
                     .materialDesignation(input.getMaterialDesignation())

@@ -60,7 +60,5 @@ public class UserDTO {
                 + ", salesRoleId=" + salesRoleId + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
                 + usernameAlias + "]";
     }
-
-    
 }
     
