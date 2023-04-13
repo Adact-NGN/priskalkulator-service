@@ -31,8 +31,6 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public User save(User newUser, Long id) {
-		
-
 		if(id == null) {
 			log.debug("A new user object was given. Persisting the whole object");
 			
@@ -50,13 +48,8 @@ public class UserServiceImpl implements UserService {
 				return null;
 			}
 			
-//			User user = optUser.get();
-//
-//			setSalesRole(newUser.getSalesRole(), newUser);
-			
 			return repository.save(newUser);
 		}
-		
 	}
 	
 	private void setSalesRole(SalesRole salesRole, User user) {

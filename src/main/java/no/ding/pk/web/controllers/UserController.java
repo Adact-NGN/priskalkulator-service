@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = {"/api/users", "/api/v1/users"})
@@ -31,13 +32,11 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     
     private final UserService userService;
-    private final MapperService mapperService;
     private final ModelMapper modelMapper;
     
     @Autowired
-    public UserController(UserService userService, MapperService mapperService, ModelMapper modelMapper) {
+    public UserController(UserService userService, ModelMapper modelMapper) {
         this.userService = userService;
-        this.mapperService = mapperService;
         this.modelMapper = modelMapper;
     }
     
@@ -50,7 +49,7 @@ public class UserController {
         List<User> userList = userService.findAll();
         
         if(!userList.isEmpty()) {
-            return mapperService.toUserDTOList(userList);
+            return userList.stream().map(user -> modelMapper.map(user, UserDTO.class)).collect(Collectors.toList());
         } else {
             return new ArrayList<>();
         }
@@ -72,7 +71,7 @@ public class UserController {
             }
             User user = optUser.get();
 
-            return mapperService.toUserDTO(user);
+            return modelMapper.map(user, UserDTO.class);
         }
         return null;
     }
@@ -84,7 +83,7 @@ public class UserController {
      */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO create(@RequestBody UserDTO userDTO) {
-        User tempUser = mapperService.toUser(userDTO);
+        User tempUser = modelMapper.map(userDTO, User.class);
         log.debug("Where we able to map the SalesRole: {}", tempUser.getSalesRole() != null);
         User createdUser = userService.save(tempUser, null);
         
@@ -96,7 +95,7 @@ public class UserController {
         }
         
 
-        return mapperService.toUserDTO(createdUser);
+        return modelMapper.map(createdUser, UserDTO.class);
     }
 
     /**
@@ -128,13 +127,13 @@ public class UserController {
             return null;
         }
 
-        User updatedUser = mapperService.toUser(userDTO);
-        log.debug("DTO to entity mapping results: {}", updatedUser);
-        updatedUser = userService.save(updatedUser, id);
+        User mappedUser = modelMapper.map(userDTO, User.class);
+        log.debug("DTO to entity mapping results: {}", mappedUser);
+        User updatedUser = userService.save(mappedUser, id);
 
         log.debug("Persisted user {}", updatedUser);
         
-        return mapperService.toUserDTO(updatedUser);
+        return modelMapper.map(updatedUser, UserDTO.class);
     }
     
     /**
@@ -158,6 +157,11 @@ public class UserController {
         return returnJson.toString();
     }
 
+    /**
+     * Get user by email
+     * @param email email address to use
+     * @return A UserDTO object if any found, else Exception
+     */
     @GetMapping(path = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getUserByEmail(@PathVariable("email") String email) {
         log.debug("Trying to get user by email: {}", email);
@@ -165,9 +169,9 @@ public class UserController {
         User byEmail = userService.findByEmail(email);
 
         if(byEmail != null) {
-            return mapperService.toUserDTO(byEmail);
+            return modelMapper.map(byEmail, UserDTO.class);
         }
 
-        throw new RuntimeException("No object to process");
+        throw new RuntimeException("No user found by given email.");
     }
 }

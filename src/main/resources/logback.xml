@@ -4,18 +4,20 @@
     <appender name="STDOUT"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date] [%thread] %-5level %logger{36} - %msg%n
+            <pattern>[%date{yyyy-MM-dd'T'HH:mm:ss, GMT+2}] [%thread] %-5level %logger{36} - %msg%n
             </pattern>
+
         </encoder>
+
     </appender>
     <appender name="COLOR" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date] %highlight([%level]) [%logger{10} %file:%line] %msg%n</pattern>
+            <pattern>[%date{yyyy-MM-dd'T'HH:mm:ss, GMT+2}] %highlight([%level]) [%logger{10} %file:%line] %msg%n</pattern>
         </encoder>
     </appender>
     <appender name="NOCOLOR" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date] [%level] [%logger{10} %file:%line] %msg%n</pattern>
+            <pattern>[%date{yyyy-MM-dd'T'HH:mm:ss, GMT+2}] [%level] [%logger{10} %file:%line] %msg%n</pattern>
         </encoder>
     </appender>
 
