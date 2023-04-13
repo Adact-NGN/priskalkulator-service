@@ -32,12 +32,12 @@ public class UserDTO {
     /**
      * Fullmaktsnivå Vanlig Avfall
      */
-    private Integer powerOfAttorneyOA;
+    private String powerOfAttorneyOA;
 
     /**
      * Fullmaktsnivå Farlig Avfall
      */
-    private Integer powerOfAttorneyFA;
+    private String powerOfAttorneyFA;
 
     /**
      * Overordnet fullmaktsinnehaver (salgssjef)

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
-import no.ding.pk.web.mappers.MapperService;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,9 +33,9 @@ public class UserController {
     
     private final UserService userService;
     private final ModelMapper modelMapper;
-    
+
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    public UserController(UserService userService, @Qualifier("modelMapper") ModelMapper modelMapper) {
         this.userService = userService;
         this.modelMapper = modelMapper;
     }
@@ -109,7 +109,6 @@ public class UserController {
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO save(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) throws JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
-        log.debug("Values in {}", userDTO);
 
         if(id == null) {
             log.error("Put request was given non existing user to update.");
@@ -130,9 +129,8 @@ public class UserController {
         User mappedUser = modelMapper.map(userDTO, User.class);
         log.debug("DTO to entity mapping results: {}", mappedUser);
         User updatedUser = userService.save(mappedUser, id);
-
         log.debug("Persisted user {}", updatedUser);
-        
+
         return modelMapper.map(updatedUser, UserDTO.class);
     }
     
