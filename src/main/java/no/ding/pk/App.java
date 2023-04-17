@@ -3,8 +3,6 @@ package no.ding.pk;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +29,6 @@ import java.util.List;
         "classpath:msal.properties"
 })
 public class App implements WebMvcConfigurer {
-    private static final Logger log = LoggerFactory.getLogger(App.class);
     public static void main( String[] args )
     {
         SpringApplication.run(App.class, args);
@@ -63,6 +60,7 @@ public class App implements WebMvcConfigurer {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new Hibernate5Module());
         objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         return objectMapper;
     }
