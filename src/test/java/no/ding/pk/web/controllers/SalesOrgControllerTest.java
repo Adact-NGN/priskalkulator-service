@@ -1,17 +1,17 @@
 package no.ding.pk.web.controllers;
 
-import no.ding.pk.service.sap.SalesOrgService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -19,17 +19,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SalesOrgController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SalesOrgControllerTest {
 
-    @MockBean
-    private SalesOrgService service;
-
-    @MockBean
-    private ModelMapper modelMapper;
-
     @Autowired
-    private MockMvc mvc;
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setup() {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+    }
     
     @Test
     public void shouldFindSalesOrgByPostalCode() throws Exception {
@@ -45,7 +46,7 @@ public class SalesOrgControllerTest {
         params.add("skiptokens", "0");
 
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).params(params))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri).params(params))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 
@@ -66,7 +67,7 @@ public class SalesOrgControllerTest {
         params.add("skiptokens", "1");
 
 
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri).params(params))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(uri).params(params))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE)).andReturn();
 

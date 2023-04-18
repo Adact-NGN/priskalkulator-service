@@ -1,31 +1,25 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.ding.pk.config.SecurityTestConfig;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,32 +30,28 @@ import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@SpringJUnitConfig({SecurityTestConfig.class})
-@WebMvcTest(controllers = PriceOfferController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/h2-db.properties")
 class PriceOfferControllerTest {
-    @LocalServerPort
-    private int serverPort;
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @Autowired
     private UserService userService;
 
+    private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+
     @Autowired
-    private ModelMapper modelMapper;
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
+
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
         String salesEmployeeEmail = "Wolfgang@farris-bad.no";
         User salesEmployee = userService.findByEmail(salesEmployeeEmail);
@@ -76,7 +66,7 @@ class PriceOfferControllerTest {
                     .department("Hvitsnippene")
                     .build();
 
-            salesEmployee = userService.save(salesEmployee, null);
+            userService.save(salesEmployee, null);
         }
 
         String approverEmail = "alexander.brox@ngn.no";
@@ -94,9 +84,8 @@ class PriceOfferControllerTest {
                     .jobTitle("Markedskonsulent")
                     .build();
 
-            approver = userService.save(approver, null);
+            userService.save(approver, null);
         }
-
     }
 
     @Test
@@ -104,49 +93,28 @@ class PriceOfferControllerTest {
         setup();
         PriceOfferDTO priceOffer = createCompleteOfferDto();
 
-        ResponseEntity<PriceOfferDTO> responseEntity = this.restTemplate
-                .postForEntity("http://localhost:" + serverPort + "/api/v2/price-offer/create", priceOffer, PriceOfferDTO.class);
-
-        assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
-    }
-
-//    @Autowired
-//    private CsrfTokenRepository csrfTokenRepository;
-//
-//    public HttpHeaders basicAuthHeaders() {
-//        String plainCreds = "user:password";
-//        byte[] plainCredsBytes = plainCreds.getBytes();
-//        byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
-//        String base64Creds = new String(base64CredsBytes);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Authorization", "Basic " + base64Creds);
-//        return headers;
-//    }
-//
-//    public HttpHeaders csrfHeaders() {
-//        CsrfToken csrfToken = csrfTokenRepository.generateToken(null);
-//        HttpHeaders headers = basicAuthHeaders();
-//
-//        headers.add(csrfToken.getHeaderName(), csrfToken.getToken());
-//        headers.add("Cookie", "XSRF-TOKEN=" + csrfToken.getToken());
-//
-//        return headers;
-//    }
-
-//    @WithMockUser("spring")
-    @Test
-    public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() throws Exception {
-        String url = "http://localhost:" + serverPort + "/api/v2/price-offer/create";
-//        ResponseEntity<String> responseEntity = this.restTemplate
-//                .postForEntity("http://localhost:" + serverPort + "/api/v2/price-offer/create", PriceOfferDTO.builder().build(), String.class);
-//
-//        assertThat(responseEntity.getStatusCode(), is(HttpStatus.INTERNAL_SERVER_ERROR));
-        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").with(jwt()
-                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+        MvcResult result = mockMvc.perform(
+                post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectWriter.writeValueAsString(priceOffer))
+                        .with(jwt()
+                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+    }
+
+    @Test
+    public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                        .content("{}".getBytes())
+                        .with(jwt()
+                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError())
+                .andReturn();
+
+        assertThat(result, notNullValue());
     }
 
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
