@@ -2,6 +2,7 @@ apiVersion : apps/v1
 kind: Deployment
 metadata:
   name: ding-ip-app-pk-service
+  #namespace: ding-ip-app-pk-service-dev
   labels:
     app: ding-ip-app-pk
     tier: backend
@@ -20,11 +21,11 @@ spec:
     spec:
       containers:
         - name: ding-ip-app-pk
-          image: dingipacr.azurecr.io/ding-ip-app-pk-service
+          image: dingipacr.azurecr.io/ding-ip-app-pk-service:latest
           imagePullPolicy: Always
-          # resources:
-          #   limits:
-          #     cpu: "500m"
-          #     memory: "256M"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "256M"
           ports:
             - containerPort: 8080
