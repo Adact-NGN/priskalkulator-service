@@ -1,6 +1,5 @@
 package no.ding.pk.service.offer;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
@@ -41,8 +40,6 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     private final ModelMapper modelMapper;
 
-    private ObjectWriter objectWriter;
-    
     @PersistenceUnit
     private EntityManagerFactory emFactory;
     
@@ -118,7 +115,6 @@ public class PriceRowServiceImpl implements PriceRowService {
                 List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
                 em.getTransaction().commit();
                 em.close();
-                //                    Material persistedMaterial = materialService.findByMaterialNumber(material.getMaterialNumber());
 
                 if(materials != null && materials.size() > 0) {
                     Material persistedMaterial = (Material) materials.get(0);
@@ -144,7 +140,9 @@ public class PriceRowServiceImpl implements PriceRowService {
                     MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
 
                     if(sapMaterial != null) {
+                        log.debug("Mapping MaterialDTO: {}", sapMaterial);
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
+                        log.debug("Mapping result: {}", fromSap);
 
                         material = materialService.save(fromSap);
                     } else {

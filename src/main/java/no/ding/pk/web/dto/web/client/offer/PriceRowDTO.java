@@ -21,8 +21,8 @@ public class PriceRowDTO {
     private Double customerPrice;
     private Double discountPct;
     private String material;
-    private String materialDesignation;
     private String designation;
+    private String materialDesignation;
     private String productGroupDesignation;
     private String deviceType;
     private Boolean showPriceInOffer;
@@ -30,7 +30,7 @@ public class PriceRowDTO {
     private Integer priceLevel;
     private Double priceLevelPrice;
     private Double standardPrice;
-    private String pricingUnit;
+    private Integer pricingUnit;
     private String quantumUnit;
     private Integer amount;
     private Double priceIncMva;

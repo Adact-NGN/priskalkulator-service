@@ -83,7 +83,12 @@ public class ModelMapperV2Config {
         mapHierarchyValuesForPriceRowDto(priceRowTypeMap);
 
         priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getMaterialNumber(), PriceRowDTO::setMaterial));
-        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getDesignation(), PriceRowDTO::setMaterialDesignation));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getDesignation(), PriceRowDTO::setDesignation));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getMaterialTypeDescription(), PriceRowDTO::setMaterialDesignation));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getMaterialGroupDesignation(), PriceRowDTO::setProductGroupDesignation));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getDeviceType(), PriceRowDTO::setDeviceType));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getPricingUnit(), PriceRowDTO::setPricingUnit));
+        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getQuantumUnit(), PriceRowDTO::setQuantumUnit));
     }
 
     private static void mapHierarchyValuesForPriceRowDto(TypeMap<PriceRow, PriceRowDTO> priceRowTypeMap) {
