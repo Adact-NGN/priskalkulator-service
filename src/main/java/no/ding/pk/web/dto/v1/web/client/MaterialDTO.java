@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.v1.web.client;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

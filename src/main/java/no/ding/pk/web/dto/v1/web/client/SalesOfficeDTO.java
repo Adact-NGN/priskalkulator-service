@@ -1,5 +1,6 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.v1.web.client;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +21,10 @@ public class SalesOfficeDTO {
     private List<PriceRowDTO> materialList;
     private List<PriceRowDTO> rentalList;
     private List<PriceRowDTO> transportServiceList;
+    @JsonAlias("zoneList")
     private List<ZoneDTO> zones;
-    private String salesOffice;
-    private String salesOfficeName;
     private String salesOrg;
+    private String salesOffice;
+    @JsonAlias({"name"})
+    private String salesOfficeName;
 }

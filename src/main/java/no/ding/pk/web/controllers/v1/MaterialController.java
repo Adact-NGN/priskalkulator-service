@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,7 @@ public class MaterialController {
     }
 
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('SCOPE_Sales')")
+//    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public MaterialDTO getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
                                                          @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {}", material, salesOrg);
@@ -43,7 +42,7 @@ public class MaterialController {
                                                                        @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {} and sales office {}", material, salesOrg, salesOffice);
 
-        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, null, salesOrg, salesOffice);
+        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, salesOrg, salesOffice, null);
     }
 
     @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)

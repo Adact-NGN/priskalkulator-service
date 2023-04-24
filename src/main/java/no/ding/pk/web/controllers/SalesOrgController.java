@@ -2,7 +2,7 @@ package no.ding.pk.web.controllers;
 
 import no.ding.pk.service.sap.SalesOrgService;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
-import no.ding.pk.web.dto.web.client.ZoneDTO;
+import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
 import no.ding.pk.web.enums.SalesOrgField;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;

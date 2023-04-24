@@ -1,0 +1,116 @@
+{
+  "customerNumber": "5162",
+  "customerName": "Europris Telem Notodden",
+  "salesOfficeList": [
+    {
+      "salesOrg": "100",
+      "salesOffice": "122",
+      "name": "GLT regionen",
+      "postalCode": "2821",
+      "city": "GJØVIK",
+      "zoneList": [
+        {
+          "number": "0000000000",
+          "postalCode": "2821",
+          "postalName": "Gjøvik",
+          "isStandardZone": true,
+          "materialList": []
+        }
+      ],
+      "materialList": [
+        {
+          "material": "50108",
+          "deviceType": "",
+          "designation": "Lift - Ventetid",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj. Lift",
+          "showPriceInOffer": true,
+          "standardPrice": "0.00",
+          "pricingUnit": "1",
+          "quantumUnit": "TI"
+        },
+        {
+          "material": "50109",
+          "deviceType": "",
+          "designation": "Lift - Steaming/vask",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj. Lift",
+          "showPriceInOffer": true,
+          "standardPrice": "0.00",
+          "pricingUnit": "1",
+          "quantumUnit": "ST"
+        },
+        {
+          "material": "50110",
+          "deviceType": "",
+          "designation": "Lift - Ekstra arbeid",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj. Lift",
+          "showPriceInOffer": true,
+          "standardPrice": "0.00",
+          "pricingUnit": "1",
+          "quantumUnit": "TI"
+        },
+        {
+          "material": "50111",
+          "deviceType": "",
+          "designation": "Lift - Kjøring på time",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj. Lift",
+          "showPriceInOffer": true,
+          "standardPrice": "569.00",
+          "pricingUnit": "1",
+          "quantumUnit": "TI"
+        },
+        {
+          "material": "50112",
+          "deviceType": "",
+          "designation": "Lift - Transport på stk",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj. Lift",
+          "showPriceInOffer": true,
+          "standardPrice": "944.00",
+          "pricingUnit": "1",
+          "quantumUnit": "ST"
+        }
+      ],
+      "transportServiceList": [],
+      "rentalList": []
+    }
+  ],
+  "salesEmployee": {
+    "id": 6012,
+    "adId": "e2f1963a-072a-4414-8a0b-6a3aa6988e0c",
+    "orgNr": "100",
+    "orgName": null,
+    "regionName": null,
+    "sureName": "Brox",
+    "name": "Alexander",
+    "username": null,
+    "usernameAlias": null,
+    "jobTitle": "Markedskonsulent",
+    "fullName": "Alexander Brox",
+    "resourceNr": "63874",
+    "phoneNumber": "95838638",
+    "email": "alexander.brox@ngn.no",
+    "salesRoleId": null,
+    "associatedPlace": "Oslo",
+    "powerOfAttorneyOA": "5",
+    "powerOfAttorneyFA": "3",
+    "overallPowerOfAttorney": null,
+    "emailSalesManager": null,
+    "regionalManagersPowerOfAttorney": null,
+    "emailRegionalManager": null,
+    "department": null
+  },
+  "customerTerms": {
+    "contractTerm": "Generelle vilkår",
+    "agreementStartDate": "2023-03-31T22:00:00.000Z",
+    "agreementEndDate": "2023-04-13T22:00:00.000Z",
+    "metalPricing": "Fastpris (opp til kr -500,- pr. tonn)",
+    "metalSetDateForOffer": "2023-03-31T22:00:00.000Z",
+    "paymentCondition": "15 dgr",
+    "invoiceInterval": "Hver 14.dag",
+    "additionForAdminFee": true
+  }
+}

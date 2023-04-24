@@ -1,9 +1,11 @@
 package no.ding.pk.repository.offer;
 
+import no.ding.pk.domain.offer.CustomerTerms;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import no.ding.pk.domain.offer.Terms;
+import java.util.List;
 
-public interface CustomerTermsRepository extends JpaRepository<Terms, Long> {
-    
+public interface CustomerTermsRepository extends JpaRepository<CustomerTerms, Long> {
+    List<CustomerTerms> findAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
+    Integer countAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
 }

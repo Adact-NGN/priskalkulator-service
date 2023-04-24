@@ -1,18 +1,14 @@
 package no.ding.pk.domain.offer;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import no.ding.pk.domain.Auditable;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.MappedSuperclass;
 import java.util.Date;
 
 @Setter
@@ -20,14 +16,17 @@ import java.util.Date;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Entity
-@Table(name = "terms")
-public class Terms {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private Long id;
+@MappedSuperclass
+public class Terms extends Auditable {
+
+    @Column
+    private String salesOffice;
+
+    @Column
+    private String customerName;
+
+    @Column
+    private String customerNumber;
 
     @Column
     private Boolean additionForAdminFee;

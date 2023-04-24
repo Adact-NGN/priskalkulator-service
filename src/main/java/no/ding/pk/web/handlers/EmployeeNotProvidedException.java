@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
-@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "No sales employee provided")
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "No sales employee provided")
 public class EmployeeNotProvidedException extends RuntimeException {
 
     public EmployeeNotProvidedException() {

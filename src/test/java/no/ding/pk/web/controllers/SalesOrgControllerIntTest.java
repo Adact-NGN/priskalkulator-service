@@ -3,7 +3,7 @@ package no.ding.pk.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
-import no.ding.pk.web.dto.web.client.ZoneDTO;
+import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;

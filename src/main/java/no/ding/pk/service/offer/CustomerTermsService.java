@@ -1,12 +1,19 @@
 package no.ding.pk.service.offer;
 
-import java.util.Optional;
+import no.ding.pk.domain.offer.CustomerTerms;
+import no.ding.pk.domain.offer.SalesOffice;
 
-import no.ding.pk.domain.offer.Terms;
+import java.util.List;
+import java.util.Optional;
 
 public interface CustomerTermsService {
 
-    Optional<Terms> findById(Long id);
-    Terms save(Terms customerTerms);
+    Optional<CustomerTerms> findById(Long id);
+    CustomerTerms update(CustomerTerms customerTerms);
 
+    List<CustomerTerms> findAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
+
+    Integer countAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
+
+    CustomerTerms save(SalesOffice salesOffice, String customerNumber, CustomerTerms customerTerms);
 }

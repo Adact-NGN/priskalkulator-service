@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.v1.web.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,9 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Terms;
+import no.ding.pk.web.dto.web.client.UserDTO;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +30,7 @@ public class PriceOfferDTO {
     private UserDTO approver;
     private Boolean isApproved;
     private Boolean needsApproval;
-    private Terms customerTerms;
+    private Terms priceOfferTerms;
     private Date dateIssued;
 
 }

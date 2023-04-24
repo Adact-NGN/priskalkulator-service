@@ -3,7 +3,6 @@ package no.ding.pk.service.offer;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
@@ -28,17 +27,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final UserService userService;
 
-    private final CustomerTermsService customerTermsService;
-
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
                                  SalesOfficeService salesOfficeService,
-                                 UserService userService,
-                                 CustomerTermsService customerTermsService) {
+                                 UserService userService) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
-        this.customerTermsService = customerTermsService;
     }
 
     private PriceOffer createNewPriceOffer(User salesEmployee) {
@@ -74,9 +69,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
         if(newPriceOffer.getSalesOfficeList() != null) {
-            // Use traditional for-loop to avoid Concurrency Exception
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
-                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList());
+                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
 
                 entity.setSalesOfficeList(salesOffices);
                 entity = repository.save(entity);
@@ -92,9 +86,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         if(newPriceOffer.getCustomerTerms() != null) {
-            Terms customerTerms = customerTermsService.save(newPriceOffer.getCustomerTerms());
-
-            entity.setCustomerTerms(customerTerms);
+            entity.setCustomerTerms(newPriceOffer.getCustomerTerms());
         }
 
         return repository.save(entity);

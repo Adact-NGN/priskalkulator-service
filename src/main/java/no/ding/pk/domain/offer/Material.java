@@ -78,7 +78,7 @@ public class Material implements Serializable {
     private String quantumUnit; // KG, STK etc.
 
     @Column
-    private String scaleQuantum;
+    private Double scaleQuantum;
 
     @Column
     private String salesZone;

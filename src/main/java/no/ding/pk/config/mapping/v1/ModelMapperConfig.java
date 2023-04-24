@@ -8,9 +8,9 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
-import no.ding.pk.web.dto.web.client.DiscountLevelDTO;
-import no.ding.pk.web.dto.web.client.MaterialDTO;
-import no.ding.pk.web.dto.web.client.PriceRowDTO;
+import no.ding.pk.web.dto.v1.web.client.DiscountLevelDTO;
+import no.ding.pk.web.dto.v1.web.client.MaterialDTO;
+import no.ding.pk.web.dto.v1.web.client.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import org.modelmapper.Converter;
@@ -34,6 +34,7 @@ public class ModelMapperConfig {
         log.debug("Creating model mapper.");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+
         modelMapper.typeMap(AdUserDTO.class, User.class)
                 .addMapping(AdUserDTO::getAdId, User::setAdId)
                 .addMapping(AdUserDTO::getSureName, User::setSureName);

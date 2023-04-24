@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import lombok.AllArgsConstructor;
@@ -38,9 +39,9 @@ public class MaterialStdPriceDTO {
     @JsonAlias({"Sone", "SalesZone"}) //: "",
     private String zone;
     @JsonAlias({"Skalakvantum", "ScaleQuantity"}) //: "0.000",
-    private String scaleQuantum;
+    private Double scaleQuantum;
     @JsonAlias({"StandardPris", "StandardPrice"}) //: "0.00",
-    private String standardPrice;
+    private Double standardPrice;
     @JsonAlias({"Valuta"}) //: "",
     private String currency;
     @JsonAlias({"Prisenhet", "PricingUnit"}) //: "1000",
@@ -67,115 +68,14 @@ public class MaterialStdPriceDTO {
     @JsonAlias({"MaterialData"})
     private MaterialDTO materialData;
 
-    public Date getValidFrom() {
-        return validFrom;
-    }
-    public void setValidFrom(Date validFrom) {
-        this.validFrom = validFrom;
-    }
-    public String getSalesOrg() {
-        return salesOrg;
-    }
-    public void setSalesOrg(String salesOrg) {
-        this.salesOrg = salesOrg;
-    }
-    public String getSalesOffice() {
-        return salesOffice;
-    }
-    public void setSalesOffice(String salesOffice) {
-        this.salesOffice = salesOffice;
-    }
-    public String getMaterial() {
-        return material;
-    }
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-    public String getDesignation() {
-        return designation;
-    }
-    public void setDesignation(String designation) {
-        this.designation = designation;
-    }
-    public String getDeviceType() {
-        return deviceType;
-    }
-    public void setDeviceType(String deviceType) {
-        this.deviceType = deviceType;
-    }
-    public String getZone() {
-        return zone;
-    }
-    public void setZone(String zone) {
-        this.zone = zone;
-    }
-    public String getScaleQuantum() {
-        return scaleQuantum;
-    }
-    public void setScaleQuantum(String scaleQuantum) {
-        this.scaleQuantum = scaleQuantum;
-    }
-    public String getStandardPrice() {
-        return standardPrice;
-    }
-    public void setStandardPrice(String standardPrice) {
-        this.standardPrice = standardPrice;
-    }
-    public String getCurrency() {
-        return currency;
-    }
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-    public String getPricingUnit() {
-        return pricingUnit;
-    }
-    public void setPricingUnit(String pricingUnit) {
-        this.pricingUnit = pricingUnit;
-    }
-    public String getQuantumUnit() {
-        return quantumUnit;
-    }
-    public void setQuantumUnit(String quantumUnit) {
-        this.quantumUnit = quantumUnit;
+    @JsonGetter(value = "formattedStandardPrice")
+    public String getFormattedStandardPrice() {
+        return this.standardPrice != null ? String.format("%.2f", this.standardPrice) : "";
     }
 
-    public String getMaterialExpired() {
-        return materialExpired;
-    }
-    public void setMaterialExpired(String materialExpired) {
-        this.materialExpired = materialExpired;
-    }
-
-    public Date getValidTo() {
-        return validTo;
-    }
-    public void setValidTo(Date validTo) {
-        this.validTo = validTo;
-    }
-    public String getProductGroup() {
-        return productGroup;
-    }
-    public void setProductGroup(String productGroup) {
-        this.productGroup = productGroup;
-    }
-    public String getProductGroupDesignation() {
-        return productGroupDesignation;
-    }
-    public void setProductGroupDesignation(String productGroupDesignation) {
-        this.productGroupDesignation = productGroupDesignation;
-    }
-    public String getMaterialType() {
-        return materialType;
-    }
-    public void setMaterialType(String materialType) {
-        this.materialType = materialType;
-    }
-    public String getMaterialTypeDesignation() {
-        return materialTypeDesignation;
-    }
-    public void setMaterialTypeDesignation(String materialTypeDesignation) {
-        this.materialTypeDesignation = materialTypeDesignation;
+    @JsonGetter(value = "formattedScaleQuantum")
+    public String getFormattedScaleQuantum() {
+        return this.scaleQuantum != null ? String.format("%.3f", this.scaleQuantum) : "";
     }
 
     @Override

@@ -42,12 +42,11 @@ public class PriceOfferTemplate extends Offer implements Serializable {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     @JoinColumn(name = "pot_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_offer_template_customerTerms"))
-    private Terms customerTerms;
+    private PriceOfferTerms customerTerms;
 
     @Builder(builderMethodName = "priceOfferTemplateBuilder")
     public PriceOfferTemplate(Long id, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
-                              Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued,
-                              Terms customerTerms) {
+                              Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued, PriceOfferTerms customerTerms) {
         super(id, customerNumber, customerName, needsApproval, approved, approvalDate,
                 dateIssued);
 

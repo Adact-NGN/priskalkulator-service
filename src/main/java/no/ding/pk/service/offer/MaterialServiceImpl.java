@@ -104,7 +104,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setQuantumUnit(material.getQuantumUnit());
         }
 
-        if(!StringUtils.equals(entity.getScaleQuantum(), material.getScaleQuantum())) {
+        if(entity.getScaleQuantum() != null && !entity.getScaleQuantum().equals(material.getScaleQuantum())) {
             entity.setScaleQuantum(material.getScaleQuantum());
         }
         

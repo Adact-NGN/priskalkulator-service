@@ -48,18 +48,17 @@ public class PriceOffer extends Offer implements Serializable {
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"))
-    private Terms customerTerms;
+    private PriceOfferTerms customerTerms;
 
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued,
-            Terms customerTerms) {
+            Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms) {
         super(id, customerNumber, customerName, needsApproval, approved, approvalDate,
                 dateIssued);
 
         this.salesOfficeList = salesOfficeList;
         this.salesEmployee = salesEmployee;
         this.approver = approver;
-        this.customerTerms = customerTerms;
+        this.customerTerms = priceOfferTerms;
     }
 }

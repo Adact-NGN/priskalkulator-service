@@ -125,7 +125,7 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
     }
     
     public boolean isExpired() {
-        return expires.getTime() < System.currentTimeMillis();
+        return expires != null && expires.getTime() < System.currentTimeMillis();
     }
     
     @Override

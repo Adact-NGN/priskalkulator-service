@@ -193,7 +193,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder()
         .materialNumber(materialNumber)
-        .standardPrice(Double.parseDouble(materialStdPriceDTO.getStandardPrice()))
+        .standardPrice(materialStdPriceDTO.getStandardPrice())
         .validFrom(materialStdPriceDTO.getValidFrom())
         .validTo(materialStdPriceDTO.getValidTo())
         .build();

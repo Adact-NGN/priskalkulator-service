@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.v1.web.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,16 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @ToString
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MaterialDiscountDTO {
-    private Long id;
-    private String level;
-    private Double discount;
-    private String calculatedDiscount;
-    private String pctDiscount;
+public class ZoneDTO {
+    Long id;
+    String zoneId;
+    String postalCode;
+    String postalName;
+    Boolean isStandardZone;
+
+    List<PriceRowDTO> priceRows;
 }

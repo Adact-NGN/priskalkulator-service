@@ -1,10 +1,10 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -34,17 +34,14 @@ import java.util.stream.Collectors;
 public class PriceOfferController {
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
 
-    private final ObjectMapper objectMapper;
-
     private final PriceOfferService service;
 
     private final ModelMapper modelMapper;
 
     @Autowired
     public PriceOfferController(
-            ObjectMapper objectMapper, PriceOfferService service,
-            @Qualifier(value = "modelMapperV2")ModelMapper modelMapper) {
-        this.objectMapper = objectMapper;
+            PriceOfferService service,
+            @Qualifier(value = "modelMapperV2") ModelMapper modelMapper) {
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -87,25 +84,21 @@ public class PriceOfferController {
         log.debug("Got new Price offer object: " + priceOfferDTO);
 
         if(priceOfferDTO.getSalesEmployee() == null) throw new EmployeeNotProvidedException();
+        if(priceOfferDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
 
-        PriceOffer priceOffer = convertToEntity(priceOfferDTO);
+        PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-        log.debug("Resulting priceOffer");
-        log.debug(priceOffer.toString());
+        log.debug("Resulting priceOffer: {}", priceOffer.toString());
 
         priceOffer = service.save(priceOffer);
 
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
 
-    private PriceOffer convertToEntity(PriceOfferDTO priceOfferDto) {
-        return modelMapper.map(priceOfferDto, PriceOffer.class);
-    }
-
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody String plainPriceOfferDTO) throws JsonProcessingException {
-        log.debug("Trying to update price offer with id: " + id);
-        log.debug("Values received for PriceOffer: {}", plainPriceOfferDTO);
+    public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
+        log.debug("Trying to update price offer with id: {}", id);
+        log.debug("Values received for PriceOffer: {}", priceOfferDTO);
 
         if(id == null) {
             log.error("Put request was given non existing price offer to update.");
@@ -119,7 +112,7 @@ public class PriceOfferController {
             return null;
         }
 
-        PriceOffer updatedOffer = objectMapper.readValue(plainPriceOfferDTO, PriceOffer.class);
+        PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
         updatedOffer = service.save(updatedOffer);
 

@@ -3,14 +3,14 @@ package no.ding.pk.web.controllers.v1;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.service.offer.PriceOfferService;
-import no.ding.pk.web.dto.web.client.PriceOfferDTO;
+import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,7 +48,7 @@ public class PriceOfferController {
     }
 
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('SCOPE_Sales')")
+//    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public List<PriceOffer> list() {
         List<PriceOffer> priceOfferList = service.findAll();
         
@@ -81,6 +81,8 @@ public class PriceOfferController {
         log.debug("Got new Price offer object: " + priceOfferDTO);
         
         PriceOffer priceOffer = convertToEntity(priceOfferDTO);
+
+        Terms terms = modelMapper.map(priceOfferDTO.getPriceOfferTerms(), Terms.class);
         
         log.debug("Resulting priceOffer");
         log.debug(priceOffer.toString());
@@ -92,9 +94,9 @@ public class PriceOfferController {
     }
 
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOffer save(@PathVariable("id") Long id, @RequestBody String plainPriceOfferDTO) throws JsonProcessingException {
+    public PriceOffer save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: " + id);
-        log.debug("Values received for PriceOffer: {}", plainPriceOfferDTO);
+        log.debug("Values received for PriceOffer: {}", priceOfferDTO);
         
         if(id == null) {
             log.error("Put request was given non existing price offer to update.");
@@ -108,7 +110,9 @@ public class PriceOfferController {
             return null;
         }
 
-        PriceOffer updatedOffer = objectMapper.readValue(plainPriceOfferDTO, PriceOffer.class);
+        PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
+
+        Terms terms = modelMapper.map(priceOfferDTO.getPriceOfferTerms(), Terms.class);
 
         updatedOffer = service.save(updatedOffer);
         

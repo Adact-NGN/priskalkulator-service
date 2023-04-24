@@ -1,14 +1,18 @@
 package no.ding.pk.service.offer;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.sap.StandardPriceService;
-
+import no.ding.pk.web.dto.sap.MaterialDTO;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -32,6 +36,12 @@ public class PriceRowServiceImpl implements PriceRowService {
     private final MaterialPriceService materialPriceService;
 
     private final StandardPriceService standardPriceService;
+
+    private final SapMaterialService sapMaterialService;
+
+    private final ModelMapper modelMapper;
+
+    private ObjectWriter objectWriter;
     
     @PersistenceUnit
     private EntityManagerFactory emFactory;
@@ -39,22 +49,30 @@ public class PriceRowServiceImpl implements PriceRowService {
     
     @Autowired
     public PriceRowServiceImpl(PriceRowRepository priceRowRepository,
-    MaterialService materialService,
-    MaterialPriceService materialPriceService, EntityManagerFactory emFactory,
-    StandardPriceService standardPriceService) {
+                               MaterialService materialService,
+                               MaterialPriceService materialPriceService, EntityManagerFactory emFactory,
+                               StandardPriceService standardPriceService, SapMaterialService sapMaterialService,
+                               @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         this.repository = priceRowRepository;
         this.materialPriceService = materialPriceService;
         this.materialService = materialService;
         this.emFactory = emFactory;
         this.standardPriceService = standardPriceService;
+        this.sapMaterialService = sapMaterialService;
+        this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice) {
+        return saveAll(priceRowList, salesOrg, salesOffice, null);
     }
     
     @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice) {
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone) {
         List<PriceRow> returnList = new ArrayList<>();
         for(int i = 0; i < priceRowList.size(); i++) {
             PriceRow materialPriceRow = priceRowList.get(i);
-            PriceRow entity = save(materialPriceRow, salesOrg, salesOffice);
+            PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone);
 
             returnList.add(entity);
         }
@@ -63,7 +81,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice) {
+    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone) {
         log.debug("Price Row: {}", materialPriceRow);
 
         PriceRow entity = new PriceRow();
@@ -123,7 +141,16 @@ public class PriceRowServiceImpl implements PriceRowService {
                     entity.setMaterial(persistedMaterial);
                 } else {
                     log.debug("New Material to create with material number: {}", material.getMaterialNumber());
-                    material = materialService.save(material);
+                    MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
+
+                    if(sapMaterial != null) {
+                        Material fromSap = modelMapper.map(sapMaterial, Material.class);
+
+                        material = materialService.save(fromSap);
+                    } else {
+                        log.debug("Could not find material {} for salesorg {}", material.getMaterialNumber(), salesOrg);
+                    }
+
                     entity.setMaterial(material);
                 }
 
@@ -138,7 +165,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             List<PriceRow> combinedMaterialPriceRows = new ArrayList<>();
 
             for(int j = 0; j < materialPriceRow.getCombinedMaterials().size(); j++) {
-                PriceRow combinedMaterial = this.save(materialPriceRow.getCombinedMaterials().get(j), salesOrg, salesOffice);
+                PriceRow combinedMaterial = this.save(materialPriceRow.getCombinedMaterials().get(j), salesOrg, salesOffice, zone);
                 combinedMaterialPriceRows.add(combinedMaterial);
             }
 

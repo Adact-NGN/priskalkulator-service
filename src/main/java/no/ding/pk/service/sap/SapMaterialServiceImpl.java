@@ -64,8 +64,8 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     @Override
-    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String zone, String salesOrg,
-                                                                            String salesOffice) {
+    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String salesOrg,
+                                                                            String salesOffice, String zone) {
 
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
@@ -267,9 +267,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap, String distributionChannel) {
-        LogicExpression categoryIdExpression = LogicExpression.builder().field(MaterialField.CategoryId).value("").comparator(LogicComparator.NotEqual).build();
+//        LogicExpression categoryIdExpression = LogicExpression.builder().field(MaterialField.CategoryId).value("").comparator(LogicComparator.NotEqual).build();
         LogicExpression distributionChannelExpression = LogicExpression.builder().field(MaterialField.DistributionChannel).value(distributionChannel).comparator(LogicComparator.Equal).build();
-        queryMap.put(categoryIdExpression, LogicOperator.And);
+//        queryMap.put(categoryIdExpression, LogicOperator.And);
         queryMap.put(distributionChannelExpression, null);
         StringBuilder sb = new StringBuilder();
 

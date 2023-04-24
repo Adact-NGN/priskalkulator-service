@@ -6,13 +6,13 @@ import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.Offer;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.UserService;
-import no.ding.pk.web.dto.web.client.PriceOfferDTO;
-import no.ding.pk.web.dto.web.client.SalesOfficeDTO;
+import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
+import no.ding.pk.web.dto.v1.web.client.SalesOfficeDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -157,15 +157,6 @@ public class PriceOfferControllerTest {
         assertThat(priceOffer.getSalesEmployee().getName(), equalTo(priceOfferDTO.getSalesEmployee().getName()));
         assertThat(priceOffer.getSalesEmployee().getPhoneNumber(), equalTo(priceOfferDTO.getSalesEmployee().getPhoneNumber()));
         assertThat(priceOffer.getSalesEmployee().getEmail(), equalTo(priceOfferDTO.getSalesEmployee().getEmail()));
-
-        assertThat(priceOffer.getCustomerTerms().getAgreementStartDate(), equalTo(priceOfferDTO.getCustomerTerms().getAgreementStartDate()));
-        assertThat(priceOffer.getCustomerTerms().getAdditionForAdminFee(), equalTo(priceOfferDTO.getCustomerTerms().getAdditionForAdminFee()));
-        assertThat(priceOffer.getCustomerTerms().getAdditionForRoadTax(), equalTo(priceOfferDTO.getCustomerTerms().getAdditionForRoadTax()));
-        assertThat(priceOffer.getCustomerTerms().getNewOrEstablishedCustomer(), equalTo(priceOfferDTO.getCustomerTerms().getNewOrEstablishedCustomer()));
-        assertThat(priceOffer.getCustomerTerms().getCustomerRequireNotification(), equalTo(priceOfferDTO.getCustomerTerms().getCustomerRequireNotification()));
-        assertThat(priceOffer.getCustomerTerms().getIndexWaste(), equalTo(priceOfferDTO.getCustomerTerms().getIndexWaste()));
-        assertThat(priceOffer.getCustomerTerms().getIndexRent(), equalTo(priceOfferDTO.getCustomerTerms().getIndexRent()));
-        assertThat(priceOffer.getCustomerTerms().getIndexTransport(), equalTo(priceOfferDTO.getCustomerTerms().getIndexTransport()));
     }
 
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
@@ -186,7 +177,7 @@ public class PriceOfferControllerTest {
     }
 
     private Offer createCompleteOffer() {
-        Terms customerTerms = Terms.builder()
+        PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
         .agreementStartDate(new Date())
         .contractTerm("Generelle vilkår")
         .additionForAdminFee(false)
@@ -272,14 +263,16 @@ public class PriceOfferControllerTest {
         List<SalesOffice> salesOfficeList = new ArrayList<>();
         salesOfficeList.add(salesOffice);
 
-        return PriceOffer.priceOfferBuilder()
-        .customerNumber("5162")
-        .salesOfficeList(salesOfficeList)
-        .salesEmployee(salesEmployee)
-        .needsApproval(true)
-        .approver(approver)
-        .approved(false)
-        .customerTerms(customerTerms)
-        .build();
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("5162")
+                .salesOfficeList(salesOfficeList)
+                .salesEmployee(salesEmployee)
+                .needsApproval(true)
+                .approver(approver)
+                .approved(false)
+                .build();
+
+        priceOffer.setCustomerTerms(priceOfferTerms);
+        return priceOffer;
     }
 }

@@ -5,9 +5,9 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
@@ -140,7 +140,7 @@ public class StartUpDev {
 
                 log.debug("Sales consultant Sales Role: {}", salesConsultant);
 
-                Terms customerTerms = Terms.builder()
+                PriceOfferTerms customerTerms = PriceOfferTerms.builder()
                         .contractTerm(TermsTypes.GeneralTerms.getValue())
                         .agreementStartDate(new Date())
                         .build();
@@ -206,7 +206,6 @@ public class StartUpDev {
                         .customerName("Europris Telem Notodden")
                         .needsApproval(true)
                         .approved(false)
-                        .customerTerms(customerTerms)
                         .salesEmployee(salesEmployee)
                         .salesOfficeList(salesOfficeList)
                         .build();
@@ -230,12 +229,12 @@ public class StartUpDev {
         private PriceRow createPriceRow(List<MaterialStdPriceDTO> materialDTOs, String materialNumber) {
                 MaterialStdPriceDTO materialDTO = materialDTOs.stream().filter(obj -> obj.getMaterial().equalsIgnoreCase(materialNumber)).findAny().orElse(null);
                 log.debug("Found materialDTO: {}", materialDTO);
-                MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, Double.parseDouble(materialDTO.getStandardPrice()));
+                MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, materialDTO.getStandardPrice());
                 Material material = createMaterial(materialNumber, materialDTO, residualWasteMaterialStdPrice);
 
                 material = materialService.save(material);
 
-                return createPriceRow(Double.parseDouble(materialDTO.getStandardPrice()), 0.02, true, Double.parseDouble(materialDTO.getStandardPrice()), 1, 56.0, 1, Double.parseDouble(materialDTO.getStandardPrice()), material);
+                return createPriceRow(materialDTO.getStandardPrice(), 0.02, true, materialDTO.getStandardPrice(), 1, 56.0, 1, materialDTO.getStandardPrice(), material);
         }
 
         private Zone createZone(String zoneId, String postalCode, String postalName, boolean isStandardZone, List<PriceRow> zoneMaterialList) {

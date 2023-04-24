@@ -34,4 +34,8 @@ public class TermsDTO {
     private Integer requiredNumberOfDaysNotice;
     private String specialConditionAction;
     private String comment;
+
+    private String salesOffice;
+    private String customerName;
+    private String customerNumber;
 }

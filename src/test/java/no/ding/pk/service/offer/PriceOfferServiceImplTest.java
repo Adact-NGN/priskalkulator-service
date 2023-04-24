@@ -7,9 +7,9 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.SalesRoleService;
@@ -23,7 +23,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import javax.transaction.Transactional;
-
 import java.util.Date;
 import java.util.List;
 
@@ -97,7 +96,7 @@ class PriceOfferServiceImplTest {
         saSalesRole.addUser(salesEmployee);
         saSalesRole = salesRoleService.save(saSalesRole);
 
-        Terms customerTerms = Terms.builder()
+        PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(new Date())
                 .build();
@@ -176,13 +175,14 @@ class PriceOfferServiceImplTest {
                 .customerName("Europris Telem Notodden")
                 .needsApproval(true)
                 .approved(false)
-                .customerTerms(customerTerms)
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(salesOfficeList)
                 .build();
 
+        priceOffer.setCustomerTerms(priceOfferTerms);
+
         ObjectMapper objectMapper = new ObjectMapper();
-        Terms customerTerms2 = objectMapper.readValue(objectMapper.writeValueAsString(customerTerms), Terms.class);
+        PriceOfferTerms priceOfferTerms2 = objectMapper.readValue(objectMapper.writeValueAsString(priceOfferTerms), PriceOfferTerms.class);
 
         SalesOffice salesOffice2 = objectMapper.readValue(objectMapper.writeValueAsString(salesOffice), SalesOffice.class);
 
@@ -191,10 +191,11 @@ class PriceOfferServiceImplTest {
                 .customerName("Follo Ren IKS")
                 .needsApproval(false)
                 .approved(false)
-                .customerTerms(customerTerms2)
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice2))
                 .build();
+
+        priceOffer2.setCustomerTerms(priceOfferTerms2);
 
         assertThat(salesEmployee.getId(), notNullValue());
 
@@ -214,7 +215,7 @@ class PriceOfferServiceImplTest {
     }
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW)
-    private void createMaterial() {
+    void createMaterial() {
         String materialNumber = "119901";
 
         MaterialPrice wastePrice = MaterialPrice.builder()
