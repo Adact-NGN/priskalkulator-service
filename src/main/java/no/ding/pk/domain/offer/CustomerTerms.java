@@ -11,6 +11,9 @@ import no.ding.pk.domain.Auditable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
@@ -23,30 +26,34 @@ import java.util.Date;
 @Entity
 @Table(name = "customer_terms")
 public class CustomerTerms extends Auditable {
-    @EmbeddedId
-    private CustomerTermsPK id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
+    @Column
+    private Integer number;
+    @Column
+    private String level;
+    @Column
+    private String nodeNr;
+    @Column(name = "change_source")
+    private String source;
     @Column
     private String salesOffice;
-
     @Column
     private String customerName;
-
     @Column
     private String customerNumber;
-
+    @Column
+    private String contractTerm;
     @Column
     private Boolean additionForAdminFee;
     @Column
     private Boolean additionForRoadTax;
-
     @Column
     private Date agreementEndDate;
     @Column
     private Date agreementStartDate;
-    @Column
-    private String contractTerm;
-
     @Column
     private Boolean customerRequireNotification; // false,
     @Column
@@ -79,6 +86,12 @@ public class CustomerTerms extends Auditable {
     private String specialConditionAction;
     @Column
     private String comment;
+    @Column
+    private String region;
+    @Column(name = "year_set")
+    private Integer year;
+    @Column
+    private String salesEmployee;
 
 //    @Builder(builderMethodName = "customerTermsBuilder")
 //    public CustomerTerms(String salesOffice, String customerName, String customerNumber, Boolean additionForAdminFee,

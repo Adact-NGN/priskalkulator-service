@@ -69,8 +69,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getMailOrdinaryWasteLvlOne, PowerOfAttorney::setOrdinaryWasteLvlOneHolder))
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getMailOrdinaryWasteLvlTwo, PowerOfAttorney::setOrdinaryWasteLvlTwoHolder))
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getDangerousWaste, PowerOfAttorney::setDangerousWasteHolder));
-
-//        TypeMap<SalesOfficePowerOfAttorneyDTO, PowerOfAttorney> sopoaToPaoTypeMap = modelMapper.createTypeMap(SalesOfficePowerOfAttorneyDTO.class, PowerOfAttorney.class);
     }
 
     private static void powerOfAttorneyToSalesOfficePowerOfAttorneyDto(ModelMapper modelMapper) {

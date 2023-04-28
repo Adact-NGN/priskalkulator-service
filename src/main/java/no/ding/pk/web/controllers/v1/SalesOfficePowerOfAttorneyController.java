@@ -35,6 +35,11 @@ public class SalesOfficePowerOfAttorneyController {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * 
+     * @param id
+     * @return
+     */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO byId(@PathVariable("id") Long id) {
         log.debug("Getting entity for id {}", id);
@@ -48,6 +53,10 @@ public class SalesOfficePowerOfAttorneyController {
         return null;
     }
 
+    /**
+     * 
+     * @return
+     */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesOfficePowerOfAttorneyDTO> list() {
         log.debug("Received request for all PowerOfAttorneys");
@@ -56,6 +65,11 @@ public class SalesOfficePowerOfAttorneyController {
         return list.stream().map(poa -> modelMapper.map(poa, SalesOfficePowerOfAttorneyDTO.class)).collect(Collectors.toList());
     }
 
+    /**
+     * 
+     * @param sopa
+     * @return
+     */
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO create(@RequestBody SalesOfficePowerOfAttorneyDTO sopa) {
         log.debug("Creating new Power of Attorney");
@@ -67,6 +81,12 @@ public class SalesOfficePowerOfAttorneyController {
         return modelMapper.map(poa, SalesOfficePowerOfAttorneyDTO.class);
     }
 
+    /**
+     * 
+     * @param id
+     * @param sopoaDTO
+     * @return
+     */
     @PutMapping(path = "/save/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO save(@PathVariable("id") Long id, @RequestBody SalesOfficePowerOfAttorneyDTO sopoaDTO) {
         log.debug("Trying to update poa with id {}", id);
@@ -82,6 +102,11 @@ public class SalesOfficePowerOfAttorneyController {
         return modelMapper.map(poa, SalesOfficePowerOfAttorneyDTO.class);
     }
 
+    /**
+     * 
+     * @param id
+     * @return
+     */
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Trying to delete entity with id {}", id);

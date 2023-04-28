@@ -61,22 +61,11 @@ public class StartUpDev {
                 User kjetil = userService.findByEmail("kjetil.torvund.minde@ngn.no");
 
                 if(kjetil == null) {
-                        kjetil = userService.save(
-                                User.builder()
-                                .adId("dc804853-6a82-4022-8eb5-244fff724af2")
-                                        .name("Kjetil")
-                                        .sureName("Torvund Minde")
-                                        .fullName("Kjetil Torvund Minde")
-                                        .orgNr("100")
-                                        .orgName("Norsk Gjenvinning")
-                                        .associatedPlace("Larvik")
-                                        .phoneNumber("90135757")
-                                        .email("kjetil.torvund.minde@ngn.no")
-                                        .jobTitle("Systemutvikler")
-                                        .powerOfAttorneyFA(5)
-                                        .powerOfAttorneyOA(5)
-                                .build(),
-                                null);
+                        kjetil = createAndGetUser("dc804853-6a82-4022-8eb5-244fff724af2", "Kjetil",
+                                "Torvund Minde", "Kjetil Torvund Minde", "100",
+                                "Norsk Gjenvinning", "Larvik", "90135757",
+                                "kjetil.torvund.minde@ngn.no",
+                                "Systemutvikler", 5, 5, null);
                 }
 
                 SalesRole admin = salesRoleService.findSalesRoleByRoleName(SalesRoleName.Superadmin.name());
@@ -88,22 +77,12 @@ public class StartUpDev {
 
                 User alex = userService.findByEmail("alexander.brox@ngn.no");
 
-                if(alex == null){
-                        alex = userService.save(User.builder()
-                                        .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-                                        .name("Alexander")
-                                        .sureName("Brox")
-                                        .fullName("Alexander Brox")
-                                        .orgNr("100")
-                                        .resourceNr("63874")
-                                        .associatedPlace("Oslo")
-                                        .phoneNumber("95838638")
-                                        .email("alexander.brox@ngn.no")
-                                        .jobTitle("Markedskonsulent")
-                                        .powerOfAttorneyOA(5)
-                                        .powerOfAttorneyFA(3)
-                                        .build()
-                                , null);
+                if(alex == null) {
+
+                        alex = createAndGetUser("e2f1963a-072a-4414-8a0b-6a3aa6988e0c", "Alexander",
+                                        "Brox", "Alexander Brox","100","Norsk Gjenvinning",
+                                "Oslo", "95838638", "alexander.brox@ngn.no",
+                                "Markedskonsulent", 5, 3, "63874");
                 }
 
                 SalesRole marketConsultant = salesRoleService.findSalesRoleByRoleName(SalesRoleName.Kundeveileder.name());
@@ -211,6 +190,28 @@ public class StartUpDev {
                         .build();
 
                 priceOfferService.save(priceOffer);
+        }
+
+        private User createAndGetUser(String adId, String name, String sureName, String fullName, String orgNr,
+                                      String orgName, String associatedPlace, String phoneNumber, String email,
+                                      String jobTitle, int powerOfAttorneyFA, int powerOfAttorneyOA, String resourceNr) {
+                return userService.save(
+                        User.builder()
+                                .adId(adId)
+                                .name(name)
+                                .sureName(sureName)
+                                .fullName(fullName)
+                                .orgNr(orgNr)
+                                .orgName(orgName)
+                                .associatedPlace(associatedPlace)
+                                .phoneNumber(phoneNumber)
+                                .email(email)
+                                .jobTitle(jobTitle)
+                                .powerOfAttorneyFA(powerOfAttorneyFA)
+                                .powerOfAttorneyOA(powerOfAttorneyOA)
+                                .resourceNr(resourceNr)
+                                .build(),
+                        null);
         }
 
         private List<PriceRow> createPriceRowList(List<String> materialNumberList, List<MaterialStdPriceDTO> materialDTOs) {
