@@ -40,7 +40,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         PriceOffer entity = new PriceOffer();
         entity.setSalesEmployee(salesEmployee);
 
-        return repository.save(entity);
+        return entity;
     }
 
     @Override
