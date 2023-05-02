@@ -36,9 +36,9 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
-     * 
-     * @param id
-     * @return
+     * Get power of attorney by id
+     * @param id power of attorney id
+     * @return {@code SalesOfficePowerOfAttorneyDTO} object
      */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO byId(@PathVariable("id") Long id) {
@@ -54,8 +54,8 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
-     * 
-     * @return
+     * Get all power og attorney objects
+     * @return List of {@code SalesOfficePowerOfAttorneyDTO}
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesOfficePowerOfAttorneyDTO> list() {
@@ -66,9 +66,9 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
-     * 
-     * @param sopa
-     * @return
+     * Create new power of attorney object
+     * @param sopa {@code SalesOfficePowerOfAttorneyDTO} power of attorney values
+     * @return Newlye persisted power of attorney as {@code SalesOfficePowerOfAttorneyDTO}
      */
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO create(@RequestBody SalesOfficePowerOfAttorneyDTO sopa) {
@@ -82,10 +82,10 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
-     * 
-     * @param id
-     * @param sopoaDTO
-     * @return
+     * Updated power of attorney object
+     * @param id Power of attorney id
+     * @param sopoaDTO Updated power of attorney object.
+     * @return {@code SalesOfficePowerOfAttorneyDTO} Updated power of attorney object
      */
     @PutMapping(path = "/save/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO save(@PathVariable("id") Long id, @RequestBody SalesOfficePowerOfAttorneyDTO sopoaDTO) {
@@ -103,9 +103,9 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
-     * 
-     * @param id
-     * @return
+     * Delete power of attorney by id
+     * @param id Power of attorney id to delete
+     * @return true if deleted, else false
      */
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {

@@ -47,6 +47,10 @@ public class PriceOfferController {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * List all {@code PriceOffer}
+     * @return List of {@code PriceOffer}
+     */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public List<PriceOffer> list() {
@@ -59,6 +63,11 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
     
+    /**
+     * Get {@code PriceOffer} by id
+     * @param id
+     * @return PriceOffer object, else empty if not found
+     */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOffer getById(@PathVariable("id") Long id) {
         if(id != null) {
@@ -76,25 +85,33 @@ public class PriceOfferController {
         return null;
     }
 
+    /**
+     * Create a new {@code PriceOffer}
+     * @param priceOfferDTO The {@code PriceOffer} to create
+     * @return Newly created {@code PriceOffer}
+     */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOffer create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
+    public PriceOffer create(@RequestBody PriceOfferDTO priceOfferDTO) {
         log.debug("Got new Price offer object: " + priceOfferDTO);
         
-        PriceOffer priceOffer = convertToEntity(priceOfferDTO);
+        PriceOffer priceOffer = mapToEntity(priceOfferDTO);
 
-        Terms terms = modelMapper.map(priceOfferDTO.getPriceOfferTerms(), Terms.class);
-        
-        log.debug("Resulting priceOffer");
-        log.debug(priceOffer.toString());
+        log.debug("PriceOffer created, returning...");
         return service.save(priceOffer);
     }
 
-    private PriceOffer convertToEntity(PriceOfferDTO priceOfferDto) {
+    private PriceOffer mapToEntity(PriceOfferDTO priceOfferDto) {
         return modelMapper.map(priceOfferDto, PriceOffer.class);
     }
 
+    /**
+     * Save updated {@code PriceOffer}
+     * @param id {@code PriceOffer} id
+     * @param priceOfferDTO updated {@code PriceOffer} object
+     * @return Updated {@code PriceOffer}
+     */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOffer save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
+    public PriceOffer save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) {
         log.debug("Trying to update price offer with id: " + id);
         log.debug("Values received for PriceOffer: {}", priceOfferDTO);
         
@@ -112,13 +129,16 @@ public class PriceOfferController {
 
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-        Terms terms = modelMapper.map(priceOfferDTO.getPriceOfferTerms(), Terms.class);
-
         updatedOffer = service.save(updatedOffer);
         
         return updatedOffer;
     }
 
+    /**
+     * Delete {@code PriceOffer} by id
+     * @param id The id for the {@code PriceOffer} to delete
+     * @return {@code true} if successful, else {@code false}
+     */
     @DeleteMapping(path = "/delete/{id}")
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);

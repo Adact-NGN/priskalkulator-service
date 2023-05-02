@@ -37,6 +37,10 @@ public class CustomerTermsController {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Get list of {@code CustomerTerms}
+     * @return List of {@code CustomerTermsDTO}
+     */
     @GetMapping("/list")
     public List<CustomerTermsDTO> list() {
         List<CustomerTerms> customerTermsList = service.findAll();
@@ -44,6 +48,11 @@ public class CustomerTermsController {
         return customerTermsList.stream().map(customerTerms -> modelMapper.map(customerTerms, CustomerTermsDTO.class)).collect(Collectors.toList());
     }
 
+    /**
+     * Create new {@code CustomerTerms} object
+     * @param customerTermsDTO Customer terms object tot persist.
+     * @return Newly persisted customer terms as {@code CustomerTermsDTO}
+     */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomerTermsDTO create(@RequestBody CustomerTermsDTO customerTermsDTO) {
 
@@ -59,6 +68,12 @@ public class CustomerTermsController {
         return modelMapper.map(customerTerms, CustomerTermsDTO.class);
     }
 
+    /**
+     * Update existing customer terms with new values
+     * @param id existing customer terms id
+     * @param customerTermsDTO updated customer terms values.
+     * @return updated customer terms as {@code CustomerTermsDTO}
+     */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomerTermsDTO save(@PathVariable Long id, @RequestBody CustomerTermsDTO customerTermsDTO) {
         log.debug("Received CustomerTerms: {}", customerTermsDTO);
@@ -70,10 +85,4 @@ public class CustomerTermsController {
 
         return modelMapper.map(customerTerms, CustomerTermsDTO.class);
     }
-
-    @GetMapping("/new")
-    public CustomerTermsDTO newCustomerTermsDTO() {
-        return new CustomerTermsDTO();
-    }
-    
 }

@@ -28,6 +28,12 @@ public class MaterialController {
         this.service = service;
     }
 
+    /**
+     * Get Material by sales orfanization and material number
+     * @param salesOrg The sales organization number
+     * @param material The material number
+     * @return {@code MaterialDTO} if material is found, else empty object.
+     */
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public MaterialDTO getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
@@ -36,6 +42,13 @@ public class MaterialController {
         return service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
     }
 
+    /**
+     * Get Material by material number, sales organization and sales office
+     * @param salesOrg The sales organization number
+     * @param salesOffice The sales office number
+     * @param material The material number
+     * @return {@code MaterialDTO} if material is found, else empty object.
+     */
     @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
                                                                        @PathVariable(value = "salesOffice") String salesOffice,
@@ -45,6 +58,13 @@ public class MaterialController {
         return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, salesOrg, salesOffice, null);
     }
 
+    /**
+     * Get all materials for given sales organization number
+     * @param salesOrg The sales organization number
+     * @param page Selected page to view, default 0 (first page)
+     * @param pageSize How many entries a page can include, default 5000
+     * @return List of {@code MaterialDTO}, else empty
+     */
     @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialList(@PathVariable(value = "salesOrg") String salesOrg,
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,

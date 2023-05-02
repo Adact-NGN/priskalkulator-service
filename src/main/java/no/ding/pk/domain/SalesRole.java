@@ -42,11 +42,9 @@ public class SalesRole implements Serializable {
     private String description;
     
     @Column
-//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyOa;
     
     @Column
-//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyFa;
 
     @JsonManagedReference
