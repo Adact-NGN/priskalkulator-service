@@ -1,4 +1,7 @@
 USE pk_poal_db_dev;
+
+
+
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, standard_price, zone) VALUES (1, null, null, 'C-02L', '100', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, standard_price, zone) VALUES (6, null, null, 'C-04L', '100', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, standard_price, zone) VALUES (11, null, null, 'C-05LL', '100', null, null);

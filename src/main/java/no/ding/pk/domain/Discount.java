@@ -11,6 +11,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -25,15 +26,12 @@ import java.util.List;
 @Table(name = "discount_matrix")
 public class Discount {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     
     @Column(nullable = false)
     private String salesOrg;
 
-//    @Column(nullable = false)
-//    private String salesOffice;
-    
     @Column(nullable = false)
     private String materialNumber;
     
@@ -122,10 +120,6 @@ public class Discount {
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
     }
-    
-//    public List<DiscountLevel> getDiscountLevels() {
-//        return discountLevels;
-//    }
     
     public void addDiscountLevel(DiscountLevel discountLevel) {
         discountLevel.setParent(this);

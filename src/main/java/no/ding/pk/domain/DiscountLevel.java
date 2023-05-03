@@ -28,9 +28,6 @@ public class DiscountLevel {
     @Column
     private Double discount;
 
-//    @Column
-//    private Double discountInNok;
-
     @Column
     private Double calculatedDiscount;
 
