@@ -69,6 +69,7 @@ public class DiscountServiceImpl implements DiscountService {
     public List<Discount> saveAll(List<Discount> discounts) {
         log.debug("Saving {} amount of Discount objects.", discounts.size());
         addDiscountLevelsToDiscountList(discounts);
+        log.debug("Prepeared {} discounts added to list.", discounts.size());
         
         return repository.saveAll(discounts);
     }

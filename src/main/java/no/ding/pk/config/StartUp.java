@@ -32,7 +32,7 @@ public class StartUp {
     @PostConstruct
     public void postConstruct() {
 
-        initializeDiscounts();
+//        initializeDiscounts();
     }
 
     private void initializeDiscounts() {
