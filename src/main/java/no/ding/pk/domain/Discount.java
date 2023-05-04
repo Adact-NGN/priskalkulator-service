@@ -33,6 +33,9 @@ public class Discount {
     private String salesOrg;
 
     @Column(nullable = false)
+    private String salesOffice;
+
+    @Column(nullable = false)
     private String materialNumber;
     
     @Column
