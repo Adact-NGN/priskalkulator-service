@@ -30,7 +30,7 @@ import java.util.List;
 @Table(name = "sales_office")
 public class SalesOffice {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

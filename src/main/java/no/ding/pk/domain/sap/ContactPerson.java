@@ -22,7 +22,7 @@ import javax.persistence.Table;
 @Table(name = "sap_contact_persons")
 public class ContactPerson {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 

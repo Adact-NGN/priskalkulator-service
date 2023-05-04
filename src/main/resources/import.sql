@@ -1,7 +1,4 @@
-# USE pk_poal_db_dev;
-# SET sql_mode='NO_AUTO_VALUE_ON_ZERO';
-
-# create table if not exists sales_roles(id bigint not null primary key auto_increment, default_power_of_attorney_fa int null, default_power_of_attorney_oa int null, description varchar(255) null, role_name varchar(255) null UNIQUE);
+# Sales roles
 
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (1, 1, 'Kundeveileder', 'KV');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (2, 2, 'Salgskonsulent (rolle a)', 'SA');
@@ -13,28 +10,7 @@ INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Distriktssjef', 'DR');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Superadmin', 'Admin');
 
-# create table if not exists sale_office_power_of_attorney_matrix(id bigint not null primary key auto_increment,
-#                                                                 sales_office varchar(255),
-#                                                                 sales_office_name varchar(255),
-#                                                                 region varchar(255),
-#                                                                 ordinary_waste_lvl_one_holder_id BIGINT       NULL,
-#                                                                 ordinary_waste_lvl_two_holder_id BIGINT       NULL,
-#                                                                 dangerous_waste_holder_id        BIGINT       NULL
-#                                                                 CONSTRAINT pk_sale_office_power_of_attorney_matrix PRIMARY KEY (id)
-# );
-
-alter table sale_office_power_of_attorney_matrix add constraint unique_sales_office unique(sales_office);
-
-alter table sale_office_power_of_attorney_matrix modify column if exists id bigint not null primary key auto_increment;
-
-ALTER TABLE sale_office_power_of_attorney_matrix
-    ADD CONSTRAINT FK_SALEOFFICEPOWEROFATTORNEYMATRIX_ON_ORDINARYWASTELVLONEHOLDER FOREIGN KEY (ordinary_waste_lvl_one_holder_id) REFERENCES users (id);
-
-ALTER TABLE sale_office_power_of_attorney_matrix
-    ADD CONSTRAINT FK_SALEOFFICEPOWEROFATTORNEYMATRIX_ON_ORDINARYWASTELVLTWOHOLDER FOREIGN KEY (ordinary_waste_lvl_two_holder_id) REFERENCES users (id);
-
-ALTER TABLE sale_office_power_of_attorney_matrix
-    ADD CONSTRAINT FK_SALE_OFFICE_POWER_OF_ATTORNEY_MATRIX_ON_DANGEROUSWASTEHOLDER FOREIGN KEY (dangerous_waste_holder_id) REFERENCES users (id);
+# Power of attorney
 
 INSERT IGNORE INTO sale_office_power_of_attorney_matrix(sales_office, sales_office_name, region) VALUES (100,'StorOslo','Oslofjord');
 INSERT IGNORE INTO sale_office_power_of_attorney_matrix(sales_office, sales_office_name, region) VALUES (101,'Asker/Bærum','Oslofjord');

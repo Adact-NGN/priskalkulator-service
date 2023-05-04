@@ -57,6 +57,7 @@ class PriceOfferServiceImplTest {
 
         if(alex == null) {
             alex = userService.save(User.builder()
+                            .id(39L)
                             .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
                             .name("Alexander")
                             .sureName("Brox")

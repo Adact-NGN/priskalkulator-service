@@ -25,7 +25,7 @@ public class SalesOfficeDTO {
     private List<ZoneDTO> zones;
     private String salesOffice;
     @JsonAlias({"name"})
-    private String salesOfficeName;
+    private String name;
     private String salesOrg;
     private String postalCode;
     private String city;

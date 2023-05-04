@@ -101,6 +101,13 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setStandardPrice(materialPriceRow.getStandardPrice());
         entity.setAmount(materialPriceRow.getAmount());
         entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
+        entity.setCategoryId(materialPriceRow.getCategoryId());
+        entity.setCategoryDescription(materialPriceRow.getCategoryDescription());
+        entity.setSubCategoryId(materialPriceRow.getSubCategoryId());
+        entity.setSubCategoryDescription(materialPriceRow.getSubCategoryDescription());
+        entity.setClassId(materialPriceRow.getClassId());
+        entity.setClassDescription(materialPriceRow.getClassDescription());
+
 
         if(materialPriceRow.getMaterial() != null) {
             Material material = materialPriceRow.getMaterial();
@@ -186,6 +193,13 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setPricingUnit(from.getPricingUnit());
         to.setQuantumUnit(from.getQuantumUnit());
         to.setSalesZone(from.getSalesZone());
+
+        to.setCategoryId(from.getCategoryId());
+        to.setCategoryDescription(from.getCategoryDescription());
+        to.setSubCategoryId(from.getSubCategoryId());
+        to.setSubCategoryDescription(from.getSubCategoryDescription());
+        to.setClassId(from.getClassId());
+        to.setClassDescription(from.getClassDescription());
     }
     
     private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {

@@ -27,7 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-//@EqualsAndHashCode
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
 public class SalesRole implements Serializable {

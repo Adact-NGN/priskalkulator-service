@@ -27,7 +27,7 @@ import java.util.Date;
 public class PriceOfferTerms extends Auditable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column

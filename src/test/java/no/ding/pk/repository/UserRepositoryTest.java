@@ -14,18 +14,18 @@ import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import no.ding.pk.domain.User;
 
-@SpringBootTest
-@TestPropertySource("/application.properties")
+@DataJpaTest
+@TestPropertySource("/h2-db.properties")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserRepositoryTest {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     private UserRepository repository;
@@ -38,7 +38,7 @@ public class UserRepositoryTest {
         user.setName("Test");
         user.setSureName("Testesen");
 
-        entityManager.persist(user);
+        repository.save(user);
 
         List<User> actual = repository.findBySureName("Testesen");
 
