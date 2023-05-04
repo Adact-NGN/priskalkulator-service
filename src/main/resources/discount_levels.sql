@@ -25,14 +25,14 @@ create table if not exists discount_levels
         foreign key (discount_id) references discount_matrix (id)
 );
 
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (2, null, 0, 0, null, 1);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (3, null, 0.05, 1, null, 1);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (4, null, 0.1, 2, null, 1);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (5, null, 0.15, 3, null, 1);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (7, null, 0, 0, null, 6);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (8, null, 0.05, 1, null, 6);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (9, null, 0.1, 2, null, 6);
-INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (10, null, 0.15, 3, null, 6);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (2, null, 0, 0, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (3, null, 0.05, 1, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (4, null, 0.1, 2, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (5, null, 0.15, 3, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (7, null, 0, 0, null, (SELECT id from discount_matrix where material_number = 'C-04L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (8, null, 0.05, 1, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (9, null, 0.1, 2, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (10, null, 0.15, 3, null, (SELECT id from discount_matrix where material_number = 'C-02L'));
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (12, null, 0, 0, null, 11);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (13, null, 0.05, 1, null, 11);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id) VALUES (14, null, 0.1, 2, null, 11);
