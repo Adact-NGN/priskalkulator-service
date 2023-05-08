@@ -1,9 +1,7 @@
 package no.ding.pk.web.controllers.v1;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.Terms;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
 import org.modelmapper.ModelMapper;
@@ -11,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,16 +32,13 @@ import java.util.Optional;
 public class PriceOfferController {
     
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
-    
-    private final ObjectMapper objectMapper;
-    
+
     private final PriceOfferService service;
 
     private final ModelMapper modelMapper;
 
     @Autowired
     public PriceOfferController(ObjectMapper objectMapper, PriceOfferService service, ModelMapper modelMapper) {
-        this.objectMapper = objectMapper;
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -52,7 +48,7 @@ public class PriceOfferController {
      * @return List of {@code PriceOffer}
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasAuthority('SCOPE_Sales')")
+    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public List<PriceOffer> list() {
         List<PriceOffer> priceOfferList = service.findAll();
         
@@ -65,7 +61,7 @@ public class PriceOfferController {
     
     /**
      * Get {@code PriceOffer} by id
-     * @param id
+     * @param id for entity to get.
      * @return PriceOffer object, else empty if not found
      */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

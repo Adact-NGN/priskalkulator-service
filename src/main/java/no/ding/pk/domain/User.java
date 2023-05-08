@@ -29,7 +29,7 @@ import java.io.Serializable;
 @Entity
 @NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
-public class User implements Serializable {
+public class User extends Auditable implements Serializable {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
