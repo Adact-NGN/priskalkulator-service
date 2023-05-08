@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PriceOfferDTO {
     private Long id;
+    private String priceOfferStatus;
     private String customerNumber;
     private String customerName;
     private List<SalesOfficeDTO> salesOfficeList;
@@ -29,6 +30,7 @@ public class PriceOfferDTO {
     private UserDTO approver;
     private Boolean isApproved;
     private Boolean needsApproval;
+    private Date activationDate;
     private TermsDTO customerTerms;
     private Date dateIssued;
     private String createdBy;

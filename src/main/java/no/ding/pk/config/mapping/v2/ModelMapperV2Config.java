@@ -4,6 +4,7 @@ import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
@@ -11,6 +12,7 @@ import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
+import no.ding.pk.web.dto.web.client.offer.SalesOfficeDTO;
 import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -63,6 +65,12 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(Zone.class, ZoneDTO.class)
                 .addMapping(Zone::getZoneId, ZoneDTO::setNumber)
                 .addMapping(Zone::getPriceRows, ZoneDTO::setMaterialList);
+
+        modelMapper.typeMap(SalesOffice.class, SalesOfficeDTO.class)
+                        .addMapping(SalesOffice::getSalesOfficeName, SalesOfficeDTO::setName);
+
+        modelMapper.typeMap(SalesOfficeDTO.class, SalesOffice.class)
+                        .addMapping(SalesOfficeDTO::getName, SalesOffice::setSalesOfficeName);
 
         priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
 
