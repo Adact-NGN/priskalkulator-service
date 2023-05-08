@@ -72,7 +72,7 @@ public class StartUpDev {
 
                 if(admin != null && admin.getUserList() != null && !admin.getUserList().contains(kjetil)) {
                         admin.addUser(kjetil);
-                        admin = salesRoleService.save(admin);
+                        salesRoleService.save(admin);
                 }
 
                 User alex = userService.findByEmail("alexander.brox@ngn.no");
@@ -176,7 +176,7 @@ public class StartUpDev {
                         .materialList(materialList)
                         .transportServiceList(transportMaterialList)
                         .rentalList(rentalMaterialList)
-                        .zones(zoneList)
+                        .zoneList(zoneList)
                         .build();
 
                 List<SalesOffice> salesOfficeList = List.of(salesOffice);

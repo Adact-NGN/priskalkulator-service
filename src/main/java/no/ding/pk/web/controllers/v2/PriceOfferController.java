@@ -100,11 +100,6 @@ public class PriceOfferController {
         log.debug("Trying to update price offer with id: {}", id);
         log.debug("Values received for PriceOffer: {}", priceOfferDTO);
 
-        if(id == null) {
-            log.error("Put request was given non existing price offer to update.");
-            return null;
-        }
-
         Optional<PriceOffer> result = service.findById(id);
 
         if(result.isEmpty()) {

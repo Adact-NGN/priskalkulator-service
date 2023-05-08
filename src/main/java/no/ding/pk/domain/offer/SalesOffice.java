@@ -61,7 +61,7 @@ public class SalesOffice {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "zones_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_zone"))
     @LazyCollection(LazyCollectionOption.FALSE)
-    private List<Zone> zones;
+    private List<Zone> zoneList;
 
     @OneToMany()
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)

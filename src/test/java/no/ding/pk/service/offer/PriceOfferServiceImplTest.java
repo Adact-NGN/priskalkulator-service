@@ -167,7 +167,7 @@ class PriceOfferServiceImplTest {
                 .postalNumber("1601")
                 .city("FREDRIKSTAD")
                 .materialList(materialList)
-                .zones(zoneList)
+                .zoneList(zoneList)
                 .build();
 
         List<SalesOffice> salesOfficeList = List.of(salesOffice);

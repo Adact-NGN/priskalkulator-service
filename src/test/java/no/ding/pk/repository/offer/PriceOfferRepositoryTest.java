@@ -156,7 +156,7 @@ public class PriceOfferRepositoryTest {
                 .salesOffice("127")
                 .salesOrg("100")
                 .postalNumber("1601")
-                .zones(zoneList)
+                .zoneList(zoneList)
                 .materialList(wastePriceRowList)
                 .build();
 
@@ -272,7 +272,7 @@ public class PriceOfferRepositoryTest {
                 .salesOffice("127")
                 .salesOrg("100")
                 .postalNumber("1601")
-                .zones(zoneList)
+                .zoneList(zoneList)
                 .materialList(wastePriceRowList)
                 .build();
 
