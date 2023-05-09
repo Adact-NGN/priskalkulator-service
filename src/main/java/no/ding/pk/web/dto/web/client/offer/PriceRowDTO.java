@@ -1,6 +1,7 @@
 package no.ding.pk.web.dto.web.client.offer;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,7 +37,9 @@ public class PriceRowDTO {
     private Double priceIncMva;
     private Date dateUpdated;
     private Date dateCreated;
+    @JsonProperty(defaultValue = "false")
     private Integer discountLevel;
+    private Boolean discountLevelExceeded;
     private PriceRowDTO combinedMaterials;
     private String categoryId;
     private String categoryDescription;

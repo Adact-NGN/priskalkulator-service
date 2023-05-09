@@ -7,7 +7,7 @@ public enum PriceOfferStatus {
     APPROVED_SENT_TO_CUSTOMER("Godkjent, sendt til kunde"),
     ACTIVATED("Aktivert");
 
-    private String status;
+    private final String status;
 
     PriceOfferStatus(String status) {
         this.status = status;

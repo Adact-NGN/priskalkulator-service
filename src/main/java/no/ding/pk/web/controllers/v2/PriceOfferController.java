@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import org.modelmapper.ModelMapper;
@@ -90,6 +91,7 @@ public class PriceOfferController {
 
         log.debug("Resulting priceOffer: {}", priceOffer.toString());
 
+        priceOffer.setPriceOfferStatus(PriceOfferStatus.OFFER_CREATED.getStatus());
         priceOffer = service.save(priceOffer);
 
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
