@@ -20,11 +20,21 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Entity
 @Table(name = "sap_contact_persons")
-public class ContactPerson {
+public class SapContactPerson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @Column
+    private String firstName;
 
+    @Column
+    private String lastName;
+
+    @Column
+    private String mobileNumber;
+
+    @Column
+    private String emailAddress;
 }

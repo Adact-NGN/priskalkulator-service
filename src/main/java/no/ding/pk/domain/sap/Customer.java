@@ -105,7 +105,7 @@ public class Customer {
     private String abcClassification;
 
     @OneToMany
-    private List<ContactPerson> contactPersons;
+    private List<SapContactPerson> sapContactPeople;
 
     @OneToMany
     private List<CustomerBranch> customerBranchList;

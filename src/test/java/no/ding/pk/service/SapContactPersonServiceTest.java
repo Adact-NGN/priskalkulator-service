@@ -38,9 +38,9 @@ import static org.hamcrest.core.IsNot.not;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-public class ContactPersonServiceTest {
+public class SapContactPersonServiceTest {
     
-    private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts";
+    private final String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts";
 
     @Autowired
     private SapHttpClient sapHttpClient;

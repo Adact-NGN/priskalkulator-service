@@ -63,8 +63,8 @@ public class PriceOffer extends Offer implements Serializable {
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
             Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
-                      String priceOfferStatus, Date activationDate) {
-        super(id, customerNumber, customerName, needsApproval, approved, approvalDate,
+                      String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
+        super(id, customerNumber, customerName, contactPersonList, needsApproval, approved, approvalDate,
                 dateIssued);
 
         this.salesOfficeList = salesOfficeList;

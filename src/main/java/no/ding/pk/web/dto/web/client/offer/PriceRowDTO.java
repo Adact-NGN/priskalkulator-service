@@ -37,9 +37,9 @@ public class PriceRowDTO {
     private Double priceIncMva;
     private Date dateUpdated;
     private Date dateCreated;
-    @JsonProperty(defaultValue = "false")
     private Integer discountLevel;
-    private Boolean discountLevelExceeded;
+    @JsonProperty(defaultValue = "false")
+    private Boolean needsApproval;
     private PriceRowDTO combinedMaterials;
     private String categoryId;
     private String categoryDescription;

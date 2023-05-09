@@ -22,6 +22,7 @@ public class PriceOfferDTO {
     private String priceOfferStatus;
     private String customerNumber;
     private String customerName;
+    private List<ContactPersonDTO> contactPersonList;
     private List<SalesOfficeDTO> salesOfficeList;
     private Date dateUpdated;
     private Date dateCreated;

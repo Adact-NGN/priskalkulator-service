@@ -68,6 +68,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
+        entity.setContactPersonList(newPriceOffer.getContactPersonList());
+
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
                 List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
