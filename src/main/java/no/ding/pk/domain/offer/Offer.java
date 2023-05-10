@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,21 @@ public class Offer extends Auditable {
 
     @Column
     private Date dateIssued;
+
+    public List<ContactPerson> getContactPersonList() {
+        return contactPersonList;
+    }
+
+    public void setContactPersonList(List<ContactPerson> contactPersonList) {
+        if(this.contactPersonList == null) {
+            this.contactPersonList = new ArrayList<>();
+        }
+
+        this.contactPersonList.clear();
+        if(contactPersonList != null && !contactPersonList.isEmpty()) {
+            this.contactPersonList.addAll(contactPersonList);
+        }
+    }
 
     @Override
     public String toString() {
