@@ -29,6 +29,9 @@ public class Offer extends Auditable {
     private Long id;
 
     @Column
+    private Boolean deleted = false;
+
+    @Column
     private String customerNumber;
 
     @Column
@@ -54,6 +57,7 @@ public class Offer extends Auditable {
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
+                "deleted = " + deleted + ", " +
                 "createdBy = " + createdBy + ", " +
                 "createdDate = " + createdDate + ", " +
                 "lastModifiedBy = " + lastModifiedBy + ", " +
