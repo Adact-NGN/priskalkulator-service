@@ -8,7 +8,7 @@ metadata:
     tier: backend
 spec:
   progressDeadlineSeconds: 3600
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ding-ip-app-pk

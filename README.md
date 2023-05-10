@@ -169,6 +169,29 @@ You get the pod names with:
 kubectl get pod
 ```
 
+## Troubleshooting AKS
+
+### Check to see if application is running in the cluster
+Prerequisite: 
+ - Kubernetes client (Kubectl) is installed.
+ - Make sure you are connected to your cluster.
+
+Optional Prerequisite:
+ - K9s
+
+Install interactive shell in the cluster:
+```
+kubectl run -it --rm aks-ssh --image=debian:stable
+```
+
+From here you can communicate directly with other pods or services within the cluster.
+
+Install the tools you need to test your application.
+Ex. Install cUrl:
+```
+apt-get update -y && apt-get install dnsutils -y && apt-get install curl -y
+```
+
 # Contribute
 TODO: Explain how other users and developers can contribute to make your code better. 
 
