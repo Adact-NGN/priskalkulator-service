@@ -5,7 +5,9 @@ on:
   push:
     branches:
       - develop
-    tags: ["v*.*.*"]
+    tags: 
+      - '*'
+    # ["v*.*.*"]
 
 env:
   IMAGE_NAME: ding-ip-app-pk-service
