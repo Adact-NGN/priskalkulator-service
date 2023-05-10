@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,7 +138,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             return false;
         }
 
-        repository.delete(priceOffer.get());
+        PriceOffer entity = priceOffer.get();
+
+        entity.getCustomerTerms().setAgreementEndDate(new Date());
+        entity.setDeleted(true);
 
         return !repository.existsById(id);
     }
