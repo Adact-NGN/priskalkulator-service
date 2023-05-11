@@ -107,7 +107,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setSubCategoryDescription(materialPriceRow.getSubCategoryDescription());
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
-
+        entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
 
         if(materialPriceRow.getMaterial() != null) {
             Material material = materialPriceRow.getMaterial();
