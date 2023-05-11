@@ -84,7 +84,6 @@ public class ModelMapperV2Config {
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         Converter<String, Material> stringToMaterial = c -> {
             if(c.getSource() != null) {
-                log.debug("Converting {} to material object", c.getSource());
                 Material material = materialRepository.findByMaterialNumber(c.getSource());
 
                 if(material != null) {

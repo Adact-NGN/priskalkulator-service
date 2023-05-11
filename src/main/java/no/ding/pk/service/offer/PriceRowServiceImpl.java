@@ -109,14 +109,16 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setClassDescription(materialPriceRow.getClassDescription());
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
 
+        entity = repository.save(entity);
+
         if(materialPriceRow.getMaterial() != null) {
-            Material material = materialPriceRow.getMaterial();
+            Material material = getMaterial(materialPriceRow.getMaterial());
             log.debug("PriceRow->Material: {}", material);
 
             EntityManager em = emFactory.createEntityManager();
             log.debug("Is material attached: {}", em.contains(material));
 
-            if(material.getId() == null) {
+            if(material != null && material.getId() == null) {
 
                 em.getTransaction().begin();
                 List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
@@ -159,8 +161,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                     entity.setMaterial(material);
                 }
 
-            } else {
-                material = materialService.save(material);
+            } else if(material != null) {
+                log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
                 entity.setMaterial(material);
             }
 
@@ -178,6 +180,16 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         return repository.save(entity);
+    }
+
+    private Material getMaterial(Material material) {
+
+        if(material.getId() != null) {
+            log.debug("Material has ID: {}", material.getId());
+            return materialService.findById(material.getId()).orElse(material);
+        }
+        log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
+        return materialService.findByMaterialNumber(material.getMaterialNumber());
     }
 
     private void updateMaterial(Material to, Material from) {

@@ -1,20 +1,18 @@
 package no.ding.pk.service.offer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
+import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.repository.offer.MaterialRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.repository.offer.MaterialRepository;
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -40,6 +38,7 @@ public class MaterialServiceImpl implements MaterialService {
         
         log.debug("Searching for material with number: {}", material.getMaterialNumber());
         Material entity = repository.findByMaterialNumber(material.getMaterialNumber());
+        log.debug("Found material: {}", entity);
         
         if(entity == null) {
             log.debug("Didn't find a material with the number: {}", material.getMaterialNumber());
