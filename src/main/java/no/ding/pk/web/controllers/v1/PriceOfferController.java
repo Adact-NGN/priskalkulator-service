@@ -58,7 +58,7 @@ public class PriceOfferController {
         
         return new ArrayList<>();
     }
-    
+
     /**
      * Get {@code PriceOffer} by id
      * @param id for entity to get.

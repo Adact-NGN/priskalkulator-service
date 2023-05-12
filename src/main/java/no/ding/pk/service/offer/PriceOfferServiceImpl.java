@@ -146,4 +146,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return !repository.existsById(id);
     }
 
+    @Override
+    public List<PriceOffer> findAllBySalesEmployeeId(Long userId) {
+        return repository.findAllBySalesEmployeeId(userId);
+    }
+
+    @Override
+    public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId) {
+        return repository.findAllByApproverIdAndNeedsApprovalEqualsTrue(approverId);
+    }
+
 }

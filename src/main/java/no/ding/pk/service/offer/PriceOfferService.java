@@ -14,4 +14,8 @@ public interface PriceOfferService {
     List<PriceOffer> findAll();
 
     boolean delete(Long id);
+
+    List<PriceOffer> findAllBySalesEmployeeId(Long userId);
+
+    List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId);
 }

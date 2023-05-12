@@ -47,6 +47,10 @@ public class PriceOfferController {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Get all price offers
+     * @return List of price offers, else empty list
+     */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> list() {
         List<PriceOffer> priceOfferList = service.findAll();
@@ -58,6 +62,43 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
+    /**
+     * Get all price offers created by sales employee
+     * @param salesEmployeeId User id to list price offers for.
+     * @return list of price offers connected to sales employee, else empty list.
+     */
+    @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PriceOfferDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
+        List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
+
+        if(!priceOffers.isEmpty()) {
+            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
+        }
+
+        return new ArrayList<>();
+    }
+
+    /**
+     * Find all that needs approval.l
+     * @param approverId approver user id
+     * @return List of price offers for approver
+     */
+    @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PriceOfferDTO> listByApprocer(@PathVariable("approverId") Long approverId) {
+        List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId);
+
+        if(!priceOffers.isEmpty()) {
+            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
+        }
+
+        return new ArrayList<>();
+    }
+
+    /**
+     * Get price offer by id
+     * @param id price offer id
+     * @return Price offer, else null
+     */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO getById(@PathVariable("id") Long id) {
         if(id != null) {
@@ -80,6 +121,12 @@ public class PriceOfferController {
         return new ResponseEntity<>("Sales employee not set", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Create new Price offer
+     * @param priceOfferDTO Price offer values
+     * @return Newly created price offer
+     * @throws JsonProcessingException if not real JSON is passed
+     */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceOfferDTO> create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Got new Price offer object: " + priceOfferDTO);
@@ -97,6 +144,13 @@ public class PriceOfferController {
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
 
+    /**
+     * Update price offer
+     * @param id Price offer id
+     * @param priceOfferDTO New values for price offer
+     * @return Updated price offer
+     * @throws JsonProcessingException if not real JSON is passed.
+     */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
@@ -116,6 +170,11 @@ public class PriceOfferController {
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
 
+    /**
+     * Soft deletes price offer by id
+     * @param id Price offer id
+     * @return true if deleted, else false
+     */
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);
