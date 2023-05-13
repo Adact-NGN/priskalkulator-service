@@ -78,7 +78,7 @@ $ docker run --detach --name some-mariadb --env MARIADB_USER=example-user --env 
 ```
 
 The <i>docker-compose.yml</i> contains two services. The first is the application, and the second is the database.<br/>
-It is advised to build the database before the application to prepear it before the application is beeing used.
+It is advised to build the database before the application to prepare it before the application is being used.
 
 To only build the database run the following command:
 
@@ -120,6 +120,8 @@ flush privileges;
 ## 3. Latest releases
 Latest release of this project is in the <i>develop</i> branch.
 ## 4. API references
+### Application Swagger API
+
 ### SAP API
 The application is mainly communicating with SAP. It gets all the information it needs about, standard prices, customer, contactinformation etc. from here.
 

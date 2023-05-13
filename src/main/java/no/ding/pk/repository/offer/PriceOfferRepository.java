@@ -15,5 +15,5 @@ public interface PriceOfferRepository extends JpaRepository<PriceOffer, Long> {
 
     List<PriceOffer> findAllBySalesEmployeeId(Long salesEmployeeId);
 
-    List<PriceOffer> findAllByApproverIdAndNeedsApprovalEqualsTrue(Long approverId);
+    List<PriceOffer> findAllByApproverIdAndNeedsApprovalIsTrue(Long approverId);
 }

@@ -153,7 +153,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId) {
-        return repository.findAllByApproverIdAndNeedsApprovalEqualsTrue(approverId);
+        return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
     }
 
 }
