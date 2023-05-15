@@ -18,4 +18,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllBySalesEmployeeId(Long userId);
 
     List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId);
+
+    Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved);
 }

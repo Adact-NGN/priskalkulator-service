@@ -6,6 +6,8 @@ import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import no.ding.pk.web.handlers.PriceOfferNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +67,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setCustomerName(newPriceOffer.getCustomerName());
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
-        entity.setIsApproved(newPriceOffer.getIsApproved());
+        // entity.setIsApproved(newPriceOffer.getIsApproved());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
@@ -154,6 +156,24 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     @Override
     public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId) {
         return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
+    }
+
+    @Override
+    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved) {
+        PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
+
+        if(priceOfferToApprove == null) {
+            throw new PriceOfferNotFoundException();
+        }
+
+        if(approved) {
+            priceOfferToApprove.setIsApproved(approved);
+
+            
+        } else {
+            priceOfferToApprove.setIsApproved(approved);
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'approvePriceOffer'");
     }
 
 }
