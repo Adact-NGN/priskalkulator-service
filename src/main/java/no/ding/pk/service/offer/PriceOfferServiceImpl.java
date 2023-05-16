@@ -8,7 +8,6 @@ import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.PriceOfferNotFoundException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +70,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setCustomerName(newPriceOffer.getCustomerName());
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
+
+
+
         // entity.setIsApproved(newPriceOffer.getIsApproved());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
@@ -81,10 +85,15 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
                 entity.setSalesOfficeList(salesOffices);
 
-                List<String> materialsInList = getAllMaterialsInList(entity);
-                entity.setMaterialsInOffer(materialsInList);
-
                 entity = repository.save(entity);
+            }
+        }
+
+        if(newPriceOffer.getNeedsApproval() && !newPriceOffer.getIsApproved()) {
+            List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+
+            if(!materialsForApproval.isEmpty()) {
+                entity.setMaterialsInOffer(String.join(",", materialsForApproval));
             }
         }
 
@@ -103,22 +112,25 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return repository.save(entity);
     }
 
-    private List<String> getAllMaterialsInList(PriceOffer priceOffer) {
+    private List<String> getAllMaterialsForApproval(PriceOffer priceOffer) {
         List<String> materialsInPriceOffer = new ArrayList<>();
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
-            for(PriceRow pr : salesOffice.getMaterialList()) {
-                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
-            }
+            collectMaterial(materialsInPriceOffer, salesOffice.getMaterialList());
 
-            for(PriceRow pr : salesOffice.getTransportServiceList()) {
-                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
-            }
+            collectMaterial(materialsInPriceOffer, salesOffice.getTransportServiceList());
 
-            for(PriceRow pr : salesOffice.getRentalList()) {
+            collectMaterial(materialsInPriceOffer, salesOffice.getRentalList());
+        }
+        Collections.sort(materialsInPriceOffer);
+        return materialsInPriceOffer;
+    }
+
+    private static void collectMaterial(List<String> materialsInPriceOffer, List<PriceRow> priceRows) {
+        for(PriceRow pr : priceRows) {
+            if(pr.getNeedsApproval()) {
                 materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
             }
         }
-        return materialsInPriceOffer;
     }
 
     private User checkAndGetSalesEmployee(User salesEmployee) {
@@ -130,7 +142,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             log.debug("User: {}", salesEmployee);
 
             if (persistedSalesEmployee == null) {
-                // TODO: Create own exception
                 throw new EmployeeNotProvidedException("No sales employee provided!");
             }
 
@@ -205,6 +216,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
         boolean anyMaterialNeedsReApproval = false;
+
+        List<String> currentMaterialInPriceOffer = getAllMaterialsForApproval(priceOfferToApprove);
+        List<String> previousMaterialInPriceOffer = Arrays.stream(priceOfferToApprove.getOldMaterialsInOffer().split(",")).toList();
 
         return anyMaterialNeedsReApproval;
     }
