@@ -13,7 +13,7 @@ steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
 - bash: |
-    git push --prune https://$(GITHUB_PATH)/$(REPO_NAME) \
+    git push --prune https://$(USERNAME):$(DEVOPS_PAT)@$(GITHUB_PATH)/$(REPO_NAME) \
     +refs+/remotes/origin/*:refs/heads/* +refs/tags/*:refs/tags/*
   displayName: 'Copy to Github'
   condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
