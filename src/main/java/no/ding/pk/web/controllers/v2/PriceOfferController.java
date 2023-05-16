@@ -1,6 +1,5 @@
 package no.ding.pk.web.controllers.v2;
 
-import com.azure.core.annotation.QueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import no.ding.pk.domain.PowerOfAttorney;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class PriceOfferController {
     * @return
     */
     @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
-    public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId, @PathVariable("priceOfferId") Long priceOfferId, @QueryParam("approved") Boolean approved) {
+    public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId, @PathVariable("priceOfferId") Long priceOfferId, @RequestParam("approved") Boolean approved) {
         return service.approvePriceOffer(priceOfferId, approverId, approved);
     }
     

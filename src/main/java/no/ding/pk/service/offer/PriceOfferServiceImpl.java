@@ -2,6 +2,7 @@ package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +80,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
 
                 entity.setSalesOfficeList(salesOffices);
+
+                List<String> materialsInList = getAllMaterialsInList(entity);
+                entity.setMaterialsInOffer(materialsInList);
+
                 entity = repository.save(entity);
             }
         }
@@ -95,6 +101,24 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private List<String> getAllMaterialsInList(PriceOffer priceOffer) {
+        List<String> materialsInPriceOffer = new ArrayList<>();
+        for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
+            for(PriceRow pr : salesOffice.getMaterialList()) {
+                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
+            }
+
+            for(PriceRow pr : salesOffice.getTransportServiceList()) {
+                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
+            }
+
+            for(PriceRow pr : salesOffice.getRentalList()) {
+                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
+            }
+        }
+        return materialsInPriceOffer;
     }
 
     private User checkAndGetSalesEmployee(User salesEmployee) {
@@ -169,11 +193,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(approved) {
             priceOfferToApprove.setIsApproved(approved);
 
-            
+            boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
+            priceOfferToApprove.setNeedsApproval(needsReApproval);
+
+
         } else {
             priceOfferToApprove.setIsApproved(approved);
         }
         throw new UnsupportedOperationException("Unimplemented method 'approvePriceOffer'");
+    }
+
+    private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
+        boolean anyMaterialNeedsReApproval = false;
+
+        return anyMaterialNeedsReApproval;
     }
 
 }
