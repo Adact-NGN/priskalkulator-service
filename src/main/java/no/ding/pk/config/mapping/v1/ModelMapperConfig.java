@@ -5,6 +5,7 @@ import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
@@ -13,6 +14,7 @@ import no.ding.pk.web.dto.v1.web.client.MaterialDTO;
 import no.ding.pk.web.dto.v1.web.client.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -42,6 +44,14 @@ public class ModelMapperConfig {
         modelMapper.typeMap(MaterialDTO.class, Material.class)
                 .addMapping(MaterialDTO::getMaterial, Material::setMaterialNumber);
 
+        modelMapper.typeMap(ZoneDTO.class, Zone.class)
+                .addMapping(ZoneDTO::getNumber, Zone::setZoneId)
+                .addMapping(ZoneDTO::getMaterialList, Zone::setPriceRows);
+
+        modelMapper.typeMap(Zone.class, ZoneDTO.class)
+                .addMapping(Zone::getZoneId, ZoneDTO::setNumber)
+                .addMapping(Zone::getPriceRows, ZoneDTO::setMaterialList);
+
         priceRowDtoToPriceRowTypeMapping(modelMapper);
 
         userToUserDtoTypeMapping(modelMapper);
@@ -69,8 +79,6 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getMailOrdinaryWasteLvlOne, PowerOfAttorney::setOrdinaryWasteLvlOneHolder))
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getMailOrdinaryWasteLvlTwo, PowerOfAttorney::setOrdinaryWasteLvlTwoHolder))
                 .addMappings(mapper -> mapper.using(emailStringToUser).map(SalesOfficePowerOfAttorneyDTO::getDangerousWaste, PowerOfAttorney::setDangerousWasteHolder));
-
-//        TypeMap<SalesOfficePowerOfAttorneyDTO, PowerOfAttorney> sopoaToPaoTypeMap = modelMapper.createTypeMap(SalesOfficePowerOfAttorneyDTO.class, PowerOfAttorney.class);
     }
 
     private static void powerOfAttorneyToSalesOfficePowerOfAttorneyDto(ModelMapper modelMapper) {

@@ -1,8 +1,6 @@
 package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.offer.CustomerTerms;
-import no.ding.pk.domain.offer.CustomerTermsPK;
-import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.CustomerTermsRepository;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -43,16 +41,13 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     }
 
     @Override
-    public CustomerTerms save(SalesOffice salesOffice, String customerNumber, CustomerTerms customerTerms) {
-        List<CustomerTerms> currentCustomerTerms = repository.findAllBySalesOfficeAndCustomerNumber(salesOffice.getSalesOffice(), customerNumber);
+    public CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms) {
+        List<CustomerTerms> currentCustomerTerms = repository.findAllBySalesOfficeAndCustomerNumber(salesOffice, customerNumber);
 
         invalidatePreviousCustomerTerm(currentCustomerTerms);
 
-        CustomerTermsPK termsPK = createTermsPK(salesOffice, customerNumber, currentCustomerTerms);
-
         ModelMapper modelMapper = new ModelMapper();
         CustomerTerms newTerm = modelMapper.map(customerTerms, CustomerTerms.class);
-        newTerm.setId(termsPK);
 
         newTerm = repository.save(newTerm);
 
@@ -60,12 +55,9 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
         return newTerm;
     }
 
-    private static CustomerTermsPK createTermsPK(SalesOffice salesOffice, String customerNumber, List<CustomerTerms> currentCustomerTerms) {
-        CustomerTermsPK customerTermsPK = new CustomerTermsPK();
-        customerTermsPK.setSalesOfficeId(Long.parseLong(salesOffice.getSalesOffice()));
-        customerTermsPK.setCustomerId(Long.parseLong(customerNumber));
-        customerTermsPK.setSerialNumber(currentCustomerTerms.size());
-        return customerTermsPK;
+    @Override
+    public List<CustomerTerms> findAll() {
+        return repository.findAll();
     }
 
     private void invalidatePreviousCustomerTerm(List<CustomerTerms> currentCustomerTerms) {

@@ -101,7 +101,7 @@
           "priceIncMva": -1
         }
       ],
-      "zones": [
+      "zoneList": [
         {
           "zoneId": "2",
           "postalCode": "3943",

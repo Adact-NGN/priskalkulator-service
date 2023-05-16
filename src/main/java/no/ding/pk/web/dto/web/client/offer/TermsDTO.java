@@ -18,20 +18,25 @@ public class TermsDTO {
     private Date agreementEndDate;
     private Date agreementStartDate;
     private String contractTerm;
-    private Boolean customerRequireNotification; // false,
+    
     private String indexRent;
     private String indexTransport;
     private String indexWaste;
     private String invoiceInterval;
     private String metalPricing;
     private Date metalSetDateForOffer;
-    private Integer monthsToFreezeCustomerFromAdjustments; // 6,
+    private Integer monthsToFreezeCustomerFromAdjustments;
     private String newOrEstablishedCustomer;
+    
+    // Notification settings
+    private Boolean customerRequireNotification;
     private String notificationMailAddress;
+    private Integer requiredNumberOfDaysNotice;
+    
     private String paymentCondition;
     private Date priceAdjustmentDate;
     private String quarterlyAdjustment;
-    private Integer requiredNumberOfDaysNotice;
+    
     private String specialConditionAction;
     private String comment;
 

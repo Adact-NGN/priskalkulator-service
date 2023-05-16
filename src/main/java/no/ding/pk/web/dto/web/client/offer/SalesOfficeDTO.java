@@ -22,10 +22,10 @@ public class SalesOfficeDTO {
     private List<PriceRowDTO> rentalList;
     private List<PriceRowDTO> transportServiceList;
     @JsonAlias("zoneList")
-    private List<ZoneDTO> zones;
+    private List<ZoneDTO> zoneList;
     private String salesOffice;
     @JsonAlias({"name"})
-    private String salesOfficeName;
+    private String name;
     private String salesOrg;
     private String postalCode;
     private String city;

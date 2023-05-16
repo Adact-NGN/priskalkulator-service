@@ -1,5 +1,16 @@
 package no.ding.pk.domain.offer;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import no.ding.pk.domain.Auditable;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,25 +23,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import no.ding.pk.domain.Auditable;
-
 import java.util.List;
 
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -39,7 +35,7 @@ import java.util.List;
 @Table(name = "price_rows")
 public class PriceRow extends Auditable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
@@ -61,6 +57,9 @@ public class PriceRow extends Auditable {
 
     @Column
     private Integer discountLevel;
+
+    @Column
+    private Boolean needsApproval = false;
     
     @Column
     private Double discountLevelPrice;
@@ -74,6 +73,19 @@ public class PriceRow extends Auditable {
     @Column
     private Double priceIncMva;
 
+    @Column
+    private String categoryId; // "
+    @Column
+    private String categoryDescription; // "
+    @Column
+    private String subCategoryId; // "
+    @Column
+    private String subCategoryDescription; // "
+    @Column
+    private String classId; // "
+    @Column
+    private String classDescription; // "
+
     @OneToMany
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
@@ -82,5 +94,31 @@ public class PriceRow extends Auditable {
 
     public boolean hasCombinedMaterials() {
         return combinedMaterials != null && !combinedMaterials.isEmpty();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "createdBy = " + createdBy + ", " +
+                "createdDate = " + createdDate + ", " +
+                "lastModifiedBy = " + lastModifiedBy + ", " +
+                "lastModifiedDate = " + lastModifiedDate + ", " +
+                "customerPrice = " + customerPrice + ", " +
+                "discountPct = " + discountPct + ", " +
+                "material = " + material + ", " +
+                "showPriceInOffer = " + showPriceInOffer + ", " +
+                "manualPrice = " + manualPrice + ", " +
+                "discountLevel = " + discountLevel + ", " +
+                "discountLevelPrice = " + discountLevelPrice + ", " +
+                "standardPrice = " + standardPrice + ", " +
+                "amount = " + amount + ", " +
+                "priceIncMva = " + priceIncMva + ", " +
+                "categoryId = " + categoryId + ", " +
+                "categoryDescription = " + categoryDescription + ", " +
+                "subCategoryId = " + subCategoryId + ", " +
+                "subCategoryDescription = " + subCategoryDescription + ", " +
+                "classId = " + classId + ", " +
+                "classDescription = " + classDescription + ")";
     }
 }

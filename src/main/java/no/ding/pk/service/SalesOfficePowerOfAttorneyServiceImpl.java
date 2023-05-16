@@ -50,4 +50,9 @@ public class SalesOfficePowerOfAttorneyServiceImpl implements SalesOfficePowerOf
 
         return byId.isEmpty();
     }
+
+    @Override
+    public List<PowerOfAttorney> findBySalesOfficeInList(List<Integer> salesOffices) {
+        return repository.findAllBysalesOfficeInList(salesOffices);
+    }
 }

@@ -6,12 +6,15 @@ import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import no.ding.pk.web.handlers.PriceOfferNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +43,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         PriceOffer entity = new PriceOffer();
         entity.setSalesEmployee(salesEmployee);
 
-        return repository.save(entity);
+        return entity;
     }
 
     @Override
@@ -64,9 +67,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setCustomerName(newPriceOffer.getCustomerName());
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
-        entity.setIsApproved(newPriceOffer.getIsApproved());
+        // entity.setIsApproved(newPriceOffer.getIsApproved());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
+
+        entity.setContactPersonList(newPriceOffer.getContactPersonList());
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
@@ -135,9 +140,40 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             return false;
         }
 
-        repository.delete(priceOffer.get());
+        PriceOffer entity = priceOffer.get();
+
+        entity.getCustomerTerms().setAgreementEndDate(new Date());
+        entity.setDeleted(true);
 
         return !repository.existsById(id);
+    }
+
+    @Override
+    public List<PriceOffer> findAllBySalesEmployeeId(Long userId) {
+        return repository.findAllBySalesEmployeeId(userId);
+    }
+
+    @Override
+    public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId) {
+        return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
+    }
+
+    @Override
+    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved) {
+        PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
+
+        if(priceOfferToApprove == null) {
+            throw new PriceOfferNotFoundException();
+        }
+
+        if(approved) {
+            priceOfferToApprove.setIsApproved(approved);
+
+            
+        } else {
+            priceOfferToApprove.setIsApproved(approved);
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'approvePriceOffer'");
     }
 
 }

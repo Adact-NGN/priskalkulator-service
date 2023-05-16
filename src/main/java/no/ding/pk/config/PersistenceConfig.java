@@ -8,7 +8,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = "no.ding.pk.repository")
-@EnableJpaAuditing
+@EnableJpaAuditing()
 public class PersistenceConfig {
-    
+
+//    @Bean
+//    public AuditorAware<String> auditorProvider() {
+//        return new AuditorAwareImpl();
+//    }
 }

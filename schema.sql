@@ -6,6 +6,8 @@ grant all privileges on pk_poal_db_dev.* TO 'admin'@'localhost' identified by 'a
 
 grant all privileges on pk_poal_db_dev.* TO 'admin'@'%' identified by 'admin1234';
 
+grant all privileges on pk_poal_db_dev.* TO 'admin'@'172.18.0.1' identified by 'admin1234';
+
 flush privileges;
 
 create table if not exists pk_poal_db_dev.discount_matrix

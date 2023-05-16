@@ -27,7 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-//@EqualsAndHashCode
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
 public class SalesRole implements Serializable {
@@ -42,11 +41,9 @@ public class SalesRole implements Serializable {
     private String description;
     
     @Column
-//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyOa;
     
     @Column
-//    @EqualsAndHashCode.Exclude
     private Integer defaultPowerOfAttorneyFa;
 
     @JsonManagedReference

@@ -15,5 +15,7 @@ public interface CustomerTermsService {
 
     Integer countAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
 
-    CustomerTerms save(SalesOffice salesOffice, String customerNumber, CustomerTerms customerTerms);
+    CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms);
+
+    List<CustomerTerms> findAll();
 }

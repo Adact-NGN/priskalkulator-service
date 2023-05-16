@@ -1,6 +1,5 @@
 package no.ding.pk.service.offer;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
@@ -41,8 +40,6 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     private final ModelMapper modelMapper;
 
-    private ObjectWriter objectWriter;
-    
     @PersistenceUnit
     private EntityManagerFactory emFactory;
     
@@ -104,21 +101,29 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setStandardPrice(materialPriceRow.getStandardPrice());
         entity.setAmount(materialPriceRow.getAmount());
         entity.setPriceIncMva(materialPriceRow.getPriceIncMva());
+        entity.setCategoryId(materialPriceRow.getCategoryId());
+        entity.setCategoryDescription(materialPriceRow.getCategoryDescription());
+        entity.setSubCategoryId(materialPriceRow.getSubCategoryId());
+        entity.setSubCategoryDescription(materialPriceRow.getSubCategoryDescription());
+        entity.setClassId(materialPriceRow.getClassId());
+        entity.setClassDescription(materialPriceRow.getClassDescription());
+        entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
+
+        entity = repository.save(entity);
 
         if(materialPriceRow.getMaterial() != null) {
-            Material material = materialPriceRow.getMaterial();
+            Material material = getMaterial(materialPriceRow.getMaterial());
             log.debug("PriceRow->Material: {}", material);
 
             EntityManager em = emFactory.createEntityManager();
             log.debug("Is material attached: {}", em.contains(material));
 
-            if(material.getId() == null) {
+            if(material != null && material.getId() == null) {
 
                 em.getTransaction().begin();
                 List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
                 em.getTransaction().commit();
                 em.close();
-                //                    Material persistedMaterial = materialService.findByMaterialNumber(material.getMaterialNumber());
 
                 if(materials != null && materials.size() > 0) {
                     Material persistedMaterial = (Material) materials.get(0);
@@ -144,7 +149,9 @@ public class PriceRowServiceImpl implements PriceRowService {
                     MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
 
                     if(sapMaterial != null) {
+                        log.debug("Mapping MaterialDTO: {}", sapMaterial);
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
+                        log.debug("Mapping result: {}", fromSap);
 
                         material = materialService.save(fromSap);
                     } else {
@@ -154,8 +161,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                     entity.setMaterial(material);
                 }
 
-            } else {
-                material = materialService.save(material);
+            } else if(material != null) {
+                log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
                 entity.setMaterial(material);
             }
 
@@ -175,6 +182,16 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
+    private Material getMaterial(Material material) {
+
+        if(material.getId() != null) {
+            log.debug("Material has ID: {}", material.getId());
+            return materialService.findById(material.getId()).orElse(material);
+        }
+        log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
+        return materialService.findByMaterialNumber(material.getMaterialNumber());
+    }
+
     private void updateMaterial(Material to, Material from) {
         log.debug("To: {}, from: {}", to, from);
         to.setDesignation(from.getDesignation());
@@ -188,6 +205,13 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setPricingUnit(from.getPricingUnit());
         to.setQuantumUnit(from.getQuantumUnit());
         to.setSalesZone(from.getSalesZone());
+
+        to.setCategoryId(from.getCategoryId());
+        to.setCategoryDescription(from.getCategoryDescription());
+        to.setSubCategoryId(from.getSubCategoryId());
+        to.setSubCategoryDescription(from.getSubCategoryDescription());
+        to.setClassId(from.getClassId());
+        to.setClassDescription(from.getClassDescription());
     }
     
     private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {

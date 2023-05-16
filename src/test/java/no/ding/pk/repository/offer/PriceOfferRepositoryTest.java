@@ -11,6 +11,7 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.UserRepository;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -59,6 +60,20 @@ public class PriceOfferRepositoryTest {
         priceOfferTemplate = offerTemplateRepository.save(priceOfferTemplate);
 
         assertThat(priceOfferTemplate.getId(), notNullValue());
+    }
+
+    @Disabled
+    @Test
+    public void shouldGetTrueWhenOfferIsDelete() {
+        PriceOffer priceOffer = (PriceOffer) createCompleteOffer();
+
+        priceOffer = repository.save(priceOffer);
+
+        priceOffer.setDeleted(true);
+
+        priceOffer = repository.save(priceOffer);
+
+        repository.existsByIdAndDeleted(priceOffer.getId());
     }
 
     private Offer createCompleteOfferTemplate() {
@@ -156,7 +171,7 @@ public class PriceOfferRepositoryTest {
                 .salesOffice("127")
                 .salesOrg("100")
                 .postalNumber("1601")
-                .zones(zoneList)
+                .zoneList(zoneList)
                 .materialList(wastePriceRowList)
                 .build();
 
@@ -272,7 +287,7 @@ public class PriceOfferRepositoryTest {
                 .salesOffice("127")
                 .salesOrg("100")
                 .postalNumber("1601")
-                .zones(zoneList)
+                .zoneList(zoneList)
                 .materialList(wastePriceRowList)
                 .build();
 

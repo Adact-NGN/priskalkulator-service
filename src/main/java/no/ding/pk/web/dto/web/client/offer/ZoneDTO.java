@@ -1,6 +1,5 @@
 package no.ding.pk.web.dto.web.client.offer;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,13 +15,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ZoneDTO {
+public class
+ZoneDTO {
     Long id;
-    @JsonAlias("number")
-    String zoneId;
+    String number;
     String postalCode;
     String postalName;
     Boolean isStandardZone;
-    @JsonAlias("materialList")
-    List<PriceRowDTO> priceRows;
+    List<PriceRowDTO> materialList;
 }

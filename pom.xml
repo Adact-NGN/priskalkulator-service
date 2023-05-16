@@ -48,6 +48,11 @@
   </dependencyManagement>
 
   <dependencies>
+<!--    <dependency>-->
+<!--      <groupId>org.hibernate</groupId>-->
+<!--      <artifactId>hibernate-envers</artifactId>-->
+<!--      <version>6.1.7.Final</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -76,15 +81,15 @@
     </dependency>
 
     <!-- Security -->
-<!--    <dependency>-->
-<!--      <groupId>com.azure.spring</groupId>-->
-<!--      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>com.azure.spring</groupId>
+      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
+    </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>org.springframework.boot</groupId>-->
-<!--      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -406,6 +411,10 @@
       <artifactId>caffeine</artifactId>
       <version>3.1.3</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+    </dependency>
 
   </dependencies>
 
@@ -554,7 +563,8 @@
         <datasource.username>test@pk-poal-db-srv-dev</datasource.username>
         <datasource.password>DqaZXsw%!_1234</datasource.password>
         <datasource.database>pk_poal_db_prod</datasource.database>
-        <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=verify-full</datasource.url>
+        <!-- For sslModes see https://mariadb.com/docs/xpand/connect/programming-languages/java/tls/ -->
+        <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=trust</datasource.url>
         <datasource.show.sql>true</datasource.show.sql>
         <datasource.ddl>update</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>

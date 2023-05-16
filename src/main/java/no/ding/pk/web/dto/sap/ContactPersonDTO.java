@@ -1,10 +1,12 @@
 package no.ding.pk.web.dto.sap;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-
+@Data
 public class ContactPersonDTO {
     @JsonAlias("Customer")
     private String customer;
@@ -29,9 +31,9 @@ public class ContactPersonDTO {
     @JsonAlias("ContactPersonDepartmentName") //: "",
     private String contactPersonDepartmentName;
     @JsonAlias("ChangedDate") //: "2021-09-09",
-    private Date chagedDate;
+    private Date changedDate;
     @JsonAlias("ChangedTime") //: "21:28:44",
-    private String chagedTime;
+    private String changedTime;
     @JsonAlias("_Customers")
     private List<ContactPersonCustomerDTO> customers;
 
@@ -40,110 +42,5 @@ public class ContactPersonDTO {
 
     @JsonAlias("ValidityEndDate")
     private Date validityEndDate;
-
-    public String getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(String customer) {
-        this.customer = customer;
-    }
-
-    public String getContactPerson() {
-        return contactPerson;
-    }
-    public void setContactPerson(String contactPerson) {
-        this.contactPerson = contactPerson;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
-    }
-    public String getMobileNumber() {
-        return mobileNumber;
-    }
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
-    }
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-    public String getContactPersonFunction() {
-        return contactPersonFunction;
-    }
-    public void setContactPersonFunction(String contactPersonFunction) {
-        this.contactPersonFunction = contactPersonFunction;
-    }
-    public String getContactPersonFunctionName() {
-        return contactPersonFunctionName;
-    }
-    public void setContactPersonFunctionName(String contactPersonFunctionName) {
-        this.contactPersonFunctionName = contactPersonFunctionName;
-    }
-    public String getContactPersonDepartment() {
-        return contactPersonDepartment;
-    }
-    public void setContactPersonDepartment(String contactPersonDepartment) {
-        this.contactPersonDepartment = contactPersonDepartment;
-    }
-    public String getContactPersonDepartmentName() {
-        return contactPersonDepartmentName;
-    }
-    public void setContactPersonDepartmentName(String contactPersonDepartmentName) {
-        this.contactPersonDepartmentName = contactPersonDepartmentName;
-    }
-    public Date getChagedDate() {
-        return chagedDate;
-    }
-    public void setChagedDate(Date chagedDate) {
-        this.chagedDate = chagedDate;
-    }
-    public String getChagedTime() {
-        return chagedTime;
-    }
-    public void setChagedTime(String chagedTime) {
-        this.chagedTime = chagedTime;
-    }
-    public List<ContactPersonCustomerDTO> getCustomers() {
-        return customers;
-    }
-    public void setCustomers(List<ContactPersonCustomerDTO> customers) {
-        this.customers = customers;
-    }
-
-    public String getRelationshipNumber() {
-        return relationshipNumber;
-    }
-
-    public void setRelationshipNumber(String relationshipNumber) {
-        this.relationshipNumber = relationshipNumber;
-    }
-
-    public Date getValidityEndDate() {
-        return validityEndDate;
-    }
-
-    public void setValidityEndDate(Date validityEndDate) {
-        this.validityEndDate = validityEndDate;
-    }
-
-    
 }
     

@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Table(name = "discount_levels")
 public class DiscountLevel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
@@ -27,9 +27,6 @@ public class DiscountLevel {
 
     @Column
     private Double discount;
-
-//    @Column
-//    private Double discountInNok;
 
     @Column
     private Double calculatedDiscount;

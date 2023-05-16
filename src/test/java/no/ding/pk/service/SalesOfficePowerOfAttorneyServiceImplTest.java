@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @SpringBootTest
 @TestPropertySource("/h2-db.properties")
-@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
+//@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
 class SalesOfficePowerOfAttorneyServiceImplTest {
 
     @Autowired
@@ -25,7 +25,7 @@ class SalesOfficePowerOfAttorneyServiceImplTest {
     @Test
     public void shouldPersistPowerOfAttorney() {
         PowerOfAttorney poa = PowerOfAttorney.builder()
-                .salesOffice(100)
+                .salesOffice(101)
                 .salesOfficeName("StorOslo")
                 .region("Oslofjord")
                 .build();
