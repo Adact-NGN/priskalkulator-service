@@ -3,11 +3,8 @@ name: Release Container Image
 on:
   pull_request:
   push:
-    branches:
-      - develop
-    tags: 
-      - '*'
-    # ["v*.*.*"]
+    tags:
+      ["v*.*.*"]
 
 env:
   IMAGE_NAME: ding-ip-app-pk-service
