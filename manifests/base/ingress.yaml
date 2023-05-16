@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: priskalkulator-ingress
+  namespace: priskalkulator-dev
+spec:
+  defaultBackend:
+    service:
+      name: ding-ip-app-pk
+      port:
+        number: 8080
+  ingressClassName: nginx
+  rules:
+  - host: dev-priskalkulator.ngn.no
+    http:
+      paths:
+      - backend:
+          service:
+            name: ding-ip-app-pk
+            port:
+              number: 8080
+        path: /service
+        pathType: Prefix
+  tls:
+  - hosts:
+    - dev-priskalkulator.ngn.no
+    secretName: wildcard-ngn-no
+status:
+  loadBalancer: {}

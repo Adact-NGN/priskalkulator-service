@@ -1,0 +1,9 @@
+resources:
+  - namespace.yaml
+  - ingress.yaml
+  - deployment.yml
+  - service.yml
+images:
+  - name: dingipacr.azurecr.io/ding-ip-app-pk-service
+    newTag: latest
+namespace: priskalkulator-dev

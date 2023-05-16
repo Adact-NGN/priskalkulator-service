@@ -1,0 +1,6 @@
+resources:
+  - ../base
+
+images:
+  - name: dingipacr.azurecr.io/ding-ip-app-pk-service
+    newTag: v0.1.1
