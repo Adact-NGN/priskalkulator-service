@@ -19,7 +19,7 @@ spec:
         app: ding-ip-app-pk
         tier: backend
     spec:
-      imagePullSecret:
+      imagePullSecrets:
         - name: 'dingipacr9837c956-auth'
       containers:
         - name: ding-ip-app-pk
