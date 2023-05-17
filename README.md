@@ -10,7 +10,7 @@ The goal for this application is to simplify the process in creating these prici
 ## Prerequisite
 
 ### WSL2 for Windows users
-For information on how to installing WSL2 for Windows with desired distro: [WSL Install](https://learn.microsoft.com/en-us/windows/wsl/install)
+For information on how to install WSL2 for Windows with desired distro: [WSL Install](https://learn.microsoft.com/en-us/windows/wsl/install)
 
 As administrator in PoweShell rin the following command:
 ```

@@ -87,10 +87,10 @@ public class PriceOfferController {
     }
 
     /**
-     *
-     * @param approverId
-     * @param priceOfferId
-     * @param approved
+     * Approve a price offre or not
+     * @param approverId User id for the approver
+     * @param priceOfferId Price offer id to approve
+     * @param approved Approvement status; true, false or null
      * @return
      */
     @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
