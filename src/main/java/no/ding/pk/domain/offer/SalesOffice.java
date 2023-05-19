@@ -52,8 +52,8 @@ public class SalesOffice {
     @Column
     private String city;
 
-    @OneToMany
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "material_list_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_materialList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> materialList;
@@ -63,14 +63,14 @@ public class SalesOffice {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Zone> zoneList;
 
-    @OneToMany()
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "transport_list_id", foreignKey = @ForeignKey(name ="Fk_salesOffice_transportServiceList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> transportServiceList;
 
-    @OneToMany()
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "rental_list_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_rentalList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> rentalList;

@@ -1,10 +1,6 @@
 package no.ding.pk.domain.offer;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import no.ding.pk.domain.Auditable;
 
 import javax.persistence.Column;
@@ -14,6 +10,7 @@ import java.util.Date;
 @Setter
 @Getter
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass

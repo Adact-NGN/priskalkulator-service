@@ -115,11 +115,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     private List<String> getAllMaterialsForApproval(PriceOffer priceOffer) {
         List<String> materialsInPriceOffer = new ArrayList<>();
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
-            collectMaterial(materialsInPriceOffer, salesOffice.getMaterialList());
+            if(salesOffice.getMaterialList() != null)
+                collectMaterial(materialsInPriceOffer, salesOffice.getMaterialList());
 
-            collectMaterial(materialsInPriceOffer, salesOffice.getTransportServiceList());
+            if(salesOffice.getTransportServiceList() != null)
+                collectMaterial(materialsInPriceOffer, salesOffice.getTransportServiceList());
 
-            collectMaterial(materialsInPriceOffer, salesOffice.getRentalList());
+            if(salesOffice.getRentalList() != null)
+                collectMaterial(materialsInPriceOffer, salesOffice.getRentalList());
         }
         Collections.sort(materialsInPriceOffer);
         return materialsInPriceOffer;

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -88,34 +89,39 @@ class PriceOfferControllerTest {
         }
     }
 
-//    @Test
-//    public void shouldPersistPriceOffer() throws Exception {
-//        setup();
-//        PriceOfferDTO priceOffer = createCompleteOfferDto();
-//
-//        MvcResult result = mockMvc.perform(
-//                post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectWriter.writeValueAsString(priceOffer))
-//                        .with(jwt()
-//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andReturn();
-//        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
-//    }
+    @Test
+    public void shouldPersistPriceOffer() throws Exception {
+        setup();
+        PriceOfferDTO priceOffer = createCompleteOfferDto();
 
-//    @Test
-//    public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() throws Exception {
-//        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-//                        .content("{}".getBytes())
-//                        .with(jwt()
-//                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
-//                .andExpect(MockMvcResultMatchers.status().is5xxServerError())
-//                .andReturn();
-//
-//        assertThat(result, notNullValue());
-//    }
+        MvcResult result = mockMvc.perform(
+                post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectWriter.writeValueAsString(priceOffer))
+                        .with(jwt()
+                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+    }
+
+    @Test
+    public void shouldFailOnMissingSalesEmployeeIfGivenEmptyObject() throws Exception {
+        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                        .content("{}".getBytes())
+                        .with(jwt()
+                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError())
+                .andReturn();
+
+        assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void shouldListAllPriceOfferForApprover() {
+
+    }
 
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
         ClassLoader classLoader = getClass().getClassLoader();

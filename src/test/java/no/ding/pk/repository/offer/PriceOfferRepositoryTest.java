@@ -1,29 +1,31 @@
 package no.ding.pk.repository.offer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.domain.offer.Offer;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceOfferTemplate;
-import no.ding.pk.domain.offer.PriceOfferTerms;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.UserRepository;
-import org.junit.jupiter.api.Disabled;
+import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.enums.TermsTypes;
+import org.apache.commons.io.IOUtils;
+import org.aspectj.weaver.tools.MatchingContext;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.MatchingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @DataJpaTest
 @TestPropertySource("/h2-db.properties")
@@ -62,7 +64,6 @@ public class PriceOfferRepositoryTest {
         assertThat(priceOfferTemplate.getId(), notNullValue());
     }
 
-    @Disabled
     @Test
     public void shouldGetTrueWhenOfferIsDelete() {
         PriceOffer priceOffer = (PriceOffer) createCompleteOffer();
@@ -74,6 +75,72 @@ public class PriceOfferRepositoryTest {
         priceOffer = repository.save(priceOffer);
 
         repository.existsByIdAndDeleted(priceOffer.getId());
+    }
+
+    @Test
+    public void shouldFindAllByApproverIdAndNeedsApprovalIsTrue() {
+        User salesAndApprover = User.builder()
+                .adId("183a1b82-d795-47d1-94a1-96f6aa5a268a")
+                .orgNr("100")
+                .orgName("Norsk Gjenvinning")
+                .sureName("Nilsen")
+                .name("Thomas")
+                .username("thomas.nilsen@ngn.no")
+                .usernameAlias("vh3180")
+                .jobTitle("Utvikler")
+                .fullName("Thomas Nilsen")
+                .powerOfAttorneyFA(2)
+                .powerOfAttorneyOA(2)
+                .build();
+
+        salesAndApprover = userRepository.save(salesAndApprover);
+
+        createCompleteOfferDtoList(salesAndApprover);
+
+        List<PriceOffer> actual = repository.findAllByApproverIdAndNeedsApprovalIsTrue(salesAndApprover.getId());
+
+        assertThat(actual, hasSize(greaterThan(0)));
+    }
+
+    private void createCompleteOfferDtoList(User salesAndApproval) {
+        Material material = Material.builder()
+                .materialNumber("70120015")
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .materialTypeDescription("Farlig Avfallsmateriale")
+                .quantumUnit("KG")
+                .build();
+
+        List<PriceRow> materialList = List.of(PriceRow.builder()
+                .material(material)
+                .showPriceInOffer(true)
+                .manualPrice(10.0)
+                .standardPrice(17180.0)
+                .needsApproval(true)
+                .categoryId("00310")
+                .categoryDescription("Farlig avfall")
+                .subCategoryId("0031000100")
+                .subCategoryDescription("FA Diverse")
+                .build()
+        );
+        SalesOffice bergen = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("134")
+                .salesOfficeName("Bergen")
+                .city("SANDSLI")
+                .materialList(materialList)
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("2756")
+                .customerName("HydroscandGjøviKongsvKr.SundÅgotnes")
+                .salesEmployee(salesAndApproval)
+                .approver(salesAndApproval)
+                .priceOfferTerms(PriceOfferTerms.builder().additionForAdminFee(true).contractTerm(TermsTypes.NGPriceTerms.name()).build())
+                .salesOfficeList(List.of(bergen))
+                .needsApproval(true)
+                .build();
+
+        repository.save(priceOffer);
     }
 
     private Offer createCompleteOfferTemplate() {
