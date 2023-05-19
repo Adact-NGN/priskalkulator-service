@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesOfficePowerOfAttorneyRepository extends JpaRepository<PowerOfAttorney, Long> {
-    List<PowerOfAttorney> findAllBySalesOfficeIn(List<Integer> salesOffices);
+    List<PowerOfAttorney> findAllBySalesOfficeIsIn(List<Integer> salesOffices);
 }
