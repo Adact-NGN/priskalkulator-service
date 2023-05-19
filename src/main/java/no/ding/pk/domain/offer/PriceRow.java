@@ -58,7 +58,7 @@ public class PriceRow extends Auditable {
     @Column
     private Integer discountLevel;
 
-    @Column(nullable = true)
+    @Column()
     private Boolean needsApproval = false;
     
     @Column
