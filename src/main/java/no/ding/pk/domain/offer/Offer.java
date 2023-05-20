@@ -49,6 +49,9 @@ public class Offer extends Auditable {
     private Boolean isApproved;
 
     @Column
+    private String dismissalReason;
+
+    @Column
     private Date approvalDate;
 
     @Column

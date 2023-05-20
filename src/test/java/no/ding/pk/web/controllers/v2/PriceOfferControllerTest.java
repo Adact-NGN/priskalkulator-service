@@ -1,6 +1,8 @@
 package no.ding.pk.web.controllers.v2;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
@@ -33,6 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,6 +46,8 @@ class PriceOfferControllerTest {
     private UserService userService;
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+
+    private final ObjectReader objectReader = new ObjectMapper().reader();
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -119,8 +124,17 @@ class PriceOfferControllerTest {
     }
 
     @Test
-    public void shouldListAllPriceOfferForApprover() {
+    public void shouldListAllPriceOfferForApprover() throws Exception {
+        long approverId = 1L;
+        MvcResult result = mockMvc.perform(get("/api/v2/price-offer/list/approver/" + approverId))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
 
+        String contentAsString = result.getResponse().getContentAsString();
+
+        JsonNode jsonNode = objectReader.readTree(contentAsString);
+
+        assertThat(contentAsString, notNullValue());
     }
 
     private PriceOfferDTO createCompleteOfferDto() throws IOException {
