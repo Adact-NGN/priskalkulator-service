@@ -110,9 +110,13 @@ public class PriceOfferController {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId);
         
         if(!priceOffers.isEmpty()) {
+            log.debug("Found price offers, {}, for approver", priceOffers.size());
             PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
+            log.debug("Mapped {} amount", priceOfferDTOS.length);
             return Arrays.stream(priceOfferDTOS).toList();
         }
+
+        log.debug("No price offers for approver {} was found.", approverId);
         
         return new ArrayList<>();
     }
