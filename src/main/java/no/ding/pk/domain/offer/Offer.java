@@ -76,6 +76,10 @@ public class Offer extends Auditable {
         return needsApproval != null && needsApproval;
     }
 
+    public boolean isApproved() {
+        return isApproved != null && isApproved;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +

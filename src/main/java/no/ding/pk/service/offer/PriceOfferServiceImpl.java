@@ -66,8 +66,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
 
-
-
         // entity.setIsApproved(newPriceOffer.getIsApproved());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
@@ -84,7 +82,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        if(newPriceOffer.getNeedsApproval() && !newPriceOffer.getIsApproved()) {
+        if(newPriceOffer.getNeedsApproval() && !newPriceOffer.isApproved()) {
             List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
             if(!materialsForApproval.isEmpty()) {
@@ -232,6 +230,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {
         List<String> approvedMaterials = new ArrayList<>();
         for(PriceRow pr : materialList) {
+            if(pr.getMaterial() == null) {
+                continue;
+            }
             if(materialsToApprove.contains(pr.getMaterial().getMaterialNumber())) {
                 if(pr.getNeedsApproval() && !pr.isApproved()) {
                     pr.setApproved(isApproved);

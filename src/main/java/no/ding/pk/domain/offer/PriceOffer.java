@@ -96,4 +96,8 @@ public class PriceOffer extends Offer implements Serializable {
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
     }
+
+    public boolean isApproved() {
+        return super.isApproved();
+    }
 }

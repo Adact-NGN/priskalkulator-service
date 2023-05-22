@@ -40,8 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -161,34 +160,24 @@ class PriceOfferControllerTest {
         User salesEmployee = userService.findByEmail(salesEmployeeEmail);
         User approver = userService.findByEmail(approverEmail);
 
-        Material material = Material.builder()
-                .materialNumber("501011")
-                .build();
-
-        PriceRow pr = PriceRow.builder()
-                .material(material)
-                .manualPrice(1000.0)
-                .needsApproval(true)
-                .approved(false)
-                .build();
-        List<PriceRow> materials = List.of(pr);
+        List<PriceRow> materials = createPriceRows();
         SalesOffice salesOfficeDTO = SalesOffice.builder()
-                .salesOffice("100")
-                .city("Oslo")
+                .salesOrg("100")
+                .salesOffice("104")
+                .city("Skien")
                 .materialList(materials)
                 .build();
         List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("102520")
+                .customerName("Vest-Telemark Rørleggerforretning AS")
                 .salesOfficeList(salesOfficeDTOs)
                 .salesEmployee(salesEmployee)
                 .approver(approver)
                 .needsApproval(true)
                 .build();
 
-        PriceOfferDTO priceOfferDTO = createCompleteOfferDto();
-        priceOfferDTO.setNeedsApproval(true);
-        priceOfferDTO.getSalesOfficeList().get(0).getMaterialList().add(modelMapper.map(pr, PriceRowDTO.class));
-        priceOfferDTO.setApprover(modelMapper.map(approver, UserDTO.class));
+        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
         MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
                 .content(objectWriter.writeValueAsString(priceOfferDTO))
@@ -216,6 +205,31 @@ class PriceOfferControllerTest {
         Boolean approvalResult = objectReader.readValue(result.getResponse().getContentAsString(), Boolean.class);
 
         assertThat(approvalResult, is(true));
+    }
+
+    private List<PriceRow> createPriceRows() {
+        List<PriceRow> returnList = new ArrayList<>();
+
+        Map<String, Double> prMatMap = Map.of("111101", 1199.0, "111102", 1199.0, "111103", 1199.0,
+                "111104", 1199.0, "111105", 1199.0, "171111", 519.0,
+                "PR-1111", 1684.0);
+
+        for (String key : prMatMap.keySet()) {
+            Material material = Material.builder()
+                    .materialNumber(key)
+                    .build();
+
+            PriceRow pr = PriceRow.builder()
+                    .material(material)
+                    .manualPrice(prMatMap.get(key))
+                    .needsApproval(true)
+                    .approved(false)
+                    .build();
+
+            returnList.add(pr);
+        }
+
+        return returnList;
     }
 
     private PriceOfferDTO createCompleteOfferDto() throws IOException {

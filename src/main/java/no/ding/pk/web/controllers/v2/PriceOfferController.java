@@ -164,8 +164,6 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
         
-        log.debug("Resulting priceOffer: {}", priceOffer.toString());
-        
         priceOffer.setPriceOfferStatus(PriceOfferStatus.OFFER_CREATED.getStatus());
         priceOffer = service.save(priceOffer);
         

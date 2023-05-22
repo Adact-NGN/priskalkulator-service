@@ -83,18 +83,21 @@ public class ModelMapperV2Config {
 
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         Converter<String, Material> stringToMaterial = c -> {
+            Material material = null;
             if(c.getSource() != null) {
-                Material material = materialRepository.findByMaterialNumber(c.getSource());
+                material = materialRepository.findByMaterialNumber(c.getSource());
 
                 if(material != null) {
                     return material;
                 }
 
-                return Material.builder().materialNumber(c.getSource()).build();
+                material = Material.builder().materialNumber(c.getSource()).build();
             }
 
-            log.debug("No material number was found. Material object could not be created.");
-            return null;
+            if(material == null)
+                log.debug("No material number was found. Material object could not be created.");
+
+            return material;
         };
 
         TypeMap<PriceRowDTO, PriceRow> priceRowDtoPropertyMap = modelMapper.createTypeMap(PriceRowDTO.class, PriceRow.class);

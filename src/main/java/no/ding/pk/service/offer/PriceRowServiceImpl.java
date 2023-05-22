@@ -189,7 +189,13 @@ public class PriceRowServiceImpl implements PriceRowService {
             return materialService.findById(material.getId()).orElse(material);
         }
         log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-        return materialService.findByMaterialNumber(material.getMaterialNumber());
+        Material byMaterialNumber = materialService.findByMaterialNumber(material.getMaterialNumber());
+
+        if(byMaterialNumber != null) {
+            return byMaterialNumber;
+        }
+
+        return material;
     }
 
     private void updateMaterial(Material to, Material from) {
