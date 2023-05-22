@@ -14,12 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -93,7 +88,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
             if(!materialsForApproval.isEmpty()) {
-                entity.setMaterialsInOffer(String.join(",", materialsForApproval));
+                entity.setMaterialsForApproval(String.join(",", materialsForApproval));
             }
         }
 
@@ -124,13 +119,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(salesOffice.getRentalList() != null)
                 collectMaterial(materialsInPriceOffer, salesOffice.getRentalList());
         }
-        Collections.sort(materialsInPriceOffer);
         return materialsInPriceOffer;
     }
 
     private static void collectMaterial(List<String> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
-            if(pr.getNeedsApproval()) {
+            if(pr.getNeedsApproval() && !pr.isApproved()) {
                 materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
             }
         }
@@ -204,26 +198,58 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new PriceOfferNotFoundException();
         }
 
-        if(approved) {
-            priceOfferToApprove.setIsApproved(approved);
-
+        if(approved != null && approved)  {
+            approveMaterialsSinceLastUpdate(priceOfferToApprove);
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
+
+            priceOfferToApprove.setIsApproved(!needsReApproval);
             priceOfferToApprove.setNeedsApproval(needsReApproval);
-
-
-        } else {
-            priceOfferToApprove.setIsApproved(approved);
         }
-        throw new UnsupportedOperationException("Unimplemented method 'approvePriceOffer'");
+
+        priceOfferToApprove = repository.save(priceOfferToApprove);
+
+        return priceOfferToApprove.getIsApproved();
+    }
+
+    private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
+        // Exception thrown here
+        List<String> materialsToApprove = new ArrayList<>(Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList());
+        List<String> approvedMaterials = new ArrayList<>();
+
+        for(SalesOffice so : priceOfferToApprove.getSalesOfficeList()) {
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getMaterialList(), priceOfferToApprove.getIsApproved()));
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getTransportServiceList(), priceOfferToApprove.getIsApproved()));
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getRentalList(), priceOfferToApprove.getIsApproved()));
+        }
+
+        Collections.sort(approvedMaterials);
+
+        materialsToApprove.removeAll(approvedMaterials);
+
+        priceOfferToApprove.setMaterialsForApproval(String.join(",", materialsToApprove));
+    }
+
+    private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {
+        List<String> approvedMaterials = new ArrayList<>();
+        for(PriceRow pr : materialList) {
+            if(materialsToApprove.contains(pr.getMaterial().getMaterialNumber())) {
+                if(pr.getNeedsApproval() && !pr.isApproved()) {
+                    pr.setApproved(isApproved);
+
+                    approvedMaterials.add(pr.getMaterial().getMaterialNumber());
+                    materialsToApprove.remove(pr.getMaterial().getMaterialNumber());
+                }
+            }
+        }
+
+        return approvedMaterials;
     }
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
-        boolean anyMaterialNeedsReApproval = false;
+        List<String> currentMaterialInPriceOffer = getAllMaterialsForApproval(priceOfferToApprove).stream().sorted().toList();
+        List<String> previousMaterialInPriceOffer = Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList();
 
-        List<String> currentMaterialInPriceOffer = getAllMaterialsForApproval(priceOfferToApprove);
-        List<String> previousMaterialInPriceOffer = Arrays.stream(priceOfferToApprove.getOldMaterialsInOffer().split(",")).toList();
-
-        return anyMaterialNeedsReApproval;
+        return currentMaterialInPriceOffer.equals(previousMaterialInPriceOffer);
     }
 
 }

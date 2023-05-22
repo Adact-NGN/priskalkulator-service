@@ -92,10 +92,12 @@ public class PriceOfferController {
      * @param approverId Approver User id
      * @param priceOfferId Id for Price offer to be approved
      * @param approved Approval status
-     * @return True of price offer was successfully approved, else false.
+     * @return True if price offer was successfully approved, else false.
      */
     @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
-    public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId, @PathVariable("priceOfferId") Long priceOfferId, @RequestParam("approved") Boolean approved) {
+    public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId,
+                                     @PathVariable("priceOfferId") Long priceOfferId,
+                                     @RequestParam(name = "approved", required = false) Boolean approved) {
         return service.approvePriceOffer(priceOfferId, approverId, approved);
     }
     

@@ -40,10 +40,7 @@ public class PriceOffer extends Offer implements Serializable {
     private String priceOfferStatus;
 
     @Column
-    private String oldMaterialsInOffer;
-
-    @Column
-    private String materialsInOffer;
+    private String materialsForApproval;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "po_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_salesOfficeList"))

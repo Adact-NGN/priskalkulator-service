@@ -40,6 +40,7 @@ public class PriceRowDTO {
     private Integer discountLevel;
     @JsonProperty(defaultValue = "false")
     private Boolean needsApproval;
+    private Boolean approved;
     private PriceRowDTO combinedMaterials;
     private String categoryId;
     private String categoryDescription;

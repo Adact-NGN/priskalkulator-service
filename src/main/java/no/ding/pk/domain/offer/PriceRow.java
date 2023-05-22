@@ -60,6 +60,9 @@ public class PriceRow extends Auditable {
 
     @Column()
     private Boolean needsApproval = false;
+
+    @Column()
+    private Boolean approved = false;
     
     @Column
     private Double discountLevelPrice;
@@ -99,6 +102,14 @@ public class PriceRow extends Auditable {
     public Boolean getNeedsApproval() {
 
         return needsApproval != null && needsApproval;
+    }
+
+    public Boolean getApproved() {
+        return approved != null && approved;
+    }
+
+    public boolean isApproved() {
+        return getApproved();
     }
 
     @Override
