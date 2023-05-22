@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,9 +58,9 @@ public class PriceOfferController {
     }
     
     /**
-    * Get all price offers
-    * @return List of price offers, else empty list
-    */
+     * Get all price offers
+     * @return List of price offers, else empty list
+     */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> list() {
         List<PriceOffer> priceOfferList = service.findAll();
@@ -72,10 +73,10 @@ public class PriceOfferController {
     }
     
     /**
-    * Get all price offers created by sales employee
-    * @param salesEmployeeId User id to list price offers for.
-    * @return list of price offers connected to sales employee, else empty list.
-    */
+     * Get all price offers created by sales employee
+     * @param salesEmployeeId User id to list price offers for.
+     * @return list of price offers connected to sales employee, else empty list.
+     */
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
         List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
@@ -88,38 +89,39 @@ public class PriceOfferController {
     }
     
     /**
-    * 
-    * @param approverId
-    * @param priceOfferId
-    * @param approved
-    * @return
-    */
+     * Set approval status for price offer
+     * @param approverId Approver User id
+     * @param priceOfferId Id for Price offer to be approved
+     * @param approved Approval status
+     * @return True of price offer was successfully approved, else false.
+     */
     @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
     public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId, @PathVariable("priceOfferId") Long priceOfferId, @QueryParam("approved") Boolean approved) {
         return service.approvePriceOffer(priceOfferId, approverId, approved);
     }
     
     /**
-    * Find all that needs approval.l
-    * @param approverId approver user id
-    * @return List of price offers for approver
-    */
+     * Find all that needs approval.
+     * @param approverId approver user id
+     * @return List of price offers for approver
+     */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> listByApprocer(@PathVariable("approverId") Long approverId) {
+    public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId) {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId);
         
         if(!priceOffers.isEmpty()) {
-            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
+            PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
+            return Arrays.stream(priceOfferDTOS).toList();
         }
         
         return new ArrayList<>();
     }
     
     /**
-    * Get price offer by id
-    * @param id price offer id
-    * @return Price offer, else null
-    */
+     * Get price offer by id
+     * @param id price offer id
+     * @return Price offer, else null
+     */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO getById(@PathVariable("id") Long id) {
         if(id != null) {
@@ -143,11 +145,11 @@ public class PriceOfferController {
     }
     
     /**
-    * Create new Price offer
-    * @param priceOfferDTO Price offer values
-    * @return Newly created price offer
-    * @throws JsonProcessingException if not real JSON is passed
-    */
+     * Create new Price offer
+     * @param priceOfferDTO Price offer values
+     * @return Newly created price offer
+     * @throws JsonProcessingException if not real JSON is passed
+     */
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceOfferDTO> create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Got new Price offer object: " + priceOfferDTO);
@@ -166,12 +168,12 @@ public class PriceOfferController {
     }
     
     /**
-    * Update price offer
-    * @param id Price offer id
-    * @param priceOfferDTO New values for price offer
-    * @return Updated price offer
-    * @throws JsonProcessingException if not real JSON is passed.
-    */
+     * Update price offer
+     * @param id Price offer id
+     * @param priceOfferDTO New values for price offer
+     * @return Updated price offer
+     * @throws JsonProcessingException if not real JSON is passed.
+     */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
@@ -230,10 +232,10 @@ public class PriceOfferController {
     }
     
     /**
-    * Soft deletes price offer by id
-    * @param id Price offer id
-    * @return true if deleted, else false
-    */
+     * Soft deletes price offer by id
+     * @param id Price offer id
+     * @return true if deleted, else false
+     */
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);

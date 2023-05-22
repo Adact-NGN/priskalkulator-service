@@ -187,6 +187,7 @@ public class StartUpDev {
                         .approved(false)
                         .salesEmployee(salesEmployee)
                         .salesOfficeList(salesOfficeList)
+                        .approver(kjetil)
                         .build();
 
                 priceOfferService.save(priceOffer);
