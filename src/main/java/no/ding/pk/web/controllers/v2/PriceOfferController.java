@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,13 +39,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v2/price-offer")
 public class PriceOfferController {
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
-
+    
     private final PriceOfferService service;
-
+    
     private final SalesOfficePowerOfAttorneyService sopoaService;
-
+    
     private final ModelMapper modelMapper;
-
+    
     @Autowired
     public PriceOfferController(
             PriceOfferService service,
@@ -54,7 +55,7 @@ public class PriceOfferController {
         this.sopoaService = sopoaService;
         this.modelMapper = modelMapper;
     }
-
+    
     /**
      * Get all price offers
      * @return List of price offers, else empty list
@@ -62,14 +63,14 @@ public class PriceOfferController {
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> list() {
         List<PriceOffer> priceOfferList = service.findAll();
-
+        
         if(!priceOfferList.isEmpty()) {
             return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList());
         }
-
+        
         return new ArrayList<>();
     }
-
+    
     /**
      * Get all price offers created by sales employee
      * @param salesEmployeeId User id to list price offers for.
@@ -78,42 +79,47 @@ public class PriceOfferController {
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
         List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
-
+        
         if(!priceOffers.isEmpty()) {
             return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
         }
-
+        
         return new ArrayList<>();
     }
-
+    
     /**
-     * Approve a price offre or not
-     * @param approverId User id for the approver
-     * @param priceOfferId Price offer id to approve
-     * @param approved Approvement status; true, false or null
-     * @return
+     * Set approval status for price offer
+     * @param approverId Approver User id
+     * @param priceOfferId Id for Price offer to be approved
+     * @param approved Approval status
+     * @return True of price offer was successfully approved, else false.
      */
     @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
     public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId, @PathVariable("priceOfferId") Long priceOfferId, @RequestParam("approved") Boolean approved) {
         return service.approvePriceOffer(priceOfferId, approverId, approved);
     }
-
+    
     /**
-     * Find all that needs approval.l
+     * Find all that needs approval.
      * @param approverId approver user id
      * @return List of price offers for approver
      */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId) {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId);
-
+        
         if(!priceOffers.isEmpty()) {
-            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
+            log.debug("Found price offers, {}, for approver", priceOffers.size());
+            PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
+            log.debug("Mapped {} amount", priceOfferDTOS.length);
+            return Arrays.stream(priceOfferDTOS).toList();
         }
+
+        log.debug("No price offers for approver {} was found.", approverId);
 
         return new ArrayList<>();
     }
-
+    
     /**
      * Get price offer by id
      * @param id price offer id
@@ -128,19 +134,19 @@ public class PriceOfferController {
                 return null;
             }
             PriceOffer priceOffer = optPriceOffer.get();
-
+            
             log.debug("Returning priceOffer: {}", priceOffer);
             return modelMapper.map(priceOffer, PriceOfferDTO.class);
         }
-
+        
         return null;
     }
-
+    
     @ExceptionHandler({EmployeeNotProvidedException.class})
     public ResponseEntity<Object> handleException() {
         return new ResponseEntity<>("Sales employee not set", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
+    
     /**
      * Create new Price offer
      * @param priceOfferDTO Price offer values
@@ -150,20 +156,20 @@ public class PriceOfferController {
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceOfferDTO> create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Got new Price offer object: " + priceOfferDTO);
-
+        
         if(priceOfferDTO.getSalesEmployee() == null) throw new EmployeeNotProvidedException();
         if(priceOfferDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
-
+        
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
-
+        
         log.debug("Resulting priceOffer: {}", priceOffer.toString());
-
+        
         priceOffer.setPriceOfferStatus(PriceOfferStatus.OFFER_CREATED.getStatus());
         priceOffer = service.save(priceOffer);
-
+        
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
-
+    
     /**
      * Update price offer
      * @param id Price offer id
@@ -175,27 +181,27 @@ public class PriceOfferController {
     public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
         log.debug("Values received for PriceOffer: {}", priceOfferDTO);
-
+        
         Optional<PriceOffer> result = service.findById(id);
-
+        
         if(result.isEmpty()) {
             log.debug("{} {} {}", "Price offer with ID", id, "was not found");
             return null;
         }
-
+        
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
-
+        
         updatedOffer = service.save(updatedOffer);
-
+        
         if(updatedOffer.getNeedsApproval() && updatedOffer.getIsApproved() != null && !updatedOffer.getIsApproved()) {
             List<Integer> salesOffices = updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
-
+            
             if(!salesOffices.isEmpty()) {
                 List<PowerOfAttorney> poa = sopoaService.findBySalesOfficeInList(salesOffices);
-
+                
                 if(!poa.isEmpty()) {
                     User approver = getApproferForPriceOffer(poa);
-
+                    
                     if(approver != null) {
                         updatedOffer.setApprover(approver);
 
@@ -208,26 +214,26 @@ public class PriceOfferController {
                 }
             }
         }
-
+        
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
-
+    
     private User getApproferForPriceOffer(List<PowerOfAttorney> poa) {
         Optional<PowerOfAttorney> findAnyPoaLvl1 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlOneHolder() != null).findAny();
-
+        
         if(findAnyPoaLvl1.isPresent()) {
             PowerOfAttorney lvl1Poa = findAnyPoaLvl1.get();
             return lvl1Poa.getOrdinaryWasteLvlOneHolder();
         } else {
             Optional<PowerOfAttorney> findAnyPoaLvl2 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlTwoHolder() != null).findAny();
-
+            
             if(findAnyPoaLvl2.isPresent()) {
                 return findAnyPoaLvl2.get().getOrdinaryWasteLvlTwoHolder();
             }
         }
         return null;
     }
-
+    
     /**
      * Soft deletes price offer by id
      * @param id Price offer id

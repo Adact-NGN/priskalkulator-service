@@ -187,6 +187,7 @@ public class StartUpDev {
                         .approved(false)
                         .salesEmployee(salesEmployee)
                         .salesOfficeList(salesOfficeList)
+                        .approver(kjetil)
                         .build();
 
                 priceOfferService.save(priceOffer);
@@ -217,9 +218,7 @@ public class StartUpDev {
         private List<PriceRow> createPriceRowList(List<String> materialNumberList, List<MaterialStdPriceDTO> materialDTOs) {
                 List<PriceRow> returnList = new ArrayList<>();
 
-                for(int i = 0; i < materialNumberList.size(); i++) {
-                        String materialNumber = materialNumberList.get(i);
-
+                for (String materialNumber : materialNumberList) {
                         PriceRow priceRow = createPriceRow(materialDTOs, materialNumber);
                         returnList.add(priceRow);
                 }
