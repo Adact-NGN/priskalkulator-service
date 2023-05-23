@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import no.ding.pk.domain.User;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -37,6 +39,9 @@ public class PriceOffer extends Offer implements Serializable {
     @Column
     private String priceOfferStatus;
 
+    @Column
+    private String materialsForApproval;
+
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "po_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_salesOfficeList"))
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -62,9 +67,9 @@ public class PriceOffer extends Offer implements Serializable {
 
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
+            Boolean needsApproval, User approver, Boolean approved, String dismissalReason, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
                       String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
-        super(id, deleted, customerNumber, customerName, contactPersonList, needsApproval, approved, approvalDate,
+        super(id, deleted, customerNumber, customerName, contactPersonList, needsApproval, approved, dismissalReason, approvalDate,
                 dateIssued);
 
         this.salesOfficeList = salesOfficeList;
@@ -74,5 +79,25 @@ public class PriceOffer extends Offer implements Serializable {
         this.priceOfferStatus = priceOfferStatus;
         this.approvalDate = approvalDate;
         this.activationDate = activationDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PriceOffer that = (PriceOffer) o;
+
+        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList).append(salesEmployee, that.salesEmployee).append(approver, that.approver).append(approvalDate, that.approvalDate).append(activationDate, that.activationDate).append(customerTerms, that.customerTerms).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
+    }
+
+    public boolean isApproved() {
+        return super.isApproved();
     }
 }

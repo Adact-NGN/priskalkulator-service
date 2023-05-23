@@ -108,6 +108,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
+        entity.setApproved(materialPriceRow.getApproved());
 
         entity = repository.save(entity);
 
@@ -189,7 +190,13 @@ public class PriceRowServiceImpl implements PriceRowService {
             return materialService.findById(material.getId()).orElse(material);
         }
         log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-        return materialService.findByMaterialNumber(material.getMaterialNumber());
+        Material byMaterialNumber = materialService.findByMaterialNumber(material.getMaterialNumber());
+
+        if(byMaterialNumber != null) {
+            return byMaterialNumber;
+        }
+
+        return material;
     }
 
     private void updateMaterial(Material to, Material from) {

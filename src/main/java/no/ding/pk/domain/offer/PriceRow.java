@@ -44,7 +44,7 @@ public class PriceRow extends Auditable {
     @Column
     private Double discountPct;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
     @JoinColumn(name = "material_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "Fk_priceRow_material"))
     private Material material;
@@ -58,8 +58,11 @@ public class PriceRow extends Auditable {
     @Column
     private Integer discountLevel;
 
-    @Column
+    @Column()
     private Boolean needsApproval = false;
+
+    @Column()
+    private Boolean approved = false;
     
     @Column
     private Double discountLevelPrice;
@@ -86,7 +89,7 @@ public class PriceRow extends Auditable {
     @Column
     private String classDescription; // "
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -94,6 +97,19 @@ public class PriceRow extends Auditable {
 
     public boolean hasCombinedMaterials() {
         return combinedMaterials != null && !combinedMaterials.isEmpty();
+    }
+
+    public Boolean getNeedsApproval() {
+
+        return needsApproval != null && needsApproval;
+    }
+
+    public Boolean getApproved() {
+        return approved != null && approved;
+    }
+
+    public boolean isApproved() {
+        return getApproved();
     }
 
     @Override

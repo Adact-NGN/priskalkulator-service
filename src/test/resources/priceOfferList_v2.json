@@ -1,0 +1,776 @@
+[
+  {
+    
+    "customerNumber": "2756",
+    "customerName": "HydroscandGjøviKongsvKr.SundÅgotnes",
+    "contactPersonList": [],
+    "salesOfficeList": [
+      {
+        
+        "materialList": [
+          {
+            
+            "material": "70120015",
+            "designation": "Ikke refunderbar spillolje,Småemb",
+            "materialDesignation": "Farlig Avfallsmateriale",
+            "productGroupDesignation": "Spillolje, ikke ref.",
+            "showPriceInOffer": true,
+            "manualPrice": 10.0,
+            "standardPrice": 17180.0,
+            "quantumUnit": "KG",
+            "needsApproval": true,
+            "combinedMaterials": {},
+            "categoryId": "00310",
+            "categoryDescription": "Farlig avfall",
+            "subCategoryId": "0031000100",
+            "subCategoryDescription": "FA Diverse",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0120",
+            "designation": "Beholder - 120L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 8.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0120-M",
+            "designation": "Beholder - 120L til matavfall",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 8.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140",
+            "designation": "Beholder - 140L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 8.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-G",
+            "designation": "Beholder - 140L til glass",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 8.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-M",
+            "designation": "Beholder - 140L til matavfall",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 8.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-S",
+            "designation": "Sikker beholder 140L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 4.5,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          }
+        ],
+        "rentalList": [],
+        "transportServiceList": [],
+        "zoneList": [
+          {
+            
+            "number": "0000000001",
+            "postalCode": "5254",
+            "postalName": "Sandsli",
+            "isStandardZone": true,
+            "materialList": [
+              {
+                
+                "material": "50000",
+                "designation": "Mal for tjenester",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 0.0,
+                "quantumUnit": "KG",
+                "needsApproval": false,
+                "combinedMaterials": {},
+                "categoryId": "",
+                "categoryDescription": "",
+                "subCategoryId": "",
+                "subCategoryDescription": "",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "material": "50101",
+                "designation": "Lift - Utsett",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 1625.0,
+                "quantumUnit": "KG",
+                "needsApproval": false,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "material": "50102",
+                "designation": "Lift - Bytting",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 1625.0,
+                "quantumUnit": "KG",
+                "needsApproval": false,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              }
+            ]
+          }
+        ],
+        "salesOffice": "134",
+        "name": "Bergen",
+        "salesOrg": "100",
+        "city": "SANDSLI"
+      },
+      {
+        
+        "materialList": [
+          {
+            
+            "material": "70120015",
+            "designation": "Ikke refunderbar spillolje,Småemb",
+            "materialDesignation": "Farlig Avfallsmateriale",
+            "productGroupDesignation": "Spillolje, ikke ref.",
+            "showPriceInOffer": true,
+            "standardPrice": 16566.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00310",
+            "categoryDescription": "Farlig avfall",
+            "subCategoryId": "0031000100",
+            "subCategoryDescription": "FA Diverse",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0120",
+            "designation": "Beholder - 120L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 13.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0120-M",
+            "designation": "Beholder - 120L til matavfall",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 13.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140",
+            "designation": "Beholder - 140L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 13.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-G",
+            "designation": "Beholder - 140L til glass",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 14.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-M",
+            "designation": "Beholder - 140L til matavfall",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 13.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "B-0140-S",
+            "designation": "Sikker beholder 140L",
+            "materialDesignation": "Avfall - Utstyr",
+            "productGroupDesignation": "Leie beholder",
+            "showPriceInOffer": true,
+            "standardPrice": 4.0,
+            "quantumUnit": "KG",
+            "needsApproval": false,
+            "combinedMaterials": {},
+            "categoryId": "00100",
+            "categoryDescription": "Beholdere",
+            "subCategoryId": "",
+            "subCategoryDescription": "",
+            "classId": "",
+            "classDescription": ""
+          }
+        ],
+        "rentalList": [],
+        "transportServiceList": [],
+        "zoneList": [
+          {
+            
+            "number": "0000000000",
+            "postalCode": "2821",
+            "postalName": "Gjøvik",
+            "isStandardZone": true,
+            "materialList": []
+          }
+        ],
+        "salesOffice": "122",
+        "name": "GLT regionen",
+        "salesOrg": "100",
+        "city": "GJØVIK"
+      }
+    ],
+    "salesEmployee": {
+      
+      "adId": "183a1b82-d795-47d1-94a1-96f6aa5a268a",
+      "orgNr": "100",
+      "orgName": "Norsk Gjenvinning",
+      "sureName": "Nilsen",
+      "name": "Thomas",
+      "username": "thomas.nilsen@ngn.no",
+      "usernameAlias": "vh3180",
+      "jobTitle": "Utvikler",
+      "fullName": "Thomas Nilsen",
+      "resourceNr": "100204",
+      "phoneNumber": "+4793238365555",
+      "email": "thomas.nilsen@ngn.no",
+      "associatedPlace": "Oslo",
+      "powerOfAttorneyOA": "2",
+      "powerOfAttorneyFA": "2",
+      "department": "Adact"
+    },
+    "approver": {
+      
+      "adId": "183a1b82-d795-47d1-94a1-96f6aa5a268a",
+      "orgNr": "100",
+      "orgName": "Norsk Gjenvinning",
+      "sureName": "Nilsen",
+      "name": "Thomas",
+      "username": "thomas.nilsen@ngn.no",
+      "usernameAlias": "vh3180",
+      "jobTitle": "Utvikler",
+      "fullName": "Thomas Nilsen",
+      "resourceNr": "100204",
+      "phoneNumber": "+4793238365555",
+      "email": "thomas.nilsen@ngn.no",
+      "associatedPlace": "Oslo",
+      "powerOfAttorneyOA": "2",
+      "powerOfAttorneyFA": "2",
+      "department": "Adact"
+    },
+    "customerTerms": {
+      
+      "additionForAdminFee": true,
+      "contractTerm": "NG Prisvilkår"
+    },
+    "createdBy": "Not fully implemented",
+    "lastModifiedBy": "Not fully implemented"
+  },
+  {
+    
+    "customerNumber": "21",
+    "customerName": "Dekkmann",
+    "contactPersonList": [],
+    "salesOfficeList": [
+      {
+        
+        "materialList": [
+          {
+            
+            "material": "111101",
+            "designation": "Matavfall, uemballert",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Matavf. fra hush.",
+            "showPriceInOffer": true,
+            "standardPrice": 1849.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000140",
+            "subCategoryDescription": "Matavfall",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "114901",
+            "designation": "Trevirke - blandet",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Bl. bearb. trevirke",
+            "showPriceInOffer": true,
+            "standardPrice": 1685.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000120",
+            "subCategoryDescription": "Blandet trevirke",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "119927",
+            "designation": "Restavfall med gips/isolasjon",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Bl. næringsavfall",
+            "showPriceInOffer": true,
+            "standardPrice": 3135.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000100",
+            "subCategoryDescription": "Blandet avfall",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "122106",
+            "designation": "Papp/papir",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Brunt papir",
+            "showPriceInOffer": true,
+            "standardPrice": 744.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000110",
+            "subCategoryDescription": "Papp, papir og kartong",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "122110",
+            "designation": "Bølgepapp",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Brunt papir",
+            "showPriceInOffer": true,
+            "standardPrice": 0.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000110",
+            "subCategoryDescription": "Papp, papir og kartong",
+            "classId": "",
+            "classDescription": ""
+          }
+        ],
+        "rentalList": [],
+        "transportServiceList": [],
+        "zoneList": [
+          {
+            
+            "number": "0000000002",
+            "postalCode": "3933",
+            "postalName": "Porsgrunn",
+            "isStandardZone": true,
+            "materialList": [
+              {
+                
+                "material": "50101",
+                "designation": "Lift - Utsett",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 1583.0,
+                "quantumUnit": "KG",
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "material": "50102",
+                "designation": "Lift - Bytting",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 1583.0,
+                "quantumUnit": "KG",
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "showPriceInOffer": true,
+                "standardPrice": 1583.0,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "material": "50103",
+                "designation": "Lift - Tømming",
+                "materialDesignation": "Tjeneste",
+                "productGroupDesignation": "Tj. Lift",
+                "showPriceInOffer": true,
+                "standardPrice": 1817.0,
+                "quantumUnit": "KG",
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000160",
+                "subCategoryDescription": "Sone differensiert",
+                "classId": "",
+                "classDescription": ""
+              }
+            ]
+          }
+        ],
+        "salesOffice": "104",
+        "name": "Skien",
+        "salesOrg": "100",
+        "city": "PORSGRUNN"
+      },
+      {
+        
+        "materialList": [
+          {
+            
+            "material": "111101",
+            "designation": "Matavfall, uemballert",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Matavf. fra hush.",
+            "showPriceInOffer": true,
+            "standardPrice": 2198.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000140",
+            "subCategoryDescription": "Matavfall",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "114901",
+            "designation": "Trevirke - blandet",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Bl. bearb. trevirke",
+            "showPriceInOffer": true,
+            "standardPrice": 1393.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000120",
+            "subCategoryDescription": "Blandet trevirke",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "119927",
+            "designation": "Restavfall med gips/isolasjon",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Bl. næringsavfall",
+            "showPriceInOffer": true,
+            "standardPrice": 2924.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000100",
+            "subCategoryDescription": "Blandet avfall",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "122106",
+            "designation": "Papp/papir",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Brunt papir",
+            "showPriceInOffer": true,
+            "standardPrice": 744.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000110",
+            "subCategoryDescription": "Papp, papir og kartong",
+            "classId": "",
+            "classDescription": ""
+          },
+          {
+            
+            "material": "122110",
+            "designation": "Bølgepapp",
+            "materialDesignation": "Avfallsmateriale",
+            "productGroupDesignation": "Brunt papir",
+            "showPriceInOffer": true,
+            "standardPrice": 0.0,
+            "quantumUnit": "KG",
+            "discountLevel": 1,
+            "combinedMaterials": {},
+            "categoryId": "00300",
+            "categoryDescription": "Avfall",
+            "subCategoryId": "0030000110",
+            "subCategoryDescription": "Papp, papir og kartong",
+            "classId": "",
+            "classDescription": ""
+          }
+        ],
+        "rentalList": [],
+        "transportServiceList": [],
+        "zoneList": [
+          {
+            
+            "number": "0000000004",
+            "postalCode": "5420",
+            "postalName": "Rubbestadneset",
+            "isStandardZone": true,
+            "materialList": [
+              {
+                
+                "showPriceInOffer": true,
+                "standardPrice": 1362.0,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000110",
+                "subCategoryDescription": "LIFTBIL TRANSPORT",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "showPriceInOffer": true,
+                "standardPrice": 1329.0,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000110",
+                "subCategoryDescription": "LIFTBIL TRANSPORT",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "showPriceInOffer": true,
+                "standardPrice": 864.0,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000110",
+                "subCategoryDescription": "LIFTBIL TRANSPORT",
+                "classId": "",
+                "classDescription": ""
+              },
+              {
+                
+                "showPriceInOffer": true,
+                "standardPrice": 150.0,
+                "combinedMaterials": {},
+                "categoryId": "00200",
+                "categoryDescription": "Transport",
+                "subCategoryId": "0020000110",
+                "subCategoryDescription": "LIFTBIL TRANSPORT",
+                "classId": "",
+                "classDescription": ""
+              }
+            ]
+          }
+        ],
+        "salesOffice": "133",
+        "name": "Haugesund",
+        "salesOrg": "100",
+        "city": "RUBBESTADNESET"
+      }
+    ],
+    "salesEmployee": {
+      
+      "adId": "dc804853-6a82-4022-8eb5-244fff724af2",
+      "name": "Kjetil",
+      "username": "kjetil.torvund.minde@ngn.no",
+      "usernameAlias": "vh2308",
+      "jobTitle": "Systemutvikler",
+      "fullName": "Kjetil Torvund Minde",
+      "resourceNr": "63940",
+      "phoneNumber": "+4790135757",
+      "email": "kjetil.torvund.minde@ngn.no",
+      "associatedPlace": "Larvik",
+      "powerOfAttorneyOA": "2",
+      "powerOfAttorneyFA": "2",
+      "department": "Adact"
+    },
+    "customerTerms": {
+      
+      "additionForAdminFee": true,
+      "agreementStartDate": 1684108800000,
+      "contractTerm": "Generelle vilkår",
+      "invoiceInterval": "Hver 14.dag",
+      "metalPricing": "Fastpris (opp til kr -500,- pr. tonn)",
+      "metalSetDateForOffer": 1684108800000,
+      "paymentCondition": "30 dgr"
+    },
+    "createdBy": "Not fully implemented",
+    "lastModifiedBy": "Not fully implemented"
+  }
+]

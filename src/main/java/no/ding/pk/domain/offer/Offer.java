@@ -49,6 +49,9 @@ public class Offer extends Auditable {
     private Boolean isApproved;
 
     @Column
+    private String dismissalReason;
+
+    @Column
     private Date approvalDate;
 
     @Column
@@ -67,6 +70,14 @@ public class Offer extends Auditable {
         if(contactPersonList != null && !contactPersonList.isEmpty()) {
             this.contactPersonList.addAll(contactPersonList);
         }
+    }
+
+    public Boolean getNeedsApproval() {
+        return needsApproval != null && needsApproval;
+    }
+
+    public boolean isApproved() {
+        return isApproved != null && isApproved;
     }
 
     @Override

@@ -46,8 +46,8 @@ public class PriceOfferTemplate extends Offer implements Serializable {
 
     @Builder(builderMethodName = "priceOfferTemplateBuilder")
     public PriceOfferTemplate(Long id, Boolean deleted, String customerNumber, String customerName, List<ContactPerson> contactPersonList, List<SalesOffice> salesOfficeList, User salesEmployee,
-                              Boolean needsApproval, User approver, Boolean approved, Date approvalDate, Date dateIssued, PriceOfferTerms customerTerms) {
-        super(id, deleted, customerNumber, customerName, contactPersonList, needsApproval, approved, approvalDate,
+                              Boolean needsApproval, User approver, Boolean approved, String dismissalReason, Date approvalDate, Date dateIssued, PriceOfferTerms customerTerms) {
+        super(id, deleted, customerNumber, customerName, contactPersonList, needsApproval, approved, dismissalReason, approvalDate,
                 dateIssued);
 
         this.salesOfficeList = salesOfficeList;

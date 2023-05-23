@@ -1,11 +1,14 @@
 {
   "customerNumber": "102520",
   "customerName": "Vest-Telemark Rørleggerforretning AS",
+  "needsApproval": false,
+  "isApproved": false,
+  "priceOfferStatus": null,
   "salesOfficeList": [
     {
       "salesOrg": "100",
       "salesOffice": "104",
-      "salesOfficeName": "Skien",
+      "name": "Skien",
       "materialList": [
         {
           "discountPct": null,
@@ -51,13 +54,13 @@
           "priceIncMva": -1
         }
       ],
-      "zones": [
+      "zoneList": [
         {
-          "zoneId": "2",
+          "number": "2",
           "postalCode": "3943",
           "postalName": "PORSGRUNN",
           "isStandardZone": true,
-          "priceRows": [
+          "materialList": [
             {
               "discountPct": null,
               "material": "50201",
