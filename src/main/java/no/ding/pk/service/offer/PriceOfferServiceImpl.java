@@ -82,12 +82,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        if(newPriceOffer.getNeedsApproval() && !newPriceOffer.isApproved()) {
-            List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+        List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
-            if(!materialsForApproval.isEmpty()) {
-                entity.setMaterialsForApproval(String.join(",", materialsForApproval));
-            }
+        if(!materialsForApproval.isEmpty()) {
+            entity.setMaterialsForApproval(String.join(",", materialsForApproval));
         }
 
         if(newPriceOffer.getApprover() != null) {
@@ -197,6 +195,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         if(approved != null && approved)  {
+            priceOfferToApprove.setIsApproved(approved);
             approveMaterialsSinceLastUpdate(priceOfferToApprove);
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 

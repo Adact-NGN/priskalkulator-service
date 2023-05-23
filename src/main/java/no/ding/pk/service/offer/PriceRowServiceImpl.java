@@ -108,6 +108,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
+        entity.setApproved(materialPriceRow.getApproved());
 
         entity = repository.save(entity);
 

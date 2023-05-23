@@ -11,7 +11,6 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
-import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +39,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -155,40 +157,26 @@ class PriceOfferControllerTest {
     }
 
     @Test
-    public void shouldSetPriceOfferToApproved() throws Exception {
-
+    public void shouldSetPriceOfferToNotApprovedWhenNewMaterialsIsAdded() throws Exception {
         User salesEmployee = userService.findByEmail(salesEmployeeEmail);
         User approver = userService.findByEmail(approverEmail);
 
         List<PriceRow> materials = createPriceRows();
-        SalesOffice salesOfficeDTO = SalesOffice.builder()
-                .salesOrg("100")
-                .salesOffice("104")
-                .city("Skien")
-                .materialList(materials)
-                .build();
+        SalesOffice salesOfficeDTO = createSalesOffice(materials);
         List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
-        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
-                .customerNumber("102520")
-                .customerName("Vest-Telemark Rørleggerforretning AS")
-                .salesOfficeList(salesOfficeDTOs)
-                .salesEmployee(salesEmployee)
-                .approver(approver)
-                .needsApproval(true)
-                .build();
+        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
 
         PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
+        // Create
         MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-                .content(objectWriter.writeValueAsString(priceOfferDTO))
-                .with(jwt()
-                        .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-                        .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
-                ))
+                        .content(objectWriter.writeValueAsString(priceOfferDTO))
+                        .with(jwt()
+                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
+                        ))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
-
-        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
 
         priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
 
@@ -205,6 +193,90 @@ class PriceOfferControllerTest {
         Boolean approvalResult = objectReader.readValue(result.getResponse().getContentAsString(), Boolean.class);
 
         assertThat(approvalResult, is(true));
+
+        result = mockMvc.perform(get("/api/v2/price-offer/id/" + priceOfferDTO.getId()).contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
+
+        // Update
+        PriceRowDTO newPriceRow = PriceRowDTO.builder()
+                .material("111107")
+                .manualPrice(1199.0)
+                .approved(false)
+                .needsApproval(true)
+                .build();
+
+        priceOfferDTO.getSalesOfficeList().get(0).getMaterialList().add(newPriceRow);
+
+        result = mockMvc.perform(put("/api/v2/price-offer/save/" + priceOfferDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectWriter.writeValueAsString(priceOfferDTO)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
+
+        assertThat(priceOfferDTO.getIsApproved(), is(false));
+        assertThat(priceOfferDTO.getNeedsApproval(), is(true));
+    }
+
+    @Test
+    public void shouldSetPriceOfferToApproved() throws Exception {
+
+        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+        User approver = userService.findByEmail(approverEmail);
+
+        List<PriceRow> materials = createPriceRows();
+        SalesOffice salesOfficeDTO = createSalesOffice(materials);
+        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
+        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
+
+        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+
+        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                .content(objectWriter.writeValueAsString(priceOfferDTO))
+                .with(jwt()
+                        .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                        .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
+                ))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
+
+        assertThat(approver.getId(), notNullValue());
+        assertThat(priceOfferDTO.getId(), notNullValue());
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("approved", "true");
+        result = mockMvc.perform(put("/api/v2/price-offer/approve/" + approver.getId() + "/" + priceOfferDTO.getId()).params(params)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        Boolean approvalResult = objectReader.readValue(result.getResponse().getContentAsString(), Boolean.class);
+
+        assertThat(approvalResult, is(true));
+    }
+
+    private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {
+        return PriceOffer.priceOfferBuilder()
+                .customerNumber("102520")
+                .customerName("Vest-Telemark Rørleggerforretning AS")
+                .salesOfficeList(salesOfficeDTOs)
+                .salesEmployee(salesEmployee)
+                .approver(approver)
+                .needsApproval(true)
+                .build();
+    }
+
+    private static SalesOffice createSalesOffice(List<PriceRow> materials) {
+        return SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("104")
+                .city("Skien")
+                .materialList(materials)
+                .build();
     }
 
     private List<PriceRow> createPriceRows() {

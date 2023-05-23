@@ -10,6 +10,7 @@ import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,16 +19,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,7 +82,7 @@ public class PriceOfferController {
     /**
      * Set approval status for price offer
      * @param approverId Approver User id
-     * @param priceOfferId Id for Price offer to be approved
+     * @param priceOfferId ID for Price offer to be approved
      * @param approved Approval status
      * @return True if price offer was successfully approved, else false.
      */
@@ -192,7 +184,12 @@ public class PriceOfferController {
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
         
         updatedOffer = service.save(updatedOffer);
-        
+
+        if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
+            updatedOffer.setNeedsApproval(true);
+            updatedOffer.setIsApproved(false);
+        }
+
         if(updatedOffer.getNeedsApproval() && updatedOffer.getIsApproved() != null && !updatedOffer.getIsApproved()) {
             List<Integer> salesOffices = updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
             
@@ -200,25 +197,25 @@ public class PriceOfferController {
                 List<PowerOfAttorney> poa = sopoaService.findBySalesOfficeInList(salesOffices);
                 
                 if(!poa.isEmpty()) {
-                    User approver = getApproferForPriceOffer(poa);
+                    User approver = getApproverForPriceOffer(poa);
                     
                     if(approver != null) {
                         updatedOffer.setApprover(approver);
 
                         updatedOffer = service.save(updatedOffer);
                     } else {
-                        log.debug("Could not find any ellidgable approver for offer with id: {}, sales offices: {}", updatedOffer.getId(), salesOffices);
+                        log.debug("Could not find any eligible approver for offer with id: {}, sales offices: {}", updatedOffer.getId(), salesOffices);
                     }
                 } else {
-                    log.debug("No Power of attorneys found for any sales offices adde to the price offer: {}", salesOffices);
+                    log.debug("No Power of attorneys found for any sales offices added to the price offer: {}", salesOffices);
                 }
             }
         }
         
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
-    
-    private User getApproferForPriceOffer(List<PowerOfAttorney> poa) {
+
+    private User getApproverForPriceOffer(List<PowerOfAttorney> poa) {
         Optional<PowerOfAttorney> findAnyPoaLvl1 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlOneHolder() != null).findAny();
         
         if(findAnyPoaLvl1.isPresent()) {
