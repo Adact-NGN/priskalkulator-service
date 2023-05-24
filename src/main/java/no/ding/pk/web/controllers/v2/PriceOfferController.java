@@ -95,14 +95,15 @@ public class PriceOfferController {
     }
     
     /**
-     * Find all that needs approval.
+     * Find and filter all price offers for approver.
      * @param approverId approver user id
+     * @param priceOfferStatus price offer status to filter on {@code not required}
      * @return List of price offers for approver
      */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId,
-                                              @RequestParam(value = "isApproved", required = false, defaultValue = "false") boolean isApproved) {
-        List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId, isApproved);
+                                              @RequestParam(value = "status", required = false) String priceOfferStatus) {
+        List<PriceOffer> priceOffers = service.findAllByApproverIdAndPriceOfferStatus(approverId, priceOfferStatus);
         
         if(!priceOffers.isEmpty()) {
             log.debug("Found price offers, {}, for approver", priceOffers.size());
@@ -158,7 +159,7 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
         
-        priceOffer.setPriceOfferStatus(PriceOfferStatus.OFFER_CREATED.getStatus());
+        priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         priceOffer = service.save(priceOffer);
         
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));

@@ -14,6 +14,7 @@ import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,8 @@ class PriceOfferControllerTest {
     private MockMvc mockMvc;
     private String approverEmail;
     private String salesEmployeeEmail;
+    private User salesEmployee;
+    private User approver;
 
     @BeforeEach
     public void setup() {
@@ -78,7 +81,7 @@ class PriceOfferControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
         salesEmployeeEmail = "Wolfgang@farris-bad.no";
-        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+        salesEmployee = userService.findByEmail(salesEmployeeEmail);
 
         if(salesEmployee == null) {
             salesEmployee = User.builder()
@@ -94,7 +97,7 @@ class PriceOfferControllerTest {
         }
 
         approverEmail = "alexander.brox@ngn.no";
-        User approver = userService.findByEmail(approverEmail);
+        approver = userService.findByEmail(approverEmail);
 
         if(approver == null) {
             approver = User.builder()
@@ -143,8 +146,19 @@ class PriceOfferControllerTest {
 
     @Test
     public void shouldListAllPriceOfferForApprover() throws Exception {
-        long approverId = 1L;
-        MvcResult result = mockMvc.perform(get("/api/v2/price-offer/list/approver/" + approverId))
+        PriceOfferDTO priceOffer = createCompleteOfferDto();
+
+        MvcResult result = mockMvc.perform(
+                        post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                                .content(objectWriter.writeValueAsString(priceOffer))
+                                .with(jwt()
+                                        .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                        .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+
+        result = mockMvc.perform(get("/api/v2/price-offer/list/approver/" + approver.getId()).param("status", PriceOfferStatus.PENDING.getStatus()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 

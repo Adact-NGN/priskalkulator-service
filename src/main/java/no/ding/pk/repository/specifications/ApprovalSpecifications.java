@@ -7,6 +7,13 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Join;
 
 public class ApprovalSpecifications {
+    public static Specification<PriceOffer> withPriceOfferStatus(String priceOfferStatus) {
+        if(priceOfferStatus == null) {
+            return null;
+        } else
+            return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("priceOfferStatus"), priceOfferStatus);
+    }
+
     public static Specification<PriceOffer> withIsApproved(Boolean isApproved) {
         if(isApproved == null) {
             return (root, query, criteriaBuilder) -> criteriaBuilder.isNull(root.get("isApproved"));

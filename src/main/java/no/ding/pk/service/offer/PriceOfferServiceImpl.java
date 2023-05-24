@@ -63,6 +63,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity = createNewPriceOffer(salesEmployee);
         }
 
+        entity.setPriceOfferStatus(newPriceOffer.getPriceOfferStatus());
+
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         if(newPriceOffer.getCustomerName() != null) {
             entity.setCustomerName(newPriceOffer.getCustomerName());
@@ -108,6 +110,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private List<String> getAllMaterialsForApproval(PriceOffer priceOffer) {
         List<String> materialsInPriceOffer = new ArrayList<>();
+
+        if(priceOffer.getSalesOfficeList() == null) {
+            return materialsInPriceOffer;
+        }
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
             if(salesOffice.getMaterialList() != null)
                 collectMaterial(materialsInPriceOffer, salesOffice.getMaterialList());
@@ -185,9 +191,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId, boolean isApproved) {
-        return repository.findAll(Specification.where(withApproverId(approverId)).and(withNeedsApproval(true)).and(withIsApproved(isApproved)));
-//        return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
+    public List<PriceOffer> findAllByApproverIdAndPriceOfferStatus(Long approverId, String priceOfferStatus) {
+        return repository.findAll(Specification.where(withApproverId(approverId)).and(withPriceOfferStatus(priceOfferStatus)));
     }
 
     @Override

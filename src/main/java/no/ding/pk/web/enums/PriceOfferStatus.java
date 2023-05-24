@@ -1,11 +1,11 @@
 package no.ding.pk.web.enums;
 
 public enum PriceOfferStatus {
-    OFFER_CREATED("Tilbud opprettet"),
-    SENT_TO_COSTUMER("Sendt til kunde"),
-    FOR_APPROVAL("Til godkjenning"),
-    APPROVED_SENT_TO_CUSTOMER("Godkjent, sendt til kunde"),
-    ACTIVATED("Aktivert");
+    PENDING("PENDING"),
+    REJECTED("REJECTED"),
+    APPROVED("APPROVED"),
+    SENT_TO_COSTUMER("SENT_TO_COSTUMER"),
+    ACTIVATED("ACTIVATED");
 
     private final String status;
 

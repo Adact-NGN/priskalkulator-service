@@ -14,7 +14,9 @@ import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,9 +49,8 @@ class PriceOfferServiceImplTest {
     @Autowired
     private MaterialService materialService;
 
-    @Test
-    public void shouldPersistPriceOffer() throws JsonProcessingException {
-
+    @BeforeEach
+    public void setup() {
         persistSalesRoles();
         createMaterial();
 
@@ -96,6 +97,12 @@ class PriceOfferServiceImplTest {
         SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
         saSalesRole.addUser(salesEmployee);
         salesRoleService.save(saSalesRole);
+    }
+
+    @Test
+    public void shouldPersistPriceOffer() throws JsonProcessingException {
+
+
 
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
@@ -170,6 +177,8 @@ class PriceOfferServiceImplTest {
                 .zoneList(zoneList)
                 .build();
 
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
+
         List<SalesOffice> salesOfficeList = List.of(salesOffice);
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .customerNumber("5162")
@@ -237,6 +246,37 @@ class PriceOfferServiceImplTest {
         .build();
 
         materialService.save(waste);
+    }
+
+    @Test
+    public void shouldListAllPriceOfferForApprover() {
+        User user = userService.findByEmail("alexander.brox@ngn.no");
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(user)
+                .approver(user)
+                .build();
+
+        service.save(priceOffer);
+
+        List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), null);
+
+        assertThat(actual, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldListAllPriceOfferForApproverWithStatusPending() {
+        User user = userService.findByEmail("alexander.brox@ngn.no");
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(user)
+                .approver(user)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .build();
+
+        service.save(priceOffer);
+
+        List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), PriceOfferStatus.PENDING.getStatus());
+
+        assertThat(actual, hasSize(greaterThan(0)));
     }
 
     private void persistSalesRoles() {
