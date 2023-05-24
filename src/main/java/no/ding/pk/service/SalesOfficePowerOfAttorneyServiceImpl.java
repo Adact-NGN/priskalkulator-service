@@ -52,6 +52,11 @@ public class SalesOfficePowerOfAttorneyServiceImpl implements SalesOfficePowerOf
     }
 
     @Override
+    public PowerOfAttorney findBySalesOffice(Integer salesOfficeNumber) {
+        return repository.findBySalesOffice(salesOfficeNumber);
+    }
+
+    @Override
     public List<PowerOfAttorney> findBySalesOfficeInList(List<Integer> salesOffices) {
         return repository.findAllBySalesOfficeIsIn(salesOffices);
     }

@@ -54,6 +54,25 @@ public class SalesOfficePowerOfAttorneyController {
     }
 
     /**
+     * Get power of attorney by sales office number
+     * @param salesOfficeNumber Sales office number to look up
+     * @return SalesOffice object or null
+     */
+    @GetMapping(path = "/office/{salesOfficeNumber}")
+    public SalesOfficePowerOfAttorneyDTO bySalesOfficeNumber(@PathVariable("salesOfficeNumber") Integer salesOfficeNumber) {
+
+        log.debug("Getting entity by sales office number: {}", salesOfficeNumber);
+
+        PowerOfAttorney poa = service.findBySalesOffice(salesOfficeNumber);
+
+        if(poa != null) {
+            return modelMapper.map(poa, SalesOfficePowerOfAttorneyDTO.class);
+        }
+
+        return null;
+    }
+
+    /**
      * Get all power og attorney objects
      * @return List of {@code SalesOfficePowerOfAttorneyDTO}
      */

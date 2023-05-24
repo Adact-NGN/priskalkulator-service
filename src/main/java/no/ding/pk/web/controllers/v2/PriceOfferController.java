@@ -100,8 +100,9 @@ public class PriceOfferController {
      * @return List of price offers for approver
      */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId) {
-        List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId);
+    public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId,
+                                              @RequestParam(value = "isApproved", required = false, defaultValue = "false") boolean isApproved) {
+        List<PriceOffer> priceOffers = service.findAllByApproverIdAndNeedsApproval(approverId, isApproved);
         
         if(!priceOffers.isEmpty()) {
             log.debug("Found price offers, {}, for approver", priceOffers.size());

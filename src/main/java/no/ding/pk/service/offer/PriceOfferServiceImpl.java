@@ -11,10 +11,13 @@ import no.ding.pk.web.handlers.PriceOfferNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
 @Transactional
 @Service
@@ -182,8 +185,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId) {
-        return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
+    public List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId, boolean isApproved) {
+        return repository.findAll(Specification.where(withApproverId(approverId)).and(withNeedsApproval(true)).and(withIsApproved(isApproved)));
+//        return repository.findAllByApproverIdAndNeedsApprovalIsTrue(approverId);
     }
 
     @Override

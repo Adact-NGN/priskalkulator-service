@@ -76,7 +76,7 @@ class PriceOfferServiceImplTest {
 
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
         knSalesRole.addUser(alex);
-        knSalesRole = salesRoleService.save(knSalesRole);
+        salesRoleService.save(knSalesRole);
 
         User salesEmployee = userService.findByEmail("Wolfgang@farris-bad.no");
 
@@ -95,7 +95,7 @@ class PriceOfferServiceImplTest {
 
         SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
         saSalesRole.addUser(salesEmployee);
-        saSalesRole = salesRoleService.save(saSalesRole);
+        salesRoleService.save(saSalesRole);
 
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())

@@ -14,4 +14,6 @@ public interface SalesOfficePowerOfAttorneyService {
     List<PowerOfAttorney> findBySalesOfficeInList(List<Integer> salesOffices);
 
     boolean delete(Long id);
+
+    PowerOfAttorney findBySalesOffice(Integer salesOfficeNumber);
 }
