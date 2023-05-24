@@ -19,5 +19,5 @@ public interface PriceOfferService {
 
     List<PriceOffer> findAllByApproverIdAndNeedsApproval(Long approverId);
 
-    Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved);
+    Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved, String comment);
 }

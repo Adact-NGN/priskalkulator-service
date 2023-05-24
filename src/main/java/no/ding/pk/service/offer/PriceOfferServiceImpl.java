@@ -187,7 +187,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved) {
+    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved, String comment) {
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
@@ -201,6 +201,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             priceOfferToApprove.setIsApproved(!needsReApproval);
             priceOfferToApprove.setNeedsApproval(needsReApproval);
+        } else {
+            priceOfferToApprove.setIsApproved(approved);
+            priceOfferToApprove.setDismissalReason(comment);
         }
 
         priceOfferToApprove = repository.save(priceOfferToApprove);

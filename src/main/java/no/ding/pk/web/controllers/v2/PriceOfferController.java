@@ -7,6 +7,7 @@ import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
@@ -83,14 +84,14 @@ public class PriceOfferController {
      * Set approval status for price offer
      * @param approverId Approver User id
      * @param priceOfferId ID for Price offer to be approved
-     * @param approved Approval status
+     * @param approvalRequest Approval status
      * @return True if price offer was successfully approved, else false.
      */
-    @PutMapping(path = "/approve/{approverId}/{priceOfferId}")
-    public Boolean approvePriceOffer(@PathVariable("approverId") Long approverId,
-                                     @PathVariable("priceOfferId") Long priceOfferId,
-                                     @RequestParam(name = "approved", required = false) Boolean approved) {
-        return service.approvePriceOffer(priceOfferId, approverId, approved);
+    @PutMapping(path = "/approval/{approverId}/{priceOfferId}")
+    public Boolean priceOfferApproval(@PathVariable("approverId") Long approverId,
+                                      @PathVariable("priceOfferId") Long priceOfferId,
+                                      @RequestBody ApprovalRequest approvalRequest) {
+        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getComment());
     }
     
     /**

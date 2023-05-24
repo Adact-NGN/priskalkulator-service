@@ -13,6 +13,7 @@ import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
+import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,8 +32,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
@@ -183,9 +182,11 @@ class PriceOfferControllerTest {
         assertThat(approver.getId(), notNullValue());
         assertThat(priceOfferDTO.getId(), notNullValue());
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("approved", "true");
-        result = mockMvc.perform(put("/api/v2/price-offer/approve/" + approver.getId() + "/" + priceOfferDTO.getId()).params(params)
+        ApprovalRequest approvalRequest = ApprovalRequest.builder()
+                .status(true)
+                .build();
+        result = mockMvc.perform(put("/api/v2/price-offer/approval/" + approver.getId() + "/" + priceOfferDTO.getId())
+                        .content(objectWriter.writeValueAsString(approvalRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
@@ -233,12 +234,13 @@ class PriceOfferControllerTest {
 
         PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
-        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-                .content(objectWriter.writeValueAsString(priceOfferDTO))
-                .with(jwt()
-                        .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-                        .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
-                ))
+        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectWriter.writeValueAsString(priceOfferDTO))
+                        .with(jwt()
+                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
+                        ))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
@@ -247,9 +249,11 @@ class PriceOfferControllerTest {
         assertThat(approver.getId(), notNullValue());
         assertThat(priceOfferDTO.getId(), notNullValue());
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("approved", "true");
-        result = mockMvc.perform(put("/api/v2/price-offer/approve/" + approver.getId() + "/" + priceOfferDTO.getId()).params(params)
+        ApprovalRequest approvalRequest = ApprovalRequest.builder()
+                .status(true)
+                .build();
+        result = mockMvc.perform(put("/api/v2/price-offer/approval/" + approver.getId() + "/" + priceOfferDTO.getId())
+                        .content(objectWriter.writeValueAsString(approvalRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();

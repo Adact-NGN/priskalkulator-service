@@ -31,6 +31,7 @@ public class PriceOfferDTO {
     private UserDTO approver;
     private Boolean isApproved;
     private Boolean needsApproval;
+    private String dismissalReason;
     private Date activationDate;
     private TermsDTO customerTerms;
     private Date dateIssued;
