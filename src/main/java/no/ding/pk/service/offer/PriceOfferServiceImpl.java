@@ -6,8 +6,10 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.PriceOfferNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -196,28 +198,30 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, Boolean approved, String comment) {
+    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment) {
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
             throw new PriceOfferNotFoundException();
         }
 
-        if(approved != null && approved)  {
-            priceOfferToApprove.setIsApproved(approved);
+        if(StringUtils.isNotBlank(priceOfferStatus) && PriceOfferStatus.isApprovalState(priceOfferStatus))  {
+            priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
             approveMaterialsSinceLastUpdate(priceOfferToApprove);
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 
-            priceOfferToApprove.setIsApproved(!needsReApproval);
-            priceOfferToApprove.setNeedsApproval(needsReApproval);
+            if(needsReApproval) {
+                priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+                priceOfferToApprove.setNeedsApproval(needsReApproval);
+            }
         } else {
-            priceOfferToApprove.setIsApproved(approved);
+            priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
             priceOfferToApprove.setDismissalReason(comment);
         }
 
         priceOfferToApprove = repository.save(priceOfferToApprove);
 
-        return priceOfferToApprove.getIsApproved();
+        return PriceOfferStatus.getApprovalStates().contains(priceOfferToApprove.getPriceOfferStatus());
     }
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
@@ -225,10 +229,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         List<String> materialsToApprove = new ArrayList<>(Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList());
         List<String> approvedMaterials = new ArrayList<>();
 
+        boolean priceOfferIsApproved = PriceOfferStatus.getApprovalStates().contains(priceOfferToApprove.getPriceOfferStatus());
+
         for(SalesOffice so : priceOfferToApprove.getSalesOfficeList()) {
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getMaterialList(), priceOfferToApprove.getIsApproved()));
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getTransportServiceList(), priceOfferToApprove.getIsApproved()));
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getRentalList(), priceOfferToApprove.getIsApproved()));
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getMaterialList(), priceOfferIsApproved));
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getTransportServiceList(), priceOfferIsApproved));
+            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getRentalList(), priceOfferIsApproved));
         }
 
         Collections.sort(approvedMaterials);

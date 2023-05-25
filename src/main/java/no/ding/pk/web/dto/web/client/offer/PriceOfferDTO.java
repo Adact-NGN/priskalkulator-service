@@ -29,7 +29,6 @@ public class PriceOfferDTO {
     private UserDTO salesEmployee;
     private Date approvalDate;
     private UserDTO approver;
-    private Boolean isApproved;
     private Boolean needsApproval;
     private String dismissalReason;
     private Date activationDate;

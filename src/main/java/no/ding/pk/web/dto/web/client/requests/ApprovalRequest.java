@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class ApprovalRequest {
-    private Boolean status;
+    private String status;
     private String comment;
 }

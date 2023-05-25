@@ -1,5 +1,7 @@
 package no.ding.pk.web.enums;
 
+import java.util.List;
+
 public enum PriceOfferStatus {
     PENDING("PENDING"),
     REJECTED("REJECTED"),
@@ -11,6 +13,14 @@ public enum PriceOfferStatus {
 
     PriceOfferStatus(String status) {
         this.status = status;
+    }
+
+    public static List<String> getApprovalStates() {
+        return List.of(APPROVED.status, SENT_TO_COSTUMER.status, ACTIVATED.status);
+    }
+
+    public static boolean isApprovalState(String status) {
+        return getApprovalStates().contains(status);
     }
 
     public String getStatus() {

@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @DataJpaTest
@@ -49,8 +50,9 @@ public class SalesRoleRepositoryTest {
     public void shouldPersistUserWithSalesRole() {
         SalesRole persistedSalesRole = createSalesRoleWithUser();
 
-        SalesRole actual = repository.findByIdWithUserList(persistedSalesRole.getId());
+        SalesRole actual = repository.findById(persistedSalesRole.getId()).orElse(null);
 
+        assertThat(actual, notNullValue());
         assertThat(actual.getUserList(), hasSize(1));
     }
 

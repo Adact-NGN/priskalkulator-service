@@ -15,6 +15,7 @@ import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.SalesRoleName;
 import no.ding.pk.web.enums.TermsTypes;
 import org.slf4j.Logger;
@@ -184,7 +185,7 @@ public class StartUpDev {
                         .customerNumber("5162")
                         .customerName("Europris Telem Notodden")
                         .needsApproval(true)
-                        .approved(false)
+                        .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                         .salesEmployee(salesEmployee)
                         .salesOfficeList(salesOfficeList)
                         .approver(kjetil)

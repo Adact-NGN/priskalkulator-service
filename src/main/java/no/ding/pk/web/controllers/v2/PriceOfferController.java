@@ -190,10 +190,10 @@ public class PriceOfferController {
 
         if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
             updatedOffer.setNeedsApproval(true);
-            updatedOffer.setIsApproved(false);
+            updatedOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         }
 
-        if(updatedOffer.getNeedsApproval() && updatedOffer.getIsApproved() != null && !updatedOffer.getIsApproved()) {
+        if(priceOfferCandidateForApprovalAndIsNotApproved(updatedOffer)) {
             List<Integer> salesOffices = updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
             
             if(!salesOffices.isEmpty()) {
@@ -216,6 +216,10 @@ public class PriceOfferController {
         }
         
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
+    }
+
+    private static boolean priceOfferCandidateForApprovalAndIsNotApproved(PriceOffer updatedOffer) {
+        return updatedOffer.getNeedsApproval() && !PriceOfferStatus.isApprovalState(updatedOffer.getPriceOfferStatus());
     }
 
     private User getApproverForPriceOffer(List<PowerOfAttorney> poa) {

@@ -197,7 +197,7 @@ class PriceOfferControllerTest {
         assertThat(priceOfferDTO.getId(), notNullValue());
 
         ApprovalRequest approvalRequest = ApprovalRequest.builder()
-                .status(true)
+                .status(PriceOfferStatus.APPROVED.getStatus())
                 .build();
         result = mockMvc.perform(put("/api/v2/price-offer/approval/" + approver.getId() + "/" + priceOfferDTO.getId())
                         .content(objectWriter.writeValueAsString(approvalRequest))
@@ -231,7 +231,7 @@ class PriceOfferControllerTest {
 
         priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
 
-        assertThat(priceOfferDTO.getIsApproved(), is(false));
+        assertThat(priceOfferDTO.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
         assertThat(priceOfferDTO.getNeedsApproval(), is(true));
     }
 
@@ -264,7 +264,7 @@ class PriceOfferControllerTest {
         assertThat(priceOfferDTO.getId(), notNullValue());
 
         ApprovalRequest approvalRequest = ApprovalRequest.builder()
-                .status(true)
+                .status(PriceOfferStatus.APPROVED.getStatus())
                 .build();
         result = mockMvc.perform(put("/api/v2/price-offer/approval/" + approver.getId() + "/" + priceOfferDTO.getId())
                         .content(objectWriter.writeValueAsString(approvalRequest))

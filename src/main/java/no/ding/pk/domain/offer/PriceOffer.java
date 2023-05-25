@@ -59,6 +59,12 @@ public class PriceOffer extends Offer implements Serializable {
     private Date approvalDate;
 
     @Column
+    private Boolean needsApproval;
+
+    @Column
+    private String dismissalReason;
+
+    @Column
     private Date activationDate;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
@@ -67,11 +73,12 @@ public class PriceOffer extends Offer implements Serializable {
 
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Boolean approved, String dismissalReason, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
+            Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
                       String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
-        super(id, deleted, customerNumber, customerName, contactPersonList, needsApproval, approved, dismissalReason, approvalDate,
+        super(id, deleted, customerNumber, customerName, contactPersonList, approvalDate,
                 dateIssued);
 
+        this.needsApproval = needsApproval;
         this.salesOfficeList = salesOfficeList;
         this.salesEmployee = salesEmployee;
         this.approver = approver;
@@ -79,6 +86,10 @@ public class PriceOffer extends Offer implements Serializable {
         this.priceOfferStatus = priceOfferStatus;
         this.approvalDate = approvalDate;
         this.activationDate = activationDate;
+    }
+
+    public Boolean getNeedsApproval() {
+        return needsApproval != null && needsApproval;
     }
 
     @Override
@@ -95,9 +106,5 @@ public class PriceOffer extends Offer implements Serializable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
-    }
-
-    public boolean isApproved() {
-        return super.isApproved();
     }
 }

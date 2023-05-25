@@ -184,10 +184,12 @@ class PriceOfferServiceImplTest {
                 .customerNumber("5162")
                 .customerName("Europris Telem Notodden")
                 .needsApproval(true)
-                .approved(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(salesOfficeList)
                 .build();
+
+        priceOffer.setNeedsApproval(true);
 
         priceOffer.setCustomerTerms(priceOfferTerms);
 
@@ -200,7 +202,7 @@ class PriceOfferServiceImplTest {
                 .customerNumber("327342")
                 .customerName("Follo Ren IKS")
                 .needsApproval(false)
-                .approved(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice2))
                 .build();

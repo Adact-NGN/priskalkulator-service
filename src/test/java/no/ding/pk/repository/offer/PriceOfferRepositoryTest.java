@@ -3,16 +3,20 @@ package no.ding.pk.repository.offer;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.UserRepository;
+import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.withApproverId;
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.withPriceOfferStatus;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -86,7 +90,7 @@ public class PriceOfferRepositoryTest {
 
         createCompleteOfferDtoList(salesAndApprover);
 
-        List<PriceOffer> actual = repository.findAllByApproverIdAndNeedsApprovalIsTrue(salesAndApprover.getId());
+        List<PriceOffer> actual = repository.findAll(Specification.where(withApproverId(salesAndApprover.getId())).and(withPriceOfferStatus(PriceOfferStatus.PENDING.getStatus())));
 
         assertThat(actual, hasSize(greaterThan(0)));
     }
@@ -126,7 +130,7 @@ public class PriceOfferRepositoryTest {
                 .approver(salesAndApproval)
                 .priceOfferTerms(PriceOfferTerms.builder().additionForAdminFee(true).contractTerm(TermsTypes.NGPriceTerms.name()).build())
                 .salesOfficeList(List.of(bergen))
-                .needsApproval(true)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
 
         repository.save(priceOffer);
@@ -238,9 +242,7 @@ public class PriceOfferRepositoryTest {
                 .customerNumber("5162")
                 .salesOfficeList(salesOfficeList)
                 .salesEmployee(salesEmployee)
-                .needsApproval(true)
                 .approver(approver)
-                .approved(false)
                 .build();
 
         priceOffer.setCustomerTerms(priceOfferTerms);
@@ -354,9 +356,7 @@ public class PriceOfferRepositoryTest {
                 .customerNumber("5162")
                 .salesOfficeList(salesOfficeList)
                 .salesEmployee(salesEmployee)
-                .needsApproval(true)
                 .approver(approver)
-                .approved(false)
                 .priceOfferTerms(customerTerms)
                 .build();
     }

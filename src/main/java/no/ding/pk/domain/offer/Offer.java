@@ -43,15 +43,6 @@ public class Offer extends Auditable {
     private List<ContactPerson> contactPersonList;
 
     @Column
-    private Boolean needsApproval;
-
-    @Column
-    private Boolean isApproved;
-
-    @Column
-    private String dismissalReason;
-
-    @Column
     private Date approvalDate;
 
     @Column
@@ -72,14 +63,6 @@ public class Offer extends Auditable {
         }
     }
 
-    public Boolean getNeedsApproval() {
-        return needsApproval != null && needsApproval;
-    }
-
-    public boolean isApproved() {
-        return isApproved != null && isApproved;
-    }
-
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
@@ -91,8 +74,6 @@ public class Offer extends Auditable {
                 "lastModifiedDate = " + lastModifiedDate + ", " +
                 "customerNumber = " + customerNumber + ", " +
                 "customerName = " + customerName + ", " +
-                "needsApproval = " + needsApproval + ", " +
-                "isApproved = " + isApproved + ", " +
                 "approvalDate = " + approvalDate + ", " +
                 "dateIssued = " + dateIssued + ")";
     }
