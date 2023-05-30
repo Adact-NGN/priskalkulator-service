@@ -8,6 +8,7 @@ import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import no.ding.pk.web.handlers.MissingApprovalStatusException;
 import no.ding.pk.web.handlers.PriceOfferNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -202,7 +203,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
+            log.debug("Could not find price offer to approve. Given price offer ID {}", approverId);
             throw new PriceOfferNotFoundException();
+        }
+
+        if(!PriceOfferStatus.getApprovalStates().contains(priceOfferStatus)) {
+            String message = String.format("Given status was not found. Given status: %s, expected one of the following [%s]", priceOfferStatus, PriceOfferStatus.getApprovalStates());
+            log.debug(message);
+            throw new MissingApprovalStatusException(message);
         }
 
         if(StringUtils.isNotBlank(priceOfferStatus) && PriceOfferStatus.isApprovalState(priceOfferStatus))  {

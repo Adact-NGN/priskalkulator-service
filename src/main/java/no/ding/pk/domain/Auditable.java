@@ -25,7 +25,7 @@ public abstract class Auditable implements Serializable {
     protected String createdBy;
  
     @CreatedDate
-    @Column(name = "CREATE_DATE_TIME", columnDefinition = "timestamp default '2021-06-10 20:47:05.967394'", updatable = false)
+    @Column(name = "CREATE_DATE", columnDefinition = "timestamp default '2021-06-10 20:47:05.967394'", updatable = false)
     protected Date createdDate;
  
     @LastModifiedBy
@@ -33,7 +33,7 @@ public abstract class Auditable implements Serializable {
     protected String lastModifiedBy;
  
     @LastModifiedDate
-    @Column(name = "MODIFIED_DATE_TIME", columnDefinition = "timestamp default '2021-06-10 20:47:05.967394'")
+    @Column(name = "MODIFIED_DATE", columnDefinition = "timestamp default '2021-06-10 20:47:05.967394'")
     protected Date lastModifiedDate;
 
 }
