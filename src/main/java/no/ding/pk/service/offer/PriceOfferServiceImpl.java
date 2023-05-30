@@ -220,7 +220,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             if(needsReApproval) {
                 priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-                priceOfferToApprove.setNeedsApproval(needsReApproval);
+                priceOfferToApprove.setNeedsApproval(true);
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
