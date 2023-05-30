@@ -2,18 +2,13 @@ package no.ding.pk.config.mapping.v2;
 
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
-import no.ding.pk.web.dto.web.client.offer.SalesOfficeDTO;
-import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
+import no.ding.pk.web.dto.web.client.offer.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -23,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -38,6 +34,32 @@ public class ModelMapperV2Config {
 //        priceOfferDtoToPriceOfferMapping(modelMapper);
 
 //        termsToPriceOfferTermsMapping(modelMapper);
+
+        Converter<ContactPersonDTO, List<ContactPerson>> dtoToList = c -> {
+            if(c.getSource() != null) {
+                ContactPerson contactPerson = modelMapper.map(c.getSource(), ContactPerson.class);
+
+                return List.of(contactPerson);
+            }
+
+            return null;
+        };
+
+        modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
+                        .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
+
+        Converter<List<ContactPerson>, ContactPersonDTO> entityToDto = c -> {
+            if(c.getSource() != null) {
+                if(!c.getSource().isEmpty()) {
+                    return modelMapper.map(c.getSource().get(0), ContactPersonDTO.class);
+                }
+            }
+
+            return null;
+        };
+
+        modelMapper.typeMap(PriceOffer.class, PriceOfferDTO.class)
+                        .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
 
         modelMapper.typeMap(AdUserDTO.class, User.class)
                 .addMapping(AdUserDTO::getAdId, User::setAdId)

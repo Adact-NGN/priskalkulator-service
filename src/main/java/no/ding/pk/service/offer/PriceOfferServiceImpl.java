@@ -207,8 +207,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new PriceOfferNotFoundException();
         }
 
-        if(!PriceOfferStatus.getApprovalStates().contains(priceOfferStatus)) {
-            String message = String.format("Given status was not found. Given status: %s, expected one of the following [%s]", priceOfferStatus, PriceOfferStatus.getApprovalStates());
+        if(!PriceOfferStatus.getAllPriceOfferStatuses().contains(priceOfferStatus)) {
+            String message = String.format("Given status was not found. Given status: %s, expected one of the following %s", priceOfferStatus, PriceOfferStatus.getApprovalStates());
             log.debug(message);
             throw new MissingApprovalStatusException(message);
         }

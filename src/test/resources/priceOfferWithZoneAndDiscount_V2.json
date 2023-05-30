@@ -95,5 +95,11 @@
     "indexWaste": "07251 - Forsyning av vatn. avløps- og renovasjonsverksemd - Indeks for totale arbeidskraftkostnader",
     "indexRent": "12535 - Totalkostnadsindeks for lastebiltransport",
     "indexTransport": "12535 - Totalkostnadsindeks for lastebiltransport"
+  },
+  "contactPerson": {
+    "firstName": "Test",
+    "lastName": "Testesen",
+    "mobileNumber": "78945321",
+    "emailAddress": "test@testesen.no"
   }
 }
