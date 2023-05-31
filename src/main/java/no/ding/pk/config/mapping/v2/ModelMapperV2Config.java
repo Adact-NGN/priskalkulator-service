@@ -31,35 +31,9 @@ public class ModelMapperV2Config {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
-//        priceOfferDtoToPriceOfferMapping(modelMapper);
+        priceOfferDtoToPriceOfferMapping(modelMapper);
 
-//        termsToPriceOfferTermsMapping(modelMapper);
-
-        Converter<ContactPersonDTO, List<ContactPerson>> dtoToList = c -> {
-            if(c.getSource() != null) {
-                ContactPerson contactPerson = modelMapper.map(c.getSource(), ContactPerson.class);
-
-                return List.of(contactPerson);
-            }
-
-            return null;
-        };
-
-        modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
-                        .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
-
-        Converter<List<ContactPerson>, ContactPersonDTO> entityToDto = c -> {
-            if(c.getSource() != null) {
-                if(!c.getSource().isEmpty()) {
-                    return modelMapper.map(c.getSource().get(0), ContactPersonDTO.class);
-                }
-            }
-
-            return null;
-        };
-
-        modelMapper.typeMap(PriceOffer.class, PriceOfferDTO.class)
-                        .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
+        priceOfferToPriceOfferDtoMapping(modelMapper);
 
         modelMapper.typeMap(AdUserDTO.class, User.class)
                 .addMapping(AdUserDTO::getAdId, User::setAdId)
@@ -103,6 +77,40 @@ public class ModelMapperV2Config {
         return modelMapper;
     }
 
+    private static void priceOfferToPriceOfferDtoMapping(ModelMapper modelMapper) {
+        Converter<List<ContactPerson>, ContactPersonDTO> entityToDto = c -> {
+            if(c.getSource() != null) {
+                if(!c.getSource().isEmpty()) {
+                    return modelMapper.map(c.getSource().get(0), ContactPersonDTO.class);
+                }
+            }
+
+            return null;
+        };
+
+        modelMapper.typeMap(PriceOffer.class, PriceOfferDTO.class)
+                .addMapping(PriceOffer::getCreatedDate, PriceOfferDTO::setDateCreated)
+                .addMapping(PriceOffer::getLastModifiedDate, PriceOfferDTO::setDateUpdated)
+                .addMapping(PriceOffer::getDismissalReason, PriceOfferDTO::setDismissalReason)
+                .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
+    }
+
+    private static void priceOfferDtoToPriceOfferMapping(ModelMapper modelMapper) {
+        Converter<ContactPersonDTO, List<ContactPerson>> dtoToList = c -> {
+            if(c.getSource() != null) {
+                ContactPerson contactPerson = modelMapper.map(c.getSource(), ContactPerson.class);
+
+                return List.of(contactPerson);
+            }
+
+            return null;
+        };
+
+        modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
+                .addMapping(PriceOfferDTO::getDismissalReason, PriceOffer::setDismissalReason)
+                .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
+    }
+
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         Converter<String, Material> stringToMaterial = c -> {
             Material material = null;
@@ -135,8 +143,6 @@ public class ModelMapperV2Config {
     private static void priceRowToPriceRowDtoTypeMapping(ModelMapper modelMapper) {
         TypeMap<PriceRow, PriceRowDTO> priceRowTypeMap = modelMapper.createTypeMap(PriceRow.class, PriceRowDTO.class);
 
-//        mapHierarchyValuesForPriceRowDto(priceRowTypeMap);
-
         priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getMaterialNumber(), PriceRowDTO::setMaterial));
         priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getDesignation(), PriceRowDTO::setDesignation));
         priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getMaterialTypeDescription(), PriceRowDTO::setMaterialDesignation));
@@ -151,15 +157,6 @@ public class ModelMapperV2Config {
         priceRowTypeMap.addMapping(PriceRow::getClassId, PriceRowDTO::setClassId);
         priceRowTypeMap.addMapping(PriceRow::getClassDescription, PriceRowDTO::setClassDescription);
     }
-
-//    private static void mapHierarchyValuesForPriceRowDto(TypeMap<PriceRow, PriceRowDTO> priceRowTypeMap) {
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getCategoryId(), PriceRowDTO::setCategoryId));
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getCategoryDescription(), PriceRowDTO::setCategoryDescription));
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getSubCategoryId(), PriceRowDTO::setSubCategoryId));
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getSubCategoryDescription(), PriceRowDTO::setSubCategoryDescription));
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getClassId(), PriceRowDTO::setClassId));
-//        priceRowTypeMap.addMappings(mapper -> mapper.map(src -> src.getMaterial().getClassDescription(), PriceRowDTO::setClassDescription));
-//    }
 
     private static void userDtoToUserTypeMapping(ModelMapper modelMapper, SalesRoleRepository salesRoleRepository) {
         TypeMap<UserDTO, User> userDtoToUserTypeMap = modelMapper.createTypeMap(UserDTO.class, User.class);

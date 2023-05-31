@@ -203,8 +203,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
-            log.debug("Could not find price offer to approve. Given price offer ID {}", approverId);
-            throw new PriceOfferNotFoundException();
+            String message = String.format("Could not find price offer to approve. Given price offer ID %d and approver ID %d", priceOfferId, approverId);
+            log.debug(message);
+            throw new PriceOfferNotFoundException(message);
         }
 
         if(!PriceOfferStatus.getAllPriceOfferStatuses().contains(priceOfferStatus)) {
