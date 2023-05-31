@@ -92,7 +92,7 @@ public class PriceOfferController {
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ApprovalRequest approvalRequest) {
         log.debug("Approval request received with request body: {}", approvalRequest);
-        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getComment());
+        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getDismissalReason());
     }
     
     /**
