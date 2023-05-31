@@ -1,6 +1,6 @@
 package no.ding.pk.service.converters;
 
-import com.itextpdf.text.DocumentException;
+import com.lowagie.text.DocumentException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import no.ding.pk.service.template.HandlebarsTemplateService;
 import org.jsoup.Jsoup;
@@ -35,23 +35,7 @@ public class PdfServiceImpl implements PdfService {
             doc = Jsoup.parseBodyFragment(cleanHtml);
         }
 
-        // Document document = new Document();
-        // try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-        //     ITextRenderer renderer = new ITextRenderer();
-        //     SharedContext sharedContext = renderer.getSharedContext();
-        //     sharedContext.setPrint(true);
-        //     sharedContext.setInteractive(false);
-        //     renderer.setDocumentFromString(doc.html());
-        //     renderer.layout();
-        //     renderer.createPDF(baos);
-
-        //     baos.close();
-
-        //     return baos.toByteArray();
-        // }
-
         ITextRenderer renderer = new ITextRenderer();
-        // Path resourceDirectory = Paths.get("src", "test", "resources");
         renderer.setDocument(W3CDom.convert(doc), "Test.pdf");
         renderer.layout();
 
@@ -61,15 +45,6 @@ public class PdfServiceImpl implements PdfService {
         baos.close();
 
         return baos.toByteArray();
-
-        // PdfWriter writer = PdfWriter.getInstance(doc, baos);
-
-        // document.open();
-        // XMLWorkerHelper.getInstance().parseXHtml(writer, doc, IOUtils.toInputStream(cleanHtml, StandardCharsets.UTF_8));
-        // document.close();
-        // baos.close();
-
-        // return baos.toByteArray();
     }
 
     private String removeHtmlComments(String htmlString) {
@@ -105,11 +80,7 @@ public class PdfServiceImpl implements PdfService {
             out.close();
 
             return out.toByteArray();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (com.lowagie.text.DocumentException e) {
-            // TODO Auto-generated catch block
+        } catch (IOException | DocumentException e) {
             e.printStackTrace();
         }
         return new byte[0];

@@ -34,7 +34,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     private final String materialServiceUrl;
     private final SapHttpClient sapHttpClient;
 
-    // private StandardPriceService standardPriceService;
     private final InMemory3DCache<String, String, MaterialDTO> inMemoryCache;
 
     private LocalJSONUtils localJSONUtils;
@@ -133,13 +132,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
             return materialDTOList;
         }
 
-        //     log.debug(String.format("Filter query: %s", filterQuery));
-
-        //     buildMaterialCache(salesOrg, filterQuery, page, pageSize);
-
-        //     log.debug("Returning from new cache");
-        // }
-
         return inMemoryCache.getAllInList(salesOrg);
     }
 
@@ -211,7 +203,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     private void updateMaterialCache(String salesOrg, String salesOffice, String filterQuery) {
-        log.debug("Got material {} sales org {} sales office {}", salesOrg, salesOffice);
+        log.debug("Got sales org {} sales office {}, query {}", salesOrg, salesOffice, filterQuery);
 
         updateMaterialCache(salesOrg, salesOffice, filterQuery, null, null);
     }
@@ -267,9 +259,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap, String distributionChannel) {
-//        LogicExpression categoryIdExpression = LogicExpression.builder().field(MaterialField.CategoryId).value("").comparator(LogicComparator.NotEqual).build();
         LogicExpression distributionChannelExpression = LogicExpression.builder().field(MaterialField.DistributionChannel).value(distributionChannel).comparator(LogicComparator.Equal).build();
-//        queryMap.put(categoryIdExpression, LogicOperator.And);
         queryMap.put(distributionChannelExpression, null);
         StringBuilder sb = new StringBuilder();
 
@@ -295,6 +285,4 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     private void appendToQuery(StringBuilder sb, LogicExpression expression) {
         sb.append(String.format("%s %s '%s'", expression.getField(), expression.getComparator().getValue(), expression.getValue()));
     }
-
-
 }

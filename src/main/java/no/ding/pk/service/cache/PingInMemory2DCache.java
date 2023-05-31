@@ -24,12 +24,14 @@ public class PingInMemory2DCache<T, V> implements InMemory2DCache<T, V> {
     @Value("${cache.max.amount.items:5000}")
     private int maxItems = 2;
     
-    private int capacity, count;
+    private final int capacity;
+    private int count;
     
     private Date expires;
     
     private final Map<T, CacheObject<V>> map;
-    private CacheObject<V> head, tail;
+    private final CacheObject<V> head;
+    private final CacheObject<V> tail;
     
     public PingInMemory2DCache() {
         log.debug("Max item cache size: {}", this.maxItems);

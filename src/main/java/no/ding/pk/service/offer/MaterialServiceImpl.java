@@ -20,8 +20,8 @@ public class MaterialServiceImpl implements MaterialService {
     
     private static final Logger log = LoggerFactory.getLogger(MaterialServiceImpl.class);
     
-    private MaterialRepository repository;
-    private MaterialPriceService materialPriceService;
+    private final MaterialRepository repository;
+    private final MaterialPriceService materialPriceService;
     
     @Autowired
     public MaterialServiceImpl(MaterialRepository repository, MaterialPriceService materialPriceService) {

@@ -135,5 +135,4 @@ public class DiscountServiceImpl implements DiscountService {
         }
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, materialNumberList);
     }
-    
 }

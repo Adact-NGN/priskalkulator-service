@@ -98,9 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
         HttpResponse<String> response = getResponse(request);
         
         if(response.statusCode() == HttpStatus.OK.value()) {
-            List<CustomerDTO> customerDTOList = responseToCustomerDTOList(response);
-            
-            return customerDTOList;
+            return responseToCustomerDTOList(response);
         }
         
         return new ArrayList<>();
@@ -109,7 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDTO> findCustomersBySalesOrgAndName(String salesOrg, String name) {
         MultiValueMap<String, String> params = getDefaultParams();
         
-        params.add("$filter", String.format("Selskap eq '%s' and Navn1 eq ''", salesOrg, name));
+        params.add("$filter", String.format("Selskap eq '%s' and Navn1 eq ''", salesOrg));
         
         HttpRequest request = createGetRequest(params);
         HttpResponse<String> response = getResponse(request);
@@ -118,7 +116,7 @@ public class CustomerServiceImpl implements CustomerService {
             return responseToCustomerDTOList(response);
         }
         
-        return new ArrayList<CustomerDTO>();
+        return new ArrayList<>();
     }
     
     public List<CustomerDTO> findCustomerByCustomerNumber(String knr) {
@@ -132,7 +130,7 @@ public class CustomerServiceImpl implements CustomerService {
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToCustomerDTOList(response);
         }
-        return new ArrayList<CustomerDTO>();
+        return new ArrayList<>();
     }
     
     @Override
@@ -148,7 +146,7 @@ public class CustomerServiceImpl implements CustomerService {
             return responseToCustomerDTOList(response);
         }
         
-        return new ArrayList<CustomerDTO>();
+        return new ArrayList<>();
     }
     
     @Override

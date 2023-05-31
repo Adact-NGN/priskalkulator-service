@@ -31,8 +31,6 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
     
     private Date expires;
 
-    private SapMaterialService service;
-    
     // private final Map<K, InMemory2DCache<T, CacheObject<V>>> cacheMap;
     private final Map<K, Cache<T, CacheObject<V>>> cacheMap;
     

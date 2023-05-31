@@ -12,7 +12,7 @@ import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
 @Service
 public class PriceOfferTemplateServiceImpl implements PriceOfferTemplateService {
 
-    private PriceOfferTemplateRepository repository;
+    private final PriceOfferTemplateRepository repository;
     
     @Autowired
     public PriceOfferTemplateServiceImpl(PriceOfferTemplateRepository repository) {

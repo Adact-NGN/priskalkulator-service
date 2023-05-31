@@ -77,7 +77,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         if(response.statusCode() == HttpStatus.OK.value()) {
             return responseToDtoList(response);
         }
-        log.debug("Unsuccsessfull response: " + response.statusCode());
+        log.debug("Unsuccessful response: " + response.statusCode());
         return new ArrayList<>();
     }
 
@@ -192,5 +192,4 @@ public class SalesOrgServiceImpl implements SalesOrgService {
             throw new Error("Failed to process JSON", e.getCause());
         }
     }
-    
 }

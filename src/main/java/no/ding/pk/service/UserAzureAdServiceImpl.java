@@ -45,11 +45,11 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
     private String scope;
 
-    private ConfidentialClientApplication app;
-    private ObjectMapper objectMapper;
-    private MapperService mapperService;
+    private final ConfidentialClientApplication app;
+    private final ObjectMapper objectMapper;
+    private final MapperService mapperService;
 
-    private LocalJSONUtils localJSONUtils;
+    private final LocalJSONUtils localJSONUtils;
 
     @Autowired
     public UserAzureAdServiceImpl(ConfidentialClientApplication app,

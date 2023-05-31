@@ -15,7 +15,7 @@ import no.ding.pk.repository.offer.MaterialPriceRepository;
 @Service
 public class MaterialPriceServiceImpl implements MaterialPriceService {
 
-    private MaterialPriceRepository repository;
+    private final MaterialPriceRepository repository;
     
     @Autowired
     public MaterialPriceServiceImpl(MaterialPriceRepository repository) {
@@ -52,7 +52,6 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
 
     @Override
     public List<MaterialPrice> findAll() {
-        // TODO Auto-generated method stub
         return repository.findAll();
     }
     

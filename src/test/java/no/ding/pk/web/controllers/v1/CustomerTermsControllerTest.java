@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -90,11 +91,16 @@ class CustomerTermsControllerTest {
                 .quarterlyAdjustment("Q1")
                 .region("Nord-Vest")
                 .year(2020)
+                .priceAdjustmentDate(new Date())
                 .build();
 
         ResponseEntity<CustomerTermsDTO> responseEntity = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/terms/customer/create", customerTermsDTO, CustomerTermsDTO.class);
 
         assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
+
+        CustomerTermsDTO actual = responseEntity.getBody();
+
+        assertThat(actual.getPriceAdjustmentDate(), notNullValue());
     }
 
     @Test

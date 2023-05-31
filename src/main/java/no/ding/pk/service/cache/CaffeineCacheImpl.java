@@ -1,15 +1,11 @@
 package no.ding.pk.service.cache;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.springframework.beans.factory.annotation.Value;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-
 import no.ding.pk.domain.cache.CacheObject;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.concurrent.TimeUnit;
 
 public class CaffeineCacheImpl<V> implements CaffeineCache {
     
