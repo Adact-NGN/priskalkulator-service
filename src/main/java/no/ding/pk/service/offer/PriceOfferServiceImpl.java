@@ -66,7 +66,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity = createNewPriceOffer(salesEmployee);
         }
 
-        entity.setPriceOfferStatus(newPriceOffer.getPriceOfferStatus());
+        entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
 
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         if(newPriceOffer.getCustomerName() != null) {
@@ -74,7 +74,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
 
-        // entity.setIsApproved(newPriceOffer.getIsApproved());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
