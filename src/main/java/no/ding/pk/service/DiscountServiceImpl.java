@@ -18,10 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static no.ding.pk.repository.specifications.DiscountSpecifications.matchMaterialNumberInList;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 
 @Transactional
 @Service
@@ -118,6 +115,12 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber) {
         return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
+    }
+
+    @Override
+    public List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneAndMaterialNumber(String salesOrg, String salesOffice,
+                                                                                  String zone, String materialNumber) {
+        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withSalesOffice(salesOffice)).and(withMaterialNumber(materialNumber)));
     }
 
     @Override

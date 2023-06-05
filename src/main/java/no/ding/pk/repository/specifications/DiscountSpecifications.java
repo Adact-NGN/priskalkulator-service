@@ -16,6 +16,14 @@ public class DiscountSpecifications {
         }
     }
 
+    public static Specification<Discount> withSalesOffice(String salesOffice) {
+        if(salesOffice == null) {
+            return null;
+        } else {
+            return (root, query, cb) -> cb.equal(root.get("salesOffice"), salesOffice);
+        }
+    }
+
     public static Specification<Discount> withZone(String zone) {
         if(zone == null || zone.equals("")) {
             return (root, query, cb) -> cb.isNull(root.get("zone"));

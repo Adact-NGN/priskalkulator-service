@@ -17,7 +17,7 @@ public class NodeCustomerDTO {
     private String hkunnr;
 
     /**
-     * Customer number for customer beloning to a Node customer
+     * Customer number for customer belonging to a Node customer
      */
     private String kunnr;
 }
