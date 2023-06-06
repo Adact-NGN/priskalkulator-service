@@ -22,10 +22,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
@@ -173,21 +170,40 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     public List<MaterialDTO> getAllMaterialsForSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String zone, Integer page, Integer pageSize) {
         Integer materialCount = getCountFromSap(salesOrg, zone);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
-        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired() || inMemoryCache.size(salesOrg) < materialCount) {
-            HashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build(), LogicOperator.And));
+//        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired() || inMemoryCache.size(salesOrg) < materialCount) {
 
-            includeOrExcludeZonedPricedMaterials(zone, queryMap);
+//            buildMaterialCache(salesOrg, salesOffice, filterQuery, page, pageSize);
+//            log.debug("Returning from new cache");
+//        }
+        HashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build(), LogicOperator.And));
 
-            String filterQuery = createFilterQuery(queryMap);
+        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
-            log.debug("Filter query: {}", filterQuery);
+        String filterQuery = createFilterQuery(queryMap);
 
-            buildMaterialCache(salesOrg, salesOffice, filterQuery, page, pageSize);
+        log.debug("Filter query: {}", filterQuery);
+        return getAllMaterialsDirectly(salesOrg, salesOffice, filterQuery, page, pageSize);
 
-            log.debug("Returning from new cache");
+//        return inMemoryCache.getAllInList(salesOrg);
+    }
+
+    private List<MaterialDTO> getAllMaterialsDirectly(String salesOrg, String salesOffice, String filterQuery, Integer page, Integer pageSize) {
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
+
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
+
+        log.debug("Created request: " + request.toString());
+
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
+
+        if(response.statusCode() == HttpStatus.OK.value()) {
+
+            return localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
         }
 
-        return inMemoryCache.getAllInList(salesOrg);
+        log.debug("Response code {}", response.statusCode());
+
+        return new ArrayList<>();
     }
 
     private void buildMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
