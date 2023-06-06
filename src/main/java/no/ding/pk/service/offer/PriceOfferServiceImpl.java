@@ -158,7 +158,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
                 approvalUsers.add(poa.getDangerousWasteHolder());
             } else {
-                if(highestDiscountLevel > 3) {
+                if(highestDiscountLevel > 5) {
                     approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
                 } else {
                     approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
