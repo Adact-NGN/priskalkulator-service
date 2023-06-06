@@ -1,10 +1,13 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
+import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.repository.offer.PriceOfferRepository;
+import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
@@ -34,13 +37,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final UserService userService;
 
+    private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
+
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
                                  SalesOfficeService salesOfficeService,
-                                 UserService userService) {
+                                 UserService userService,
+                                 SalesOfficePowerOfAttorneyService powerOfAttorneyService) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
+        this.powerOfAttorneyService = powerOfAttorneyService;
     }
 
     private PriceOffer createNewPriceOffer(User salesEmployee) {
@@ -89,16 +96,30 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        List<String> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
         if(!materialsForApproval.isEmpty()) {
-            entity.setMaterialsForApproval(String.join(",", materialsForApproval));
+            StringBuilder materialNumbersForApproval = new StringBuilder();
+            for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
+                String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+
+                if(materialNumbersForApproval.length() > 0) {
+                    materialNumbersForApproval.append(",").append(materials);
+                } else {
+                    materialNumbersForApproval = new StringBuilder(materials);
+                }
+            }
+
+            entity.setMaterialsForApproval(materialsForApproval.toString());
         }
 
         if(newPriceOffer.getApprover() != null) {
             User approver = checkUserObject(newPriceOffer.getApprover());
 
             if(approver != null) {
+                entity.setApprover(approver);
+            } else {
+                approver = getApproverForOffer(materialsForApproval);
                 entity.setApprover(approver);
             }
         }
@@ -110,13 +131,56 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return repository.save(entity);
     }
 
-    private List<String> getAllMaterialsForApproval(PriceOffer priceOffer) {
-        List<String> materialsInPriceOffer = new ArrayList<>();
+    private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval) {
+        Set<User> approvalUsers = new HashSet<>();
+
+        for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
+            boolean hasFaMaterialForApproval = false;
+            boolean hasRegularMaterialForApproval = false;
+
+            int highestDiscountLevel = 0;
+
+            for(PriceRow priceRow : listEntry.getValue()) {
+                Material material = priceRow.getMaterial();
+                if(material.isFaMaterial()) {
+                    hasFaMaterialForApproval = true;
+                } else {
+                    hasRegularMaterialForApproval = true;
+
+                    if(priceRow.getDiscountLevel() > highestDiscountLevel) {
+                        highestDiscountLevel = priceRow.getDiscountLevel();
+                    }
+                }
+            }
+
+            PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(Integer.valueOf(listEntry.getKey()));
+
+            if(hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                approvalUsers.add(poa.getDangerousWasteHolder());
+            } else {
+                if(highestDiscountLevel > 3) {
+                    approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                } else {
+                    approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
+                }
+            }
+        }
+
+        if(approvalUsers.isEmpty()) {
+            return null;
+        }
+
+        return approvalUsers.iterator().next();
+    }
+
+    private Map<String, List<PriceRow>> getAllMaterialsForApproval(PriceOffer priceOffer) {
+        Map<String, List<PriceRow>> salesOfficeMaterialsMap = new HashMap<>();
 
         if(priceOffer.getSalesOfficeList() == null) {
-            return materialsInPriceOffer;
+            return salesOfficeMaterialsMap;
         }
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
+            List<PriceRow> materialsInPriceOffer = new ArrayList<>();
             if(salesOffice.getMaterialList() != null)
                 collectMaterial(materialsInPriceOffer, salesOffice.getMaterialList());
 
@@ -125,14 +189,18 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             if(salesOffice.getRentalList() != null)
                 collectMaterial(materialsInPriceOffer, salesOffice.getRentalList());
+
+            if(!materialsInPriceOffer.isEmpty()) {
+                salesOfficeMaterialsMap.put(salesOffice.getSalesOffice(), materialsInPriceOffer);
+            }
         }
-        return materialsInPriceOffer;
+        return salesOfficeMaterialsMap;
     }
 
-    private static void collectMaterial(List<String> materialsInPriceOffer, List<PriceRow> priceRows) {
+    private static void collectMaterial(List<PriceRow> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
             if(pr.getNeedsApproval() && !pr.isApproved()) {
-                materialsInPriceOffer.add(pr.getMaterial().getMaterialNumber());
+                materialsInPriceOffer.add(pr);
             }
         }
     }
@@ -221,6 +289,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(needsReApproval) {
                 priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
                 priceOfferToApprove.setNeedsApproval(true);
+
+                if(priceOfferToApprove.getApprover() == null) {
+                    Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
+                    User approver = getApproverForOffer(materialsForApproval);
+
+                    priceOfferToApprove.setApprover(approver);
+                }
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
@@ -272,7 +347,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
-        List<String> currentMaterialInPriceOffer = getAllMaterialsForApproval(priceOfferToApprove).stream().sorted().toList();
+        List<String> currentMaterialInPriceOffer = new ArrayList<>();
+        for (Map.Entry<String, List<PriceRow>> listEntry : getAllMaterialsForApproval(priceOfferToApprove).entrySet()) {
+            currentMaterialInPriceOffer.addAll(listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+        }
+
         List<String> previousMaterialInPriceOffer = Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList();
 
         return currentMaterialInPriceOffer.equals(previousMaterialInPriceOffer);

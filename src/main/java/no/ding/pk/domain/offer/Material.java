@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.CascadeType;
@@ -99,13 +101,20 @@ public class Material implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
         Material material = (Material) o;
-        return id != null && Objects.equals(id, material.id);
+
+        return new EqualsBuilder().append(id, material.id).append(currency, material.currency).append(designation, material.designation).append(deviceType, material.deviceType).append(materialNumber, material.materialNumber).append(materialGroup, material.materialGroup).append(materialGroupDesignation, material.materialGroupDesignation).append(materialType, material.materialType).append(materialTypeDescription, material.materialTypeDescription).append(materialStandardPrice, material.materialStandardPrice).append(pricingUnit, material.pricingUnit).append(quantumUnit, material.quantumUnit).append(scaleQuantum, material.scaleQuantum).append(salesZone, material.salesZone).append(categoryId, material.categoryId).append(categoryDescription, material.categoryDescription).append(subCategoryId, material.subCategoryId).append(subCategoryDescription, material.subCategoryDescription).append(classId, material.classId).append(classDescription, material.classDescription).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return new HashCodeBuilder(17, 37).append(id).append(currency).append(designation).append(deviceType).append(materialNumber).append(materialGroup).append(materialGroupDesignation).append(materialType).append(materialTypeDescription).append(materialStandardPrice).append(pricingUnit).append(quantumUnit).append(scaleQuantum).append(salesZone).append(categoryId).append(categoryDescription).append(subCategoryId).append(subCategoryDescription).append(classId).append(classDescription).toHashCode();
+    }
+
+    public boolean isFaMaterial() {
+        return categoryDescription != null && categoryDescription.equals("Farlig avfall");
     }
 }

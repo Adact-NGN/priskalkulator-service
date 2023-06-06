@@ -6,6 +6,7 @@ create table if not exists discount_matrix
     material_designation varchar(255) null,
     material_number      varchar(255) not null,
     sales_org            varchar(255) not null,
+    sales_office         varchar(255) not null,
     standard_price       double       null,
     zone                 varchar(255) null
 );
