@@ -2,14 +2,12 @@ package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
+import no.ding.pk.web.handlers.ApproverNotFoundException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.MissingApprovalStatusException;
 import no.ding.pk.web.handlers.PriceOfferNotFoundException;
@@ -312,6 +310,30 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         priceOfferToApprove = repository.save(priceOfferToApprove);
 
         return PriceOfferStatus.getApprovalStates().contains(priceOfferToApprove.getPriceOfferStatus());
+    }
+
+    @Override
+    public Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms) {
+        User approver = userService.findById(approverId).orElse(null);
+
+        if(approver == null) {
+            String message = String.format("No approver with given id %d was found.", approverId);
+            throw new ApproverNotFoundException(message);
+        }
+
+        PriceOffer priceOfferToActivate = repository.findById(priceOfferId).orElse(null);
+
+        if(priceOfferToActivate == null) {
+            String message = String.format("No PriceOffer with given id %d was found.", priceOfferId);
+            throw new PriceOfferNotFoundException(message);
+        }
+
+        priceOfferToActivate.setCustomerTerms(customerTerms);
+        priceOfferToActivate.setPriceOfferStatus(PriceOfferStatus.ACTIVATED.getStatus());
+
+        repository.save(priceOfferToActivate);
+
+        return true;
     }
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {

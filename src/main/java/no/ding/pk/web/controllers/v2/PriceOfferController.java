@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
@@ -78,6 +80,16 @@ public class PriceOfferController {
         }
         
         return new ArrayList<>();
+    }
+
+    @PutMapping(path = "/activate/{approverId}/{priceOfferId}")
+    public Boolean activatePriceOffer(@PathVariable("approverId") Long approverId,
+                                      @PathVariable("priceOfferId") Long priceOfferId,
+                                      @RequestBody TermsDTO customerTermsDTO) {
+        log.debug("Activating price offer with id {} by user with id {}", priceOfferId, approverId);
+
+        PriceOfferTerms customerTerms = modelMapper.map(customerTermsDTO, PriceOfferTerms.class);
+        return service.activatePriceOffer(approverId, priceOfferId, customerTerms);
     }
     
     /**

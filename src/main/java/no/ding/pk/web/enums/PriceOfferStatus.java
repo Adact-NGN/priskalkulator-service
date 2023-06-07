@@ -16,7 +16,7 @@ public enum PriceOfferStatus {
     }
 
     public static List<String> getApprovalStates() {
-        return List.of(APPROVED.status, SENT_TO_COSTUMER.status, ACTIVATED.status);
+        return List.of(APPROVED.status, SENT_TO_COSTUMER.status);
     }
 
     public static List<String> getAllPriceOfferStatuses() {

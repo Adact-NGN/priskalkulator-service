@@ -1,9 +1,10 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
+
 import java.util.List;
 import java.util.Optional;
-
-import no.ding.pk.domain.offer.PriceOffer;
 
 public interface PriceOfferService {
 
@@ -20,4 +21,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllByApproverIdAndPriceOfferStatus(Long approverId, String priceOfferStatus);
 
     Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment);
+
+    Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms);
 }

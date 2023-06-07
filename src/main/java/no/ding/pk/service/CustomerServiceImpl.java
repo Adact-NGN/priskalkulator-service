@@ -28,6 +28,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -204,7 +205,7 @@ public class CustomerServiceImpl implements CustomerService {
         try {
             return objectMapper.readValue(customerDTOString, CustomerDTO.class);
         } catch (JsonProcessingException | JSONException e) {
-            log.debug(e.getStackTrace().toString());
+            log.debug(Arrays.toString(e.getStackTrace()));
             log.debug(e.getMessage());
             log.debug(customerDTOString);
             throw new Error("Failed to process JSON", e.getCause());
@@ -217,8 +218,6 @@ public class CustomerServiceImpl implements CustomerService {
         .queryParams(params)
         .build();
 
-        log.debug("Requesting SAP using username: {}", sapUsername);
-        
         return HttpRequest.newBuilder()
         .GET()
         .uri(url.toUri())
@@ -234,7 +233,7 @@ public class CustomerServiceImpl implements CustomerService {
         
         
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$expand", expansionFields.stream().collect(Collectors.joining(",")));
+        params.add("$expand", String.join(",", expansionFields));
         
         return params;
     }
