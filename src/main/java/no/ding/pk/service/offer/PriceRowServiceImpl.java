@@ -67,8 +67,7 @@ public class PriceRowServiceImpl implements PriceRowService {
     @Override
     public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone) {
         List<PriceRow> returnList = new ArrayList<>();
-        for(int i = 0; i < priceRowList.size(); i++) {
-            PriceRow materialPriceRow = priceRowList.get(i);
+        for (PriceRow materialPriceRow : priceRowList) {
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone);
 
             returnList.add(entity);
@@ -122,7 +121,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             if(material != null && material.getId() == null) {
 
                 em.getTransaction().begin();
-                List materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                var materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
                 em.getTransaction().commit();
                 em.close();
 

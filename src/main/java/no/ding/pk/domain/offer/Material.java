@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -19,6 +20,7 @@ import java.io.Serializable;
                 query = "from Material m where m.materialNumber = :materialNumber"
         )
 })
+@JsonIgnoreProperties({"faMaterial"})
 @Entity
 @Table(name = "materials")
 public class Material implements Serializable {
@@ -38,6 +40,12 @@ public class Material implements Serializable {
 
     @Column(unique = true, nullable = false)
     private String materialNumber;
+
+    @Column
+    private String salesOrg;
+
+    @Column
+    private String salesOffice;
 
     @Column
     private String materialGroup;
@@ -88,12 +96,32 @@ public class Material implements Serializable {
 
         Material material = (Material) o;
 
-        return new EqualsBuilder().append(id, material.id).append(currency, material.currency).append(designation, material.designation).append(deviceType, material.deviceType).append(materialNumber, material.materialNumber).append(materialGroup, material.materialGroup).append(materialGroupDesignation, material.materialGroupDesignation).append(materialType, material.materialType).append(materialTypeDescription, material.materialTypeDescription).append(materialStandardPrice, material.materialStandardPrice).append(pricingUnit, material.pricingUnit).append(quantumUnit, material.quantumUnit).append(scaleQuantum, material.scaleQuantum).append(salesZone, material.salesZone).append(categoryId, material.categoryId).append(categoryDescription, material.categoryDescription).append(subCategoryId, material.subCategoryId).append(subCategoryDescription, material.subCategoryDescription).append(classId, material.classId).append(classDescription, material.classDescription).isEquals();
+        return new EqualsBuilder().append(id, material.id).append(currency, material.currency)
+                .append(designation, material.designation).append(deviceType, material.deviceType)
+                .append(materialNumber, material.materialNumber).append(salesOrg, material.salesOrg)
+                .append(materialGroup, material.materialGroup)
+                .append(materialGroupDesignation, material.materialGroupDesignation)
+                .append(materialType, material.materialType)
+                .append(materialTypeDescription, material.materialTypeDescription)
+                .append(materialStandardPrice, material.materialStandardPrice)
+                .append(pricingUnit, material.pricingUnit).append(quantumUnit, material.quantumUnit)
+                .append(scaleQuantum, material.scaleQuantum).append(salesZone, material.salesZone)
+                .append(categoryId, material.categoryId).append(categoryDescription, material.categoryDescription)
+                .append(subCategoryId, material.subCategoryId)
+                .append(subCategoryDescription, material.subCategoryDescription)
+                .append(classId, material.classId).append(classDescription, material.classDescription)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(id).append(currency).append(designation).append(deviceType).append(materialNumber).append(materialGroup).append(materialGroupDesignation).append(materialType).append(materialTypeDescription).append(materialStandardPrice).append(pricingUnit).append(quantumUnit).append(scaleQuantum).append(salesZone).append(categoryId).append(categoryDescription).append(subCategoryId).append(subCategoryDescription).append(classId).append(classDescription).toHashCode();
+        return new HashCodeBuilder(17, 37).append(id).append(currency)
+                .append(designation).append(deviceType).append(materialNumber).append(materialGroup)
+                .append(materialGroupDesignation).append(materialType).append(materialTypeDescription)
+                .append(materialStandardPrice).append(pricingUnit).append(quantumUnit).append(scaleQuantum)
+                .append(salesZone).append(categoryId).append(categoryDescription).append(subCategoryId)
+                .append(subCategoryDescription).append(classId).append(classDescription)
+                .toHashCode();
     }
 
     public boolean isFaMaterial() {

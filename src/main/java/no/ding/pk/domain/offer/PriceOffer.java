@@ -39,7 +39,7 @@ public class PriceOffer extends Offer implements Serializable {
     @Column
     private String priceOfferStatus;
 
-    @Column
+    @Column(length = 21844)
     private String materialsForApproval;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

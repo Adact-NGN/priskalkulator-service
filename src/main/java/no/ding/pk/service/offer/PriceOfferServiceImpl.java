@@ -110,7 +110,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 }
             }
 
-            entity.setMaterialsForApproval(materialsForApproval.toString());
+            entity.setMaterialsForApproval(materialNumbersForApproval.toString());
         }
 
         if(newPriceOffer.getApprover() != null) {
@@ -122,6 +122,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 approver = getApproverForOffer(materialsForApproval);
                 entity.setApprover(approver);
             }
+        } else if(!materialsForApproval.isEmpty()) {
+            User approver = getApproverForOffer(materialsForApproval);
+
+            if(approver == null) {
+                log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
+            }
+            entity.setApprover(approver);
         }
 
         if(newPriceOffer.getCustomerTerms() != null) {
@@ -146,10 +153,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                     hasFaMaterialForApproval = true;
                 } else {
                     hasRegularMaterialForApproval = true;
+                }
 
-                    if(priceRow.getDiscountLevel() > highestDiscountLevel) {
-                        highestDiscountLevel = priceRow.getDiscountLevel();
-                    }
+                if(priceRow.getDiscountLevel() > highestDiscountLevel) {
+                    highestDiscountLevel = priceRow.getDiscountLevel();
                 }
             }
 

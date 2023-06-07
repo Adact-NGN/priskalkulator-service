@@ -2,16 +2,12 @@ package no.ding.pk.service.offer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceOfferTerms;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -29,9 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
@@ -49,8 +43,12 @@ class PriceOfferServiceImplTest {
     @Autowired
     private MaterialService materialService;
 
+    @Autowired
+    private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
+
     @BeforeEach
     public void setup() {
+
         persistSalesRoles();
         createMaterial();
 
@@ -78,6 +76,40 @@ class PriceOfferServiceImplTest {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
         knSalesRole.addUser(alex);
         salesRoleService.save(knSalesRole);
+
+        User eirik = userService.findByEmail("Eirik.Flaa@ngn.no");
+
+        if(eirik == null) {
+            userService.save(User.builder()
+                    .name("Eirik")
+                    .sureName("Flaa")
+                    .orgNr("100")
+                    .associatedPlace("Larvik")
+                    .email("Eirik.Flaa@ngn.no")
+                    .jobTitle("Prosjektleder")
+                    .powerOfAttorneyFA(5)
+                    .powerOfAttorneyOA(5)
+                    .build(),
+                    null
+            );
+        }
+
+        User kjetil = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        if(kjetil == null) {
+            userService.save(User.builder()
+                            .name("Kjetil")
+                            .sureName("Minde")
+                            .orgNr("100")
+                            .associatedPlace("Larvik")
+                            .email("kjetil.torvund.minde@ngn.no")
+                            .jobTitle("Fullstack utvikler")
+                            .powerOfAttorneyFA(5)
+                            .powerOfAttorneyOA(5)
+                            .build(),
+                    null
+            );
+        }
 
         User salesEmployee = userService.findByEmail("Wolfgang@farris-bad.no");
 
@@ -224,6 +256,195 @@ class PriceOfferServiceImplTest {
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldSetFaApproverWhenOnlyDangerousWastNeedsApproval() {
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
+                .salesOffice(104)
+                .salesOfficeName("Skien")
+                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                .dangerousWasteHolder(dangerousWasteHolder)
+                .build();
+        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+
+
+        Material material = createDangerousMaterial();
+        PriceRow priceRow = PriceRow.builder()
+                .material(material)
+                .standardPrice(16566.00)
+                .discountLevel(3)
+                .needsApproval(true)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOfficeName("Skien")
+                .salesOffice("104")
+                .materialList(List.of(priceRow))
+                .build();
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(dangerousWasteHolder)
+                .salesOfficeList(List.of(salesOffice))
+                .needsApproval(true)
+                .build();
+
+        PriceOffer actual = service.save(priceOffer);
+
+        assertThat(actual.getApprover(), notNullValue());
+        assertThat(actual.getApprover(), equalTo(dangerousWasteHolder));
+    }
+
+    @Test
+    public void shouldSetOrdinaryLvlOneApproverWhenDangerousWastAndOrdinaryMaterialNeedsApproval() {
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
+                .salesOffice(104)
+                .salesOfficeName("Skien")
+                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                .dangerousWasteHolder(dangerousWasteHolder)
+                .build();
+        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+
+
+        Material ordinaryMaterial = createOrdinaryMaterial();
+        PriceRow ordinaryWastePriceRow = PriceRow.builder()
+                .material(ordinaryMaterial)
+                .standardPrice(170.00)
+                .discountLevel(3)
+                .needsApproval(true)
+                .build();
+
+        Material dangerousMaterial = createDangerousMaterial();
+        PriceRow priceRow = PriceRow.builder()
+                .material(dangerousMaterial)
+                .standardPrice(16566.00)
+                .discountLevel(3)
+                .needsApproval(true)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOfficeName("Skien")
+                .salesOffice("104")
+                .materialList(List.of(priceRow, ordinaryWastePriceRow))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(dangerousWasteHolder)
+                .salesOfficeList(List.of(salesOffice))
+                .needsApproval(true)
+                .build();
+
+        PriceOffer actual = service.save(priceOffer);
+
+        assertThat(actual.getApprover(), notNullValue());
+        assertThat(actual.getApprover(), equalTo(ordinaryWasteHolder));
+    }
+
+    @Test
+    public void shouldSetOrdinaryLvlTwoWhenDiscountLevelIsAtItsHighest() {
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
+                .salesOffice(104)
+                .salesOfficeName("Skien")
+                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                .dangerousWasteHolder(dangerousWasteHolder)
+                .build();
+        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+
+
+        Material ordinaryMaterial = createOrdinaryMaterial();
+        PriceRow ordinaryWastePriceRow = PriceRow.builder()
+                .material(ordinaryMaterial)
+                .standardPrice(170.00)
+                .discountLevel(6)
+                .needsApproval(true)
+                .build();
+
+        Material dangerousMaterial = createDangerousMaterial();
+        PriceRow priceRow = PriceRow.builder()
+                .material(dangerousMaterial)
+                .standardPrice(16566.00)
+                .discountLevel(3)
+                .needsApproval(true)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOfficeName("Skien")
+                .salesOffice("104")
+                .materialList(List.of(priceRow, ordinaryWastePriceRow))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(dangerousWasteHolder)
+                .salesOfficeList(List.of(salesOffice))
+                .needsApproval(true)
+                .build();
+
+        PriceOffer actual = service.save(priceOffer);
+
+        assertThat(actual.getApprover(), notNullValue());
+        assertThat(actual.getApprover(), equalTo(ordinaryWasteHolderLvl2));
+    }
+
+    private Material createOrdinaryMaterial() {
+        String materialNumber = "159904";
+
+        MaterialPrice wastePrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(170.00)
+                .build();
+
+        return Material.builder()
+                .salesOffice("104")
+                .salesOrg("100")
+                .designation("Degaussing harddisker")
+                .materialNumber(materialNumber)
+                .scaleQuantum(0.0)
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .materialGroup("1599")
+                .materialGroupDesignation("Blandet EE-avfall")
+                .materialType("ZWAF")
+                .materialTypeDescription("Avfallsmateriale")
+                .materialStandardPrice(wastePrice)
+                .build();
+    }
+
+    private static Material createDangerousMaterial() {
+        String materialNumber = "70120015";
+        MaterialPrice wastePrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(16566.00)
+                .build();
+        return Material.builder()
+                .materialNumber(materialNumber)
+                .salesOrg("100")
+                .salesOffice("100")
+                .quantumUnit("KG")
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .materialGroup("7012")
+                .materialTypeDescription("Spillolje, ikke ref.")
+                .materialType("ZAFA")
+                .materialTypeDescription("Farlig Avfallsmateriale")
+                .categoryId("00310")
+                .categoryDescription("Farlig avfall")
+                .subCategoryId("0031000100")
+                .subCategoryDescription("FA Diverse")
+                .pricingUnit(1000)
+                .materialStandardPrice(wastePrice)
+                .build();
     }
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW)
