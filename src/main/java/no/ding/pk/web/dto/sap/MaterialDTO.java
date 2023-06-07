@@ -80,24 +80,4 @@ public class MaterialDTO {
     private String lastChangedTime;
     @JsonAlias("LastChangedDate")
     private Date lastChangedDate; // 2022-01-26"
-
-    // @JsonAlias("MaterialStdPrice")
-    // private List<MaterialStdPriceDTO> materialStdPrices;
-
-    // public void addMaterialStdPrice(MaterialStdPriceDTO materialStdPriceDTO) {
-    //     if(materialStdPrices == null) {
-    //         materialStdPrices = new ArrayList<>();
-    //     }
-
-    //     materialStdPrices.add(materialStdPriceDTO);
-    // }
-
-    // public void addAllMaterialStdPrices(List<MaterialStdPriceDTO> stdPrices) {
-    //     if(materialStdPrices == null) {
-    //         materialStdPrices = new ArrayList<>();
-    //     }
-
-    //     materialStdPrices.addAll(stdPrices);
-    // }
-
 }
