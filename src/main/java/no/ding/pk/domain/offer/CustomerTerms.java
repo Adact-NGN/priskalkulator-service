@@ -38,6 +38,8 @@ public class CustomerTerms extends Auditable {
     @Column(name = "change_source")
     private String source;
     @Column
+    private String salesOrg;
+    @Column
     private String salesOffice;
     @Column
     private String customerName;
@@ -91,21 +93,4 @@ public class CustomerTerms extends Auditable {
     private Integer year;
     @Column
     private String salesEmployee;
-
-//    @Builder(builderMethodName = "customerTermsBuilder")
-//    public CustomerTerms(String salesOffice, String customerName, String customerNumber, Boolean additionForAdminFee,
-//                         Boolean additionForRoadTax, Date agreementEndDate, Date agreementStartDate, String contractTerm,
-//                         Boolean customerRequireNotification, String indexRent, String indexTransport, String indexWaste,
-//                         String invoiceInterval, String metalPricing, Date metalSetDateForOffer,
-//                         Integer monthsToFreezeCustomerFromAdjustments, String newOrEstablishedCustomer,
-//                         String notificationMailAddress, String paymentCondition, Date priceAdjustmentDate,
-//                         String quarterlyAdjustment, Integer requiredNumberOfDaysNotice, String specialConditionAction,
-//                         String comment, CustomerTermsPK id) {
-//        super(salesOffice, customerName, customerNumber, additionForAdminFee, additionForRoadTax, agreementEndDate,
-//                agreementStartDate, contractTerm, customerRequireNotification, indexRent, indexTransport, indexWaste,
-//                invoiceInterval, metalPricing, metalSetDateForOffer, monthsToFreezeCustomerFromAdjustments,
-//                newOrEstablishedCustomer, notificationMailAddress, paymentCondition, priceAdjustmentDate,
-//                quarterlyAdjustment, requiredNumberOfDaysNotice, specialConditionAction, comment);
-//        this.id = id;
-//    }
 }

@@ -240,7 +240,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public List<PriceOffer> findAll() {
-        return repository.findAll();
+        return repository.findAllWherePriceOfferStatusNotLike(PriceOfferStatus.ACTIVATED.getStatus());
     }
 
     @Override

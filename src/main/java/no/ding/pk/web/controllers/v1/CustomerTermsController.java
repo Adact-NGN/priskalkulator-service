@@ -63,6 +63,8 @@ public class CustomerTermsController {
 
         CustomerTerms customerTerms = modelMapper.map(customerTermsDTO, CustomerTerms.class);
 
+        CustomerTerms activeCustomerTerms = service.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(customerTerms.getCustomerNumber(), customerTerms.getSalesOffice(), customerTerms.getSalesOrg());
+
         customerTerms = service.save(customerTerms.getSalesOffice(), customerTerms.getCustomerNumber(), customerTerms);
 
         return modelMapper.map(customerTerms, CustomerTermsDTO.class);

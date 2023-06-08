@@ -18,4 +18,6 @@ public interface CustomerTermsService {
     CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms);
 
     List<CustomerTerms> findAll();
+    CustomerTerms findActiveTermsForCustomerForSalesOfficeAndSalesOrg(String customerNumber, String salesOffice,
+            String salesOrg);
 }
