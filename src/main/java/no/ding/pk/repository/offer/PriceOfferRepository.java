@@ -14,6 +14,10 @@ public interface PriceOfferRepository extends JpaRepository<PriceOffer, Long>, J
     @Query("select case when count(po) > 0 then true ELSE false end from PriceOffer po where po.id = :id and po.deleted = true ")
     Boolean existsByIdAndDeleted(@Param("id") Long id);
 
+    List<PriceOffer> findAllByPriceOfferStatusNotIn(List<String> statuses);
+
+    List<PriceOffer> findAllByPriceOfferStatusIn(List<String> statuses);
+
     List<PriceOffer> findAllBySalesEmployeeId(Long salesEmployeeId);
 
     List<PriceOffer> findAllByApproverIdAndNeedsApprovalIsTrue(Long approverId);

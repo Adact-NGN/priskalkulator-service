@@ -53,12 +53,20 @@ public class PriceOfferController {
     
     /**
      * Get all price offers
+     * @param statuses list of all price offer with statuses to be inn the list.
      * @return List of price offers, else empty list
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> list() {
-        List<PriceOffer> priceOfferList = service.findAll();
-        
+    public List<PriceOfferDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
+
+        List<PriceOffer> priceOfferList;
+        if(StringUtils.isNotBlank(statuses)) {
+            List<String> statusList = new ArrayList<>(Arrays.stream(statuses.split(",")).toList());
+            priceOfferList = service.findAllByPriceOfferStatusInList(statusList);
+        } else {
+            priceOfferList = service.findAllWithoutStatusInList(List.of(PriceOfferStatus.ACTIVATED.getStatus()));
+        }
+
         if(!priceOfferList.isEmpty()) {
             return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList());
         }
@@ -82,6 +90,13 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
+    /**
+     * Activate price offer
+     * @param approverId id for {@code User}
+     * @param priceOfferId id for price offer
+     * @param customerTermsDTO completed customer terms to be added to the price offer.
+     * @return true if price offer is updated, else false
+     */
     @PutMapping(path = "/activate/{approverId}/{priceOfferId}")
     public Boolean activatePriceOffer(@PathVariable("approverId") Long approverId,
                                       @PathVariable("priceOfferId") Long priceOfferId,

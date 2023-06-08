@@ -14,6 +14,8 @@ public interface PriceOfferService {
 
     List<PriceOffer> findAll();
 
+    List<PriceOffer> findAllWithoutStatusInList(List<String> status);
+
     boolean delete(Long id);
 
     List<PriceOffer> findAllBySalesEmployeeId(Long userId);
@@ -23,4 +25,6 @@ public interface PriceOfferService {
     Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment);
 
     Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms);
+
+    List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
 }

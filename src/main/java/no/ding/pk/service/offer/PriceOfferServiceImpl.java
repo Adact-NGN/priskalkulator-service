@@ -240,7 +240,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public List<PriceOffer> findAll() {
-        return repository.findAllWherePriceOfferStatusNotLike(PriceOfferStatus.ACTIVATED.getStatus());
+        return repository.findAll();
+    }
+
+    @Override
+    public List<PriceOffer> findAllWithoutStatusInList(List<String> status) {
+        return repository.findAllByPriceOfferStatusNotIn(status);
     }
 
     @Override
@@ -334,6 +339,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         repository.save(priceOfferToActivate);
 
         return true;
+    }
+
+    @Override
+    public List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList) {
+        return repository.findAllByPriceOfferStatusIn(statusList);
     }
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
