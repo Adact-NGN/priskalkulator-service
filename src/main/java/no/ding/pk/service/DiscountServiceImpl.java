@@ -99,17 +99,17 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber, String zones) {
+    public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zones) {
         List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
 
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
             List <String> zoneList = Arrays.asList(zones.split(","));
-            return repository.findAllBySalesOrgAndZoneInAndMaterialNumberIn(salesOrg, zoneList, materialNumbers);
+            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
     }
 
     @Override

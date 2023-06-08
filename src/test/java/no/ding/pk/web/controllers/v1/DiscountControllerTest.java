@@ -33,12 +33,23 @@ public class DiscountControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    private final String salesOffice = "100";
+
     @Test
     public void shouldReturnListOfDiscountsForMaterialsWithNoZoneDifferentiatedPrices() {
         String materials = "50106,50107";
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers=" + materials, Discount[].class);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers=" + materials, Discount[].class);
 
         assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldReturnEmptyListWhenTheresIsNoMaterialsForSalesOffice() {
+        String materials = "50106,50107";
+        String salesOffice = "104";
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers=" + materials, Discount[].class);
+
+        assertThat(responseEntity.getBody(), arrayWithSize(0));
     }
 
     @Test
@@ -48,7 +59,7 @@ public class DiscountControllerTest {
         Map<String, String> params = new HashMap<>();
         params.put("materialNumbers", materials);
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers={materialNumbers}&zones=", Discount[].class, params);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers={materialNumbers}&zones=", Discount[].class, params);
 
         assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
     }
@@ -57,7 +68,7 @@ public class DiscountControllerTest {
     public void shouldNotReturnDiscountsForMaterialsWithZoneDifferentiatedPrices() {
         String materials = "50101,50102";
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers=" + materials, Discount[].class);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers=" + materials, Discount[].class);
 
         assertThat(responseEntity.getBody(), arrayWithSize(0));
     }
@@ -66,7 +77,7 @@ public class DiscountControllerTest {
     public void shouldNotReturnDiscountsForSingleMaterialWithZoneDifferentiatedPrices() {
         String materials = "50101";
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers=" + materials, Discount[].class);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers=" + materials, Discount[].class);
 
         assertThat(responseEntity.getBody(), arrayWithSize(0));
     }
@@ -80,7 +91,7 @@ public class DiscountControllerTest {
         params.put("materialNumbers", materials);
         params.put("zones", zones);
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers={materialNumbers}&zones={zones}",
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers={materialNumbers}&zones={zones}",
                 Discount[].class,
                 params);
 
@@ -96,7 +107,7 @@ public class DiscountControllerTest {
         params.put("materialNumbers", materials);
         params.put("zones", zones);
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers={materialNumbers}&zones={zones}",
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers={materialNumbers}&zones={zones}",
                 Discount[].class,
                 params);
 
@@ -106,7 +117,7 @@ public class DiscountControllerTest {
     @Test
     public void shouldGetResultForSingleMaterialWithNoZoneDifferentiatedPrices() {
         String materials = "50106";
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?materialNumbers=" + materials, Discount[].class);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers=" + materials, Discount[].class);
 
         assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
     }

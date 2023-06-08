@@ -21,7 +21,7 @@ public interface DiscountService {
 
     List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneAndMaterialNumber(String salesOrg, String salesOffice, String zone, String materialNumber);
 
-    List<Discount> findAllBySalesOrgAndMaterialNumber(String salesOrg, String materialNumber, String zone);
+    List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zone);
 
     List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String materialNumber,
             Integer level);

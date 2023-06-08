@@ -16,14 +16,10 @@ public interface DiscountRepository extends JpaRepository<Discount, Long>, JpaSp
     @Query("select distinct d from Discount d where d.salesOrg = :salesOrg")
     List<Discount> findAllBySalesOrg(@Param("salesOrg") String salesOrg);
 
-//    @Query("select distinct d from Discount d where d.salesOrg = :salesOrg and d.zone is null and d.materialNumber in :materialNumbers")
     List<Discount> findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers);
 
     @Query("select distinct d from Discount d where d.salesOrg = :salesOrg and d.zone = :zone and d.materialNumber in :materialNumbers")
     List<Discount> findAllBySalesOrgAndMaterialNumberAndZoneInListQuery(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers, @Param("zone") String zone);
 
-//    @Query("select d from Discount d where d.salesOrg = :salesOrg and d.zone in :zones and d.materialNumber in :materialNumbers")
-    List<Discount> findAllBySalesOrgAndZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("zones") List<String> zones, @Param("materialNumbers") List<String> materialNumbers);
-
-
+    List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("salesOffice") String salesOffice, @Param("zones") List<String> zones, @Param("materialNumbers") List<String> materialNumbers);
 }

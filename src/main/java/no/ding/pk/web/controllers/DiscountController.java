@@ -59,16 +59,18 @@ public class DiscountController {
     /**
      * Returns a list over all discounts for a given sales organization and for a list of material numbers.
      * @param salesOrg Sales organization number
+     * @param salesOffice Sales office number
      * @param materialNumbers Comma separated list of material numbers.
      * @param zones Which zones to get discount for, not required.
      * @return A list of all discounts, else empty list
      */
     @GetMapping(path = "/in-list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg,
+                                                                             @RequestParam(value = "salesOffice") String salesOffice,
                                                                              @RequestParam(value = "materialNumbers") String materialNumbers,
                                                                              @RequestParam(value = "zones", required = false) String zones) {
         log.debug("Getting discount for material {} and zone {} in sales org {}", materialNumbers, zones, salesOrg);
-        return service.findAllBySalesOrgAndMaterialNumber(salesOrg, materialNumbers, zones);
+        return service.findAllBySalesOrgAndSalesOfficeAndMaterialNumber(salesOrg, salesOffice, materialNumbers, zones);
     }
 
     /**
