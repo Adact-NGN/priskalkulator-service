@@ -12,6 +12,7 @@ import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
+import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ class PriceOfferServiceImplTest {
 
     @Autowired
     private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
+
+    @Autowired
+    private CustomerTermsService customerTermsService;
 
     @BeforeEach
     public void setup() {
@@ -133,9 +137,6 @@ class PriceOfferServiceImplTest {
 
     @Test
     public void shouldPersistPriceOffer() throws JsonProcessingException {
-
-
-
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(new Date())
@@ -363,7 +364,6 @@ class PriceOfferServiceImplTest {
                 .build();
         salesOfficePowerOfAttorneyService.save(powerOfAttorney);
 
-
         Material ordinaryMaterial = createOrdinaryMaterial();
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
                 .material(ordinaryMaterial)
@@ -396,6 +396,68 @@ class PriceOfferServiceImplTest {
 
         assertThat(actual.getApprover(), notNullValue());
         assertThat(actual.getApprover(), equalTo(ordinaryWasteHolderLvl2));
+    }
+
+    @Test
+    public void shouldEndExistingCustomerTermsAndAddNewWhenNewPriceOfferIsActivated() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
+
+        CustomerTerms oldCustomerTerms = CustomerTerms.builder()
+                .customerNumber("169239")
+                .customerName("Monica")
+                .contractTerm(TermsTypes.GeneralTerms.getValue())
+                .agreementStartDate(currentDateTime.minusYears(1).toDate())
+                .salesEmployee(salesEmployee.getEmail())
+                .salesOrg("100")
+                .salesOffice("100")
+                .build();
+
+        customerTermsService.save("100", "169239", oldCustomerTerms);
+
+        Material ordinaryMaterial = createOrdinaryMaterial();
+        PriceRow ordinaryWastePriceRow = PriceRow.builder()
+                .material(ordinaryMaterial)
+                .standardPrice(170.00)
+                .discountLevel(6)
+                .needsApproval(false)
+                .build();
+
+        Material dangerousMaterial = createDangerousMaterial();
+        PriceRow priceRow = PriceRow.builder()
+                .material(dangerousMaterial)
+                .standardPrice(16566.00)
+                .discountLevel(3)
+                .needsApproval(false)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOfficeName("Skien")
+                .salesOffice("104")
+                .materialList(List.of(priceRow, ordinaryWastePriceRow))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(salesOffice))
+                .needsApproval(true)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
+                .customerNumber("169239")
+                .customerName("Monica")
+                .contractTerm(TermsTypes.GeneralTerms.getValue())
+                .agreementStartDate(currentDateTime.toDate())
+                .salesOrg("100")
+                .salesOffice("100")
+                .build();
+
+        Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms);
+
+        assertThat(actual, is(true));
     }
 
     private Material createOrdinaryMaterial() {

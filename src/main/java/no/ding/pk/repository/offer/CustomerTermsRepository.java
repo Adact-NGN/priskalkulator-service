@@ -13,5 +13,5 @@ public interface CustomerTermsRepository extends JpaRepository<CustomerTerms, Lo
     List<CustomerTerms> findAllBySalesOfficeAndCustomerNumber(@Param("salesOffice") String salesOffice, @Param("customerNumber") String customerNumber);
     Integer countAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
 
-    CustomerTerms findBySalesOrgAndSalesOfficeAndCustomerNumberAndAgreementEndDateGreaterThanOrAgreementEndDateIsNull(String salgsOrg, String salesOffice, String customerNumber, Date date);
+    List<CustomerTerms> findBySalesOrgAndSalesOfficeAndCustomerNumberAndAgreementEndDateGreaterThanOrAgreementEndDateIsNullOrderByCreatedDateDesc(String salgsOrg, String salesOffice, String customerNumber, Date date);
 }

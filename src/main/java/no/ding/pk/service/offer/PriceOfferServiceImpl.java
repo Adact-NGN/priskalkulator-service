@@ -12,9 +12,11 @@ import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.MissingApprovalStatusException;
 import no.ding.pk.web.handlers.PriceOfferNotFoundException;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -37,15 +39,22 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
+    private final CustomerTermsService customerTermsService;
+    private final ModelMapper modelMapper;
+
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
-                                 SalesOfficePowerOfAttorneyService powerOfAttorneyService) {
+                                 SalesOfficePowerOfAttorneyService powerOfAttorneyService,
+                                 CustomerTermsService customerTermsService,
+                                 @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
+        this.customerTermsService = customerTermsService;
+        this.modelMapper = modelMapper;
     }
 
     private PriceOffer createNewPriceOffer(User salesEmployee) {
@@ -158,15 +167,33 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 }
             }
 
-            PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(Integer.valueOf(listEntry.getKey()));
+            Integer salesOfficeNumber = Integer.valueOf(listEntry.getKey());
+            PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(salesOfficeNumber);
 
-            if(hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
-                approvalUsers.add(poa.getDangerousWasteHolder());
+            if(poa == null) {
+                log.debug("No power of attorney found for sales office {}", salesOfficeNumber);
+                log.debug("Unable to set any approved for given price offer");
             } else {
-                if(highestDiscountLevel > 5) {
-                    approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                    if(poa.getDangerousWasteHolder() == null) {
+                        log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
+                    } else {
+                        approvalUsers.add(poa.getDangerousWasteHolder());
+                    }
                 } else {
-                    approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
+                    if (highestDiscountLevel > 5) {
+                        if(poa.getOrdinaryWasteLvlTwoHolder() == null) {
+                            log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
+                        } else {
+                            approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                        }
+                    } else {
+                        if(poa.getOrdinaryWasteLvlOneHolder() == null) {
+                            log.debug("No sales manager elected for approval of ordinary waste for sales office {}", salesOfficeNumber);
+                        } else {
+                            approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
+                        }
+                    }
                 }
             }
         }
@@ -333,12 +360,40 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new PriceOfferNotFoundException(message);
         }
 
+        // TODO: Do we need to check if the given user is allowed to execute this function?
+//        if(priceOfferToActivate.getApprover().equals(approver) || priceOfferToActivate.getSalesEmployee().equals(approver))
+
         priceOfferToActivate.setCustomerTerms(customerTerms);
         priceOfferToActivate.setPriceOfferStatus(PriceOfferStatus.ACTIVATED.getStatus());
 
-        repository.save(priceOfferToActivate);
+        priceOfferToActivate = repository.save(priceOfferToActivate);
+
+        for(SalesOffice salesOffice : priceOfferToActivate.getSalesOfficeList()) {
+            endExistingCustomerTerms(priceOfferToActivate, salesOffice);
+
+            CustomerTerms newCustomerTerms = modelMapper.map(priceOfferToActivate.getCustomerTerms(), CustomerTerms.class);
+
+            newCustomerTerms.setId(null);
+            newCustomerTerms.setCreatedBy(null);
+            newCustomerTerms.setCreatedDate(null);
+            newCustomerTerms.setLastModifiedBy(null);
+            newCustomerTerms.setLastModifiedDate(null);
+
+            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), newCustomerTerms);
+        }
 
         return true;
+    }
+
+    private void endExistingCustomerTerms(PriceOffer priceOfferToActivate, SalesOffice salesOffice) {
+        CustomerTerms currentActiveCustomerTerms = customerTermsService.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(priceOfferToActivate.getCustomerNumber(),
+                salesOffice.getSalesOffice(), salesOffice.getSalesOrg());
+
+        if(currentActiveCustomerTerms != null) {
+            currentActiveCustomerTerms.setAgreementEndDate(new Date());
+
+            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), currentActiveCustomerTerms);
+        }
     }
 
     @Override
@@ -348,7 +403,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
         // Exception thrown here
-        List<String> materialsToApprove = new ArrayList<>(Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList());
+        List<String> materialsToApprove = convertMaterialsStringToList(priceOfferToApprove);
         List<String> approvedMaterials = new ArrayList<>();
 
         boolean priceOfferIsApproved = PriceOfferStatus.getApprovalStates().contains(priceOfferToApprove.getPriceOfferStatus());
@@ -364,6 +419,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         materialsToApprove.removeAll(approvedMaterials);
 
         priceOfferToApprove.setMaterialsForApproval(String.join(",", materialsToApprove));
+    }
+
+    private static List<String> convertMaterialsStringToList(PriceOffer priceOfferToApprove) {
+        List<String> returnList = new ArrayList<>();
+        if(StringUtils.isNotBlank(priceOfferToApprove.getMaterialsForApproval())) {
+            String[] array = priceOfferToApprove.getMaterialsForApproval().split(",");
+            if(array.length > 0)
+                returnList.addAll(Arrays.stream(array).sorted().toList());
+        }
+
+        return returnList;
     }
 
     private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {

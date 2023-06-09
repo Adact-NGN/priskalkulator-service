@@ -31,26 +31,23 @@ public class PriceOfferTerms extends Auditable {
     private Long id;
 
     @Column
+    private String salesOrg;
+    @Column
     private String salesOffice;
-
     @Column
     private String customerName;
-
     @Column
     private String customerNumber;
-
+    @Column
+    private String contractTerm;
     @Column
     private Boolean additionForAdminFee;
     @Column
     private Boolean additionForRoadTax;
-
     @Column
     private Date agreementEndDate;
     @Column
     private Date agreementStartDate;
-    @Column
-    private String contractTerm;
-
     @Column
     private Boolean customerRequireNotification; // false,
     @Column
@@ -83,21 +80,4 @@ public class PriceOfferTerms extends Auditable {
     private String specialConditionAction;
     @Column
     private String comment;
-
-//    @Builder(builderMethodName = "priceOfferTermsBuilder")
-//    public PriceOfferTerms(String salesOffice, String customerName, String customerNumber, Boolean additionForAdminFee,
-//                           Boolean additionForRoadTax, Date agreementEndDate, Date agreementStartDate, String contractTerm,
-//                           Boolean customerRequireNotification, String indexRent, String indexTransport, String indexWaste,
-//                           String invoiceInterval, String metalPricing, Date metalSetDateForOffer,
-//                           Integer monthsToFreezeCustomerFromAdjustments, String newOrEstablishedCustomer,
-//                           String notificationMailAddress, String paymentCondition, Date priceAdjustmentDate,
-//                           String quarterlyAdjustment, Integer requiredNumberOfDaysNotice, String specialConditionAction,
-//                           String comment, Long id) {
-//        super(salesOffice, customerName, customerNumber, additionForAdminFee, additionForRoadTax, agreementEndDate,
-//                agreementStartDate, contractTerm, customerRequireNotification, indexRent, indexTransport, indexWaste,
-//                invoiceInterval, metalPricing, metalSetDateForOffer, monthsToFreezeCustomerFromAdjustments,
-//                newOrEstablishedCustomer, notificationMailAddress, paymentCondition, priceAdjustmentDate,
-//                quarterlyAdjustment, requiredNumberOfDaysNotice, specialConditionAction, comment);
-//        this.id = id;
-//    }
 }

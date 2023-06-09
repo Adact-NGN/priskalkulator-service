@@ -44,12 +44,9 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     public CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms) {
         List<CustomerTerms> currentCustomerTerms = repository.findAllBySalesOfficeAndCustomerNumber(salesOffice, customerNumber);
         
-        invalidatePreviousCustomerTerm(currentCustomerTerms);
+//        invalidatePreviousCustomerTerm(currentCustomerTerms);
         
-        ModelMapper modelMapper = new ModelMapper();
-        CustomerTerms newTerm = modelMapper.map(customerTerms, CustomerTerms.class);
-        
-        newTerm = repository.save(newTerm);
+        CustomerTerms newTerm = repository.save(customerTerms);
         
         log.debug("Created new Term for customer: {}", newTerm);
         return newTerm;
@@ -74,7 +71,9 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     
     @Override
     public CustomerTerms findActiveTermsForCustomerForSalesOfficeAndSalesOrg(String customerNumber, String salesOffice, String salesOrg) {
-        return repository.findBySalesOrgAndSalesOfficeAndCustomerNumberAndAgreementEndDateGreaterThanOrAgreementEndDateIsNull(salesOrg, salesOffice, customerNumber, new Date());
+        List<CustomerTerms> allActiveCustomerTerms = repository.findBySalesOrgAndSalesOfficeAndCustomerNumberAndAgreementEndDateGreaterThanOrAgreementEndDateIsNullOrderByCreatedDateDesc(salesOrg, salesOffice, customerNumber, new Date());
+
+        return allActiveCustomerTerms.get(0);
     }
     
 }

@@ -1,18 +1,15 @@
 package no.ding.pk.service.offer;
 
-import java.util.Date;
-
-import javax.transaction.Transactional;
-
-import org.joda.time.LocalDate;
+import no.ding.pk.domain.offer.CustomerTerms;
+import no.ding.pk.repository.offer.CustomerTermsRepository;
 import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import no.ding.pk.domain.offer.CustomerTerms;
-import no.ding.pk.repository.offer.CustomerTermsRepository;
+import javax.transaction.Transactional;
+import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -21,9 +18,6 @@ import static org.hamcrest.Matchers.notNullValue;
 @Transactional
 @TestPropertySource("/h2-db.properties")
 public class CustomerTermsServiceImplTest {
-
-    @Autowired
-    private CustomerTermsRepository repository;
 
     @Autowired
     private CustomerTermsService service;
@@ -54,7 +48,7 @@ public class CustomerTermsServiceImplTest {
     }
 
     @Test
-    void testFindActiveTermsForCustomerForSalesOfficeAndSalesOrgWhereEndDateIsInTheFuture() {
+    void testFindActiveTermsForCustomerForSalesOfficeAndSalesOrgWhereEndDateIsInTheFuture() throws InterruptedException {
 
         String customerNumber = "295843";
         String salesOffice = "100";
@@ -66,9 +60,21 @@ public class CustomerTermsServiceImplTest {
         .customerNumber(customerNumber)
         .salesOffice(salesOffice)
         .salesOrg(salesOrg)
-        .agreementStartDate(new Date())
+        .agreementStartDate(currentDateAndTime.toDate())
         .agreementEndDate(currentDateAndTime.plusYears(1).toDate())
         .build();
+
+        service.save(salesOffice, customerNumber, customerTerms);
+
+        Thread.sleep(2000L);
+
+        customerTerms = CustomerTerms.builder()
+                .customerNumber(customerNumber)
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .agreementStartDate(currentDateAndTime.minusYears(1).toDate())
+                .agreementEndDate(null)
+                .build();
 
         service.save(salesOffice, customerNumber, customerTerms);
 
