@@ -455,6 +455,7 @@ class PriceOfferServiceImplTest {
                 .salesOffice("100")
                 .build();
 
+
         Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms);
 
         assertThat(actual, is(true));

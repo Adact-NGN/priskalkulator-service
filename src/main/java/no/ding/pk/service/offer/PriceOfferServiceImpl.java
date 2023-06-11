@@ -57,28 +57,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         this.modelMapper = modelMapper;
     }
 
-    private PriceOffer createNewPriceOffer(User salesEmployee) {
-        PriceOffer entity = new PriceOffer();
-        entity.setSalesEmployee(salesEmployee);
-
-        return entity;
-    }
-
     @Override
     public PriceOffer save(PriceOffer newPriceOffer) {
         log.debug("Received PriceOffer {}", newPriceOffer);
 
         User salesEmployee = checkAndGetSalesEmployee(newPriceOffer.getSalesEmployee());
 
-        PriceOffer entity;
-
-        if(newPriceOffer.getId() != null) {
-            Optional<PriceOffer> optEntity = repository.findById(newPriceOffer.getId());
-
-            entity = optEntity.orElseGet(() -> createNewPriceOffer(salesEmployee));
-        } else {
-            entity = createNewPriceOffer(salesEmployee);
-        }
+        PriceOffer entity = getPriceOffer(newPriceOffer, salesEmployee);
 
         entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
 
@@ -87,7 +72,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setCustomerName(newPriceOffer.getCustomerName());
         }
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
-
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
@@ -118,6 +102,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
 
             entity.setMaterialsForApproval(materialNumbersForApproval.toString());
+
+            User approver = getApproverForOffer(materialsForApproval);
+
+            if(approver != null) {
+                entity.setApprover(approver);
+            } else {
+                log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
+            }
         }
 
         if(newPriceOffer.getApprover() != null) {
@@ -129,13 +121,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 approver = getApproverForOffer(materialsForApproval);
                 entity.setApprover(approver);
             }
-        } else if(!materialsForApproval.isEmpty()) {
-            User approver = getApproverForOffer(materialsForApproval);
-
-            if(approver == null) {
-                log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
-            }
-            entity.setApprover(approver);
         }
 
         if(newPriceOffer.getCustomerTerms() != null) {
@@ -143,6 +128,23 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
+        if(newPriceOffer.getId() != null) {
+            Optional<PriceOffer> optEntity = repository.findById(newPriceOffer.getId());
+
+            return optEntity.orElseGet(() -> createNewPriceOffer(salesEmployee));
+        } else {
+            return createNewPriceOffer(salesEmployee);
+        }
+    }
+
+    private PriceOffer createNewPriceOffer(User salesEmployee) {
+        PriceOffer entity = new PriceOffer();
+        entity.setSalesEmployee(salesEmployee);
+
+        return entity;
     }
 
     private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval) {
@@ -162,7 +164,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                     hasRegularMaterialForApproval = true;
                 }
 
-                if(priceRow.getDiscountLevel() > highestDiscountLevel) {
+                if(priceRow.getDiscountLevel() != null && priceRow.getDiscountLevel() > highestDiscountLevel) {
                     highestDiscountLevel = priceRow.getDiscountLevel();
                 }
             }

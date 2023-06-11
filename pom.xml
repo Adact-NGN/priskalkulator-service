@@ -2,740 +2,742 @@
 
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.0</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
-
-  <groupId>no.ding.pk</groupId>
-  <artifactId>ding-ip-app-pk-service</artifactId>
-  <version>1.0-SNAPSHOT</version>
-
-  <name>ding-ip-app-pk-service</name>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <environment>dev</environment>
-    <logging.level>DEBUG</logging.level>
-    <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
-    <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
-    <datasource.database>pk_poal_db_${environment}</datasource.database>
-    <datasource.url>jdbc:mariadb://localhost:3306/${datasource.database}</datasource.url>
-    <datasource.show.sql>true</datasource.show.sql>
-    <datasource.ddl>update</datasource.ddl>
-    <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
-    <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
-    <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
-    <pdf.template.file.name>priceOfferTemplate</pdf.template.file.name>
-  </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.azure.spring</groupId>
-        <artifactId>spring-cloud-azure-dependencies</artifactId>
-        <version>4.7.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <dependencies>
-<!--    <dependency>-->
-<!--      <groupId>org.hibernate</groupId>-->
-<!--      <artifactId>hibernate-envers</artifactId>-->
-<!--      <version>6.1.7.Final</version>-->
-<!--    </dependency>-->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-integration</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.integration</groupId>
-      <artifactId>spring-integration-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-logging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-json</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- Security -->
-    <dependency>
-      <groupId>com.azure.spring</groupId>
-      <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-<!--    <dependency>-->
-<!--      <groupId>com.azure.spring</groupId>-->
-<!--      <artifactId>spring-cloud-azure-starter-keyvault</artifactId>-->
-<!--    </dependency>-->
-
-    <!-- Include log4j2 -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-log4j2</artifactId>
-    </dependency>
-
-    <!-- <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>5.2.17.Final</version>
-      <scope>runtime</scope>
-    </dependency> -->
-
-    <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>msal4j</artifactId>
-      <version>1.13.5</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <version>3.1.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-hibernate5</artifactId>
-      <version>2.14.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </exclusion>
-      </exclusions>
-      <!-- <type>bundle</type> -->
-    </dependency>
-
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20230227</version>
-      <!-- <type>bundle</type> -->
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.14.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.14.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.modelmapper</groupId>
-      <artifactId>modelmapper</artifactId>
-      <version>3.1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
-    <dependency>
-      <groupId>commons-validator</groupId>
-      <artifactId>commons-validator</artifactId>
-      <version>1.7</version>
-    </dependency>
-
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>4.4</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.11.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
-    </dependency>
-
-    <!-- Swagger -->
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-boot-starter</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-data-rest</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-    <!-- End Swagger -->
-
-    <!-- PDF libs -->
-    <dependency>
-      <groupId>org.apache.pdfbox</groupId>
-      <artifactId>pdfbox-tools</artifactId>
-      <version>3.0.0-RC1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.pdfbox</groupId>
-          <artifactId>pdfbox</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.itextpdf</groupId>
-      <artifactId>itextpdf</artifactId>
-      <version>5.5.13.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.itextpdf.tool</groupId>
-      <artifactId>xmlworker</artifactId>
-      <version>5.5.10</version>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
-    <dependency>
-      <groupId>org.xhtmlrenderer</groupId>
-      <artifactId>flying-saucer-pdf</artifactId>
-      <version>9.1.22</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bctsp-jdk14</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>1.13.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xhtmlrenderer</groupId>
-      <artifactId>flying-saucer-pdf-openpdf</artifactId>
-      <version>9.1.20</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.xhtmlrenderer</groupId>
-          <artifactId>flying-saucer-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- Date tools -->
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>2.12.5</version>
-    </dependency>
-
-    <!-- Handlebars -->
-    <dependency>
-      <groupId>com.github.jknack</groupId>
-      <artifactId>handlebars-proto</artifactId>
-      <version>4.3.1</version>
-    </dependency>
-
-    <!-- Testing -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
-      <version>5.9.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-inline</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.skyscreamer</groupId>
-          <artifactId>jsonassert</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-      <version>2.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>2.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>2.1.214</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-inline</artifactId>
-      <version>5.1.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.openhtmltopdf</groupId>
-      <artifactId>openhtmltopdf-core</artifactId>
-      <version>1.0.6</version>
-    </dependency>
-    <dependency>
-      <groupId>com.openhtmltopdf</groupId>
-      <artifactId>openhtmltopdf-pdfbox</artifactId>
-      <version>1.0.6</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <!-- <version>5.1.9.RELEASE</version> -->
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>31.1-jre</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <version>2.10.1</version>
-    </dependency>
-
-    <!-- cache -->
-    <dependency>
-      <groupId>com.github.ben-manes.caffeine</groupId>
-      <artifactId>caffeine</artifactId>
-      <version>3.1.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-    </dependency>
-
-  </dependencies>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-        <excludes>
-          <exclude>*.pdf</exclude>
-          <exclude>**/*.p12</exclude>
-          <exclude>**/*.cer</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-        <excludes>
-          <exclude>*.pdf</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
-      <plugins>
-        <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-        <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.2.0</version>
-          <configuration>
-            <encoding>UTF-8</encoding>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
-          <configuration>
-            <source>11</source>
-            <target>11</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.0.0-M7</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-        </plugin>
-        <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.12.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.3.0</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.2</version>
-        <configuration>
-          <!-- <includes>
-            <include>**/*Test.java</include>
-          </includes> -->
-          <excludes>
-            <exclude>repository</exclude>
-          </excludes>
-          <properties>
-            <includeTags>unittest</includeTags>
-            <excludeTags>integrationtest</excludeTags>
-          </properties>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>no.ding.pk.App</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
+    <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+        <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>repackage</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-  <profiles>
-    <profile>
-      <id>default</id>
-    </profile>
-    <profile>
-      <id>prod</id>
-      <dependencies>
-        <!-- Azure Keyvault Certificate -->
-        <dependency>
-          <groupId>com.azure.spring</groupId>
-          <artifactId>azure-spring-boot-starter-keyvault-certificates</artifactId>
-          <version>3.14.0</version>
-        </dependency>
-        <!-- End Security-->
-      </dependencies>
-      <properties>
-        <active.profile>prod</active.profile>
-        <allowed.cors.url>http://20.238.224.213</allowed.cors.url>
-        <datasource.username>test@pk-poal-db-srv-dev</datasource.username>
-        <datasource.password>DqaZXsw%!_1234</datasource.password>
-        <datasource.database>pk_poal_db_prod</datasource.database>
-        <!-- For sslModes see https://mariadb.com/docs/xpand/connect/programming-languages/java/tls/ -->
-        <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=trust</datasource.url>
-        <datasource.show.sql>true</datasource.show.sql>
-        <datasource.ddl>update</datasource.ddl>
-        <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
-        <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+    <groupId>no.ding.pk</groupId>
+    <artifactId>ding-ip-app-pk-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>ding-ip-app-pk-service</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <environment>dev</environment>
         <logging.level>DEBUG</logging.level>
-        <sap.username>AZURE_ECOM2</sap.username>
-        <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
-        <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
-        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
-        <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
-        <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
-        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <active.profile>dev</active.profile>
-        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
-        <datasource.username>admin</datasource.username>
-        <datasource.password>admin1234</datasource.password>
-        <datasource.database>pk_poal_db_dev</datasource.database>
-        <datasource.url>jdbc:mariadb://localhost:3306/${datasource.database}</datasource.url>
-        <datasource.show.sql>true</datasource.show.sql>
-        <datasource.ddl>create-drop</datasource.ddl>
-        <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
-        <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
-        <logging.level>DEBUG</logging.level>
-        <sap.username>AZURE_ECOM2</sap.username>
-        <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
-        <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
-        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
-        <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
-        <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
-        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-devtools</artifactId>
-          <optional>true</optional>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <properties>
-                <groups>unittest</groups>
-              </properties>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>docker-dev</id>
-      <properties>
-        <active.profile>docker-dev</active.profile>
-        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
-        <datasource.username>admin</datasource.username>
-        <datasource.password>admin1234</datasource.password>
-        <datasource.database>pk_poal_db_dev</datasource.database>
-        <datasource.path>${env.DB_HOST}</datasource.path>
-        <datasource.url>jdbc:mariadb://${datasource.path}:3306/${datasource.database}</datasource.url>
-        <datasource.show.sql>true</datasource.show.sql>
-        <datasource.ddl>create-drop</datasource.ddl>
-        <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
-        <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
-        <logging.level>DEBUG</logging.level>
-        <sap.username>AZURE_ECOM2</sap.username>
-        <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
-        <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
-        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
-        <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
-        <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
-        <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <properties>
-                <groups>unittest</groups>
-              </properties>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>itest</id>
-      <properties>
-        <active.profile>itest</active.profile>
-        <allowed.cors.url>http://localhost:4200</allowed.cors.url>
         <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
         <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
-        <datasource.database>pk_poal_db_dev</datasource.database>
-        <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=verify-full</datasource.url>
+        <datasource.database>pk_poal_db_${environment}</datasource.database>
+        <datasource.url>jdbc:mariadb://localhost:3306/${datasource.database}</datasource.url>
         <datasource.show.sql>true</datasource.show.sql>
         <datasource.ddl>update</datasource.ddl>
         <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
         <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
-        <sap.username>AZURE_ECOM2</sap.username>
-        <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
-        <sap.api.user.url></sap.api.user.url>
-        <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
-        <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
-        <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
-        <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
         <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <properties>
-                <groups>integrationtest</groups>
-              </properties>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>test</id>
-      <build>
+        <pdf.template.file.name>priceOfferTemplate</pdf.template.file.name>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
+                <version>4.7.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!--    <dependency>-->
+        <!--      <groupId>org.hibernate</groupId>-->
+        <!--      <artifactId>hibernate-envers</artifactId>-->
+        <!--      <version>6.1.7.Final</version>-->
+        <!--    </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-integration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Security -->
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>spring-cloud-azure-starter-active-directory</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--    <dependency>-->
+        <!--      <groupId>com.azure.spring</groupId>-->
+        <!--      <artifactId>spring-cloud-azure-starter-keyvault</artifactId>-->
+        <!--    </dependency>-->
+
+        <!-- Include log4j2 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <!-- <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-core</artifactId>
+          <version>5.2.17.Final</version>
+          <scope>runtime</scope>
+        </dependency> -->
+
+        <dependency>
+            <groupId>com.microsoft.azure</groupId>
+            <artifactId>msal4j</artifactId>
+            <version>1.13.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5</artifactId>
+            <version>2.14.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+            <!-- <type>bundle</type> -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20230227</version>
+            <!-- <type>bundle</type> -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.14.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.14.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-validator/commons-validator -->
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.7</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-data-rest</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- End Swagger -->
+
+        <!-- PDF libs -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox-tools</artifactId>
+            <version>3.0.0-RC1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.pdfbox</groupId>
+                    <artifactId>pdfbox</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf.tool</groupId>
+            <artifactId>xmlworker</artifactId>
+            <version>5.5.10</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>9.1.22</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bctsp-jdk14</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.13.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf-openpdf</artifactId>
+            <version>9.1.20</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.xhtmlrenderer</groupId>
+                    <artifactId>flying-saucer-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Date tools -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.12.5</version>
+        </dependency>
+
+        <!-- Handlebars -->
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-proto</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>5.9.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-inline</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.skyscreamer</groupId>
+                    <artifactId>jsonassert</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.1.214</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>5.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-core</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <!-- <version>5.1.9.RELEASE</version> -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+        <!-- cache -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>5.7.7</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
         <resources>
-          <resource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <excludes>
-              <exclude>*.pdf</exclude>
-            </excludes>
-          </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>*.pdf</exclude>
+                    <exclude>**/*.p12</exclude>
+                    <exclude>**/*.cer</exclude>
+                </excludes>
+            </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>*.pdf</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
+        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+            <plugins>
+                <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.10.1</version>
+                    <configuration>
+                        <source>11</source>
+                        <target>11</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M7</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.12.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.3.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <properties>
-                <groups>unittest</groups>
-              </properties>
-            </configuration>
-          </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <!-- <includes>
+                      <include>**/*Test.java</include>
+                    </includes> -->
+                    <excludes>
+                        <exclude>repository</exclude>
+                    </excludes>
+                    <properties>
+                        <includeTags>unittest</includeTags>
+                        <excludeTags>integrationtest</excludeTags>
+                    </properties>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>no.ding.pk.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
         </plugins>
-      </build>
-      <properties>
-        <active.profile>test</active.profile>
-        <datasource.username>sa</datasource.username>
-        <datasource.password></datasource.password>
-        <mariadb.datasource.username>admin</mariadb.datasource.username>
-        <mariadb.datasource.password>admin1234</mariadb.datasource.password>
-        <h2.datasource.username>sa</h2.datasource.username>
-        <h2.datasource.password></h2.datasource.password>
-        <datasource.database>pk_poal_db_dev</datasource.database>
-        <datasource.url>jdbc:h2:mem:testdb</datasource.url>
-        <datasource.show.sql>true</datasource.show.sql>
-        <datasource.ddl>update</datasource.ddl>
-        <datasource.driverClassName>org.h2.Driver</datasource.driverClassName>
-        <datasource.hibernate.dialect>org.hibernate.dialect.H2Dialect</datasource.hibernate.dialect>
-      </properties>
-    </profile>
-  </profiles>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <dependencies>
+                <!-- Azure Keyvault Certificate -->
+                <dependency>
+                    <groupId>com.azure.spring</groupId>
+                    <artifactId>azure-spring-boot-starter-keyvault-certificates</artifactId>
+                    <version>3.14.0</version>
+                </dependency>
+                <!-- End Security-->
+            </dependencies>
+            <properties>
+                <active.profile>prod</active.profile>
+                <allowed.cors.url>http://20.238.224.213</allowed.cors.url>
+                <datasource.username>test@pk-poal-db-srv-dev</datasource.username>
+                <datasource.password>DqaZXsw%!_1234</datasource.password>
+                <datasource.database>pk_poal_db_prod</datasource.database>
+                <!-- For sslModes see https://mariadb.com/docs/xpand/connect/programming-languages/java/tls/ -->
+                <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=trust</datasource.url>
+                <datasource.show.sql>true</datasource.show.sql>
+                <datasource.ddl>update</datasource.ddl>
+                <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
+                <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+                <logging.level>DEBUG</logging.level>
+                <sap.username>AZURE_ECOM2</sap.username>
+                <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
+                <sap.api.user.url></sap.api.user.url>
+                <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder?$format=json</sap.api.customer.url>
+                <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
+                <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
+                <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+                <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <active.profile>dev</active.profile>
+                <allowed.cors.url>http://localhost:4200</allowed.cors.url>
+                <datasource.username>admin</datasource.username>
+                <datasource.password>admin1234</datasource.password>
+                <datasource.database>pk_poal_db_dev</datasource.database>
+                <datasource.url>jdbc:mariadb://localhost:3306/${datasource.database}</datasource.url>
+                <datasource.show.sql>true</datasource.show.sql>
+                <datasource.ddl>create-drop</datasource.ddl>
+                <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
+                <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+                <logging.level>DEBUG</logging.level>
+                <sap.username>AZURE_ECOM2</sap.username>
+                <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
+                <sap.api.user.url></sap.api.user.url>
+                <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
+                <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
+                <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
+                <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+                <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-devtools</artifactId>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <properties>
+                                <groups>unittest</groups>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-dev</id>
+            <properties>
+                <active.profile>docker-dev</active.profile>
+                <allowed.cors.url>http://localhost:4200</allowed.cors.url>
+                <datasource.username>admin</datasource.username>
+                <datasource.password>admin1234</datasource.password>
+                <datasource.database>pk_poal_db_dev</datasource.database>
+                <datasource.path>${env.DB_HOST}</datasource.path>
+                <datasource.url>jdbc:mariadb://${datasource.path}:3306/${datasource.database}</datasource.url>
+                <datasource.show.sql>true</datasource.show.sql>
+                <datasource.ddl>create-drop</datasource.ddl>
+                <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
+                <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+                <logging.level>DEBUG</logging.level>
+                <sap.username>AZURE_ECOM2</sap.username>
+                <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
+                <sap.api.user.url></sap.api.user.url>
+                <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
+                <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
+                <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
+                <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+                <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <properties>
+                                <groups>unittest</groups>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>itest</id>
+            <properties>
+                <active.profile>itest</active.profile>
+                <allowed.cors.url>http://localhost:4200</allowed.cors.url>
+                <datasource.username>${env.DATABASE_USERNAME}</datasource.username>
+                <datasource.password>${env.DATABASE_PASSWORD}</datasource.password>
+                <datasource.database>pk_poal_db_dev</datasource.database>
+                <datasource.url>jdbc:mariadb://pk-poal-db-srv-dev.mariadb.database.azure.com:3306/${datasource.database}?sslMode=verify-full</datasource.url>
+                <datasource.show.sql>true</datasource.show.sql>
+                <datasource.ddl>update</datasource.ddl>
+                <datasource.driverClassName>org.mariadb.jdbc.Driver</datasource.driverClassName>
+                <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
+                <sap.username>AZURE_ECOM2</sap.username>
+                <sap.password>AzureEcom2@NorskGjenvinning.no2023</sap.password>
+                <sap.api.user.url></sap.api.user.url>
+                <sap.api.customer.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder</sap.api.customer.url>
+                <sap.api.contact.person.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hs_contactperson/srvd/sap/zsd_hs_contactperson_master/0001/Contacts</sap.api.contact.person.url>
+                <sap.api.material.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_materials/srvd_a2x/sap/zapi_ecom_materials/0001/Materials</sap.api.material.url>
+                <sap.api.standard.price.url>https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet</sap.api.standard.price.url>
+                <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <properties>
+                                <groups>integrationtest</groups>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>test</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/test/resources</directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>*.pdf</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <properties>
+                                <groups>unittest</groups>
+                            </properties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <properties>
+                <active.profile>test</active.profile>
+                <datasource.username>sa</datasource.username>
+                <datasource.password></datasource.password>
+                <mariadb.datasource.username>admin</mariadb.datasource.username>
+                <mariadb.datasource.password>admin1234</mariadb.datasource.password>
+                <h2.datasource.username>sa</h2.datasource.username>
+                <h2.datasource.password></h2.datasource.password>
+                <datasource.database>pk_poal_db_dev</datasource.database>
+                <datasource.url>jdbc:h2:mem:testdb</datasource.url>
+                <datasource.show.sql>true</datasource.show.sql>
+                <datasource.ddl>update</datasource.ddl>
+                <datasource.driverClassName>org.h2.Driver</datasource.driverClassName>
+                <datasource.hibernate.dialect>org.hibernate.dialect.H2Dialect</datasource.hibernate.dialect>
+            </properties>
+        </profile>
+    </profiles>
 </project>
