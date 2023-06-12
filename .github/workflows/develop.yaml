@@ -42,7 +42,7 @@ jobs:
         id: get_previous_version
         run: |
           previous_version=$(git describe --tags --abbrev=0)
-          echo "::set-output name=previous_version::$previous_version"
+          echo "{previous_version}={previous_version}" >> $GITHUB_OUTPUT
 
       - name: Increment Version
         id: increment_version
@@ -53,7 +53,7 @@ jobs:
           minor=${version_parts[1]}
           patch=${version_parts[2]}
           new_version="$major.$((minor + 1)).$patch"
-          echo "{name}={new_version}" >> $GITHUB_STATE
+          echo "{name}={new_version}" >> $GITHUB_OUTPUT
 
       - name: Bump Version
         working-directory: manifest/dev
