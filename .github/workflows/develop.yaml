@@ -17,9 +17,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-
+          distribution: 'corretto'
+          check-latest: true
+          cache: 'maven'
       - name: Build with Maven
-        run: mvn clean install -Pprod
+        run: mvn -B package --file pom.xml -Pprod
 
   version-bump:
     name: Bump Minor Version
