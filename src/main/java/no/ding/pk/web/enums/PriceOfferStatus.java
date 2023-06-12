@@ -7,7 +7,8 @@ public enum PriceOfferStatus {
     REJECTED("REJECTED"),
     APPROVED("APPROVED"),
     SENT_TO_COSTUMER("SENT_TO_COSTUMER"),
-    ACTIVATED("ACTIVATED");
+    ACTIVATED("ACTIVATED"),
+    SENT_TO_SAP("SENT_TO_SAP");
 
     private final String status;
 

@@ -95,6 +95,11 @@ public class PriceOfferRepositoryTest {
         assertThat(actual, hasSize(greaterThan(0)));
     }
 
+    @Test
+    public void shouldGetAllPriceOfferReadyForBoReport() {
+        
+    }
+
     private void createCompleteOfferDtoList(User salesAndApproval) {
         Material material = Material.builder()
                 .materialNumber("70120015")
