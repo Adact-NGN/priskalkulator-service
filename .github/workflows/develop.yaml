@@ -43,7 +43,7 @@ jobs:
         id: get_previous_version
         run: |
           previous_version=$(git describe --tags --abbrev=0)
-          echo "previous_version=previous_version" >> $GITHUB_OUTPUT
+          echo "previous_version={previous_version}" >> $GITHUB_OUTPUT
 
       - name: Increment Version
         id: increment_version
@@ -54,17 +54,17 @@ jobs:
           minor=${version_parts[1]}
           patch=${version_parts[2]}
           new_version="$major.$((minor + 1)).$patch"
-          echo "new version=new_version" >> $GITHUB_OUTPUT
+          echo "new version={new_version}" >> $GITHUB_OUTPUT
 
       - uses: actions/checkout@v3
       - name: Bump Version
-        working-directory: manifest/dev
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous Version: $previous_version"
           new_version=${{ steps.increment_version.outputs.new_version }}
           echo "New Version: $new_version"
           # Update your project files or use the appropriate command to bump the version
+          cd manifest/dev
           kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
 
       - name: Create release
