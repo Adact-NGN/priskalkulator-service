@@ -62,10 +62,10 @@ jobs:
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous Version: ${previous_version}" >> $GITHUB_OUTPUT
           new_version=${{ steps.increment_version.outputs.new_version }}
-          echo "New Version: $new_version"
+          echo "New Version: ${new_version}" >> $GITHUB_OUTPUT
           # Update your project files or use the appropriate command to bump the version
           pwd
-          cd ./manifest/dev
+          cd manifest/dev
           kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
 
       - name: Create release
