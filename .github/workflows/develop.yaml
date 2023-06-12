@@ -56,12 +56,14 @@ jobs:
           echo "::set-output name=new_version::$new_version"
 
       - name: Bump Version
+        working-directory: "manifest/dev"
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous Version: $previous_version"
           new_version=${{ steps.increment_version.outputs.new_version }}
           echo "New Version: $new_version"
           # Update your project files or use the appropriate command to bump the version
+          kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
 
       - name: Create release
         uses: actions/create-release@v1
