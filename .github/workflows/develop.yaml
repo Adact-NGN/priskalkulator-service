@@ -35,8 +35,8 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Git
-        uses: actions/setup-git@v2
+      # - name: Set up Git
+      #   uses: actions/setup-git@v2
 
       - name: Retrieve Previous Release Version
         id: get_previous_version
