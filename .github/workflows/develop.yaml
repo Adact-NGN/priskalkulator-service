@@ -53,10 +53,10 @@ jobs:
           minor=${version_parts[1]}
           patch=${version_parts[2]}
           new_version="$major.$((minor + 1)).$patch"
-          echo "::set-output name=new_version::$new_version"
+          echo "{name}={new_version}" >> $GITHUB_STATE
 
       - name: Bump Version
-        working-directory: "manifest/dev"
+        working-directory: "/manifest/dev"
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous Version: $previous_version"
