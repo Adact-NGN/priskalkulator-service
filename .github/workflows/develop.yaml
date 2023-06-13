@@ -39,7 +39,7 @@ jobs:
         id: get_previous_version
         run: |
           previous_version=$(git describe --tags --abbrev=0)
-          echo "Previous version [$previous_version]"
+          echo "previous_version=$previous_version" >> $GITHUB_OUTPUT
 
       - name: Increment Version
         id: increment_version
@@ -55,6 +55,7 @@ jobs:
           echo "$patch"
           new_version="v$major.$((minor + 1)).$patch"
           echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
       - uses: actions/checkout@v3
         with:
@@ -63,7 +64,7 @@ jobs:
         working-directory: manifest/dev/
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
-          echo "Previous Version: [$previous_version]" >> $GITHUB_OUTPUT
+          echo "Previous Version: [$previous_version]"
           new_version=${{ steps.increment_version.outputs.new_version }}
           echo "New Version: [$new_version]"
           # Update your project files or use the appropriate command to bump the version
