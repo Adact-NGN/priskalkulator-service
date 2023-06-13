@@ -48,7 +48,7 @@ jobs:
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
-          major="${version_parts[0]}//[^0-9]"
+          major=${version_parts[0]}//[^0-9]
           echo "Major $major"
           minor=${version_parts[1]}
           echo "Minor $minor"
