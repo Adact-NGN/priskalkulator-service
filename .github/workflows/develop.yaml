@@ -49,8 +49,8 @@ jobs:
           major=${version_parts[0]}
           minor=${version_parts[1]}
           patch=${version_parts[2]}
-          new_version="$major.$((minor + 1)).$patch"
-          echo "New version: [$new_version]"
+          new_version="v$major.$((minor + 1)).$patch"
+          echo "New version: $new_version"
 
       - uses: actions/checkout@v3
         with:
