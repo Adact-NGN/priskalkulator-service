@@ -464,4 +464,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return currentMaterialInPriceOffer.equals(previousMaterialInPriceOffer);
     }
 
+    @Override
+    public List<PriceOffer> findAllPriceOffersRadyForBoReport() {
+        
+        return repository.findAllByPriceOfferStatusIn(List.of(PriceOfferStatus.ACTIVATED.getStatus()));
+    }
+
 }

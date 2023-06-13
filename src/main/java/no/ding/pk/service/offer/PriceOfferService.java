@@ -27,4 +27,6 @@ public interface PriceOfferService {
     Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms);
 
     List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
+
+    List<PriceOffer> findAllPriceOffersRadyForBoReport();
 }

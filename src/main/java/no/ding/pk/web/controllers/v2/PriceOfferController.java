@@ -276,4 +276,18 @@ public class PriceOfferController {
         log.debug("Deleting PriceOffer with id: {}", id);
         return service.delete(id);
     }
+
+    /**
+     * Get all price offers ready for BO-report.
+     * @return List of all price offers ready for BO-report.
+     */
+    @GetMapping(path = "/bo-report/ready", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PriceOffer> getPriceOffersReadyForBoReport() {
+        log.debug("Getting all offers ready for BO-report");
+
+        List<PriceOffer> priceOffersForBoReport = service.findAllPriceOffersRadyForBoReport();
+
+        log.debug("Ammount of offers for BO-report: {}", priceOffersForBoReport.size());
+        return priceOffersForBoReport;
+    }
 }
