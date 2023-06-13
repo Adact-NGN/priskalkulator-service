@@ -1,9 +1,8 @@
-name: Java CI Dev
+name: Validate feature
 
 on: 
   push:
     branches:
-      - "develop"
       - "feature/**"
 
 jobs:

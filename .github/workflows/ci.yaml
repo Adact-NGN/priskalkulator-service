@@ -1,0 +1,85 @@
+name: Create minor version
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+    version-bump:
+      name: Bump Minor Version
+      runs-on: ubuntu-latest
+      needs: build
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+            token: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Retrieve Previous Release Version
+          id: get_previous_version
+          run: |
+            previous_version=$(git describe --tags --abbrev=0)
+            echo "Previous version: $previous_version"
+            echo "previous_version=$previous_version" >> $GITHUB_OUTPUT
+
+        - name: Increment Version
+          id: increment_version
+          run: |
+            previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+            echo "Previous version: $previous_version"
+            IFS='.' read -ra version_parts <<< "$previous_version"
+            major=${version_parts[0]//[!0-9]/}
+            echo "Major $major"
+            minor=${version_parts[1]}
+            echo "Minor $minor"
+            patch=${version_parts[2]}
+            echo "Patch $patch"
+            new_version="v$major.$((minor + 1)).$patch"
+            echo "New version: $new_version"
+            echo "new_version=$new_version" >> $GITHUB_OUTPUT 
+
+        #      - name: Update Kustomize Version
+        #        run: |
+        #          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+        #          new_version=${{ steps.increment_version.outputs.new_version }}
+        #          echo "New version: $new_version"
+        #          less manifests/dev/kustomization.yaml
+        #          sed -i "s/$previous_version/$new_version/g" manifests/dev/kustomization.yaml
+        #          less manifests/dev/kustomization.yaml
+
+        - uses: actions/checkout@v3
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+        - name: Bump Version
+          working-directory: manifests/dev/
+          run: |
+            previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+            echo "Previous Version: [$previous_version]"
+            new_version=${{ steps.increment_version.outputs.new_version }}
+            echo "New Version: [$new_version]"
+            # Update your project files or use the appropriate command to bump the version
+            pwd
+            kustomize edit set image dingipacr.azurecr.io/ding-ip-app-pk-service=:${{ steps.increment_version.outputs.new_version }}
+            less kustomization.yaml
+
+        - name: Commit and Push Changes
+          run: |
+            pwd
+#            git checkout develop
+            git config user.name "GitHub Actions"
+            git config user.email "kjetil.torvund.minde@ngn.no"
+            git commit -am "Update version in Kustomize file"
+            git status
+            git push
+
+        - name: Create release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: v${{ steps.increment_version.outputs.new_version }}
+            release_name: Release v${{ steps.increment_version.outputs.new_version }}
+            body: |
+              Created release ${{ steps.increment_version.outputs.new_version }}
