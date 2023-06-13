@@ -58,13 +58,29 @@ jobs:
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
-      - name: Update Kustomize Version
+#      - name: Update Kustomize Version
+#        run: |
+#          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+#          new_version=${{ steps.increment_version.outputs.new_version }}
+#          echo "New version: $new_version"
+#          less manifests/dev/kustomization.yaml
+#          sed -i "s/$previous_version/$new_version/g" manifests/dev/kustomization.yaml
+#          less manifests/dev/kustomization.yaml
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump Version
+        working-directory: manifests/dev/
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
           new_version=${{ steps.increment_version.outputs.new_version }}
-          echo "New version: $new_version"
+          echo "New Version: [$new_version]"
+          # Update your project files or use the appropriate command to bump the version
+          pwd
+          kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
           less manifests/dev/kustomization.yaml
-          sed -i "s/$previous_version/$new_version/g" manifests/dev/kustomization.yaml
 
       - name: Commit and Push Changes
         run: |
@@ -73,21 +89,6 @@ jobs:
           git commit -am "Update version in Kustomize file"
           git status
           git push
-
-
-#      - uses: actions/checkout@v3
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Bump Version
-#        working-directory: manifest/dev/
-#        run: |
-#          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
-#          echo "Previous Version: [$previous_version]"
-#          new_version=${{ steps.increment_version.outputs.new_version }}
-#          echo "New Version: [$new_version]"
-#          # Update your project files or use the appropriate command to bump the version
-#          pwd
-#          kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
 
       - name: Create release
         uses: actions/create-release@v1
