@@ -48,13 +48,13 @@ jobs:
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
-          major=${version_parts[0]}
+          major=${version_parts[0]} | tr -dc '0-9'
           echo "Major $major"
           minor=${version_parts[1]}
           echo "Minor $minor"
           patch=${version_parts[2]}
           echo "Patch $patch"
-          new_version="v$major.$((minor + 1)).$patch"
+          new_version="$major.$((minor + 1)).$patch"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
