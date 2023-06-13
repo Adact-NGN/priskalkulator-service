@@ -44,11 +44,15 @@ jobs:
       - name: Increment Version
         id: increment_version
         run: |
-          previous_version=$1
+          previous_version=${{ steps.get_previous_version.previous_version }}
+          echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
           major=${version_parts[0]}
+          echo "Major $major"
           minor=${version_parts[1]}
+          echo "$minor"
           patch=${version_parts[2]}
+          echo "$patch"
           new_version="v$major.$((minor + 1)).$patch"
           echo "New version: $new_version"
 
