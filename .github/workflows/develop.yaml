@@ -63,7 +63,7 @@ jobs:
           echo "New Version: ${new_version}" >> $GITHUB_OUTPUT
           # Update your project files or use the appropriate command to bump the version
           pwd
-          cd manifest/dev
+          cd /home/runner/work/priskalkulator-service/priskalkulator-service/manifest/dev
           pwd
           kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
 
