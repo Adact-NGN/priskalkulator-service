@@ -79,12 +79,13 @@ jobs:
           echo "New Version: [$new_version]"
           # Update your project files or use the appropriate command to bump the version
           pwd
-          kustomize edit set image app-image=v${{ steps.increment_version.outputs.new_version }}
+          kustomize edit set image app-image=${{ steps.increment_version.outputs.new_version }}
           less kustomization.yaml
 
       - name: Commit and Push Changes
         run: |
           pwd
+          git checkout develop
           git config user.name "GitHub Actions"
           git config user.email "kjetil.torvund.minde@ngn.no"
           git commit -am "Update version in Kustomize file"
