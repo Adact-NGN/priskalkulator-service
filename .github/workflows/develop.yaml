@@ -61,7 +61,7 @@ jobs:
       - name: Update Kustomize Version
         run: |
           new_version=${{ steps.increment_version.outputs.new_version }}
-          sed -i "s/VERSION_PLACEHOLDER/$new_version/g" manifest/dev/kustomization.yaml
+          sed -i "s/VERSION_PLACEHOLDER/$new_version/g" manifests/dev/kustomization.yaml
 
       - name: Commit and Push Changes
         run: |
