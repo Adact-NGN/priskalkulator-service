@@ -64,11 +64,9 @@ jobs:
           less kustomization.yaml
       - name: Commit and Push Changes
         run: |
-          pwd
           git config user.name "GitHub Actions"
           git config user.email "kjetil.torvund.minde@ngn.no"
           git commit -am "Update version in Kustomize file"
-          git status
           git push
 
       - name: Create release
