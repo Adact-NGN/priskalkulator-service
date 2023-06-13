@@ -45,7 +45,7 @@ jobs:
       - name: Increment Version
         id: increment_version
         run: |
-          previous_version=$1
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
           major=${version_parts[0]}
