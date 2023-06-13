@@ -79,7 +79,7 @@ jobs:
           echo "New Version: [$new_version]"
           # Update your project files or use the appropriate command to bump the version
           pwd
-          kustomize edit set image app-image=${{ steps.increment_version.outputs.new_version }}
+          kustomize edit set image dingipacr.azurecr.io/ding-ip-app-pk-service=:${{ steps.increment_version.outputs.new_version }}
           less kustomization.yaml
 
       - name: Commit and Push Changes
