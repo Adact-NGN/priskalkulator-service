@@ -49,7 +49,7 @@ jobs:
           echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
           echo "${version_parts[0]//[!0-9]/}"
-          major=${version_parts[0]}//[!0-9]
+          major=${version_parts[0]//[!0-9]/}
           echo "Major $major"
           minor=${version_parts[1]}
           echo "Minor $minor"
