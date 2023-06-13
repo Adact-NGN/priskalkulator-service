@@ -39,20 +39,21 @@ jobs:
         id: get_previous_version
         run: |
           previous_version=$(git describe --tags --abbrev=0)
+          echo "Previous version: $previous_version"
           echo "previous_version=$previous_version" >> $GITHUB_OUTPUT
 
       - name: Increment Version
         id: increment_version
         run: |
-          previous_version=${{ steps.get_previous_version.previous_version }}
+          previous_version=$1
           echo "Previous version: $previous_version"
           IFS='.' read -ra version_parts <<< "$previous_version"
           major=${version_parts[0]}
           echo "Major $major"
           minor=${version_parts[1]}
-          echo "$minor"
+          echo "Minor $minor"
           patch=${version_parts[2]}
-          echo "$patch"
+          echo "Patch $patch"
           new_version="v$major.$((minor + 1)).$patch"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
