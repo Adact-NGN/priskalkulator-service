@@ -8,6 +8,7 @@ import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -57,7 +58,7 @@ public class PriceOfferController {
      * @return List of price offers, else empty list
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
+    public List<PriceOfferListDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
 
         List<PriceOffer> priceOfferList;
         if(StringUtils.isNotBlank(statuses)) {
@@ -68,7 +69,7 @@ public class PriceOfferController {
         }
 
         if(!priceOfferList.isEmpty()) {
-            return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList());
+            return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
         }
         
         return new ArrayList<>();

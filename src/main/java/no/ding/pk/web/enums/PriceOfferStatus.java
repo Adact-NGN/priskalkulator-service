@@ -1,7 +1,10 @@
 package no.ding.pk.web.enums;
 
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public enum PriceOfferStatus {
     PENDING("PENDING"),
     REJECTED("REJECTED"),

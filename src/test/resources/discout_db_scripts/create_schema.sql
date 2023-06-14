@@ -8,7 +8,8 @@ create table if not exists discount_matrix
     sales_org            varchar(255) not null,
     sales_office         varchar(255) not null,
     standard_price       double       null,
-    zone                 varchar(255) null
+    zone                 varchar(255) null,
+    fa                   varchar(255) null
 );
 
 create table if not exists discount_levels

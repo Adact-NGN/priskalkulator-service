@@ -49,6 +49,9 @@ public class Discount {
     
     @Column
     private Double standardPrice;
+
+    @Column
+    private String fa;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
     @LazyCollection(LazyCollectionOption.FALSE)

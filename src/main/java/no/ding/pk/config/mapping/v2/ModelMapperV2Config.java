@@ -68,6 +68,21 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(SalesOfficeDTO.class, SalesOffice.class)
                         .addMapping(SalesOfficeDTO::getName, SalesOffice::setSalesOfficeName);
 
+        modelMapper.typeMap(PriceOffer.class, PriceOfferListDTO.class)
+                        .addMapping(PriceOffer::getId, PriceOfferListDTO::setId)
+                .addMapping(PriceOffer::getCreatedDate, PriceOfferListDTO::setDateCreated)
+                .addMapping(PriceOffer::getCustomerName, PriceOfferListDTO::setCustomerName)
+                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomer)
+                .addMappings(mapping -> {
+                    mapping.map(source -> {
+                        if(source.getSalesEmployee() != null) {
+                            return source.getSalesEmployee().getName();
+                        }
+
+                        return null;
+                    }, PriceOfferListDTO::setSalesEmployee);
+                });
+
         priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
 
         priceRowToPriceRowDtoTypeMapping(modelMapper);
