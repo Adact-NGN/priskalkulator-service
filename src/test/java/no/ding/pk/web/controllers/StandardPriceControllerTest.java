@@ -84,6 +84,11 @@ public class StandardPriceControllerTest {
 
         assertThat(stdPriceList, hasSize(greaterThan(0)));
         assertThat(stdPriceList.get(3).getMaterialData(), notNullValue());
+
+        List<MaterialStdPriceDTO> zonedPrice = stdPriceList.stream().filter(stdPrice -> stdPrice.getMaterialData() != null && "Sone differensiert".equals(stdPrice.getMaterialData().getSubCategoryDescription())).toList();
+
+        assertThat(zonedPrice, hasSize(0));
+
     }
 
     @Test

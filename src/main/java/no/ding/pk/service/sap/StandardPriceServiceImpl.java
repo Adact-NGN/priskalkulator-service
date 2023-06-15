@@ -79,9 +79,18 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             if(StringUtils.isNotBlank(zone)) {
                 standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
+            } else {
+                standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isBlank(p.getZone())).toList();
             }
 
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
+
+            if(StringUtils.isBlank(zone)) {
+                List<MaterialDTO> nonZonedMaterialsDTO = allMaterialsForSalesOrg.stream().filter(p -> !"Sone differensiert".equals(p.getSubCategoryDescription())).toList();
+                List<String> nonZonedMaterialNumbers = nonZonedMaterialsDTO.stream().map(MaterialDTO::getMaterial).toList();
+
+                standardPriceDTOList = standardPriceDTOList.stream().filter(p -> nonZonedMaterialNumbers.contains(p.getMaterial())).toList();
+            }
 
             Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
@@ -260,7 +269,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private void addMaterialsToCache(String salesOffice, List<MaterialStdPriceDTO> standardPriceDTOList) {
         log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
         for(MaterialStdPriceDTO material : standardPriceDTOList) {
-            StringBuffer tempObjectKey = new StringBuffer();
+            StringBuilder tempObjectKey = new StringBuilder();
             tempObjectKey.append(material.getMaterial());
             
             if(!StringUtils.isBlank(material.getZone())) {
@@ -276,7 +285,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             }
 
             String objectKey = tempObjectKey.toString();
-            inMemoryCache.put(salesOffice, objectKey.toString(), material);
+            inMemoryCache.put(salesOffice, objectKey, material);
         }
         int amountAddedForSalesOffice = inMemoryCache.size(salesOffice);
         log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
