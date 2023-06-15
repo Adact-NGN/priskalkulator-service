@@ -77,23 +77,36 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> standardPriceDTOList = jsonToMaterialStdPriceDTO(response);
 
+            if(StringUtils.isNotBlank(zone)) {
+                standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
+            }
+
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
 
-            Map<String, MaterialDTO> materialDTOMap = new HashMap<>();
-            for(MaterialDTO materialDTO : allMaterialsForSalesOrg) {
-                materialDTOMap.put(materialDTO.getMaterial(), materialDTO);
-            }
+            Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
-            for(MaterialStdPriceDTO priceDTO : standardPriceDTOList) {
-                if(materialDTOMap.containsKey(priceDTO.getMaterial())) {
-                    priceDTO.setMaterialData(materialDTOMap.get(priceDTO.getMaterial()));
-                }
-            }
+            addMaterialDataToStandardPrice(standardPriceDTOList, materialDTOMap);
 
             return standardPriceDTOList;
         }
         
         return new ArrayList<>();
+    }
+
+    private static void addMaterialDataToStandardPrice(List<MaterialStdPriceDTO> standardPriceDTOList, Map<String, MaterialDTO> materialDTOMap) {
+        for(MaterialStdPriceDTO priceDTO : standardPriceDTOList) {
+            if(materialDTOMap.containsKey(priceDTO.getMaterial())) {
+                priceDTO.setMaterialData(materialDTOMap.get(priceDTO.getMaterial()));
+            }
+        }
+    }
+
+    private static Map<String, MaterialDTO> createMaterialDTOMap(List<MaterialDTO> allMaterialsForSalesOrg) {
+        Map<String, MaterialDTO> materialDTOMap = new HashMap<>();
+        for(MaterialDTO materialDTO : allMaterialsForSalesOrg) {
+            materialDTOMap.put(materialDTO.getMaterial(), materialDTO);
+        }
+        return materialDTOMap;
     }
 
     @Override
@@ -115,16 +128,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
 
-            Map<String, MaterialDTO> materialDTOMap = new HashMap<>();
-            for(MaterialDTO materialDTO : allMaterialsForSalesOrg) {
-                materialDTOMap.put(materialDTO.getMaterial(), materialDTO);
-            }
+            Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
-            for(MaterialStdPriceDTO priceDTO : materialStdPriceDTO) {
-                if(materialDTOMap.containsKey(priceDTO.getMaterial())) {
-                    priceDTO.setMaterialData(materialDTOMap.get(priceDTO.getMaterial()));
-                }
-            }
+            addMaterialDataToStandardPrice(materialStdPriceDTO, materialDTOMap);
 
             return materialDtoToMaterialPrice(materialNumber, materialStdPriceDTO.get(0));
         }
@@ -165,16 +171,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
 
-            Map<String, MaterialDTO> materialDTOMap = new HashMap<>();
-            for(MaterialDTO materialDTO : allMaterialsForSalesOrg) {
-                materialDTOMap.put(materialDTO.getMaterial(), materialDTO);
-            }
+            Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
-            for(MaterialStdPriceDTO priceDTO : materialStdPriceDTOS) {
-                if(materialDTOMap.containsKey(priceDTO.getMaterial())) {
-                    priceDTO.setMaterialData(materialDTOMap.get(priceDTO.getMaterial()));
-                }
-            }
+            addMaterialDataToStandardPrice(materialStdPriceDTOS, materialDTOMap);
         }
         return materialStdPriceDTOS;
     }
