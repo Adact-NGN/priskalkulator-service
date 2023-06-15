@@ -223,7 +223,7 @@ public class PriceOfferController {
         }
 
         if(priceOfferCandidateForApprovalAndIsNotApproved(updatedOffer)) {
-            List<Integer> salesOffices = updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
+            List<Integer> salesOffices = collectSalesOfficeNumbers(updatedOffer);
             
             if(!salesOffices.isEmpty()) {
                 List<PowerOfAttorney> poa = sopoaService.findBySalesOfficeInList(salesOffices);
@@ -245,6 +245,10 @@ public class PriceOfferController {
         }
         
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
+    }
+
+    private static List<Integer> collectSalesOfficeNumbers(PriceOffer updatedOffer) {
+        return updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
     }
 
     private static boolean priceOfferCandidateForApprovalAndIsNotApproved(PriceOffer updatedOffer) {

@@ -7,6 +7,7 @@ import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,6 +140,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                         log.debug("No MaterialPrice for Material, getting standard price for material: {}", material.getMaterialNumber());
                         MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
                         persistedMaterial.setMaterialStandardPrice(stdPrice);
+                        persistedMaterial.setPricingUnit(stdPrice.getPricingUnit());
+                        persistedMaterial.setQuantumUnit(stdPrice.getQuantumUnit());
                     }
 
                     persistedMaterial = materialService.save(persistedMaterial);
@@ -151,6 +154,14 @@ public class PriceRowServiceImpl implements PriceRowService {
                     if(sapMaterial != null) {
                         log.debug("Mapping MaterialDTO: {}", sapMaterial);
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
+
+                        if(fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
+                            MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
+
+                            fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
+                            fromSap.setPricingUnit(stdPrice.getPricingUnit());
+                        }
+
                         log.debug("Mapping result: {}", fromSap);
 
                         material = materialService.save(fromSap);
