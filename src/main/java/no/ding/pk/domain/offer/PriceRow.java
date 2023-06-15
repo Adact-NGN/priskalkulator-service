@@ -56,6 +56,9 @@ public class PriceRow extends Auditable {
     private Double manualPrice;
 
     @Column
+    private Double discountedPrice;
+
+    @Column
     private Integer discountLevel;
 
     @Column()

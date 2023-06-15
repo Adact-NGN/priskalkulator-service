@@ -96,6 +96,9 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setDiscountPct(materialPriceRow.getDiscountPct());
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
         entity.setManualPrice(materialPriceRow.getManualPrice());
+
+        calculateDiscountPrice(entity);
+
         entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
         entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
         entity.setStandardPrice(materialPriceRow.getStandardPrice());
@@ -193,6 +196,14 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         return repository.save(entity);
+    }
+
+    private void calculateDiscountPrice(PriceRow entity) {
+        if(entity.getDiscountedPrice() == null) {
+            if(entity.getDiscountLevel() != null) {
+
+            }
+        }
     }
 
     private Material getMaterial(Material material) {
