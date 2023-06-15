@@ -200,11 +200,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder()
-        .materialNumber(materialNumber)
-        .standardPrice(materialStdPriceDTO.getStandardPrice())
-        .validFrom(materialStdPriceDTO.getValidFrom())
-        .validTo(materialStdPriceDTO.getValidTo())
-        .build();
+                .materialNumber(materialNumber)
+                .standardPrice(materialStdPriceDTO.getStandardPrice())
+                .validFrom(materialStdPriceDTO.getValidFrom())
+                .validTo(materialStdPriceDTO.getValidTo())
+                .pricingUnit(Integer.valueOf(materialStdPriceDTO.getPricingUnit()))
+                .quantumUnit(materialStdPriceDTO.getQuantumUnit())
+                .build();
     }
     
     private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
