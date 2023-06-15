@@ -158,8 +158,10 @@ public class PriceRowServiceImpl implements PriceRowService {
                         if(fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
                             MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
 
-                            fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
-                            fromSap.setPricingUnit(stdPrice.getPricingUnit());
+                            if(stdPrice != null) {
+                                fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
+                                fromSap.setPricingUnit(stdPrice.getPricingUnit());
+                            }
                         }
 
                         log.debug("Mapping result: {}", fromSap);
