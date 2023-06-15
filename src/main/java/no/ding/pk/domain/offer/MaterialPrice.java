@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.Hibernate;
 
 import javax.persistence.Column;
@@ -56,13 +58,21 @@ public class MaterialPrice extends Auditable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
         MaterialPrice that = (MaterialPrice) o;
-        return id != null && Objects.equals(id, that.id);
+
+        return new EqualsBuilder().append(id, that.id).append(materialNumber, that.materialNumber)
+                .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
+                .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
+                .append(quantumUnit, that.quantumUnit).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return new HashCodeBuilder(17, 37).append(id).append(materialNumber)
+                .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
+                .append(quantumUnit).toHashCode();
     }
 }
