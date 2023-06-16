@@ -11,6 +11,7 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
+import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
@@ -45,8 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -146,7 +146,10 @@ class PriceOfferControllerTest {
 
     @Test
     public void shouldListAllPriceOfferForApprover() throws Exception {
+
         PriceOfferDTO priceOffer = createCompleteOfferDto();
+        UserDTO approverDto = modelMapper.map(approver, UserDTO.class);
+        priceOffer.setApprover(approverDto);
 
         MvcResult result = mockMvc.perform(
                         post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
@@ -164,9 +167,10 @@ class PriceOfferControllerTest {
 
         String contentAsString = result.getResponse().getContentAsString();
 
-        JsonNode jsonNode = objectReader.readTree(contentAsString);
-
         assertThat(contentAsString, notNullValue());
+        PriceOfferDTO[] priceOffers = objectReader.readValue(contentAsString, PriceOfferDTO[].class);
+
+        assertThat(priceOffers, arrayWithSize(greaterThan(0)));
     }
 
     @Test
@@ -275,6 +279,36 @@ class PriceOfferControllerTest {
         Boolean approvalResult = objectReader.readValue(result.getResponse().getContentAsString(), Boolean.class);
 
         assertThat(approvalResult, is(true));
+    }
+
+    @Test
+    public void shouldListAllPriceOffersWithListDTO() throws Exception {
+        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+        User approver = userService.findByEmail(approverEmail);
+
+        List<PriceRow> materials = createPriceRows();
+        SalesOffice salesOfficeDTO = createSalesOffice(materials);
+        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
+        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
+
+        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+
+        // Create
+        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectWriter.writeValueAsString(priceOfferDTO))
+                        .with(jwt()
+                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
+                        ))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
+
+        priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
+
+
+        MvcResult resultList = mockMvc.perform(get("/api/v2/price-offer/list").contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        
     }
 
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {

@@ -68,22 +68,7 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(SalesOfficeDTO.class, SalesOffice.class)
                         .addMapping(SalesOfficeDTO::getName, SalesOffice::setSalesOfficeName);
 
-        modelMapper.typeMap(PriceOffer.class, PriceOfferListDTO.class)
-                        .addMapping(PriceOffer::getId, PriceOfferListDTO::setId)
-                .addMapping(PriceOffer::getPriceOfferStatus, PriceOfferListDTO::setPriceOfferStatus)
-                .addMapping(PriceOffer::getCreatedDate, PriceOfferListDTO::setDateCreated)
-                .addMapping(PriceOffer::getLastModifiedDate, PriceOfferListDTO::setDateUpdated)
-                .addMapping(PriceOffer::getCustomerName, PriceOfferListDTO::setCustomerName)
-                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomerNumber)
-                .addMappings(mapping -> {
-                    mapping.map(source -> {
-                        if(source.getSalesEmployee() != null) {
-                            return source.getSalesEmployee().getFullName();
-                        }
-
-                        return null;
-                    }, PriceOfferListDTO::setSalesEmployee);
-                });
+        priceOfferToPriceOfferListDto(modelMapper);
 
         priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
 
@@ -92,6 +77,25 @@ public class ModelMapperV2Config {
         userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
 
         return modelMapper;
+    }
+
+    private static void priceOfferToPriceOfferListDto(ModelMapper modelMapper) {
+        Converter<User, String> userToFullNameString = context -> {
+            if(context.getSource() != null) {
+                return context.getSource().getFullName();
+            }
+
+            return null;
+        };
+
+        modelMapper.typeMap(PriceOffer.class, PriceOfferListDTO.class)
+                        .addMapping(PriceOffer::getId, PriceOfferListDTO::setId)
+                .addMapping(PriceOffer::getPriceOfferStatus, PriceOfferListDTO::setPriceOfferStatus)
+                .addMapping(PriceOffer::getCreatedDate, PriceOfferListDTO::setDateCreated)
+                .addMapping(PriceOffer::getLastModifiedDate, PriceOfferListDTO::setDateUpdated)
+                .addMapping(PriceOffer::getCustomerName, PriceOfferListDTO::setCustomerName)
+                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomerNumber)
+                .addMappings(mapping -> mapping.using(userToFullNameString).map(PriceOffer::getSalesEmployee, PriceOfferListDTO::setSalesEmployee));
     }
 
     private static void priceOfferToPriceOfferDtoMapping(ModelMapper modelMapper) {
