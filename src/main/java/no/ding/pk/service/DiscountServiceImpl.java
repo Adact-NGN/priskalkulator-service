@@ -99,17 +99,17 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zones) {
-        List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
+    public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumbers, String zones) {
+        List<String> materialNumberList = Arrays.asList(materialNumbers.split(","));
 
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
             List <String> zoneList = Arrays.asList(zones.split(","));
-            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
+            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumberList);
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumberList))));
     }
 
     @Override
@@ -137,5 +137,10 @@ public class DiscountServiceImpl implements DiscountService {
             return discountLevelRepository.findAllByParentSalesOrgAndParentZoneAndParentMaterialNumberInList(salesOrg, zone, materialNumberList);
         }
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, materialNumberList);
+    }
+
+    @Override
+    public List<Discount> findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials) {
+        return repository.findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materials);
     }
 }

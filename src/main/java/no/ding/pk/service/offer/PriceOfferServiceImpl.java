@@ -1,9 +1,11 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
@@ -39,6 +42,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
+    private final DiscountService discountService;
+
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
 
@@ -47,12 +52,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 CustomerTermsService customerTermsService,
+                                 DiscountService discountService, CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
+        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
     }
@@ -76,6 +82,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
         entity.setContactPersonList(newPriceOffer.getContactPersonList());
+
+        // salesOrg, salesOffice, material, Discount
+        Map<String, Map<String, Map<String, Discount>>> salesOrgSalesOfficeMaterialDiscountMap = createDiscountMap(newPriceOffer);
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
@@ -128,6 +137,40 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private Map<String, Map<String, Map<String, Discount>>> createDiscountMap(PriceOffer newPriceOffer) {
+        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
+        for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
+
+            Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
+            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
+            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
+
+            Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
+            salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
+
+            discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
+        }
+
+        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
+        for (String salesOrg : discountMap.keySet()) {
+            for(String salesOffice : discountMap.get(salesOrg).keySet()) {
+                List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
+
+                List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+            }
+        }
+
+//        discountService.fin
+        return null;
+    }
+
+    private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
+        if(materialList == null) {
+            return new HashSet<>();
+        }
+        return materialList.stream().map(material -> material.getMaterial().getMaterialNumber()).collect(Collectors.toSet());
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
