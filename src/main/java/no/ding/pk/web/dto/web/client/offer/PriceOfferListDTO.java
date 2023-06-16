@@ -8,7 +8,9 @@ import java.util.Date;
 public class PriceOfferListDTO {
     private Long id;
     private Date dateCreated;
-    private String customer;
+    private Date dateUpdated;
+    private String customerNumber;
     private String customerName;
-    private String salesEmployee;
+    private String salesEmployee; // full name
+    private String priceOfferStatus;
 }

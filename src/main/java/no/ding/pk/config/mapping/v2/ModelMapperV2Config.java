@@ -70,13 +70,15 @@ public class ModelMapperV2Config {
 
         modelMapper.typeMap(PriceOffer.class, PriceOfferListDTO.class)
                         .addMapping(PriceOffer::getId, PriceOfferListDTO::setId)
+                .addMapping(PriceOffer::getPriceOfferStatus, PriceOfferListDTO::setPriceOfferStatus)
                 .addMapping(PriceOffer::getCreatedDate, PriceOfferListDTO::setDateCreated)
+                .addMapping(PriceOffer::getLastModifiedDate, PriceOfferListDTO::setDateUpdated)
                 .addMapping(PriceOffer::getCustomerName, PriceOfferListDTO::setCustomerName)
-                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomer)
+                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomerNumber)
                 .addMappings(mapping -> {
                     mapping.map(source -> {
                         if(source.getSalesEmployee() != null) {
-                            return source.getSalesEmployee().getName();
+                            return source.getSalesEmployee().getFullName();
                         }
 
                         return null;
