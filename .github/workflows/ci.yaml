@@ -65,7 +65,7 @@ jobs:
       - name: Commit and Push Changes
         run: |
           pwd
-          git config user.name "GitHub Actions"
+          git config user.name "kjetilatngn"
           git config user.email "kjetil.torvund.minde@ngn.no"
           git commit -am "Update version in Kustomize file"
           git push
