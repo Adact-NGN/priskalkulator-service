@@ -11,6 +11,6 @@ public class PriceOfferListDTO {
     private Date dateUpdated;
     private String customerNumber;
     private String customerName;
-    private String salesEmployee; // full name
+    private SimpleSalesEmployeeDTO salesEmployee; // full name
     private String priceOfferStatus;
 }

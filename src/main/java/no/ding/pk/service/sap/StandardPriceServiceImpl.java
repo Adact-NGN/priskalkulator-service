@@ -64,24 +64,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg, String zone) {
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone);
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", filterQuery);
-        params.add("$format", "json");
-        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-
-        log.debug("Created request: " + request.toString());
-        
-        HttpResponse<String> response = sendRequest(request);
+        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         log.debug("Response code: {}", response.statusCode());
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> standardPriceDTOList = jsonToMaterialStdPriceDTO(response);
 
-            if(StringUtils.isNotBlank(zone)) {
-                standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
-            } else {
-                standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isBlank(p.getZone())).toList();
-            }
+            standardPriceDTOList = filterStdPricesByZone(zone, standardPriceDTOList);
 
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
 
@@ -100,6 +89,18 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         
         return new ArrayList<>();
+    }
+
+    private static List<MaterialStdPriceDTO> filterStdPricesByZone(String zone, List<MaterialStdPriceDTO> standardPriceDTOList) {
+        if(standardPriceDTOList == null) {
+            return new ArrayList<>();
+        }
+        if(StringUtils.isNotBlank(zone)) {
+            standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
+        } else {
+            standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isBlank(p.getZone())).toList();
+        }
+        return standardPriceDTOList;
     }
 
     private static void addMaterialDataToStandardPrice(List<MaterialStdPriceDTO> standardPriceDTOList, Map<String, MaterialDTO> materialDTOMap) {
@@ -121,12 +122,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public MaterialPrice getStandardPriceForMaterial(String materialNumber, String salesOrg, String salesOffice) {
         String filterQuery = createFilterQuery(salesOffice, salesOrg, materialNumber, null);
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", filterQuery);
-        params.add("$format", "json");
-        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
+        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> materialStdPriceDTO = jsonToMaterialStdPriceDTO(response);
@@ -150,22 +146,31 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceForSalesOrgSalesOfficeAndMaterial(String salesOrg, String salesOffice, String material, String zone) {
         String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone);
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", filterQuery);
-        params.add("$format", "json");
 
-        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
+        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> priceDTOS = jsonToMaterialStdPriceDTO(response);
+
+            priceDTOS = filterStdPricesByZone(zone, priceDTOS);
 
             if(!priceDTOS.isEmpty()) {
                 return priceDTOS;
             }
         }
         return new ArrayList<>();
+    }
+
+    private HttpResponse<String> prepareAndPerformSapRequest(String filterQuery) {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("$filter", filterQuery);
+        params.add("$format", "json");
+
+        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
+
+        log.debug("Created request: " + request.toString());
+
+        return sapHttpClient.getResponse(request);
     }
 
     @Override
@@ -210,14 +215,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
     
     private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("$filter", filterQuery);
-        params.add("$format", "json");
-        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-        
-        log.debug("Created request: " + request.toString());
-        
-        HttpResponse<String> response = sendRequest(request);
+        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         log.debug("Response code: {}", response.statusCode());
         if(response.statusCode() == HttpStatus.OK.value()) {

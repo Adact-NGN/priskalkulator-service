@@ -80,13 +80,7 @@ public class ModelMapperV2Config {
     }
 
     private static void priceOfferToPriceOfferListDto(ModelMapper modelMapper) {
-        Converter<User, String> userToFullNameString = context -> {
-            if(context.getSource() != null) {
-                return context.getSource().getFullName();
-            }
-
-            return null;
-        };
+        modelMapper.createTypeMap(User.class, SimpleSalesEmployeeDTO.class).addMappings(mapping -> mapping.map(User::getFullName, SimpleSalesEmployeeDTO::setFullName));
 
         modelMapper.typeMap(PriceOffer.class, PriceOfferListDTO.class)
                         .addMapping(PriceOffer::getId, PriceOfferListDTO::setId)
@@ -94,8 +88,7 @@ public class ModelMapperV2Config {
                 .addMapping(PriceOffer::getCreatedDate, PriceOfferListDTO::setDateCreated)
                 .addMapping(PriceOffer::getLastModifiedDate, PriceOfferListDTO::setDateUpdated)
                 .addMapping(PriceOffer::getCustomerName, PriceOfferListDTO::setCustomerName)
-                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomerNumber)
-                .addMappings(mapping -> mapping.using(userToFullNameString).map(PriceOffer::getSalesEmployee, PriceOfferListDTO::setSalesEmployee));
+                .addMapping(PriceOffer::getCustomerNumber, PriceOfferListDTO::setCustomerNumber);
     }
 
     private static void priceOfferToPriceOfferDtoMapping(ModelMapper modelMapper) {

@@ -1,6 +1,5 @@
 package no.ding.pk.web.controllers.v2;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -13,6 +12,7 @@ import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -170,6 +170,7 @@ class PriceOfferControllerTest {
         assertThat(contentAsString, notNullValue());
         PriceOfferDTO[] priceOffers = objectReader.readValue(contentAsString, PriceOfferDTO[].class);
 
+
         assertThat(priceOffers, arrayWithSize(greaterThan(0)));
     }
 
@@ -305,10 +306,12 @@ class PriceOfferControllerTest {
 
         priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
 
-
         MvcResult resultList = mockMvc.perform(get("/api/v2/price-offer/list").contentType(MediaType.APPLICATION_JSON)).andReturn();
 
-        
+        PriceOfferListDTO[] priceOfferListDTOS = objectReader.readValue(resultList.getResponse().getContentAsString(), PriceOfferListDTO[].class);
+
+        assertThat(priceOfferListDTOS, arrayWithSize(greaterThan(0)));
+        assertThat(priceOfferListDTOS[0].getSalesEmployee().getFullName(), is(priceOfferDTO.getSalesEmployee().getFullName()));
     }
 
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {

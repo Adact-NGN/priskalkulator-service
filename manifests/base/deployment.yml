@@ -18,6 +18,7 @@ spec:
       labels:
         app: ding-ip-app-pk
         tier: backend
+        intility-logging: default
     spec:
       imagePullSecrets:
         - name: 'dingipacr9837c956-auth'
