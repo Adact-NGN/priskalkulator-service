@@ -1,8 +1,9 @@
 name: Create minor version
 
 on:
-  push:
-    branches: [develop]
+  pull_request_review:
+#  push:
+#    branches: [develop]
 
 jobs:
   build:
@@ -50,8 +51,7 @@ jobs:
 
       - uses: actions/checkout@v3
         with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-          ssh-key: ${{ secrets.BUMP_VERSION_SECRET_KEY }}
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
       - name: Bump Version
         working-directory: manifests/dev/
         run: |
@@ -65,10 +65,13 @@ jobs:
           less kustomization.yaml
       - name: Commit and Push Changes
         run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
           pwd
           git config user.name "kjetilatngn"
           git config user.email "kjetil.torvund.minde@ngn.no"
-          git commit -am "Update version in Kustomize file"
+          git commit -am "$previous_version -> $new_version"
           git push
 
       - name: Create release
