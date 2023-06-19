@@ -1,9 +1,8 @@
 name: Create minor version
 
 on:
-  pull_request_review:
-#  push:
-#    branches: [develop]
+  push:
+    branches: [develop]
 
 jobs:
   build:
