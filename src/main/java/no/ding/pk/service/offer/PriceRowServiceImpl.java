@@ -103,7 +103,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
         entity.setManualPrice(materialPriceRow.getManualPrice());
 
-        calculateDiscountPrice(entity, salesOrg, salesOffice, zone, discountMap);
+        calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
 
         entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
         entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
@@ -204,7 +204,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
-    private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, String zone, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+    private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
         if(entity.getDiscountedPrice() == null) {
             if(entity.getDiscountLevel() != null) {
                 Discount discount = discountMap.get(salesOrg).get(salesOffice).get(entity.getMaterial().getMaterialNumber());
@@ -213,12 +213,21 @@ public class PriceRowServiceImpl implements PriceRowService {
                     DiscountLevel dl = discount.getDiscountLevels().get(entity.getDiscountLevel());
                     log.debug("Getting discount for material {}, with discount level {}");
 
+                    if(dl.getDiscount() < 0.0) {
+                        entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
+                    } else {
+                        entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
+                    }
                     entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
                 } else {
                     log.debug("No discount found for material {} for sales office {} in sales org {}",
                             entity.getMaterial().getMaterialNumber(), salesOffice, salesOrg);
                 }
+            } else {
+                log.debug("No discount level set for price row.");
             }
+        } else {
+            log.debug("Discounted price already set.");
         }
     }
 
