@@ -1,22 +1,31 @@
 name: Create minor version
 
 on:
-  push:
-    branches: [develop]
+  pull_request_review:
+    types:
+      - submitted
+#  pull_request:
+#    branches:
+#      - develop
+#    types:
+#      - closed
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     name: Bump Minor Version
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
+        id: step1
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Retrieve Previous Release Version
+        if: steps.step1.outcome == 'success'
         id: get_previous_version
         run: |
           previous_version=$(git describe --tags --abbrev=0)
@@ -24,6 +33,7 @@ jobs:
           echo "previous_version=$previous_version" >> $GITHUB_OUTPUT
 
       - name: Increment Version
+        if: steps.get_previous_version.outcome == 'success'
         id: increment_version
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
@@ -49,9 +59,13 @@ jobs:
       #          less manifests/dev/kustomization.yaml
 
       - uses: actions/checkout@v3
+        if: steps.increment_version.outcome == 'success'
+        id: checkout_code
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
       - name: Bump Version
+        if: steps.checkout_code.outcome == 'success'
+        id: bump_version
         working-directory: manifests/dev/
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
@@ -63,20 +77,25 @@ jobs:
           kustomize edit set image dingipacr.azurecr.io/ding-ip-app-pk-service=:${{ steps.increment_version.outputs.new_version }}
           less kustomization.yaml
       - name: Commit and Push Changes
+        if: steps.bump_version.outcome == 'success'
+        id: commit_n_push
         run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
           pwd
-          git config user.name "GitHub Actions"
+          git config user.name "kjetilatngn"
           git config user.email "kjetil.torvund.minde@ngn.no"
-          git commit -am "Update version in Kustomize file"
-          git status
+          git commit -am "$previous_version -> $new_version"
           git push
 
       - name: Create release
+        if: steps.commit_n_push.outcome == 'success'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.increment_version.outputs.new_version }}
-          release_name: Release v${{ steps.increment_version.outputs.new_version }}
+          tag_name: ${{ steps.increment_version.outputs.new_version }}
+          release_name: Release ${{ steps.increment_version.outputs.new_version }}
           body: |
             Created release ${{ steps.increment_version.outputs.new_version }}
