@@ -28,6 +28,7 @@ public class PriceRowDTO {
     private String deviceType;
     private Boolean showPriceInOffer;
     private Double manualPrice;
+    private Double discountedPrice;
     private Integer priceLevel;
     private Double priceLevelPrice;
     private Double standardPrice;

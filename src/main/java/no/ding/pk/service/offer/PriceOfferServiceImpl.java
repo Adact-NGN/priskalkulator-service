@@ -84,11 +84,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setContactPersonList(newPriceOffer.getContactPersonList());
 
         // salesOrg, salesOffice, material, Discount
-        Map<String, Map<String, Map<String, Discount>>> salesOrgSalesOfficeMaterialDiscountMap = createDiscountMap(newPriceOffer);
+        Map<String, Map<String, Map<String, Discount>>> discountMap = createDiscountMapForSalesOrg(newPriceOffer);
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
-                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
+                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber(), discountMap);
 
                 entity.setSalesOfficeList(salesOffices);
 
@@ -139,31 +139,48 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return repository.save(entity);
     }
 
-    private Map<String, Map<String, Map<String, Discount>>> createDiscountMap(PriceOffer newPriceOffer) {
+    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
         Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
         for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
 
+            // Collect all Material numbers in each price row lists.
             Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
 
+            // Create sales office to material number map.
             Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
             salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
 
+            // Add map to sales org map, sales office, material number map.
             discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
         }
 
         Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
+
         for (String salesOrg : discountMap.keySet()) {
+            if(!orgOfficeMaterialDiscount.containsKey(salesOrg)) {
+                orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
+            }
+
+            Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
             for(String salesOffice : discountMap.get(salesOrg).keySet()) {
+                Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
                 List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
 
                 List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+
+                if(discounts != null && !discounts.isEmpty()) {
+                    discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
+                }
+
+                salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
             }
+
+            orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
         }
 
-//        discountService.fin
-        return null;
+        return orgOfficeMaterialDiscount;
     }
 
     private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {

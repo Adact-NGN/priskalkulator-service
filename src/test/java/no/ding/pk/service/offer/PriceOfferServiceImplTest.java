@@ -2,11 +2,10 @@ package no.ding.pk.service.offer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.ding.pk.domain.PowerOfAttorney;
-import no.ding.pk.domain.SalesRole;
-import no.ding.pk.domain.User;
+import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
@@ -50,11 +49,15 @@ class PriceOfferServiceImplTest {
     @Autowired
     private CustomerTermsService customerTermsService;
 
+    @Autowired
+    private DiscountService discountService;
+
     @BeforeEach
     public void setup() {
 
         persistSalesRoles();
         createMaterial();
+        createDiscountMatrix();
 
         User alex = userService.findByEmail("alexander.brox@ngn.no");
 
@@ -141,7 +144,6 @@ class PriceOfferServiceImplTest {
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(new Date())
                 .build();
-
 
         MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder()
                 .materialNumber("119901")
@@ -459,6 +461,43 @@ class PriceOfferServiceImplTest {
         Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms);
 
         assertThat(actual, is(true));
+    }
+
+    private void createDiscountMatrix() {
+        String materialNumber = "119901";
+
+        List<DiscountLevel> discountLevels = List.of(
+                DiscountLevel.builder()
+                        .level(0)
+                        .discount(0.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(1)
+                        .discount(223.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(2)
+                        .discount(446.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(3)
+                        .discount(669.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(4)
+                        .discount(895.0)
+                        .build()
+        );
+        Discount discount = Discount.builder()
+                .materialNumber(materialNumber)
+                .salesOrg("100")
+                .salesOffice("127")
+                .materialDesignation("Restavfall")
+                .build();
+
+        discountLevels.forEach(discount::addDiscountLevel);
+
+        discountService.save(discount);
     }
 
     private Material createOrdinaryMaterial() {

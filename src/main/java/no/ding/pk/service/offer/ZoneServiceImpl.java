@@ -54,7 +54,7 @@ public class ZoneServiceImpl implements ZoneService {
            entity.setIsStandardZone(zone.getIsStandardZone());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
-                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice);
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, discountMap);
 
                 zone.setPriceRows(materials);
             }
