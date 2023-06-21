@@ -1,6 +1,8 @@
 resources:
 - ../base
+- ingress.yaml
 
 images:
 - name: dingipacr.azurecr.io/ding-ip-app-pk-service
   newTag: v0.1.24
+namespace: priskalkulator-prod
