@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +45,8 @@ public class StartUpDev {
                 this.materialService = materialService;
         }
 
-        @Transactional
-        @PostConstruct
+//        @Transactional
+//        @PostConstruct
         public void postConstruct() {
 
                 User kjetil = userService.findByEmail("kjetil.torvund.minde@ngn.no");
@@ -208,7 +206,10 @@ public class StartUpDev {
 
                 for (String materialNumber : materialNumberList) {
                         PriceRow priceRow = createPriceRow(materialDTOs, materialNumber);
-                        returnList.add(priceRow);
+
+                        if(priceRow != null) {
+                                returnList.add(priceRow);
+                        }
                 }
 
                 return returnList;
@@ -217,7 +218,9 @@ public class StartUpDev {
         private PriceRow createPriceRow(List<MaterialStdPriceDTO> materialDTOs, String materialNumber) {
                 MaterialStdPriceDTO materialDTO = materialDTOs.stream().filter(obj -> obj.getMaterial().equalsIgnoreCase(materialNumber)).findAny().orElse(null);
                 log.debug("Found materialDTO: {}", materialDTO);
-                assert materialDTO != null;
+                if(materialDTO == null) {
+                        return null;
+                }
                 MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, materialDTO.getStandardPrice());
                 Material material = createMaterial(materialNumber, materialDTO, residualWasteMaterialStdPrice);
 
