@@ -5,6 +5,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "title_type")
+@Table(name = "title_types")
 @Entity
 public class TitleType {
     @Id
@@ -22,7 +23,17 @@ public class TitleType {
     @Column
     private String titleType;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "titleType")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<KeyCombination> keyCombinations;
+
+    public void addKeyCombination(KeyCombination keyCombination) {
+        if(keyCombinations == null) {
+            keyCombinations = new ArrayList<>();
+        }
+
+        keyCombination.setTitleType(this);
+
+        keyCombinations.add(keyCombination);
+    }
 }

@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "key_combination")
+@Table(name = "key_combinations")
 @Entity
 public class KeyCombination {
     @Id
@@ -20,5 +20,9 @@ public class KeyCombination {
     private String keyCombination;
 
     @Column
-    private String keyCombinationDescription;
+    private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "title_type_id", foreignKey = @ForeignKey(name = "FK_key_combination_title_type"))
+    private TitleType titleType;
 }
