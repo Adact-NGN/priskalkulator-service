@@ -148,6 +148,7 @@ public class ModelMapperV2Config {
         priceRowDtoPropertyMap.addMappings(mapper -> mapper.using(stringToMaterial).map(PriceRowDTO::getMaterial, PriceRow::setMaterial));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getCategoryId, (destination, value) -> destination.getMaterial().setCategoryId((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getCategoryDescription, (destination, value) -> destination.getMaterial().setCategoryDescription((String) value)));
+        priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getDeviceType, (destination, value) -> destination.getMaterial().setDeviceType((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getSubCategoryId, (destination, value) -> destination.getMaterial().setSubCategoryId((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getSubCategoryDescription, (destination, value) -> destination.getMaterial().setSubCategoryDescription((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getClassId, (destination, value) -> destination.getMaterial().setClassId((String) value)));

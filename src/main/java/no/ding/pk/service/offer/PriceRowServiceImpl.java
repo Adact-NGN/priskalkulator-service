@@ -141,7 +141,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                         persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
                     } else {
                         log.debug("No MaterialPrice for Material, getting standard price for material: {}", material.getMaterialNumber());
-                        MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
+                        MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
                         persistedMaterial.setMaterialStandardPrice(stdPrice);
                         persistedMaterial.setPricingUnit(stdPrice.getPricingUnit());
                         persistedMaterial.setQuantumUnit(stdPrice.getQuantumUnit());
@@ -158,10 +158,11 @@ public class PriceRowServiceImpl implements PriceRowService {
                         log.debug("Mapping MaterialDTO: {}", sapMaterial);
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
 
-                        if(fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
-                            MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), salesOrg, salesOffice);
+                        if(StringUtils.isBlank(fromSap.getDeviceType()) || fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
+                            MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
 
                             if(stdPrice != null) {
+                                fromSap.setDeviceType(stdPrice.getDeviceType());
                                 fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
                                 fromSap.setPricingUnit(stdPrice.getPricingUnit());
                             }
@@ -201,7 +202,7 @@ public class PriceRowServiceImpl implements PriceRowService {
     private void calculateDiscountPrice(PriceRow entity) {
         if(entity.getDiscountedPrice() == null) {
             if(entity.getDiscountLevel() != null) {
-
+                // TODO: Being fixed in another branch.
             }
         }
     }

@@ -17,14 +17,17 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.test.context.TestExecutionListeners;
@@ -57,6 +60,9 @@ class PriceOfferControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
@@ -120,15 +126,21 @@ class PriceOfferControllerTest {
         setup();
         PriceOfferDTO priceOffer = createCompleteOfferDto();
 
-        MvcResult result = mockMvc.perform(
-                post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectWriter.writeValueAsString(priceOffer))
-                        .with(jwt()
-                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
-        assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
+
+//        MvcResult result = mockMvc.perform(
+//                post(createUrl).contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectWriter.writeValueAsString(priceOffer))
+//                        .with(jwt()
+//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andReturn();
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        List<PriceRowDTO> priceRowDtoWithDeviceType = actual.getBody().getSalesOfficeList().get(0).getMaterialList().stream().filter(priceRowDTO -> StringUtils.isNotBlank(priceRowDTO.getDeviceType())).toList();
+        assertThat(priceRowDtoWithDeviceType, hasSize(greaterThan(0)));
     }
 
     @Test
@@ -295,16 +307,18 @@ class PriceOfferControllerTest {
         PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
         // Create
-        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-                        .content(objectWriter.writeValueAsString(priceOfferDTO))
-                        .with(jwt()
-                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
-                        ))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andReturn();
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> result = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+//        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectWriter.writeValueAsString(priceOfferDTO))
+//                        .with(jwt()
+//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
+//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
+//                        ))
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                .andReturn();
 
-        priceOfferDTO = objectReader.readValue(result.getResponse().getContentAsString(), PriceOfferDTO.class);
+        priceOfferDTO = result.getBody();
 
         MvcResult resultList = mockMvc.perform(get("/api/v2/price-offer/list").contentType(MediaType.APPLICATION_JSON)).andReturn();
 
