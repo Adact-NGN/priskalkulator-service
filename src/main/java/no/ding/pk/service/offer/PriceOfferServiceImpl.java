@@ -65,8 +65,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         PriceOffer entity = getPriceOffer(newPriceOffer, salesEmployee);
 
-        entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         if(newPriceOffer.getCustomerName() != null) {
             entity.setCustomerName(newPriceOffer.getCustomerName());
@@ -90,6 +88,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
         if(!materialsForApproval.isEmpty()) {
+            entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
             StringBuilder materialNumbersForApproval = new StringBuilder();
             for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
                 String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
@@ -110,6 +109,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             } else {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
             }
+        } else {
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
         if(newPriceOffer.getApprover() != null) {

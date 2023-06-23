@@ -552,8 +552,28 @@ class PriceOfferServiceImplTest {
     @Test
     public void shouldListAllPriceOfferForApproverWithStatusPending() {
         User user = userService.findByEmail("alexander.brox@ngn.no");
+
+        MaterialPrice materialPrice = MaterialPrice.builder()
+                .materialNumber("119901")
+                .standardPrice(1199.0)
+                .build();
+        Material material = Material.builder()
+                .materialNumber("119901")
+                .materialStandardPrice(materialPrice)
+                .build();
+
+        PriceRow priceRow = PriceRow.builder()
+                .material(material)
+                .discountLevel(7)
+                .needsApproval(true)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOffice("100")
+                .materialList(List.of(priceRow))
+                .build();
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .salesEmployee(user)
+                .salesOfficeList(List.of(salesOffice))
                 .approver(user)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
