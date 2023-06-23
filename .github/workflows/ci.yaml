@@ -94,13 +94,41 @@ jobs:
           git commit -am "$previous_version -> $new_version"
           git push
 
-      - name: Create release
+      - name: Create Draft Release
         if: steps.commit_n_push.outcome == 'success'
-        uses: avakar/tag-and-release@v1
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.increment_version.outputs.new_version }}
-#          release_name: ${{ steps.increment_version.outputs.new_version }}
-          body: |
-            Created release ${{ steps.increment_version.outputs.new_version }}
+          release_name: ${{ steps.increment_version.outputs.new_version }}
+          draft: true
+          prerelease: false
+
+      - uses: actions/upload-release-asset@v1.0.1
+        if: steps.create_release.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./priskalkulator-service-${{ steps.increment_version.outputs.new_version }}.zip
+          asset_name: priskalkulator-service-${{ steps.increment_version.outputs.new_version }}.zip
+          asset_content_type: application/zip
+
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
+
+#      - name: Create release
+#        if: steps.commit_n_push.outcome == 'success'
+#        uses: avakar/tag-and-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.increment_version.outputs.new_version }}
+##          release_name: ${{ steps.increment_version.outputs.new_version }}
+#          body: |
+#            Created release ${{ steps.increment_version.outputs.new_version }}
