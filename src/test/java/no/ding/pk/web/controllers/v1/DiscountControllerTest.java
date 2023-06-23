@@ -99,6 +99,23 @@ public class DiscountControllerTest {
     }
 
     @Test
+    public void shouldReturnDiscountsForSingleMaterialWithSingleZoneDifferentiatedPrices() {
+        String materials = "50101";
+        String zones = "1";
+
+        Map<String, String> params = new HashMap<>();
+        params.put("salesOffice", salesOffice);
+        params.put("materialNumbers", materials);
+        params.put("zones", zones);
+
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice={salesOffice}&materialNumbers={materialNumbers}&zones={zones}",
+                Discount[].class,
+                params);
+
+        assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
+    }
+
+    @Test
     public void shouldReturnDiscountsForMaterialsWithZoneDifferentiatedPrices() {
         String materials = "50101,50102";
         String zones = "1,2";
