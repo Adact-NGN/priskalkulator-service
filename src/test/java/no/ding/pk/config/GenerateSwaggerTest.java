@@ -29,7 +29,7 @@ public class GenerateSwaggerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/v2/api-docs").accept(MediaType.APPLICATION_JSON))
                 .andDo((result -> {
                     JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
-                    FileUtils.writeStringToFile(new File("swagger.json"), jsonObject.toString(2), StandardCharsets.UTF_8);
+                    FileUtils.writeStringToFile(new File("spec/swagger.json"), jsonObject.toString(2), StandardCharsets.UTF_8);
                 }));
     }
 }
