@@ -3248,6 +3248,7 @@
       "type": "object",
       "title": "MaterialPrice",
       "properties": {
+        "deviceType": {"type": "string"},
         "createdDate": {
           "format": "date-time",
           "type": "string"

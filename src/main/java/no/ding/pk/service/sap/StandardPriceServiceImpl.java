@@ -62,7 +62,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     @Override
     public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg, String zone) {
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -120,8 +120,8 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
 
     @Override
-    public MaterialPrice getStandardPriceForMaterial(String materialNumber, String salesOrg, String salesOffice) {
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, materialNumber, null);
+    public MaterialPrice getStandardPriceForMaterial(String materialNumber, String deviceType, String zone, String salesOrg, String salesOffice) {
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, materialNumber, zone, deviceType);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
@@ -137,6 +137,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             addMaterialDataToStandardPrice(materialStdPriceDTO, materialDTOMap);
 
+            if(StringUtils.isNotBlank(deviceType)) {
+                materialStdPriceDTO = materialStdPriceDTO.stream().filter(mspDTO -> deviceType.equals(mspDTO.getDeviceType())).toList();
+            }
+
             return materialDtoToMaterialPrice(materialNumber, materialStdPriceDTO.get(0));
         }
         
@@ -145,7 +149,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceForSalesOrgSalesOfficeAndMaterial(String salesOrg, String salesOffice, String material, String zone) {
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -206,6 +210,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder()
                 .materialNumber(materialNumber)
+                .deviceType(materialStdPriceDTO.getDeviceType())
                 .standardPrice(materialStdPriceDTO.getStandardPrice())
                 .validFrom(materialStdPriceDTO.getValidFrom())
                 .validTo(materialStdPriceDTO.getValidTo())
@@ -228,10 +233,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
     
     private String createFilterQuery(String salesOffice, String salesOrg) {
-        return createFilterQuery(salesOffice, salesOrg, null, null);
+        return createFilterQuery(salesOffice, salesOrg, null, null, null);
     }
     
-    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone) {
+    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
         String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
@@ -251,6 +256,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), zone));
         } else {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
+        }
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            filterQuery.append(String.format("and %s eq '%s'", MaterialField.DeviceCategory.getValue(), deviceType));
         }
         return filterQuery.toString();
     }
@@ -328,7 +337,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceDTO(String salesOrg, String salesOffice, String material) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
