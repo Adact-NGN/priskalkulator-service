@@ -8,3 +8,28 @@ spec:
   type: other
   lifecycle: unknown
   owner: norsk_gjenvinning_norge_as
+
+---
+apiVersion: backstage.io/v1alpha1 # Required
+kind: API # Required
+metadata: # Required
+  name: priskalkulator-service-api # Required
+  title: Priskalkulator Service API
+  description: The service API for Priskalkulator serves all the core functions for creating and managing price offers for customers of Norsk Gjenvinning.
+  tags: [rest-api,java]
+  links:
+    - url: https://github.com/Adact-NGN/priskalkulator-service/blob/develop/spec/swagger.json
+      title: API Spec
+      icon: code
+spec:
+  type: openapi # Required
+  lifecycle: development # Required
+  owner: calculator-team # Required
+  definition: | # Required
+    {
+      "openapi": "3.0.1",
+      "info": {
+        "title": "TestApi",
+        "version": "1.0"
+      }
+    }
