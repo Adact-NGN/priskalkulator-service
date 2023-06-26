@@ -189,7 +189,7 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-        mapMissingMaterialValues(priceOfferDTO, priceOffer);
+//        mapMissingMaterialValues(priceOfferDTO, priceOffer);
         
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         priceOffer = service.save(priceOffer);

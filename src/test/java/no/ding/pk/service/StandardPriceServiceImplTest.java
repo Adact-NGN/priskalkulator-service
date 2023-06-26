@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -48,6 +49,9 @@ public class StandardPriceServiceImplTest {
     
     @Autowired
     private SapMaterialService sapMaterialService;
+
+    @Autowired
+    private ModelMapper modelMapper;
     
     @Value("${cache.max.amount.items:5000}") 
     private Integer capacity;
@@ -59,7 +63,7 @@ public class StandardPriceServiceImplTest {
         service = new StandardPriceServiceImpl(new ObjectMapper(), 
         inMemoryCache,
         sapMaterialService,
-        sapHttpClient);
+        sapHttpClient, modelMapper);
     }
     
     @Test

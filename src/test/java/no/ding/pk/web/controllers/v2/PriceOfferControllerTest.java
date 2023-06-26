@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
+import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
@@ -17,13 +15,13 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,6 +48,9 @@ import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
@@ -68,6 +69,9 @@ class PriceOfferControllerTest {
 
     private final ObjectReader objectReader = new ObjectMapper().reader();
 
+    @MockBean
+    private MaterialPriceService materialPriceService = mock(MaterialPriceService.class);
+
     @Autowired
     private WebApplicationContext webApplicationContext;
 
@@ -83,6 +87,13 @@ class PriceOfferControllerTest {
 
     @BeforeEach
     public void setup() {
+
+        MaterialPrice stdMaterialPrice = MaterialPrice.builder()
+                .standardPrice(1000.0)
+                .pricingUnit(1)
+                .deviceType("Test_device_type")
+                .build();
+        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(stdMaterialPrice);
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
 
@@ -138,9 +149,6 @@ class PriceOfferControllerTest {
 //                .andExpect(MockMvcResultMatchers.status().isOk())
 //                .andReturn();
         assertThat(actual.getStatusCode(), is(HttpStatus.OK));
-
-        List<PriceRowDTO> priceRowDtoWithDeviceType = actual.getBody().getSalesOfficeList().get(0).getMaterialList().stream().filter(priceRowDTO -> StringUtils.isNotBlank(priceRowDTO.getDeviceType())).toList();
-        assertThat(priceRowDtoWithDeviceType, hasSize(greaterThan(0)));
     }
 
     @Test

@@ -46,7 +46,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity = new Material();
             entity.setMaterialNumber(material.getMaterialNumber());
         } else {
-            log.debug("Found material...");
+            log.debug("Found material {} ...", material.getMaterialNumber());
         }
 
         if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
@@ -78,17 +78,21 @@ public class MaterialServiceImpl implements MaterialService {
         if(!StringUtils.equals(entity.getDeviceType(), material.getDesignation())) {
             entity.setDeviceType(material.getDeviceType());
         }
-        
+
+        log.debug("Getting std price for material: {}", material.getMaterialNumber());
         MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
         
         if(materialPriceEntity == null) {
+            log.debug("Std price for material not found.");
             materialPriceEntity = material.getMaterialStandardPrice();
         } else if(material.getMaterialStandardPrice() != null){
             materialPriceEntity.copy(material.getMaterialStandardPrice());
         }
-        
-        if(materialPriceEntity != null) {
-            entity.setMaterialStandardPrice(materialPriceEntity);
+
+        entity.setMaterialStandardPrice(materialPriceEntity);
+
+        if(materialPriceEntity != null && !StringUtils.equals(entity.getDeviceType(), materialPriceEntity.getDeviceType())) {
+            entity.setDeviceType(materialPriceEntity.getDeviceType());
         }
 
         if(!StringUtils.equals(entity.getCurrency(), material.getCurrency())) {
@@ -117,12 +121,10 @@ public class MaterialServiceImpl implements MaterialService {
     @Override
     public List<Material> saveAll(List<Material> materialList) {
         List<Material> returnMaterials = new ArrayList<>();
-        
-        for(int i = 0; i < materialList.size(); i++) {
-            Material material = materialList.get(i);
-            
+
+        for (Material material : materialList) {
             material = save(material);
-            
+
             returnMaterials.add(material);
         }
         

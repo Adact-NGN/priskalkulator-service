@@ -7,6 +7,7 @@ import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.sap.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
 import org.modelmapper.Converter;
@@ -75,6 +76,9 @@ public class ModelMapperV2Config {
         priceRowToPriceRowDtoTypeMapping(modelMapper);
 
         userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
+
+        modelMapper.typeMap(MaterialStdPriceDTO.class, MaterialPrice.class)
+                .addMapping(MaterialStdPriceDTO::getMaterial, MaterialPrice::setMaterialNumber);
 
         return modelMapper;
     }

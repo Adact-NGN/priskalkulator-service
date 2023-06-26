@@ -12,11 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 
@@ -100,7 +96,8 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zones) {
-        List<String> materialNumbers = Arrays.asList(materialNumber.split(","));
+        List<String> materialNumbers = cleanUpAndGetMaterialNumbersAsList(materialNumber);
+        log.debug("Materials to find discounts for: {}", materialNumbers);
 
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
@@ -110,6 +107,12 @@ public class DiscountServiceImpl implements DiscountService {
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
         return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+    }
+
+    private List<String> cleanUpAndGetMaterialNumbersAsList(String materialNumber) {
+        String[] materialNumberArray = materialNumber.split(",");
+
+        return Arrays.stream(materialNumberArray).distinct().toList();
     }
 
     @Override
