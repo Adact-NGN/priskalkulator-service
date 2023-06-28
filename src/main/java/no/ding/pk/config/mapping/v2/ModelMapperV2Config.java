@@ -7,6 +7,7 @@ import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.sap.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
 import org.modelmapper.Converter;
@@ -76,6 +77,9 @@ public class ModelMapperV2Config {
 
         userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
 
+        modelMapper.typeMap(MaterialStdPriceDTO.class, MaterialPrice.class)
+                .addMapping(MaterialStdPriceDTO::getMaterial, MaterialPrice::setMaterialNumber);
+
         return modelMapper;
     }
 
@@ -126,26 +130,36 @@ public class ModelMapperV2Config {
     }
 
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
+        // https://amydegregorio.com/2018/01/17/using-custom-modelmapper-converters-and-mappings/
         Converter<String, Material> stringToMaterial = c -> {
             Material material = null;
             if(c.getSource() != null) {
-                material = materialRepository.findByMaterialNumber(c.getSource());
+                String[] materialDeviceTypeId = c.getSource().split("_");
+
+                if(materialDeviceTypeId.length > 1) {
+                    material = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
+                } else {
+                    material = materialRepository.findByMaterialNumber(c.getSource());
+                }
 
                 if(material != null) {
                     return material;
                 }
 
-                material = Material.builder().materialNumber(c.getSource()).build();
-            }
-
-            if(material == null)
                 log.debug("No material number was found. Material object could not be created.");
+
+                if(materialDeviceTypeId.length > 1) {
+                    material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();
+                } else {
+                    material = Material.builder().materialNumber(c.getSource()).build();
+                }
+            }
 
             return material;
         };
 
         TypeMap<PriceRowDTO, PriceRow> priceRowDtoPropertyMap = modelMapper.createTypeMap(PriceRowDTO.class, PriceRow.class);
-        priceRowDtoPropertyMap.addMappings(mapper -> mapper.using(stringToMaterial).map(PriceRowDTO::getMaterial, PriceRow::setMaterial));
+        priceRowDtoPropertyMap.addMappings(mapper -> mapper.using(stringToMaterial).map(PriceRowDTO::getMaterialId, PriceRow::setMaterial));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getCategoryId, (destination, value) -> destination.getMaterial().setCategoryId((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getCategoryDescription, (destination, value) -> destination.getMaterial().setCategoryDescription((String) value)));
         priceRowDtoPropertyMap.addMappings(mapping -> mapping.map(PriceRowDTO::getDeviceType, (destination, value) -> destination.getMaterial().setDeviceType((String) value)));

@@ -18,6 +18,10 @@ import java.io.Serializable;
         @NamedQuery(
                 name = "findMaterialByMaterialNumber",
                 query = "from Material m where m.materialNumber = :materialNumber"
+        ),
+        @NamedQuery(
+                name = "findMaterialByMaterialNumberAndDeviceType",
+                query = "from Material m where m.materialNumber = :materialNumber and m.deviceType = :deviceType"
         )
 })
 @JsonIgnoreProperties({"faMaterial"})

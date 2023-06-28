@@ -35,8 +35,6 @@ public class PriceRowServiceImpl implements PriceRowService {
     
     private final MaterialPriceService materialPriceService;
 
-    private final StandardPriceService standardPriceService;
-
     private final SapMaterialService sapMaterialService;
 
     private final ModelMapper modelMapper;
@@ -55,21 +53,22 @@ public class PriceRowServiceImpl implements PriceRowService {
         this.materialPriceService = materialPriceService;
         this.materialService = materialService;
         this.emFactory = emFactory;
-        this.standardPriceService = standardPriceService;
         this.sapMaterialService = sapMaterialService;
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice) {
-        return saveAll(priceRowList, salesOrg, salesOffice, null);
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, List<MaterialPrice> materialStdPrices) {
+        return saveAll(priceRowList, salesOrg, salesOffice, null, materialStdPrices);
     }
     
     @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone) {
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone, List<MaterialPrice> materialStdPrices) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-            PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone);
+
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPrices);
+            PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice);
 
             returnList.add(entity);
         }
@@ -78,7 +77,18 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone) {
+    private MaterialPrice getMaterialPriceForMaterial(Material material, List<MaterialPrice> materialStdPrices) {
+        if(materialStdPrices == null || materialStdPrices.isEmpty()) {
+            return null;
+        }
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            return materialStdPrices.stream().filter(materialPrice ->
+                    materialPrice.getMaterialNumber().equals(material.getMaterialNumber()) && materialPrice.getDeviceType().equals(material.getDeviceType())).findFirst().orElse(null);
+        }
+        return materialStdPrices.stream().filter(materialPrice -> materialPrice.getMaterialNumber().equals(material.getMaterialNumber())).findFirst().orElse(null);
+    }
+
+    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone, MaterialPrice materialPrice) {
         log.debug("Price Row: {}", materialPriceRow);
 
         PriceRow entity = new PriceRow();
@@ -122,10 +132,16 @@ public class PriceRowServiceImpl implements PriceRowService {
             EntityManager em = emFactory.createEntityManager();
             log.debug("Is material attached: {}", em.contains(material));
 
-            if(material != null && material.getId() == null) {
+            if(material.getId() == null) {
 
                 em.getTransaction().begin();
-                var materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                List materials;
+
+                if(StringUtils.isNotBlank(material.getDeviceType())) {
+                    materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+                } else {
+                    materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                }
                 em.getTransaction().commit();
                 em.close();
 
@@ -139,12 +155,20 @@ public class PriceRowServiceImpl implements PriceRowService {
                     if(persistedMaterialPrice != null) {
                         updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
                         persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
+
+                        if(materialPrice != null) {
+                            persistedMaterial.setPricingUnit(materialPrice.getPricingUnit());
+                            persistedMaterial.setQuantumUnit(materialPrice.getQuantumUnit());
+                            persistedMaterial.setDeviceType(materialPrice.getDeviceType());
+                        }
+
                     } else {
                         log.debug("No MaterialPrice for Material, getting standard price for material: {}", material.getMaterialNumber());
-                        MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
-                        persistedMaterial.setMaterialStandardPrice(stdPrice);
-                        persistedMaterial.setPricingUnit(stdPrice.getPricingUnit());
-                        persistedMaterial.setQuantumUnit(stdPrice.getQuantumUnit());
+                        //MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
+                        persistedMaterial.setMaterialStandardPrice(materialPrice);
+                        persistedMaterial.setPricingUnit(materialPrice.getPricingUnit());
+                        persistedMaterial.setQuantumUnit(materialPrice.getQuantumUnit());
+                        persistedMaterial.setDeviceType(materialPrice.getDeviceType());
                     }
 
                     persistedMaterial = materialService.save(persistedMaterial);
@@ -159,12 +183,10 @@ public class PriceRowServiceImpl implements PriceRowService {
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
 
                         if(StringUtils.isBlank(fromSap.getDeviceType()) || fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
-                            MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
-
-                            if(stdPrice != null) {
-                                fromSap.setDeviceType(stdPrice.getDeviceType());
-                                fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
-                                fromSap.setPricingUnit(stdPrice.getPricingUnit());
+                            if(materialPrice != null) {
+                                fromSap.setDeviceType(materialPrice.getDeviceType());
+                                fromSap.setQuantumUnit(materialPrice.getQuantumUnit());
+                                fromSap.setPricingUnit(materialPrice.getPricingUnit());
                             }
                         }
 
@@ -178,18 +200,24 @@ public class PriceRowServiceImpl implements PriceRowService {
                     entity.setMaterial(material);
                 }
 
-            } else if(material != null) {
+            } else {
                 log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
+
+                if(materialPrice != null) {
+                    material.setDeviceType(materialPrice.getDeviceType());
+                    material.setQuantumUnit(materialPrice.getQuantumUnit());
+                    material.setPricingUnit(materialPrice.getPricingUnit());
+                }
+
                 entity.setMaterial(material);
             }
-
         }
 
         if(materialPriceRow.hasCombinedMaterials()) {
             List<PriceRow> combinedMaterialPriceRows = new ArrayList<>();
 
             for(int j = 0; j < materialPriceRow.getCombinedMaterials().size(); j++) {
-                PriceRow combinedMaterial = this.save(materialPriceRow.getCombinedMaterials().get(j), salesOrg, salesOffice, zone);
+                PriceRow combinedMaterial = this.save(materialPriceRow.getCombinedMaterials().get(j), salesOrg, salesOffice, zone, materialPrice);
                 combinedMaterialPriceRows.add(combinedMaterial);
             }
 
@@ -250,6 +278,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setStandardPrice(from.getStandardPrice());
         to.setValidFrom(from.getValidFrom());
         to.setValidTo(from.getValidTo());
+        to.setDeviceType(from.getDeviceType());
     }
     
 }

@@ -89,18 +89,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         if(!materialsForApproval.isEmpty()) {
             entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-            StringBuilder materialNumbersForApproval = new StringBuilder();
-            for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
-                String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+            String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
-                if(materialNumbersForApproval.length() > 0) {
-                    materialNumbersForApproval.append(",").append(materials);
-                } else {
-                    materialNumbersForApproval = new StringBuilder(materials);
-                }
-            }
-
-            entity.setMaterialsForApproval(materialNumbersForApproval.toString());
+            entity.setMaterialsForApproval(materialNumbersForApproval);
 
             User approver = getApproverForOffer(materialsForApproval);
 
@@ -110,6 +101,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
             }
         } else {
+            log.debug("No materials needs to be approved, set price offer as APPROVED.");
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
@@ -129,6 +121,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private static String flattenMaterialNumbersMapToCommaseparatedListString(Map<String, List<PriceRow>> materialsForApproval) {
+        StringBuilder materialNumbersForApproval = new StringBuilder();
+        for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
+            String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+
+            if(materialNumbersForApproval.length() > 0) {
+                materialNumbersForApproval.append(",").append(materials);
+            } else {
+                materialNumbersForApproval = new StringBuilder(materials);
+            }
+        }
+        return materialNumbersForApproval.toString();
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {

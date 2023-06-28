@@ -189,7 +189,7 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-        mapMissingMaterialValues(priceOfferDTO, priceOffer);
+//        mapMaterialValues(priceOfferDTO, priceOffer);
         
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         priceOffer = service.save(priceOffer);
@@ -197,7 +197,12 @@ public class PriceOfferController {
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
 
-    private void mapMissingMaterialValues(PriceOfferDTO priceOfferDTO, PriceOffer priceOffer) {
+    /**
+     * Adds missing fields for the {@code Material} object. The ModelMapper is unable to map all fields when converting from a string to an object.
+     * @param priceOfferDTO incoming price {@code PriceOfferDTO} offer to get missing values from
+     * @param priceOffer converted {@code PriceOffer} to update
+     */
+    private void mapMaterialValues(PriceOfferDTO priceOfferDTO, PriceOffer priceOffer) {
         if(priceOfferDTO.getSalesOfficeList() == null) {
             return;
         }
@@ -208,7 +213,7 @@ public class PriceOfferController {
                 salesOfficeDTO.getMaterialList().forEach(updateMaterialInPriceRowsIn(salesOffice));
             }
 
-            if(salesOffice.getRentalList() != null) {
+            if(salesOfficeDTO.getRentalList() != null) {
                 salesOfficeDTO.getRentalList().forEach(updateMaterialInPriceRowsIn(salesOffice));
             }
 
@@ -230,12 +235,12 @@ public class PriceOfferController {
             Material material = priceRow.getMaterial();
 
             if (material != null) {
-                updateMaterial(material, priceRowDTO);
+                createMaterialFromPriceRowDTO(material, priceRowDTO);
             }
         };
     }
 
-    private void updateMaterial(Material to, PriceRowDTO from) {
+    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from) {
         log.debug("To: {}, from: {}", to, from);
         to.setDesignation(from.getDesignation());
         to.setMaterialGroupDesignation(from.getProductGroupDesignation());
@@ -281,6 +286,8 @@ public class PriceOfferController {
         }
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
+
+//        mapMaterialValues(priceOfferDTO, updatedOffer);
         
         updatedOffer = service.save(updatedOffer);
 

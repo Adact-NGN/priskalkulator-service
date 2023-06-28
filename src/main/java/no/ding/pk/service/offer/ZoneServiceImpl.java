@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.service.sap.StandardPriceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,47 +21,48 @@ import no.ding.pk.repository.offer.ZoneRepository;
 @Service
 public class ZoneServiceImpl implements ZoneService {
 
-    private static Logger log = LoggerFactory.getLogger(ZoneServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ZoneServiceImpl.class);
 
     private final ZoneRepository repository;
     private final PriceRowService priceRowService;
+    private final StandardPriceService standardPriceService;
 
     @Autowired
-    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService) {
+    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService, StandardPriceService standardPriceService) {
         this.repository = repository;
         this.priceRowService = priceRowService;
+        this.standardPriceService = standardPriceService;
     }
 
     @Override
     public List<Zone> saveAll(List<Zone> zoneList, String salesOrg, String salesOffice) {
         List<Zone> returnZoneList = new ArrayList<>();
 
-        for(int i = 0; i < zoneList.size(); i++) {
-            Zone zone = zoneList.get(i);
+        for (Zone zone : zoneList) {
             log.debug("Zone {}", zone);
 
-           Zone entity = new Zone();
+            Zone entity = new Zone();
 
-           if(zone.getId() != null) {
-               Optional<Zone> optZone = repository.findById(zone.getId());
+            if (zone.getId() != null) {
+                Optional<Zone> optZone = repository.findById(zone.getId());
 
-               if(optZone.isPresent()) {
-                   entity = optZone.get();
-               }
-           }
+                if (optZone.isPresent()) {
+                    entity = optZone.get();
+                }
+            }
 
-           entity.setZoneId(zone.getZoneId());
-           entity.setPostalCode(zone.getPostalCode());
-           entity.setPostalName(zone.getPostalName());
-           entity.setIsStandardZone(zone.getIsStandardZone());
+            entity.setZoneId(zone.getZoneId());
+            entity.setPostalCode(zone.getPostalCode());
+            entity.setPostalName(zone.getPostalName());
+            entity.setIsStandardZone(zone.getIsStandardZone());
 
-            if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
-                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice);
+            List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOrg, salesOffice, zone.getZoneId());
+
+            if (zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, materialStdPrices);
 
                 zone.setPriceRows(materials);
             }
-
-//            entity = repository.save(zone);
 
             returnZoneList.add(zone);
         }
@@ -67,5 +70,5 @@ public class ZoneServiceImpl implements ZoneService {
         log.debug("Persisted {} amount of Zones", returnZoneList.size());
         return returnZoneList;
     }
-    
+
 }
