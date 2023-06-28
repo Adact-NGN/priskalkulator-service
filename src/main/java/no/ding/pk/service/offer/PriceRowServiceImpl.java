@@ -135,7 +135,13 @@ public class PriceRowServiceImpl implements PriceRowService {
             if(material.getId() == null) {
 
                 em.getTransaction().begin();
-                var materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                List materials;
+
+                if(StringUtils.isNotBlank(material.getDeviceType())) {
+                    materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+                } else {
+                    materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                }
                 em.getTransaction().commit();
                 em.close();
 

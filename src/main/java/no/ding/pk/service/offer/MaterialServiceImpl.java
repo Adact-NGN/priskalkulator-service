@@ -140,4 +140,9 @@ public class MaterialServiceImpl implements MaterialService {
     public Material findByMaterialNumber(String materialNumber) {
         return repository.findByMaterialNumber(materialNumber);
     }
+
+    @Override
+    public Material findByMaterialNumberAndDeviceType(String material, String deviceType) {
+        return repository.findByMaterialNumberAndDeviceType(material, deviceType);
+    }
 }
