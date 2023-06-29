@@ -17,6 +17,7 @@ import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,10 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -135,19 +133,11 @@ class PriceOfferControllerTest {
     @Test
     public void shouldPersistPriceOffer() throws Exception {
         setup();
-        PriceOfferDTO priceOffer = createCompleteOfferDto();
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
 
         String createUrl = "/api/v2/price-offer/create";
         ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
 
-//        MvcResult result = mockMvc.perform(
-//                post(createUrl).contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectWriter.writeValueAsString(priceOffer))
-//                        .with(jwt()
-//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andReturn();
         assertThat(actual.getStatusCode(), is(HttpStatus.OK));
     }
 
@@ -167,7 +157,7 @@ class PriceOfferControllerTest {
     @Test
     public void shouldListAllPriceOfferForApprover() throws Exception {
 
-        PriceOfferDTO priceOffer = createCompleteOfferDto();
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
         UserDTO approverDto = modelMapper.map(approver, UserDTO.class);
         priceOffer.setApprover(approverDto);
 
@@ -317,14 +307,6 @@ class PriceOfferControllerTest {
         // Create
         String createUrl = "/api/v2/price-offer/create";
         ResponseEntity<PriceOfferDTO> result = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
-//        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectWriter.writeValueAsString(priceOfferDTO))
-//                        .with(jwt()
-//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
-//                        ))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andReturn();
 
         priceOfferDTO = result.getBody();
 
@@ -334,6 +316,24 @@ class PriceOfferControllerTest {
 
         assertThat(priceOfferListDTOS, arrayWithSize(greaterThan(0)));
         assertThat(priceOfferListDTOS[0].getSalesEmployee().getFullName(), is(priceOfferDTO.getSalesEmployee().getFullName()));
+    }
+
+    @Test
+    public void shouldPersistPriceOfferWithDeviceType() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithDeviceType.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO actualPo = actual.getBody();
+
+        assertThat(actualPo, notNullValue());
+        Set<String> deviceTypes = new HashSet<>();
+        actualPo.getSalesOfficeList().forEach(salesOfficeDTO -> salesOfficeDTO.getMaterialList().forEach(priceRowDTO -> deviceTypes.add(priceRowDTO.getDeviceType())));
+
+        assertThat(deviceTypes.size(), greaterThan(1));
     }
 
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {
@@ -381,10 +381,15 @@ class PriceOfferControllerTest {
         return returnList;
     }
 
-    private PriceOfferDTO createCompleteOfferDto() throws IOException {
+    private PriceOfferDTO createCompleteOfferDto(String filename) throws IOException {
+        String inputFileName = filename;
+        if (StringUtils.isBlank(filename)) {
+            inputFileName = "priceOfferWithZoneAndDiscount_V2.json";
+        }
+
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File file = new File(Objects.requireNonNull(classLoader.getResource("priceOfferWithZoneAndDiscount_V2.json")).getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource(inputFileName)).getFile());
 
         assertThat(file.exists(), is(true));
 

@@ -241,8 +241,15 @@ public class PriceRowServiceImpl implements PriceRowService {
             log.debug("Material has ID: {}", material.getId());
             return materialService.findById(material.getId()).orElse(material);
         }
-        log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-        Material byMaterialNumber = materialService.findByMaterialNumber(material.getMaterialNumber());
+
+        Material byMaterialNumber;
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
+            byMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
+        } else {
+            log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
+            byMaterialNumber = materialService.findByMaterialNumber(material.getMaterialNumber());
+        }
 
         if(byMaterialNumber != null) {
             return byMaterialNumber;

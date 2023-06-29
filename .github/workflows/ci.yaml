@@ -112,9 +112,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ steps.increment_version.outputs.new_version }}.zip
-          asset_name: ${{ steps.increment_version.outputs.new_version }}.zip
-          asset_content_type: application/zip
+#          asset_path: ./${{ steps.increment_version.outputs.new_version }}.zip
+#          asset_name: ${{ steps.increment_version.outputs.new_version }}.zip
+#          asset_content_type: application/zip
 
       - uses: eregon/publish-release@v1
         env:
