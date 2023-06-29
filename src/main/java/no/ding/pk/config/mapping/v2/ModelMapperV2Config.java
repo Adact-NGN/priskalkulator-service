@@ -146,7 +146,7 @@ public class ModelMapperV2Config {
                     return material;
                 }
 
-                log.debug("No material number was found. Material object could not be created.");
+                log.debug("No material number was found. Material object must be created.");
 
                 if(materialDeviceTypeId.length > 1) {
                     material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();

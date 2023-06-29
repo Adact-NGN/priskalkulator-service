@@ -1,0 +1,137 @@
+{
+  "customerNumber": "111327",
+  "customerName": "Kjetil's Bussreiser AS",
+  "salesOfficeList": [
+    {
+      "salesOrg": "100",
+      "salesOffice": "104",
+      "name": "",
+      "postalCode": "3933",
+      "city": "PORSGRUNN",
+      "zoneList": [
+        {
+          "number": "0000000002",
+          "postalCode": "3933",
+          "postalName": "Porsgrunn",
+          "isStandardZone": true,
+          "materialList": []
+        }
+      ],
+      "materialList": [
+        {
+          "material": "50301",
+          "deviceType": "B-0-S",
+          "designation": "Flatvogn - Utsett",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj.  Flatvogn",
+          "showPriceInOffer": true,
+          "standardPrice": 13,
+          "categoryId": "00200",
+          "categoryDescription": "Transport",
+          "subCategoryId": "0020000131",
+          "subCategoryDescription": "Flatvogn - Utsett",
+          "classId": "",
+          "classDescription": "",
+          "pricingUnit": "1",
+          "quantumUnit": "ST",
+          "needsApproval": false
+        },
+        {
+          "material": "50301",
+          "deviceType": "B-0030-S",
+          "designation": "Flatvogn - Utsett",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj.  Flatvogn",
+          "showPriceInOffer": true,
+          "standardPrice": 0,
+          "categoryId": "00200",
+          "categoryDescription": "Transport",
+          "subCategoryId": "0020000131",
+          "subCategoryDescription": "Flatvogn - Utsett",
+          "classId": "",
+          "classDescription": "",
+          "pricingUnit": "1",
+          "quantumUnit": "ST",
+          "needsApproval": false
+        },
+        {
+          "material": "50301",
+          "deviceType": "B-0060-FO",
+          "designation": "Flatvogn - Utsett",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj.  Flatvogn",
+          "showPriceInOffer": true,
+          "standardPrice": 337,
+          "categoryId": "00200",
+          "categoryDescription": "Transport",
+          "subCategoryId": "0020000131",
+          "subCategoryDescription": "Flatvogn - Utsett",
+          "classId": "",
+          "classDescription": "",
+          "pricingUnit": "1",
+          "quantumUnit": "ST",
+          "needsApproval": false
+        },
+        {
+          "material": "50301",
+          "deviceType": "B-0120",
+          "designation": "Flatvogn - Utsett",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj.  Flatvogn",
+          "showPriceInOffer": true,
+          "standardPrice": 337,
+          "categoryId": "00200",
+          "categoryDescription": "Transport",
+          "subCategoryId": "0020000131",
+          "subCategoryDescription": "Flatvogn - Utsett",
+          "classId": "",
+          "classDescription": "",
+          "pricingUnit": "1",
+          "quantumUnit": "ST",
+          "needsApproval": false
+        },
+        {
+          "material": "50301",
+          "deviceType": "B-0120-M",
+          "designation": "Flatvogn - Utsett",
+          "materialDesignation": "Tjeneste",
+          "productGroupDesignation": "Tj.  Flatvogn",
+          "showPriceInOffer": true,
+          "standardPrice": 337,
+          "categoryId": "00200",
+          "categoryDescription": "Transport",
+          "subCategoryId": "0020000131",
+          "subCategoryDescription": "Flatvogn - Utsett",
+          "classId": "",
+          "classDescription": "",
+          "pricingUnit": "1",
+          "quantumUnit": "ST",
+          "needsApproval": false
+        }
+      ],
+      "transportServiceList": [],
+      "rentalList": []
+    }
+  ],
+  "salesEmployee": {
+    "id": 2,
+    "name": "Alexander",
+    "phoneNumber": "95838638",
+    "email": "alexander.brox@ngn.no",
+    "orgNr": "100",
+    "orgName": "Norsk Gjenvinning",
+    "sureName": "Brox",
+    "jobTitle": "Salgsleder",
+    "fullName": "Alexander Brox",
+    "associatedPlace": "Oslo",
+    "powerOfAttorneyOA": "5",
+    "powerOfAttorneyFA": "5"
+  },
+  "needsApproval": false,
+  "customerTerms": {
+    "contractTerm": "Generelle vilkår",
+    "agreementStartDate": "2023-06-29T09:52:00.329Z",
+    "agreementEndDate": "2023-06-29T09:52:00.329Z",
+    "additionForAdminFee": true
+  }
+}
