@@ -2,16 +2,19 @@ package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.offer.CustomerTerms;
 import no.ding.pk.repository.offer.CustomerTermsRepository;
-import org.modelmapper.ModelMapper;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static no.ding.pk.repository.specifications.CustomerTermsSpecifications.*;
 
 @Transactional
 @Service
@@ -44,7 +47,7 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     public CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms) {
         List<CustomerTerms> currentCustomerTerms = repository.findAllBySalesOfficeAndCustomerNumber(salesOffice, customerNumber);
         
-//        invalidatePreviousCustomerTerm(currentCustomerTerms);
+        invalidatePreviousCustomerTerm(currentCustomerTerms, customerTerms.getAgreementStartDate());
         
         CustomerTerms newTerm = repository.save(customerTerms);
         
@@ -53,13 +56,14 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     }
     
     @Override
-    public List<CustomerTerms> findAll() {
-        return repository.findAll();
+    public List<CustomerTerms> findAll(String salesOffice, String customerNumber) {
+        return repository.findAll(Specification.where(withSalesOffice(salesOffice).and(withCustomerNumber(customerNumber))));
     }
     
-    private void invalidatePreviousCustomerTerm(List<CustomerTerms> currentCustomerTerms) {
+    private void invalidatePreviousCustomerTerm(List<CustomerTerms> currentCustomerTerms, Date agreementStartDate) {
         currentCustomerTerms.stream().filter(terms -> terms.getAgreementEndDate() == null || terms.getAgreementEndDate().equals(new Date())).forEach(terms -> {
-            terms.setAgreementEndDate(new Date());
+            LocalDateTime localDateTime = new LocalDateTime(agreementStartDate);
+            terms.setAgreementEndDate(localDateTime.minusDays(1).toDate());
             repository.save(terms);
         });
     }
@@ -75,5 +79,10 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
 
         return allActiveCustomerTerms.get(0);
     }
-    
+
+    @Override
+    public List<CustomerTerms> findAllActive(String salesOffice, String customerNumber) {
+        return repository.findAll(Specification.where(withSalesOffice(salesOffice).and(withCustomerNumber(customerNumber)).and(withAgreementEndDateGreaterThan(null))));
+    }
+
 }

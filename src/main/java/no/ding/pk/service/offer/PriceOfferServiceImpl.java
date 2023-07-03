@@ -391,6 +391,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), newCustomerTerms);
         }
 
+        log.debug("Activated new terms for sales offices in list: {}", priceOfferToActivate.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
+
         return true;
     }
 
