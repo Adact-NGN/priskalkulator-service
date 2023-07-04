@@ -8,10 +8,12 @@ import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialPriceService;
+import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
+import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
@@ -24,9 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.test.context.TestExecutionListeners;
@@ -139,6 +139,42 @@ class PriceOfferControllerTest {
         ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
 
         assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+    }
+
+    @Test
+    public void shouldActivatePriceOffer() throws IOException {
+        setup();
+
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> createdPriceOffer = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
+
+        assertThat(createdPriceOffer.getStatusCode(), is(HttpStatus.OK));
+        assertThat(createdPriceOffer, notNullValue());
+
+        TermsDTO customerTerms = createdPriceOffer.getBody().getCustomerTerms();
+        customerTerms.setMetalPricing("Fastpris (opp til kr -500,- pr. tonn)");
+        customerTerms.setMetalSetDateForOffer(new Date());
+        customerTerms.setPaymentCondition("15 dgr");
+        customerTerms.setInvoiceInterval("Hver 14.dag");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<TermsDTO> request = new HttpEntity<>(customerTerms, headers);
+
+        String activateOfferUrl = "/api/v2/price-offer/activate/" + createdPriceOffer.getBody().getSalesEmployee().getId() + "/" + createdPriceOffer.getBody().getId();
+        ResponseEntity<Boolean> actual = restTemplate.exchange(activateOfferUrl, HttpMethod.PUT, request, Boolean.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+        assertThat(actual.getBody(), is(true));
+
+        ResponseEntity<CustomerTermsDTO[]> activeCustomerTerms = restTemplate.getForEntity("/api/v1/terms/customer/list/active?salesOffice={salesOffice}&customerNumber={customerNumber}", CustomerTermsDTO[].class,
+                Map.of("salesOffice", createdPriceOffer.getBody().getSalesOfficeList().get(0).getSalesOffice(), "customerNumber", createdPriceOffer.getBody().getCustomerNumber()));
+
+        assertThat(activeCustomerTerms.getStatusCode(), is(HttpStatus.OK));
+        assertThat(activeCustomerTerms.getBody(), arrayWithSize(1));
     }
 
     @Test

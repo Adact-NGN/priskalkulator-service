@@ -71,12 +71,13 @@ public class CustomerTermsController {
         log.debug("Received CustomerTerms: {}", customerTermsDTO);
 
         if(customerTermsDTO.getSalesOffice() == null) throw new SalesOfficeNotProvidedException();
-        if(customerTermsDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
+        if(customerTermsDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException("Customer number is missing");
+        if(customerTermsDTO.getCustomerName() == null) throw new CustomerNotProvidedException("Customer name is missing");
         if(customerTermsDTO.getAgreementStartDate() == null) throw new MissingAgreementStartDateException();
 
         CustomerTerms customerTerms = modelMapper.map(customerTermsDTO, CustomerTerms.class);
 
-        customerTerms = service.save(customerTerms.getSalesOffice(), customerTerms.getCustomerNumber(), customerTerms);
+        customerTerms = service.save(customerTerms);
 
         return modelMapper.map(customerTerms, CustomerTermsDTO.class);
     }

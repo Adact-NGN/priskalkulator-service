@@ -388,7 +388,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             newCustomerTerms.setLastModifiedBy(null);
             newCustomerTerms.setLastModifiedDate(null);
 
-            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), newCustomerTerms);
+            customerTermsService.save(salesOffice.getSalesOffice(), priceOfferToActivate.getCustomerNumber(), priceOfferToActivate.getCustomerName(), newCustomerTerms);
         }
 
         log.debug("Activated new terms for sales offices in list: {}", priceOfferToActivate.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
@@ -403,7 +403,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(currentActiveCustomerTerms != null) {
             currentActiveCustomerTerms.setAgreementEndDate(new Date());
 
-            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), currentActiveCustomerTerms);
+            customerTermsService.save(salesOffice.getSalesOffice(), priceOfferToActivate.getCustomerNumber(), priceOfferToActivate.getCustomerName(), currentActiveCustomerTerms);
         }
     }
 

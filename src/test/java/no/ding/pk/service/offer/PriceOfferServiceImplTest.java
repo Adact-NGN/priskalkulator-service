@@ -414,7 +414,7 @@ class PriceOfferServiceImplTest {
                 .salesOffice("100")
                 .build();
 
-        customerTermsService.save("100", "169239", oldCustomerTerms);
+        customerTermsService.save(oldCustomerTerms.getSalesOffice(), oldCustomerTerms.getCustomerNumber(), oldCustomerTerms.getCustomerName(), oldCustomerTerms);
 
         Material ordinaryMaterial = createOrdinaryMaterial();
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
@@ -439,6 +439,8 @@ class PriceOfferServiceImplTest {
                 .build();
 
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerName("Monica")
+                .customerNumber("169239")
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice))
                 .needsApproval(true)
