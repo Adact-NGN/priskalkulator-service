@@ -94,13 +94,23 @@ jobs:
           git commit -am "$previous_version -> $new_version"
           git push
 
-      - name: Create and push Release
+      - name: Create and push tag
         if: steps.commit_n_push.outcome == 'success'
+        id: create_tag
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          git tag ${{ steps.increment_version.outputs.new_version }} -a -m "$previous_version -> $new_version"
+          git push origin ${{ steps.increment_version.outputs.new_version }}
+
+      - name: Create and push Release
+        if: steps.commit_n_push.create_tag == 'success'
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --prerelease
+          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --release
 
 #      - name: Create Draft Release
 #        if: steps.commit_n_push.outcome == 'success'
