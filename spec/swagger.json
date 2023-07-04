@@ -224,6 +224,22 @@
         "403": {"description": "Forbidden"},
         "404": {"description": "Not Found"}
       },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "customerNumber",
+          "description": "customerNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        }
+      ],
       "tags": ["customer-terms-controller"]
     }},
     "/api/v2/price-offer/list/{salesEmployeeId}": {"get": {
@@ -2630,6 +2646,40 @@
         "required": true
       }],
       "tags": ["sales-role-controller"]
+    }},
+    "/api/v1/terms/customer/list/active": {"get": {
+      "summary": "listAllActive",
+      "produces": ["*/*"],
+      "operationId": "listAllActiveUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerTermsDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "customerNumber",
+          "description": "customerNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["customer-terms-controller"]
     }}
   },
   "host": "localhost",
