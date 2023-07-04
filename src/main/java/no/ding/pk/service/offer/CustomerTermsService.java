@@ -14,11 +14,13 @@ public interface CustomerTermsService {
 
     Integer countAllBySalesOfficeAndCustomerNumber(String salesOffice, String customerNumber);
 
-    CustomerTerms save(String salesOffice, String customerNumber, CustomerTerms customerTerms);
+    CustomerTerms save(String salesOffice, String customerNumber, String customerName, CustomerTerms customerTerms);
 
     List<CustomerTerms> findAll(String salesOffice, String customerNumber);
     CustomerTerms findActiveTermsForCustomerForSalesOfficeAndSalesOrg(String customerNumber, String salesOffice,
             String salesOrg);
 
     List<CustomerTerms> findAllActive(String salesOffice, String customerNumber);
+
+    CustomerTerms save(CustomerTerms customerTerms);
 }

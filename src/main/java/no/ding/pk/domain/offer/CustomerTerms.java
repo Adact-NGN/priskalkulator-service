@@ -39,11 +39,11 @@ public class CustomerTerms extends Auditable {
     private String source;
     @Column
     private String salesOrg;
-    @Column
+    @Column(nullable = false)
     private String salesOffice;
-    @Column
+    @Column(nullable = false)
     private String customerName;
-    @Column
+    @Column(nullable = false)
     private String customerNumber;
     @Column
     private String contractTerm;

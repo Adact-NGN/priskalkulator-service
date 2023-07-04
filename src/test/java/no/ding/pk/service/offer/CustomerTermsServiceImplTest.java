@@ -26,18 +26,20 @@ public class CustomerTermsServiceImplTest {
     void testFindActiveTermsForCustomerForSalesOfficeAndSalesOrgWhereEndDateIsNull() {
 
         String customerNumber = "295843";
+        String customerName = "Test";
         String salesOffice = "100";
         String salesOrg = "100";
 
         CustomerTerms customerTerms = CustomerTerms.builder()
-        .customerNumber(customerNumber)
-        .salesOffice(salesOffice)
-        .salesOrg(salesOrg)
-        .agreementStartDate(new Date())
-        .agreementEndDate(null)
-        .build();
+                .customerNumber(customerNumber)
+                .customerName(customerName)
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .agreementStartDate(new Date())
+                .agreementEndDate(null)
+                .build();
 
-        service.save(salesOffice, customerNumber, customerTerms);
+        service.save(salesOffice, customerNumber, customerName, customerTerms);
 
         CustomerTerms actual = service.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(customerNumber, salesOffice, salesOrg);
 
@@ -48,20 +50,22 @@ public class CustomerTermsServiceImplTest {
     void testFindActiveTermsForCustomerForSalesOfficeAndSalesOrgWhereEndDateIsInTheFuture() throws InterruptedException {
 
         String customerNumber = "295843";
+        String customerName = "Test";
         String salesOffice = "100";
         String salesOrg = "100";
 
         LocalDateTime currentDateAndTime = LocalDateTime.now();
 
         CustomerTerms customerTerms = CustomerTerms.builder()
-        .customerNumber(customerNumber)
-        .salesOffice(salesOffice)
-        .salesOrg(salesOrg)
-        .agreementStartDate(currentDateAndTime.toDate())
-        .agreementEndDate(currentDateAndTime.plusYears(1).toDate())
-        .build();
+                .customerNumber(customerNumber)
+                .customerName(customerName)
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .agreementStartDate(currentDateAndTime.toDate())
+                .agreementEndDate(currentDateAndTime.plusYears(1).toDate())
+                .build();
 
-        service.save(salesOffice, customerNumber, customerTerms);
+        service.save(salesOffice, customerNumber, customerName, customerTerms);
 
         Thread.sleep(2000L);
 
@@ -73,7 +77,7 @@ public class CustomerTermsServiceImplTest {
                 .agreementEndDate(null)
                 .build();
 
-        service.save(salesOffice, customerNumber, customerTerms);
+        service.save(salesOffice, customerNumber, customerName, customerTerms);
 
         CustomerTerms actual = service.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(customerNumber, salesOffice, salesOrg);
 
@@ -83,6 +87,7 @@ public class CustomerTermsServiceImplTest {
     @Test
     public void shouldOnlyGetLastActiveCustomerTermsForCustomer() {
         String customerNumber = "295843";
+        String customerName = "Test";
         String salesOffice = "100";
         String salesOrg = "100";
 
@@ -91,18 +96,21 @@ public class CustomerTermsServiceImplTest {
         List<CustomerTerms> customerTerms = List.of(
                 CustomerTerms.builder()
                         .customerNumber(customerNumber)
+                        .customerName(customerName)
                         .salesOrg(salesOrg)
                         .salesOffice(salesOffice)
                         .agreementStartDate(localDateTime.minusYears(2).toDate())
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(customerNumber)
+                        .customerName(customerName)
                         .salesOrg(salesOrg)
                         .salesOffice(salesOffice)
                         .agreementStartDate(localDateTime.minusYears(1).toDate())
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(customerNumber)
+                        .customerName(customerName)
                         .salesOrg(salesOrg)
                         .salesOffice(salesOffice)
                         .comment("This one should be returned")
@@ -111,7 +119,7 @@ public class CustomerTermsServiceImplTest {
         );
 
         for(CustomerTerms customerTerm : customerTerms) {
-            service.save(salesOffice, customerNumber, customerTerm);
+            service.save(salesOffice, customerNumber, customerName, customerTerm);
         }
 
         CustomerTerms actual = service.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(customerNumber, salesOffice, salesOrg);

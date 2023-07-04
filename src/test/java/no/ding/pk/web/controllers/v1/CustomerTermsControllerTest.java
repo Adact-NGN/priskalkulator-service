@@ -51,12 +51,13 @@ class CustomerTermsControllerTest {
     public void shouldGetAllCustomerTerms() {
         String salesOffice = "100";
         String customerNumber = "326380";
+        String customerName = "Veidekke Ulven B4 PN 36547";
         CustomerTerms customerTerms = CustomerTerms.builder()
                 .number(2)
                 .level("Kundenivå")
                 .source("PK")
                 .salesOffice(salesOffice)
-                .customerName("Veidekke Ulven B4 PN 36547")
+                .customerName(customerName)
                 .customerNumber(customerNumber)
                 .specialConditionAction("Fastpris")
                 .contractTerm("NG prisvilkår")
@@ -69,7 +70,7 @@ class CustomerTermsControllerTest {
                 .year(2022)
                 .build();
 
-        service.save(salesOffice, customerNumber, customerTerms);
+        service.save(salesOffice, customerNumber, customerName, customerTerms);
 
         ResponseEntity<CustomerTermsDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/terms/customer/list", CustomerTermsDTO[].class);
 
@@ -83,12 +84,13 @@ class CustomerTermsControllerTest {
     public void shouldGetAllCustomerTermsForSpecificCustomer() {
         String salesOffice = "100";
         String customerNumber = "326380";
+        String customerName = "Veidekke Ulven B4 PN 36547";
         CustomerTerms customerTerms = CustomerTerms.builder()
                 .number(2)
                 .level("Kundenivå")
                 .source("PK")
                 .salesOffice(salesOffice)
-                .customerName("Veidekke Ulven B4 PN 36547")
+                .customerName(customerName)
                 .customerNumber(customerNumber)
                 .specialConditionAction("Fastpris")
                 .contractTerm("NG prisvilkår")
@@ -101,16 +103,17 @@ class CustomerTermsControllerTest {
                 .year(2022)
                 .build();
 
-        service.save(salesOffice, customerNumber, customerTerms);
+        service.save(salesOffice, customerNumber, customerName, customerTerms);
 
         CustomerTerms secondCustomerTerms = CustomerTerms.builder()
                 .salesOrg("100")
                 .salesOffice("104")
                 .customerNumber("12345678")
+                .customerName("Test")
                 .agreementStartDate(new Date())
                 .build();
 
-        service.save("104", "12345678", secondCustomerTerms);
+        service.save("104", "12345678", "Test", secondCustomerTerms);
 
         Map<String, String> params = Map.of("salesOffice", salesOffice, "customerNumber", customerNumber);
 
@@ -123,13 +126,16 @@ class CustomerTermsControllerTest {
     @Test
     public void shouldListAllActiveCustomerTerms() {
         String firstCustomerNumber = "12345678";
+        String firstCustomerName = "C1";
         String secondCustomerNumber = "87654321";
+        String secondCustomerName = "C2";
 
         LocalDateTime localDateTime = new LocalDateTime();
 
         List<CustomerTerms> customerTerms = List.of(
                 CustomerTerms.builder()
                         .customerNumber(firstCustomerNumber)
+                        .customerName(firstCustomerName)
                         .salesOffice("100")
                         .salesOrg("100")
                         .agreementStartDate(localDateTime.minusYears(2).toDate())
@@ -137,12 +143,14 @@ class CustomerTermsControllerTest {
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(firstCustomerNumber)
+                        .customerName(firstCustomerName)
                         .salesOffice("100")
                         .salesOrg("100")
                         .agreementStartDate(new Date())
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(secondCustomerNumber)
+                        .customerName(secondCustomerName)
                         .salesOffice("104")
                         .salesOrg("100")
                         .agreementStartDate(localDateTime.minusYears(2).toDate())
@@ -150,13 +158,14 @@ class CustomerTermsControllerTest {
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(secondCustomerNumber)
+                        .customerName(secondCustomerName)
                         .salesOffice("104")
                         .salesOrg("100")
                         .agreementStartDate(new Date())
                         .build());
 
         for(CustomerTerms ct: customerTerms) {
-            service.save(ct.getSalesOffice(), ct.getCustomerNumber(), ct);
+            service.save(ct.getSalesOffice(), ct.getCustomerNumber(), ct.getCustomerName(), ct);
         }
 
         ResponseEntity<CustomerTermsDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/terms/customer/list/active",
@@ -168,13 +177,16 @@ class CustomerTermsControllerTest {
     @Test
     public void shouldListAllActiveCustomerTermsFilteredByCustomerAndCustomerNumber() {
         String firstCustomerNumber = "12345678";
+        String firstCustomerName = "C1";
         String secondCustomerNumber = "87654321";
+        String secondCustomerName = "C2";
 
         LocalDateTime localDateTime = new LocalDateTime();
 
         List<CustomerTerms> customerTerms = List.of(
                 CustomerTerms.builder()
                         .customerNumber(firstCustomerNumber)
+                        .customerName(firstCustomerName)
                         .salesOffice("100")
                         .salesOrg("100")
                         .agreementStartDate(localDateTime.minusYears(2).toDate())
@@ -182,12 +194,14 @@ class CustomerTermsControllerTest {
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(firstCustomerNumber)
+                        .customerName(firstCustomerName)
                         .salesOffice("100")
                         .salesOrg("100")
                         .agreementStartDate(new Date())
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(secondCustomerNumber)
+                        .customerName(secondCustomerName)
                         .salesOffice("104")
                         .salesOrg("100")
                         .agreementStartDate(localDateTime.minusYears(2).toDate())
@@ -195,13 +209,14 @@ class CustomerTermsControllerTest {
                         .build(),
                 CustomerTerms.builder()
                         .customerNumber(secondCustomerNumber)
+                        .customerName(secondCustomerName)
                         .salesOffice("104")
                         .salesOrg("100")
                         .agreementStartDate(new Date())
                         .build());
 
         for(CustomerTerms ct: customerTerms) {
-            service.save(ct.getSalesOffice(), ct.getCustomerNumber(), ct);
+            service.save(ct.getSalesOffice(), ct.getCustomerNumber(), ct.getCustomerName(), ct);
         }
 
         Map<String, String> params = Map.of("salesOffice", "100", "customerNumber", firstCustomerNumber);
