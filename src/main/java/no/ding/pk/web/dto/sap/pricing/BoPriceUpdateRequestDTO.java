@@ -22,5 +22,5 @@ public class BoPriceUpdateRequestDTO {
     @JsonProperty("ConditionQuantityUnit")
     private String conditionQuantityUnit; // Enhet fra materialobjektet
     @JsonProperty("to_SlsPrcgCndnRecdValidity")
-    private List<SlsPrcgCndnRecdValidityDTO> to_SlsPrcgCndnRecdValidity;
+    private List<ConditionRecordValidityDTO> to_SlsPrcgCndnRecdValidity;
 }
