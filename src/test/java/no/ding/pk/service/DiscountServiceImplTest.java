@@ -28,6 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
@@ -150,6 +151,17 @@ public class DiscountServiceImplTest {
         List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0), null);
 
         assertThat(actual.size(), greaterThanOrEqualTo(5));
+    }
+
+    @Test
+    public void shouldFindAllDiscountsInListForSalesOrgAndSalesOffice() {
+        addMissingDiscounts();
+
+        List<String> materialNumbers = List.of("113103");
+        List<Discount> actual = service.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", materialNumbers);
+
+        assertThat(actual, hasSize(greaterThan(0)));
+
     }
 
     private void addMissingDiscounts() {

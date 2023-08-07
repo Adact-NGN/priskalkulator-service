@@ -205,13 +205,17 @@ public class PriceRowServiceImpl implements PriceRowService {
     }
 
     private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+        if(discountMap == null || discountMap.isEmpty()) {
+            log.debug("No discount map provided for material: {}", entity.getMaterial().getMaterialNumber());
+            return;
+        }
         if(entity.getDiscountedPrice() == null) {
             if(entity.getDiscountLevel() != null) {
                 Discount discount = discountMap.get(salesOrg).get(salesOffice).get(entity.getMaterial().getMaterialNumber());
 
                 if(discount != null && !discount.getDiscountLevels().isEmpty()) {
                     DiscountLevel dl = discount.getDiscountLevels().get(entity.getDiscountLevel());
-                    log.debug("Getting discount for material {}, with discount level {}");
+                    log.debug("Getting discount for material {}, with discount level {}", entity.getMaterial().getMaterialNumber(), entity.getDiscountLevel());
 
                     if(dl.getDiscount() < 0.0) {
                         entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
