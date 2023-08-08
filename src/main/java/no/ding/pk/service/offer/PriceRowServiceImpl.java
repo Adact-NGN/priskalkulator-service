@@ -103,8 +103,6 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
         entity.setManualPrice(materialPriceRow.getManualPrice());
 
-        calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
-
         entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
         entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
         entity.setStandardPrice(materialPriceRow.getStandardPrice());
@@ -151,6 +149,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                         persistedMaterial.setMaterialStandardPrice(stdPrice);
                         persistedMaterial.setPricingUnit(stdPrice.getPricingUnit());
                         persistedMaterial.setQuantumUnit(stdPrice.getQuantumUnit());
+
+                        materialPriceRow.setStandardPrice(stdPrice.getStandardPrice());
                     }
 
                     persistedMaterial = materialService.save(persistedMaterial);
@@ -170,6 +170,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                             if(stdPrice != null) {
                                 fromSap.setQuantumUnit(stdPrice.getQuantumUnit());
                                 fromSap.setPricingUnit(stdPrice.getPricingUnit());
+
+                                materialPriceRow.setStandardPrice(stdPrice.getStandardPrice());
                             }
                         }
 
@@ -189,6 +191,8 @@ public class PriceRowServiceImpl implements PriceRowService {
             }
 
         }
+
+        calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
 
         if(materialPriceRow.hasCombinedMaterials()) {
             List<PriceRow> combinedMaterialPriceRows = new ArrayList<>();

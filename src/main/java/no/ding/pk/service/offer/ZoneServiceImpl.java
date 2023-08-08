@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import no.ding.pk.domain.Discount;
+import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,39 +24,40 @@ public class ZoneServiceImpl implements ZoneService {
 
     private final ZoneRepository repository;
     private final PriceRowService priceRowService;
+    private final DiscountService discountService;
 
     @Autowired
-    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService) {
+    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService, DiscountService discountService) {
         this.repository = repository;
         this.priceRowService = priceRowService;
+        this.discountService = discountService;
     }
 
     @Override
     public List<Zone> saveAll(List<Zone> zoneList, String salesOrg, String salesOffice) {
         List<Zone> returnZoneList = new ArrayList<>();
 
-        Map<String, Map<String, Set<String>>> discountMap = createDiscountMapForZones(zoneList, salesOrg, salesOffice);
+        Map<String, Map<String, Map<String, Discount>>> discountMap = createDiscountMapForZones(zoneList, salesOrg, salesOffice);
 
-        for(int i = 0; i < zoneList.size(); i++) {
-            Zone zone = zoneList.get(i);
+        for (Zone zone : zoneList) {
             log.debug("Zone {}", zone);
 
-           Zone entity = new Zone();
+            Zone entity = new Zone();
 
-           if(zone.getId() != null) {
-               Optional<Zone> optZone = repository.findById(zone.getId());
+            if (zone.getId() != null) {
+                Optional<Zone> optZone = repository.findById(zone.getId());
 
-               if(optZone.isPresent()) {
-                   entity = optZone.get();
-               }
-           }
+                if (optZone.isPresent()) {
+                    entity = optZone.get();
+                }
+            }
 
-           entity.setZoneId(zone.getZoneId());
-           entity.setPostalCode(zone.getPostalCode());
-           entity.setPostalName(zone.getPostalName());
-           entity.setIsStandardZone(zone.getIsStandardZone());
+            entity.setZoneId(zone.getZoneId());
+            entity.setPostalCode(zone.getPostalCode());
+            entity.setPostalName(zone.getPostalName());
+            entity.setIsStandardZone(zone.getIsStandardZone());
 
-            if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
+            if (zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
 
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, discountMap); // TODO: Fix this.
 
@@ -70,8 +73,8 @@ public class ZoneServiceImpl implements ZoneService {
         return returnZoneList;
     }
 
-    private Map<String, Map<String, Set<String>>> createDiscountMapForZones(List<Zone> zoneList, String salesOrg, String salesOffice) {
-        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
+    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForZones(List<Zone> zoneList, String salesOrg, String salesOffice) {
+        Map<String, Map<String, Set<String>>> salesOrgSalesOfficeMaterialSet = new HashMap<>();
 
         // Collect all Material numbers in each price row lists.
         Set<String> materialNumberSet = getMaterialNumberSet(zoneList);
@@ -81,9 +84,27 @@ public class ZoneServiceImpl implements ZoneService {
         salesOfficeMaterialMap.put(salesOffice, materialNumberSet);
 
         // Add map to sales org map, sales office, material number map.
-        discountMap.put(salesOrg, salesOfficeMaterialMap);
+        salesOrgSalesOfficeMaterialSet.put(salesOrg, salesOfficeMaterialMap);
 
-        return discountMap;
+        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
+
+        orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
+
+        Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
+        Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
+        List<String> materialNumbers = salesOrgSalesOfficeMaterialSet.get(salesOrg).get(salesOffice).stream().toList();
+
+        List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+
+        if(discounts != null && !discounts.isEmpty()) {
+            discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
+        }
+
+        salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
+
+        orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
+
+        return orgOfficeMaterialDiscount;
     }
 
     private Set<String> getMaterialNumberSet(List<Zone> zoneList) {

@@ -166,6 +166,7 @@ class PriceOfferServiceImplTest {
                 .discountLevelPrice(56.0)
                 .amount(1)
                 .priceIncMva(2448.0)
+                .standardPrice(2456.0)
                 .material(residualWasteMaterial)
                 .build();
         List<PriceRow> materialList = List.of(priceRow);
@@ -191,6 +192,7 @@ class PriceOfferServiceImplTest {
                 .discountLevelPrice(100.0)
                 .amount(1)
                 .priceIncMva(1125.0)
+                .standardPrice(1131.0)
                 .material(zoneMaterial)
                 .build();
         List<PriceRow> zoneMaterialList = List.of(zonePriceRow);
@@ -575,8 +577,15 @@ class PriceOfferServiceImplTest {
 
     @Test
     public void shouldListAllPriceOfferForApprover() {
+
         User user = userService.findByEmail("alexander.brox@ngn.no");
+        List<SalesOffice> salesOfficeList = List.of(SalesOffice
+                .builder()
+                .salesOffice("100")
+                .materialList(List.of())
+                .build());
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesOfficeList(salesOfficeList)
                 .salesEmployee(user)
                 .approver(user)
                 .build();
@@ -591,8 +600,14 @@ class PriceOfferServiceImplTest {
     @Test
     public void shouldListAllPriceOfferForApproverWithStatusPending() {
         User user = userService.findByEmail("alexander.brox@ngn.no");
+        List<SalesOffice> salesOfficeList = List.of(SalesOffice
+                .builder()
+                .salesOffice("100")
+                .materialList(List.of())
+                .build());
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .salesEmployee(user)
+                .salesOfficeList(salesOfficeList)
                 .approver(user)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
