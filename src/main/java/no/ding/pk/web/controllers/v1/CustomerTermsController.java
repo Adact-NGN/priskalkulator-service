@@ -4,19 +4,14 @@ import no.ding.pk.domain.offer.CustomerTerms;
 import no.ding.pk.service.offer.CustomerTermsService;
 import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
+import no.ding.pk.web.handlers.MissingAgreementStartDateException;
 import no.ding.pk.web.handlers.SalesOfficeNotProvidedException;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,11 +34,28 @@ public class CustomerTermsController {
 
     /**
      * Get list of {@code CustomerTerms}
+     * @param salesOffice Sales office to filter for, { {@code @required}  false } .
+     * @param customerNumber customer number to filter for, { {@code @required}  false } .
      * @return List of {@code CustomerTermsDTO}
      */
     @GetMapping("/list")
-    public List<CustomerTermsDTO> list() {
-        List<CustomerTerms> customerTermsList = service.findAll();
+    public List<CustomerTermsDTO> list(@RequestParam(name = "salesOffice", required = false) String salesOffice,
+                                       @RequestParam(name = "customerNumber", required = false) String customerNumber) {
+        List<CustomerTerms> customerTermsList = service.findAll(salesOffice, customerNumber);
+
+        return customerTermsList.stream().map(customerTerms -> modelMapper.map(customerTerms, CustomerTermsDTO.class)).collect(Collectors.toList());
+    }
+
+    /**
+     * Get list of all active {@code CustomerTerms}
+     * @param salesOffice Sales Office to filter for
+     * @param customerNumber Customer number to filter for
+     * @return List of {@code CustomerTermsDTO}
+     */
+    @GetMapping("/list/active")
+    public List<CustomerTermsDTO> listAllActive(@RequestParam(name = "salesOffice", required = false) String salesOffice,
+                                                @RequestParam(name = "customerNumber", required = false) String customerNumber) {
+        List<CustomerTerms> customerTermsList = service.findAllActive(salesOffice, customerNumber);
 
         return customerTermsList.stream().map(customerTerms -> modelMapper.map(customerTerms, CustomerTermsDTO.class)).collect(Collectors.toList());
     }
@@ -59,13 +71,13 @@ public class CustomerTermsController {
         log.debug("Received CustomerTerms: {}", customerTermsDTO);
 
         if(customerTermsDTO.getSalesOffice() == null) throw new SalesOfficeNotProvidedException();
-        if(customerTermsDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
+        if(customerTermsDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException("Customer number is missing");
+        if(customerTermsDTO.getCustomerName() == null) throw new CustomerNotProvidedException("Customer name is missing");
+        if(customerTermsDTO.getAgreementStartDate() == null) throw new MissingAgreementStartDateException();
 
         CustomerTerms customerTerms = modelMapper.map(customerTermsDTO, CustomerTerms.class);
 
-        CustomerTerms activeCustomerTerms = service.findActiveTermsForCustomerForSalesOfficeAndSalesOrg(customerTerms.getCustomerNumber(), customerTerms.getSalesOffice(), customerTerms.getSalesOrg());
-
-        customerTerms = service.save(customerTerms.getSalesOffice(), customerTerms.getCustomerNumber(), customerTerms);
+        customerTerms = service.save(customerTerms);
 
         return modelMapper.map(customerTerms, CustomerTermsDTO.class);
     }

@@ -2,9 +2,9 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.ding.pk.config.DiscountServiceConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
+import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,8 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,17 +29,19 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
 @Disabled("Need to isolate the scope")
-@ActiveProfiles({"test"})
-@SpringJUnitConfig({DiscountServiceConfig.class})
+@SpringBootTest
+@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
+@TestPropertySource("/h2-db.properties")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class DiscountServiceImplTest {
 
     @Autowired
@@ -79,6 +85,7 @@ public class DiscountServiceImplTest {
     public void shouldSaveDiscountObjectWithDiscountLevels() {
         Discount expected = Discount.builder()
                 .salesOrg("100")
+                .salesOffice("100")
                 .materialNumber("Test")
                 .materialDesignation("Test")
                 .standardPrice(1234.0)
@@ -91,8 +98,9 @@ public class DiscountServiceImplTest {
 
     @Test
     public void shouldBeAbleToAddDiscountLevelToDiscountWithMissingCalculatedDiscountAndPctSet() {
-        Discount expected = Discount.defaultBuilder()
+        Discount expected = Discount.builder()
                 .salesOrg("100")
+                .salesOffice("100")
                 .materialNumber("Test2")
                 .materialDesignation("Test2")
                 .standardPrice(1234.0)
@@ -152,7 +160,18 @@ public class DiscountServiceImplTest {
         assertThat(actual.size(), greaterThanOrEqualTo(5));
     }
 
-    private void addMissingDiscounts() {
+    @Test
+    public void shouldFindAllDiscountsInListForSalesOrgAndSalesOffice() {
+        addMissingDiscounts();
+
+        List<String> materialNumbers = List.of("113103");
+        List<Discount> actual = service.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", materialNumbers);
+
+        assertThat(actual, hasSize(1));
+
+    }
+
+    protected void addMissingDiscounts() {
         List<String> toPersist = service.findAll().stream().map(Discount::getMaterialNumber).collect(Collectors.toList());
 
         List<Discount> discounts = testData.stream().filter(discount -> !toPersist.contains(discount.getMaterialNumber())).collect(Collectors.toList());

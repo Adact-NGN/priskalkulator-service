@@ -8,24 +8,25 @@ import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialPriceService;
+import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
+import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.test.context.TestExecutionListeners;
@@ -41,10 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -135,20 +133,48 @@ class PriceOfferControllerTest {
     @Test
     public void shouldPersistPriceOffer() throws Exception {
         setup();
-        PriceOfferDTO priceOffer = createCompleteOfferDto();
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
 
         String createUrl = "/api/v2/price-offer/create";
         ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
 
-//        MvcResult result = mockMvc.perform(
-//                post(createUrl).contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectWriter.writeValueAsString(priceOffer))
-//                        .with(jwt()
-//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andReturn();
         assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+    }
+
+    @Test
+    public void shouldActivatePriceOffer() throws IOException {
+        setup();
+
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> createdPriceOffer = restTemplate.postForEntity(createUrl, priceOffer, PriceOfferDTO.class);
+
+        assertThat(createdPriceOffer.getStatusCode(), is(HttpStatus.OK));
+        assertThat(createdPriceOffer, notNullValue());
+
+        TermsDTO customerTerms = createdPriceOffer.getBody().getCustomerTerms();
+        customerTerms.setMetalPricing("Fastpris (opp til kr -500,- pr. tonn)");
+        customerTerms.setMetalSetDateForOffer(new Date());
+        customerTerms.setPaymentCondition("15 dgr");
+        customerTerms.setInvoiceInterval("Hver 14.dag");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<TermsDTO> request = new HttpEntity<>(customerTerms, headers);
+
+        String activateOfferUrl = "/api/v2/price-offer/activate/" + createdPriceOffer.getBody().getSalesEmployee().getId() + "/" + createdPriceOffer.getBody().getId();
+        ResponseEntity<Boolean> actual = restTemplate.exchange(activateOfferUrl, HttpMethod.PUT, request, Boolean.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+        assertThat(actual.getBody(), is(true));
+
+        ResponseEntity<CustomerTermsDTO[]> activeCustomerTerms = restTemplate.getForEntity("/api/v1/terms/customer/list/active?salesOffice={salesOffice}&customerNumber={customerNumber}", CustomerTermsDTO[].class,
+                Map.of("salesOffice", createdPriceOffer.getBody().getSalesOfficeList().get(0).getSalesOffice(), "customerNumber", createdPriceOffer.getBody().getCustomerNumber()));
+
+        assertThat(activeCustomerTerms.getStatusCode(), is(HttpStatus.OK));
+        assertThat(activeCustomerTerms.getBody(), arrayWithSize(1));
     }
 
     @Test
@@ -167,7 +193,7 @@ class PriceOfferControllerTest {
     @Test
     public void shouldListAllPriceOfferForApprover() throws Exception {
 
-        PriceOfferDTO priceOffer = createCompleteOfferDto();
+        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
         UserDTO approverDto = modelMapper.map(approver, UserDTO.class);
         priceOffer.setApprover(approverDto);
 
@@ -317,14 +343,6 @@ class PriceOfferControllerTest {
         // Create
         String createUrl = "/api/v2/price-offer/create";
         ResponseEntity<PriceOfferDTO> result = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
-//        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectWriter.writeValueAsString(priceOfferDTO))
-//                        .with(jwt()
-//                                .authorities(List.of(new SimpleGrantedAuthority("admin"), new SimpleGrantedAuthority("ROLE_AUTHORIZED_PERSONNEL")))
-//                                .jwt(jwt -> jwt.claim(StandardClaimNames.PREFERRED_USERNAME, "ch4mpy"))
-//                        ))
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andReturn();
 
         priceOfferDTO = result.getBody();
 
@@ -334,6 +352,24 @@ class PriceOfferControllerTest {
 
         assertThat(priceOfferListDTOS, arrayWithSize(greaterThan(0)));
         assertThat(priceOfferListDTOS[0].getSalesEmployee().getFullName(), is(priceOfferDTO.getSalesEmployee().getFullName()));
+    }
+
+    @Test
+    public void shouldPersistPriceOfferWithDeviceType() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithDeviceType.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO actualPo = actual.getBody();
+
+        assertThat(actualPo, notNullValue());
+        Set<String> deviceTypes = new HashSet<>();
+        actualPo.getSalesOfficeList().forEach(salesOfficeDTO -> salesOfficeDTO.getMaterialList().forEach(priceRowDTO -> deviceTypes.add(priceRowDTO.getDeviceType())));
+
+        assertThat(deviceTypes.size(), greaterThan(1));
     }
 
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {
@@ -381,10 +417,15 @@ class PriceOfferControllerTest {
         return returnList;
     }
 
-    private PriceOfferDTO createCompleteOfferDto() throws IOException {
+    private PriceOfferDTO createCompleteOfferDto(String filename) throws IOException {
+        String inputFileName = filename;
+        if (StringUtils.isBlank(filename)) {
+            inputFileName = "priceOfferWithZoneAndDiscount_V2.json";
+        }
+
         ClassLoader classLoader = getClass().getClassLoader();
 
-        File file = new File(Objects.requireNonNull(classLoader.getResource("priceOfferWithZoneAndDiscount_V2.json")).getFile());
+        File file = new File(Objects.requireNonNull(classLoader.getResource(inputFileName)).getFile());
 
         assertThat(file.exists(), is(true));
 

@@ -1,6 +1,7 @@
 [
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "113103",
         "materialDesignation": "Hageavfall, trær og røtter",
         "standardPrice": 1573.5,
@@ -40,6 +41,7 @@
     },
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "113104",
         "materialDesignation": "Hageavfall, kvernet",
         "standardPrice": 1194.5,
@@ -79,6 +81,7 @@
     },
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "113104",
         "materialDesignation": "Hageavfall, kvernet",
         "standardPrice": 1194.5,
@@ -118,6 +121,7 @@
     },
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "C-05L-L",
         "zone": null,
         "deviceType": null,
@@ -155,6 +159,7 @@
     },
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "C-06L",
         "zone": null,
         "deviceType": null,
@@ -193,6 +198,7 @@
     },
     {
         "salesOrg": "100",
+        "salesOffice": "100",
         "materialNumber": "C-08L",
         "zone": null,
         "deviceType": null,

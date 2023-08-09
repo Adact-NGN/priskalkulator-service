@@ -1,5 +1,6 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Transactional
@@ -28,24 +30,20 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
     
     private final ZoneService zoneService;
 
-    private final CustomerTermsService customerTermsService;
-
-    private final PriceOfferTermsService priceOfferTermsService;
-
     private final StandardPriceService standardPriceService;
-    
+
     @Autowired
-    public SalesOfficeServiceImpl(SalesOfficeRepository repository, PriceRowService priceRowService, ZoneService zoneService, CustomerTermsService customerTermsService, PriceOfferTermsService priceOfferTermsService, StandardPriceService standardPriceService) {
+    public SalesOfficeServiceImpl(SalesOfficeRepository repository, PriceRowService priceRowService,
+                                  ZoneService zoneService,
+                                  StandardPriceService standardPriceService) {
         this.repository = repository;
         this.priceRowService = priceRowService;
         this.zoneService = zoneService;
-        this.customerTermsService = customerTermsService;
-        this.priceOfferTermsService = priceOfferTermsService;
         this.standardPriceService = standardPriceService;
     }
     
     @Override
-    public List<SalesOffice> saveAll(List<SalesOffice> salesOfficeList, String customerNumber) {
+    public List<SalesOffice> saveAll(List<SalesOffice> salesOfficeList, String customerNumber, Map<String, Map<String, Map<String, Discount>>> discountMap) {
         List<SalesOffice> returnList = new ArrayList<>();
         if(salesOfficeList != null && salesOfficeList.size() > 0) {
             for (SalesOffice salesOffice : salesOfficeList) {
@@ -74,8 +72,8 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
 
                 if (salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
                     log.debug("Adding Sales office material list");
-                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
-
+                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    
                     entity.setMaterialList(materialList);
 
                     log.debug("Finished adding Sales office material list");
@@ -83,16 +81,16 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
 
                 if (salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
                     log.debug("Adding transport service material list");
-                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
-
+                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    
                     entity.setTransportServiceList(transportServiceMaterialList);
                     log.debug("Finished adding transport materials");
                 }
 
                 if (salesOffice.getRentalList() != null && salesOffice.getRentalList().size() > 0) {
                     log.debug("Adding rental service material list");
-                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
-
+                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    
                     entity.setRentalList(rentalMaterialList);
                     log.debug("Finished adding rental materials");
                 }
