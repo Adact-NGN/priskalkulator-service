@@ -71,8 +71,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         PriceOffer entity = getPriceOffer(newPriceOffer, salesEmployee);
 
-        entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         if(newPriceOffer.getCustomerName() != null) {
             entity.setCustomerName(newPriceOffer.getCustomerName());
@@ -99,18 +97,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
         if(!materialsForApproval.isEmpty()) {
-            StringBuilder materialNumbersForApproval = new StringBuilder();
-            for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
-                String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+            entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+            String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
-                if(materialNumbersForApproval.length() > 0) {
-                    materialNumbersForApproval.append(",").append(materials);
-                } else {
-                    materialNumbersForApproval = new StringBuilder(materials);
-                }
-            }
-
-            entity.setMaterialsForApproval(materialNumbersForApproval.toString());
+            entity.setMaterialsForApproval(materialNumbersForApproval);
 
             User approver = getApproverForOffer(materialsForApproval);
 
@@ -119,6 +109,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             } else {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
             }
+        } else {
+            log.debug("No materials needs to be approved, set price offer as APPROVED.");
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
         if(newPriceOffer.getApprover() != null) {
@@ -137,6 +130,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return repository.save(entity);
+    }
+
+    private static String flattenMaterialNumbersMapToCommaseparatedListString(Map<String, List<PriceRow>> materialsForApproval) {
+        StringBuilder materialNumbersForApproval = new StringBuilder();
+        for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
+            String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
+
+            if(materialNumbersForApproval.length() > 0) {
+                materialNumbersForApproval.append(",").append(materials);
+            } else {
+                materialNumbersForApproval = new StringBuilder(materials);
+            }
+        }
+        return materialNumbersForApproval.toString();
     }
 
     private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
@@ -441,8 +448,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             newCustomerTerms.setLastModifiedBy(null);
             newCustomerTerms.setLastModifiedDate(null);
 
-            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), newCustomerTerms);
+            customerTermsService.save(salesOffice.getSalesOffice(), priceOfferToActivate.getCustomerNumber(), priceOfferToActivate.getCustomerName(), newCustomerTerms);
         }
+
+        log.debug("Activated new terms for sales offices in list: {}", priceOfferToActivate.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
 
         return true;
     }
@@ -454,7 +463,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(currentActiveCustomerTerms != null) {
             currentActiveCustomerTerms.setAgreementEndDate(new Date());
 
-            customerTermsService.save(salesOffice.getSalesOffice(), salesOffice.getCustomerNumber(), currentActiveCustomerTerms);
+            customerTermsService.save(salesOffice.getSalesOffice(), priceOfferToActivate.getCustomerNumber(), priceOfferToActivate.getCustomerName(), currentActiveCustomerTerms);
         }
     }
 
@@ -464,7 +473,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
-        // Exception thrown here
         List<String> materialsToApprove = convertMaterialsStringToList(priceOfferToApprove);
         List<String> approvedMaterials = new ArrayList<>();
 
@@ -500,6 +508,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(pr.getMaterial() == null) {
                 continue;
             }
+
             if(materialsToApprove.contains(pr.getMaterial().getMaterialNumber())) {
                 if(pr.getNeedsApproval() && !pr.isApproved()) {
                     pr.setApproved(isApproved);

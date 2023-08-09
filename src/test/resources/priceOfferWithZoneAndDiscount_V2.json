@@ -16,7 +16,14 @@
           "priceLevelPrice": 0.1,
           "standardPrice": 1199,
           "priceIncMva": -1,
-          "discountLevel": 2
+          "discountLevel": 2,
+          "needsApproval": true
+        },
+        {
+          "material": "50301",
+          "materialDesignation": "Flatvogn - Utsett",
+          "standardPrice": 13,
+          "deviceType": "B-0-S"
         },
         {
           "material": "111102",
@@ -52,6 +59,7 @@
           "standardPrice": 1684,
           "priceIncMva": -1
         }
+
       ],
       "zoneList": [
         {

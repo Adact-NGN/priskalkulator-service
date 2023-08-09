@@ -18,11 +18,15 @@ import java.io.Serializable;
         @NamedQuery(
                 name = "findMaterialByMaterialNumber",
                 query = "from Material m where m.materialNumber = :materialNumber"
+        ),
+        @NamedQuery(
+                name = "findMaterialByMaterialNumberAndDeviceType",
+                query = "from Material m where m.materialNumber = :materialNumber and m.deviceType = :deviceType"
         )
 })
 @JsonIgnoreProperties({"faMaterial"})
 @Entity
-@Table(name = "materials")
+@Table(name = "materials", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType"}))
 public class Material implements Serializable {
 
 	@Id
@@ -38,7 +42,7 @@ public class Material implements Serializable {
     @Column
     private String deviceType;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String materialNumber;
 
     @Column

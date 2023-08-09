@@ -12,4 +12,5 @@ public interface MaterialService {
     Optional<Material> findById(Long id);
     Material findByMaterialNumber(String materialNumber);
 
+    Material findByMaterialNumberAndDeviceType(String material, String deviceType);
 }

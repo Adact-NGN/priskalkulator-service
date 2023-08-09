@@ -99,17 +99,24 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumbers, String zones) {
-        List<String> materialNumberList = Arrays.asList(materialNumbers.split(","));
+    public List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zones) {
+        List<String> materialNumbers = cleanUpAndGetMaterialNumbersAsList(materialNumber);
+        log.debug("Materials to find discounts for: {}", materialNumbers);
 
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
             List <String> zoneList = Arrays.asList(zones.split(","));
-            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumberList);
+            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumberList))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+    }
+
+    private List<String> cleanUpAndGetMaterialNumbersAsList(String materialNumber) {
+        String[] materialNumberArray = materialNumber.split(",");
+
+        return Arrays.stream(materialNumberArray).distinct().toList();
     }
 
     @Override

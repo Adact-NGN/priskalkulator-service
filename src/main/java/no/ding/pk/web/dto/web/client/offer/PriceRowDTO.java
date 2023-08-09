@@ -1,6 +1,7 @@
 package no.ding.pk.web.dto.web.client.offer;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -49,4 +51,15 @@ public class PriceRowDTO {
     private String subCategoryDescription;
     private String classId;
     private String classDescription;
+
+    @JsonIgnore
+    public String getMaterialId() {
+        StringBuilder sb = new StringBuilder(material);
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            sb.append("_").append(deviceType);
+        }
+
+        return sb.toString();
+    }
 }

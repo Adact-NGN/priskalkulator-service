@@ -1,8 +1,10 @@
-name: Create minor version
+name: Validate develop
 
 on:
   pull_request:
     branches: [develop]
+    types:
+      - opened
 
 jobs:
   build:

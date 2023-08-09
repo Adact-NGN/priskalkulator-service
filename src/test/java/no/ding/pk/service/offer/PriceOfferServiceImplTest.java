@@ -418,7 +418,7 @@ class PriceOfferServiceImplTest {
                 .salesOffice("100")
                 .build();
 
-        customerTermsService.save("100", "169239", oldCustomerTerms);
+        customerTermsService.save(oldCustomerTerms.getSalesOffice(), oldCustomerTerms.getCustomerNumber(), oldCustomerTerms.getCustomerName(), oldCustomerTerms);
 
         Material ordinaryMaterial = createOrdinaryMaterial();
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
@@ -443,6 +443,8 @@ class PriceOfferServiceImplTest {
                 .build();
 
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerName("Monica")
+                .customerNumber("169239")
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice))
                 .needsApproval(true)
@@ -577,7 +579,6 @@ class PriceOfferServiceImplTest {
 
     @Test
     public void shouldListAllPriceOfferForApprover() {
-
         User user = userService.findByEmail("alexander.brox@ngn.no");
         List<SalesOffice> salesOfficeList = List.of(SalesOffice
                 .builder()
@@ -600,14 +601,27 @@ class PriceOfferServiceImplTest {
     @Test
     public void shouldListAllPriceOfferForApproverWithStatusPending() {
         User user = userService.findByEmail("alexander.brox@ngn.no");
-        List<SalesOffice> salesOfficeList = List.of(SalesOffice
-                .builder()
+        MaterialPrice materialPrice = MaterialPrice.builder()
+                .materialNumber("119901")
+                .standardPrice(1199.0)
+                .build();
+        Material material = Material.builder()
+                .materialNumber("119901")
+                .materialStandardPrice(materialPrice)
+                .build();
+
+        PriceRow priceRow = PriceRow.builder()
+                .material(material)
+                .discountLevel(7)
+                .needsApproval(true)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
-                .materialList(List.of())
-                .build());
+                .materialList(List.of(priceRow))
+                .build();
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .salesEmployee(user)
-                .salesOfficeList(salesOfficeList)
+                .salesOfficeList(List.of(salesOffice))
                 .approver(user)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();

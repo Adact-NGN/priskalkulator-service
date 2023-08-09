@@ -1,9 +1,14 @@
 name: Create minor version
 
 on:
-  pull_request_review:
+  pull_request:
+    branches:
+      - develop
     types:
-      - submitted
+      - closed
+#  pull_request_review:
+#    types:
+#      - submitted
 #  pull_request:
 #    branches:
 #      - develop
@@ -11,7 +16,7 @@ on:
 #      - closed
 
 jobs:
-  build:
+  if_merged:
     if: github.event.pull_request.merged == true
     name: Bump Minor Version
     runs-on: ubuntu-latest
@@ -89,13 +94,59 @@ jobs:
           git commit -am "$previous_version -> $new_version"
           git push
 
-      - name: Create release
+      - name: Create and push tag
         if: steps.commit_n_push.outcome == 'success'
-        uses: actions/create-release@v1
+        id: create_tag
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          git tag ${{ steps.increment_version.outputs.new_version }} -a -m "$previous_version -> $new_version"
+          git push origin ${{ steps.increment_version.outputs.new_version }}
+
+      - name: Create and push Release
+        if: steps.commit_n_push.create_tag == 'success'
+        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.increment_version.outputs.new_version }}
-          release_name: Release ${{ steps.increment_version.outputs.new_version }}
-          body: |
-            Created release ${{ steps.increment_version.outputs.new_version }}
+        run: |
+          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --release
+
+#      - name: Create Draft Release
+#        if: steps.commit_n_push.outcome == 'success'
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.increment_version.outputs.new_version }}
+#          release_name: ${{ steps.increment_version.outputs.new_version }}
+#          draft: true
+#          prerelease: false
+
+#      - uses: actions/upload-release-asset@v1.0.1
+#        if: steps.create_release.outcome == 'success'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: ./${{ steps.increment_version.outputs.new_version }}.zip
+#          asset_name: ${{ steps.increment_version.outputs.new_version }}.zip
+#          asset_content_type: application/zip
+
+#      - uses: eregon/publish-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          release_id: ${{ steps.create_release.outputs.id }}
+
+#      - name: Create release
+#        if: steps.commit_n_push.outcome == 'success'
+#        uses: avakar/tag-and-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.increment_version.outputs.new_version }}
+##          release_name: ${{ steps.increment_version.outputs.new_version }}
+#          body: |
+#            Created release ${{ steps.increment_version.outputs.new_version }}

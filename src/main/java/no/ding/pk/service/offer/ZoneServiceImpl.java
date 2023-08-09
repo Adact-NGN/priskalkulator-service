@@ -1,12 +1,19 @@
 package no.ding.pk.service.offer;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import no.ding.pk.domain.Discount;
 import no.ding.pk.service.DiscountService;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.service.sap.StandardPriceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +32,15 @@ public class ZoneServiceImpl implements ZoneService {
     private final ZoneRepository repository;
     private final PriceRowService priceRowService;
     private final DiscountService discountService;
+    private final StandardPriceService standardPriceService;
 
     @Autowired
-    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService, DiscountService discountService) {
+    public ZoneServiceImpl(ZoneRepository repository, PriceRowService priceRowService, DiscountService discountService,
+                           StandardPriceService standardPriceService) {
         this.repository = repository;
         this.priceRowService = priceRowService;
         this.discountService = discountService;
+        this.standardPriceService = standardPriceService;
     }
 
     @Override
@@ -57,14 +67,13 @@ public class ZoneServiceImpl implements ZoneService {
             entity.setPostalName(zone.getPostalName());
             entity.setIsStandardZone(zone.getIsStandardZone());
 
-            if (zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
+            List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOrg, salesOffice, zone.getZoneId());
 
-                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, discountMap); // TODO: Fix this.
+            if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, materialStdPrices, discountMap);
 
                 zone.setPriceRows(materials);
             }
-
-//            entity = repository.save(zone);
 
             returnZoneList.add(zone);
         }

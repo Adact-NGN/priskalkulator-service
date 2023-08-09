@@ -3,12 +3,12 @@ package no.ding.pk.web.controllers.v2;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceOfferTerms;
+import no.ding.pk.domain.offer.*;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
+import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RestController(value = "priceOfferControllerV2")
@@ -187,13 +188,84 @@ public class PriceOfferController {
         if(priceOfferDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
+
+//        mapMaterialValues(priceOfferDTO, priceOffer);
         
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         priceOffer = service.save(priceOffer);
         
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
-    
+
+    /**
+     * Adds missing fields for the {@code Material} object. The ModelMapper is unable to map all fields when converting from a string to an object.
+     * @param priceOfferDTO incoming price {@code PriceOfferDTO} offer to get missing values from
+     * @param priceOffer converted {@code PriceOffer} to update
+     */
+    private void mapMaterialValues(PriceOfferDTO priceOfferDTO, PriceOffer priceOffer) {
+        if(priceOfferDTO.getSalesOfficeList() == null) {
+            return;
+        }
+        priceOfferDTO.getSalesOfficeList().forEach(salesOfficeDTO -> {
+            SalesOffice salesOffice = priceOffer.getSalesOfficeList().stream().filter(so -> salesOfficeDTO.getSalesOffice().equals(so.getSalesOffice())).findAny().orElse(null);
+
+            if(salesOfficeDTO.getMaterialList() != null) {
+                salesOfficeDTO.getMaterialList().forEach(updateMaterialInPriceRowsIn(salesOffice));
+            }
+
+            if(salesOfficeDTO.getRentalList() != null) {
+                salesOfficeDTO.getRentalList().forEach(updateMaterialInPriceRowsIn(salesOffice));
+            }
+
+            if(salesOfficeDTO.getTransportServiceList() != null) {
+                salesOfficeDTO.getTransportServiceList().forEach(updateMaterialInPriceRowsIn(salesOffice));
+            }
+        });
+    }
+
+    private Consumer<PriceRowDTO> updateMaterialInPriceRowsIn(SalesOffice salesOffice) {
+        return priceRowDTO -> {
+            String materialNumber = priceRowDTO.getMaterial();
+
+            PriceRow priceRow = salesOffice.getMaterialList().stream().filter(pr -> materialNumber.equals(pr.getMaterial().getMaterialNumber())).findAny().orElse(null);
+
+            if (priceRow == null) {
+                return;
+            }
+            Material material = priceRow.getMaterial();
+
+            if (material != null) {
+                createMaterialFromPriceRowDTO(material, priceRowDTO);
+            }
+        };
+    }
+
+    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from) {
+        log.debug("To: {}, from: {}", to, from);
+        to.setDesignation(from.getDesignation());
+        to.setMaterialGroupDesignation(from.getProductGroupDesignation());
+        to.setMaterialTypeDescription(from.getMaterialDesignation());
+        to.setDeviceType(from.getDeviceType());
+        MaterialPrice materialStdPrice = MaterialPrice.builder()
+                .materialNumber(from.getMaterial())
+                .deviceType(from.getDeviceType())
+                .standardPrice(from.getStandardPrice())
+                .pricingUnit(from.getPricingUnit())
+                .quantumUnit(from.getQuantumUnit())
+                .build();
+        to.setMaterialStandardPrice(materialStdPrice);
+
+        to.setPricingUnit(from.getPricingUnit());
+        to.setQuantumUnit(from.getQuantumUnit());
+
+        to.setCategoryId(from.getCategoryId());
+        to.setCategoryDescription(from.getCategoryDescription());
+        to.setSubCategoryId(from.getSubCategoryId());
+        to.setSubCategoryDescription(from.getSubCategoryDescription());
+        to.setClassId(from.getClassId());
+        to.setClassDescription(from.getClassDescription());
+    }
+
     /**
      * Update price offer
      * @param id Price offer id
@@ -214,6 +286,8 @@ public class PriceOfferController {
         }
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
+
+//        mapMaterialValues(priceOfferDTO, updatedOffer);
         
         updatedOffer = service.save(updatedOffer);
 

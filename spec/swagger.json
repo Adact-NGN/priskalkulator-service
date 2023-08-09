@@ -1,0 +1,4005 @@
+{
+  "basePath": "/",
+  "paths": {
+    "/api/v1/sales-office-power-of-attorney/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT_3",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+          "in": "body",
+          "name": "sopoaDTO",
+          "description": "sopoaDTO",
+          "required": true
+        }
+      ],
+      "tags": ["sales-office-power-of-attorney-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v2/price-offer/activate/{approverId}/{priceOfferId}": {"put": {
+      "summary": "activatePriceOffer",
+      "produces": ["*/*"],
+      "operationId": "activatePriceOfferUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"type": "boolean"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "approverId",
+          "format": "int64",
+          "description": "approverId",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/TermsDTO"},
+          "in": "body",
+          "name": "customerTermsDTO",
+          "description": "customerTermsDTO",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "priceOfferId",
+          "format": "int64",
+          "description": "priceOfferId",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/sales-office-power-of-attorney/delete/{id}": {"delete": {
+      "summary": "delete",
+      "produces": ["application/json"],
+      "operationId": "deleteUsingDELETE_2",
+      "responses": {
+        "200": {
+          "schema": {"type": "boolean"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "204": {"description": "No Content"},
+        "403": {"description": "Forbidden"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["sales-office-power-of-attorney-controller"]
+    }},
+    "/api/v1/sales-office-power-of-attorney/list": {"get": {
+      "summary": "list",
+      "produces": ["application/json"],
+      "operationId": "listUsingGET_4",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["sales-office-power-of-attorney-controller"]
+    }},
+    "/api/v1/sales-office-power-of-attorney/office/{salesOfficeNumber}": {"get": {
+      "summary": "bySalesOfficeNumber",
+      "produces": ["*/*"],
+      "operationId": "bySalesOfficeNumberUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "salesOfficeNumber",
+        "format": "int32",
+        "description": "salesOfficeNumber",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["sales-office-power-of-attorney-controller"]
+    }},
+    "/api/v2/price-offer/list": {"get": {
+      "summary": "list",
+      "produces": ["application/json"],
+      "operationId": "listUsingGET_3",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/PriceOfferListDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "query",
+        "name": "statuses",
+        "description": "statuses",
+        "type": "string",
+        "required": false
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v2/price-offer/bo-report/ready": {"get": {
+      "summary": "getPriceOffersReadyForBoReport",
+      "produces": ["application/json"],
+      "operationId": "getPriceOffersReadyForBoReportUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/PriceOffer"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v1/sales-office-power-of-attorney/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST_3",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+        "in": "body",
+        "name": "sopa",
+        "description": "sopa",
+        "required": true
+      }],
+      "tags": ["sales-office-power-of-attorney-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/terms/customer/list": {"get": {
+      "summary": "list",
+      "produces": ["*/*"],
+      "operationId": "listUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerTermsDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "customerNumber",
+          "description": "customerNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["customer-terms-controller"]
+    }},
+    "/api/v2/price-offer/list/{salesEmployeeId}": {"get": {
+      "summary": "listBySalesEmployee",
+      "produces": ["application/json"],
+      "operationId": "listBySalesEmployeeUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/PriceOfferDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "salesEmployeeId",
+        "format": "int64",
+        "description": "salesEmployeeId",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v1/price-offer/delete/{id}": {"delete": {
+      "summary": "delete",
+      "produces": ["*/*"],
+      "operationId": "deleteUsingDELETE",
+      "responses": {
+        "200": {
+          "schema": {"type": "boolean"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "204": {"description": "No Content"},
+        "403": {"description": "Forbidden"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v1/users/email/{email}": {"get": {
+      "summary": "getUserByEmail",
+      "produces": ["application/json"],
+      "operationId": "getUserByEmailUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "email",
+        "description": "email",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/api/v1/users/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST_5",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/UserDTO"},
+        "in": "body",
+        "name": "userDTO",
+        "description": "userDTO",
+        "required": true
+      }],
+      "tags": ["user-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/standard-price/{salesorg}/{salesoffice}": {"get": {
+      "summary": "getStdPricesForSalesOfficeAndSalesOrg",
+      "produces": ["application/json"],
+      "operationId": "getStdPricesForSalesOfficeAndSalesOrgUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialStdPriceDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "salesoffice",
+          "description": "salesoffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesorg",
+          "description": "salesorg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["standard-price-controller"]
+    }},
+    "/api/v1/material/{salesOrg}/{material}": {"get": {
+      "summary": "getMaterialByMaterialNumber",
+      "produces": ["application/json"],
+      "operationId": "getMaterialByMaterialNumberUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/MaterialDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "material",
+          "description": "material",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["material-controller"]
+    }},
+    "/api/users/id/{id}": {"get": {
+      "summary": "getById",
+      "produces": ["application/json"],
+      "operationId": "getByIdUsingGET_2",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/api/v2/price-offer/approval/{approverId}/{priceOfferId}": {"put": {
+      "summary": "priceOfferApproval",
+      "produces": ["*/*"],
+      "operationId": "priceOfferApprovalUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"type": "boolean"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "schema": {"$ref": "#/definitions/ApprovalRequest"},
+          "in": "body",
+          "name": "approvalRequest",
+          "description": "approvalRequest",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "approverId",
+          "format": "int64",
+          "description": "approverId",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "priceOfferId",
+          "format": "int64",
+          "description": "priceOfferId",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/users/list": {"get": {
+      "summary": "list",
+      "produces": ["application/json"],
+      "operationId": "listUsingGET_6",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/UserDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["user-controller"]
+    }},
+    "/api/sales-role/list": {"get": {
+      "summary": "getSalesRoleList",
+      "produces": ["application/json"],
+      "operationId": "getSalesRoleListUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["sales-role-controller"]
+    }},
+    "/api/ad/users": {"get": {
+      "summary": "searchForUserByEmail",
+      "produces": ["application/json"],
+      "operationId": "searchForUserByEmailUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/UserDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "query",
+        "name": "email",
+        "description": "email",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["ad-user-controller"]
+    }},
+    "/api/v1/discount/list/{salesOrg}": {"get": {
+      "summary": "getAllDiscountsForSalesOrg",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsForSalesOrgUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "materialNumber",
+          "description": "materialNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["discount-controller"]
+    }},
+    "/api/discount/level": {"get": {
+      "summary": "getSpecificDiscountLevel",
+      "produces": ["application/json"],
+      "operationId": "getSpecificDiscountLevelUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/DiscountLevel"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "level",
+          "format": "int32",
+          "description": "level",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "materialNumber",
+          "description": "materialNumber",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["discount-level-controller"]
+    }},
+    "/api/v1/price-offer/list": {"get": {
+      "summary": "list",
+      "produces": ["application/json"],
+      "operationId": "listUsingGET_2",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/PriceOffer"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v1/sales-role": {"post": {
+      "summary": "saveSalesRole",
+      "produces": ["application/json"],
+      "operationId": "saveSalesRoleUsingPOST_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesRoleDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/SalesRole"},
+        "in": "body",
+        "name": "salesRole",
+        "description": "salesRole",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/salesorg/list": {"get": {
+      "summary": "getAll",
+      "produces": ["application/json"],
+      "operationId": "getAllUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesOrgDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/discount": {"post": {
+      "summary": "createDiscount",
+      "produces": ["application/json"],
+      "operationId": "createDiscountUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/Discount"},
+        "in": "body",
+        "name": "discount",
+        "description": "discount",
+        "required": true
+      }],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/salesorg": {"get": {
+      "summary": "findByRequestParams",
+      "produces": ["application/json"],
+      "operationId": "findByRequestParamsUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesOrgDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "city",
+          "description": "city",
+          "type": "string",
+          "required": false
+        },
+        {
+          "default": true,
+          "in": "query",
+          "name": "greedy",
+          "description": "greedy",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "postalCode",
+          "description": "postalCode",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesZone",
+          "description": "salesZone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "default": 0,
+          "in": "query",
+          "name": "skiptokens",
+          "format": "int32",
+          "description": "skiptokens",
+          "type": "integer",
+          "required": false
+        }
+      ],
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/v1/discount/in-list/{salesOrg}": {"get": {
+      "summary": "getAllDiscountsForSalesOrgAndMaterialNumbersInList",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsForSalesOrgAndMaterialNumbersInListUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "materialNumbers",
+          "description": "materialNumbers",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zones",
+          "description": "zones",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["discount-controller"]
+    }},
+    "/api/sales-role/user/{userId}": {"get": {
+      "summary": "getSalesRoleForUser",
+      "produces": ["application/json"],
+      "operationId": "getSalesRoleForUserUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "userId",
+        "format": "int64",
+        "description": "userId",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"]
+    }},
+    "/api/sales-role/batch": {"post": {
+      "summary": "saveBatchSalesRole",
+      "produces": ["application/json"],
+      "operationId": "saveBatchSalesRoleUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/SalesRole"}
+        },
+        "in": "body",
+        "name": "salesRoles",
+        "description": "salesRoles",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/pdf/create/{id}": {"post": {
+      "summary": "createPdf",
+      "produces": ["application/pdf"],
+      "operationId": "createPdfUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/Resource"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"type": "string"},
+          "in": "body",
+          "name": "json",
+          "description": "json",
+          "required": true
+        }
+      ],
+      "tags": ["pdf-service-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/price-offer-template": {"post": {
+      "summary": "createTemplate",
+      "produces": ["application/json"],
+      "operationId": "createTemplateUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOfferTemplate"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/PriceOfferTemplate"},
+        "in": "body",
+        "name": "newTemplate",
+        "description": "newTemplate",
+        "required": true
+      }],
+      "tags": ["price-office-template-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/sales-role/{id}": {"put": {
+      "summary": "updateSalesRole",
+      "produces": ["application/json"],
+      "operationId": "updateSalesRoleUsingPUT_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesRoleDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/SalesRole"},
+        "in": "body",
+        "name": "salesRole",
+        "description": "salesRole",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/sales-role": {"post": {
+      "summary": "saveSalesRole",
+      "produces": ["application/json"],
+      "operationId": "saveSalesRoleUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesRoleDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/SalesRole"},
+        "in": "body",
+        "name": "salesRole",
+        "description": "salesRole",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/discount/list": {"get": {
+      "summary": "getAllDiscounts",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["discount-controller"]
+    }},
+    "/api/salesorg/list": {"get": {
+      "summary": "getAll",
+      "produces": ["application/json"],
+      "operationId": "getAllUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesOrgDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/v1/price-offer/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOffer"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+        "in": "body",
+        "name": "priceOfferDTO",
+        "description": "priceOfferDTO",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v2/price-offer/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST_2",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+        "in": "body",
+        "name": "priceOfferDTO",
+        "description": "priceOfferDTO",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/users/delete/{id}": {"delete": {
+      "summary": "delete",
+      "produces": ["application/json"],
+      "operationId": "deleteUsingDELETE_3",
+      "responses": {
+        "200": {
+          "schema": {"type": "string"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "204": {"description": "No Content"},
+        "403": {"description": "Forbidden"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/health": {"get": {
+      "summary": "healthCheck",
+      "produces": ["*/*"],
+      "operationId": "healthCheckUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"type": "string"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["home-controller"]
+    }},
+    "/api/contact-person/{cpn}": {"get": {
+      "summary": "findContactPersonByNumber",
+      "produces": ["application/json"],
+      "operationId": "findContactPersonByNumberUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ContactPersonDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "cpn",
+        "description": "cpn",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["contact-person-controller"]
+    }},
+    "/api/v1/price-offer/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOffer"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+          "in": "body",
+          "name": "priceOfferDTO",
+          "description": "priceOfferDTO",
+          "required": true
+        }
+      ],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/material/list/{salesOrg}": {"get": {
+      "summary": "getMaterialList",
+      "produces": ["application/json"],
+      "operationId": "getMaterialListUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "default": 0,
+          "in": "query",
+          "name": "page",
+          "format": "int32",
+          "description": "page",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "default": 5000,
+          "in": "query",
+          "name": "pageSize",
+          "format": "int32",
+          "description": "pageSize",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["material-controller"]
+    }},
+    "/api/discount/level/{id}": {"put": {
+      "summary": "updateDiscountLevel",
+      "produces": ["application/json"],
+      "operationId": "updateDiscountLevelUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/DiscountLevel"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "schema": {"$ref": "#/definitions/DiscountLevel"},
+          "in": "body",
+          "name": "discountLevel",
+          "description": "discountLevel",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["discount-level-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/sales-office-power-of-attorney/id/{id}": {"get": {
+      "summary": "byId",
+      "produces": ["application/json"],
+      "operationId": "byIdUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesOfficePowerOfAttorneyDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["sales-office-power-of-attorney-controller"]
+    }},
+    "/api/v1/users/delete/{id}": {"delete": {
+      "summary": "delete",
+      "produces": ["application/json"],
+      "operationId": "deleteUsingDELETE_4",
+      "responses": {
+        "200": {
+          "schema": {"type": "string"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "204": {"description": "No Content"},
+        "403": {"description": "Forbidden"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/api/v1/discount/{id}": {"put": {
+      "summary": "updateDiscount",
+      "produces": ["application/json"],
+      "operationId": "updateDiscountUsingPUT_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "in": "body",
+          "name": "discount",
+          "description": "discount",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/customers": {"get": {
+      "summary": "searchForCustomer",
+      "produces": ["application/json"],
+      "operationId": "searchForCustomerUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "searchString",
+          "description": "searchString",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["customer-controller"]
+    }},
+    "/api/users/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT_4",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "in": "body",
+          "name": "userDTO",
+          "description": "userDTO",
+          "required": true
+        }
+      ],
+      "tags": ["user-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/ad/users/mail/{email}": {"get": {
+      "summary": "getAdUserByMail",
+      "produces": ["application/json"],
+      "operationId": "getAdUserByMailUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "email",
+        "description": "email",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["ad-user-controller"]
+    }},
+    "/api/v2/price-offer/delete/{id}": {"delete": {
+      "summary": "delete",
+      "produces": ["application/json"],
+      "operationId": "deleteUsingDELETE_1",
+      "responses": {
+        "200": {
+          "schema": {"type": "boolean"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "204": {"description": "No Content"},
+        "403": {"description": "Forbidden"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/customers/{knr}": {"get": {
+      "summary": "getCustomerByCustomerNumber",
+      "produces": ["application/json"],
+      "operationId": "getCustomerByCustomerNumberUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "knr",
+        "description": "knr",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["customer-controller"]
+    }},
+    "/api/v1/sales-role/batch": {"post": {
+      "summary": "saveBatchSalesRole",
+      "produces": ["application/json"],
+      "operationId": "saveBatchSalesRoleUsingPOST_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/SalesRole"}
+        },
+        "in": "body",
+        "name": "salesRoles",
+        "description": "salesRoles",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/users/id/{id}": {"get": {
+      "summary": "getById",
+      "produces": ["application/json"],
+      "operationId": "getByIdUsingGET_3",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/api/v2/price-offer/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT_2",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+          "in": "body",
+          "name": "priceOfferDTO",
+          "description": "priceOfferDTO",
+          "required": true
+        }
+      ],
+      "tags": ["price-offer-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/users/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT_5",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "in": "body",
+          "name": "userDTO",
+          "description": "userDTO",
+          "required": true
+        }
+      ],
+      "tags": ["user-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v2/price-offer/id/{id}": {"get": {
+      "summary": "getById",
+      "produces": ["application/json"],
+      "operationId": "getByIdUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOfferDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/v1/discount/list": {"get": {
+      "summary": "getAllDiscounts",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["discount-controller"]
+    }},
+    "/api/v1/standard-price/{salesorg}/{salesoffice}/{material}": {"get": {
+      "summary": "getStdPriceForSalesOrgAndSalesOfficeAndMaterial",
+      "produces": ["application/json"],
+      "operationId": "getStdPriceForSalesOrgAndSalesOfficeAndMaterialUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialStdPriceDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "material",
+          "description": "material",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesoffice",
+          "description": "salesoffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesorg",
+          "description": "salesorg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["standard-price-controller"]
+    }},
+    "/api/salesorg": {"get": {
+      "summary": "findByRequestParams",
+      "produces": ["application/json"],
+      "operationId": "findByRequestParamsUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesOrgDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "city",
+          "description": "city",
+          "type": "string",
+          "required": false
+        },
+        {
+          "default": true,
+          "in": "query",
+          "name": "greedy",
+          "description": "greedy",
+          "type": "boolean",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "postalCode",
+          "description": "postalCode",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesZone",
+          "description": "salesZone",
+          "type": "string",
+          "required": false
+        },
+        {
+          "default": 0,
+          "in": "query",
+          "name": "skiptokens",
+          "format": "int32",
+          "description": "skiptokens",
+          "type": "integer",
+          "required": false
+        }
+      ],
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/users/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST_4",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/UserDTO"},
+        "in": "body",
+        "name": "userDTO",
+        "description": "userDTO",
+        "required": true
+      }],
+      "tags": ["user-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/discount/level/list": {"get": {
+      "summary": "getAllDiscountLevelsForSpecificDiscount",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountLevelsForSpecificDiscountUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/DiscountLevel"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "materialNumber",
+          "description": "materialNumber",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["discount-level-controller"]
+    }},
+    "/api/v1/material/list/{salesOrg}/{salesOffice}": {"get": {
+      "summary": "getMaterialsWithStdPrice",
+      "produces": ["application/json"],
+      "operationId": "getMaterialsWithStdPriceUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "default": 0,
+          "in": "query",
+          "name": "page",
+          "format": "int32",
+          "description": "page",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "default": 5000,
+          "in": "query",
+          "name": "pageSize",
+          "format": "int32",
+          "description": "pageSize",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["material-controller"]
+    }},
+    "/api/v1/price-offer/id/{id}": {"get": {
+      "summary": "getById",
+      "produces": ["application/json"],
+      "operationId": "getByIdUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/PriceOffer"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/discount/{id}": {"put": {
+      "summary": "updateDiscount",
+      "produces": ["application/json"],
+      "operationId": "updateDiscountUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "in": "body",
+          "name": "discount",
+          "description": "discount",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/sales-role/{id}": {"put": {
+      "summary": "updateSalesRole",
+      "produces": ["application/json"],
+      "operationId": "updateSalesRoleUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/SalesRoleDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/SalesRole"},
+        "in": "body",
+        "name": "salesRole",
+        "description": "salesRole",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/contact-person/list": {"get": {
+      "summary": "getContactPersons",
+      "produces": ["application/json"],
+      "operationId": "getContactPersonsUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ContactPersonDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "expand",
+          "description": "expand",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "skipToken",
+          "format": "int32",
+          "description": "skipToken",
+          "type": "integer",
+          "required": false
+        }
+      ],
+      "tags": ["contact-person-controller"]
+    }},
+    "/api/v1/material/{salesOrg}/{salesOffice}/{material}": {"get": {
+      "summary": "getMaterialByMaterialNumberAndSalesOffice",
+      "produces": ["application/json"],
+      "operationId": "getMaterialByMaterialNumberAndSalesOfficeUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/MaterialDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "material",
+          "description": "material",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["material-controller"]
+    }},
+    "/api/v1/terms/customer/save/{id}": {"put": {
+      "summary": "save",
+      "produces": ["application/json"],
+      "operationId": "saveUsingPUT",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/CustomerTermsDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "schema": {"$ref": "#/definitions/CustomerTermsDTO"},
+          "in": "body",
+          "name": "customerTermsDTO",
+          "description": "customerTermsDTO",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "format": "int64",
+          "description": "id",
+          "type": "integer",
+          "required": true
+        }
+      ],
+      "tags": ["customer-terms-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/salesorg/{salesOrg}/{salesOffice}/zones": {"get": {
+      "summary": "getZonesForSalesOffice",
+      "produces": ["application/json"],
+      "operationId": "getZonesForSalesOfficeUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ZoneDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "postalCode",
+          "description": "postalCode",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/discount/list/{salesOrg}": {"get": {
+      "summary": "getAllDiscountsForSalesOrg",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsForSalesOrgUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "materialNumber",
+          "description": "materialNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["discount-controller"]
+    }},
+    "/api/discount/batch": {"post": {
+      "summary": "createDiscounts",
+      "produces": ["application/json"],
+      "operationId": "createDiscountsUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/Discount"}
+        },
+        "in": "body",
+        "name": "discounts",
+        "description": "discounts",
+        "required": true
+      }],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/sales-role/list": {"get": {
+      "summary": "getSalesRoleList",
+      "produces": ["application/json"],
+      "operationId": "getSalesRoleListUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["sales-role-controller"]
+    }},
+    "/api/discount/in-list/{salesOrg}": {"get": {
+      "summary": "getAllDiscountsForSalesOrgAndMaterialNumbersInList",
+      "produces": ["application/json"],
+      "operationId": "getAllDiscountsForSalesOrgAndMaterialNumbersInListUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "materialNumbers",
+          "description": "materialNumbers",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zones",
+          "description": "zones",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["discount-controller"]
+    }},
+    "/api/v2/price-offer/list/approver/{approverId}": {"get": {
+      "summary": "listByApprover",
+      "produces": ["application/json"],
+      "operationId": "listByApproverUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/PriceOfferDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "approverId",
+          "format": "int64",
+          "description": "approverId",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "status",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["price-offer-controller"]
+    }},
+    "/api/customers/list": {"get": {
+      "summary": "fetchAllCustomers",
+      "produces": ["application/json"],
+      "operationId": "fetchAllCustomersUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "default": "Betaler",
+          "in": "query",
+          "name": "customerType",
+          "description": "customerType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "expand",
+          "description": "expand",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "parentCompany",
+          "description": "parentCompany",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "skipToken",
+          "format": "int32",
+          "description": "skipToken",
+          "type": "integer",
+          "required": false
+        }
+      ],
+      "tags": ["customer-controller"]
+    }},
+    "/api/v1/standard-price/{salesorg}/{salesoffice}": {"get": {
+      "summary": "getStdPricesForSalesOfficeAndSalesOrg",
+      "produces": ["application/json"],
+      "operationId": "getStdPricesForSalesOfficeAndSalesOrgUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialStdPriceDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "salesoffice",
+          "description": "salesoffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesorg",
+          "description": "salesorg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["standard-price-controller"]
+    }},
+    "/api/v1/discount/batch": {"post": {
+      "summary": "createDiscounts",
+      "produces": ["application/json"],
+      "operationId": "createDiscountsUsingPOST_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/Discount"}
+          },
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/Discount"}
+        },
+        "in": "body",
+        "name": "discounts",
+        "description": "discounts",
+        "required": true
+      }],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/v1/discount": {"post": {
+      "summary": "createDiscount",
+      "produces": ["application/json"],
+      "operationId": "createDiscountUsingPOST_1",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/Discount"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/Discount"},
+        "in": "body",
+        "name": "discount",
+        "description": "discount",
+        "required": true
+      }],
+      "tags": ["discount-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/salesorg/{salesOrg}/{salesOffice}/zones": {"get": {
+      "summary": "getZonesForSalesOffice",
+      "produces": ["application/json"],
+      "operationId": "getZonesForSalesOfficeUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ZoneDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "postalCode",
+          "description": "postalCode",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesOrg",
+          "description": "salesOrg",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "tags": ["sales-org-controller"]
+    }},
+    "/api/v1/terms/customer/create": {"post": {
+      "summary": "create",
+      "produces": ["application/json"],
+      "operationId": "createUsingPOST",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/CustomerTermsDTO"},
+          "description": "OK"
+        },
+        "201": {"description": "Created"},
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "schema": {"$ref": "#/definitions/CustomerTermsDTO"},
+        "in": "body",
+        "name": "customerTermsDTO",
+        "description": "customerTermsDTO",
+        "required": true
+      }],
+      "tags": ["customer-terms-controller"],
+      "consumes": ["application/json"]
+    }},
+    "/api/users/email/{email}": {"get": {
+      "summary": "getUserByEmail",
+      "produces": ["application/json"],
+      "operationId": "getUserByEmailUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"$ref": "#/definitions/UserDTO"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "email",
+        "description": "email",
+        "type": "string",
+        "required": true
+      }],
+      "tags": ["user-controller"]
+    }},
+    "/api/standard-price/{salesorg}/{salesoffice}/{material}": {"get": {
+      "summary": "getStdPriceForSalesOrgAndSalesOfficeAndMaterial",
+      "produces": ["application/json"],
+      "operationId": "getStdPriceForSalesOrgAndSalesOfficeAndMaterialUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/MaterialStdPriceDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "material",
+          "description": "material",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesoffice",
+          "description": "salesoffice",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "path",
+          "name": "salesorg",
+          "description": "salesorg",
+          "type": "string",
+          "required": true
+        },
+        {
+          "in": "query",
+          "name": "zone",
+          "description": "zone",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["standard-price-controller"]
+    }},
+    "/api/users/list": {"get": {
+      "summary": "list",
+      "produces": ["application/json"],
+      "operationId": "listUsingGET_5",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/UserDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["user-controller"]
+    }},
+    "/api/v1/bo-report/title-type/list": {"get": {
+      "summary": "list",
+      "produces": ["*/*"],
+      "operationId": "listUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/TitleTypeDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "query",
+        "name": "type",
+        "description": "type",
+        "type": "string",
+        "required": false
+      }],
+      "tags": ["bo-report-title-type-controller"]
+    }},
+    "/ssl-test": {"get": {
+      "summary": "inbound",
+      "produces": ["*/*"],
+      "operationId": "inboundUsingGET",
+      "responses": {
+        "200": {
+          "schema": {"type": "string"},
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "tags": ["home-controller"]
+    }},
+    "/api/v1/sales-role/user/{userId}": {"get": {
+      "summary": "getSalesRoleForUser",
+      "produces": ["application/json"],
+      "operationId": "getSalesRoleForUserUsingGET_1",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/SalesRoleDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "userId",
+        "format": "int64",
+        "description": "userId",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["sales-role-controller"]
+    }},
+    "/api/v1/terms/customer/list/active": {"get": {
+      "summary": "listAllActive",
+      "produces": ["*/*"],
+      "operationId": "listAllActiveUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/CustomerTermsDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [
+        {
+          "in": "query",
+          "name": "customerNumber",
+          "description": "customerNumber",
+          "type": "string",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "salesOffice",
+          "description": "salesOffice",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "tags": ["customer-terms-controller"]
+    }}
+  },
+  "host": "localhost",
+  "definitions": {
+    "PriceOffer": {
+      "type": "object",
+      "title": "PriceOffer",
+      "properties": {
+        "approver": {"$ref": "#/definitions/User"},
+        "contactPersonList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/ContactPerson"}
+        },
+        "dateIssued": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "materialsForApproval": {"type": "string"},
+        "salesEmployee": {"$ref": "#/definitions/User"},
+        "approvalDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lastModifiedBy": {"type": "string"},
+        "dismissalReason": {"type": "string"},
+        "needsApproval": {"type": "boolean"},
+        "customerNumber": {"type": "string"},
+        "salesOfficeList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/SalesOffice"}
+        },
+        "customerName": {"type": "string"},
+        "priceOfferStatus": {"type": "string"},
+        "customerTerms": {"$ref": "#/definitions/PriceOfferTerms"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "deleted": {"type": "boolean"},
+        "createdBy": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "activationDate": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "DiscountLevel": {
+      "type": "object",
+      "title": "DiscountLevel",
+      "properties": {
+        "level": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calculatedDiscount": {
+          "format": "double",
+          "type": "number"
+        },
+        "pctDiscount": {
+          "format": "double",
+          "type": "number"
+        },
+        "discount": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "PriceRow": {
+      "type": "object",
+      "title": "PriceRow",
+      "properties": {
+        "discountLevel": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "priceIncMva": {
+          "format": "double",
+          "type": "number"
+        },
+        "manualPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "needsApproval": {"type": "boolean"},
+        "subCategoryDescription": {"type": "string"},
+        "categoryDescription": {"type": "string"},
+        "approved": {"type": "boolean"},
+        "classId": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "amount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "showPriceInOffer": {"type": "boolean"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "discountPct": {
+          "format": "double",
+          "type": "number"
+        },
+        "discountLevelPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "lastModifiedBy": {"type": "string"},
+        "standardPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "combinedMaterials": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRow"}
+        },
+        "subCategoryId": {"type": "string"},
+        "customerPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "classDescription": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "discountedPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "material": {"$ref": "#/definitions/Material"},
+        "createdBy": {"type": "string"},
+        "categoryId": {"type": "string"}
+      }
+    },
+    "Discount": {
+      "type": "object",
+      "title": "Discount",
+      "properties": {
+        "deviceType": {"type": "string"},
+        "materialDesignation": {"type": "string"},
+        "materialNumber": {"type": "string"},
+        "zone": {"type": "string"},
+        "salesOffice": {"type": "string"},
+        "discountLevels": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/DiscountLevel"}
+        },
+        "standardPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "fa": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "salesOrg": {"type": "string"}
+      }
+    },
+    "User": {
+      "type": "object",
+      "title": "User",
+      "properties": {
+        "regionalManagersPowerOfAttorney": {"type": "string"},
+        "jobTitle": {"type": "string"},
+        "regionName": {"type": "string"},
+        "powerOfAttorneyFA": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "orgNr": {"type": "string"},
+        "emailSalesManager": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "department": {"type": "string"},
+        "sureName": {"type": "string"},
+        "email": {"type": "string"},
+        "overallPowerOfAttorney": {"type": "string"},
+        "associatedPlace": {"type": "string"},
+        "orgName": {"type": "string"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "usernameAlias": {"type": "string"},
+        "lastModifiedBy": {"type": "string"},
+        "salesRole": {"$ref": "#/definitions/SalesRole"},
+        "fullName": {"type": "string"},
+        "powerOfAttorneyOA": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "adId": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "phoneNumber": {"type": "string"},
+        "createdBy": {"type": "string"},
+        "emailRegionalManager": {"type": "string"},
+        "name": {"type": "string"},
+        "resourceNr": {"type": "string"},
+        "username": {"type": "string"}
+      }
+    },
+    "PriceOfferTemplate": {
+      "type": "object",
+      "title": "PriceOfferTemplate",
+      "properties": {
+        "approver": {"$ref": "#/definitions/User"},
+        "contactPersonList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/ContactPerson"}
+        },
+        "dateIssued": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "salesEmployee": {"$ref": "#/definitions/User"},
+        "approvalDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lastModifiedBy": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "salesOfficeList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/SalesOffice"}
+        },
+        "customerName": {"type": "string"},
+        "customerTerms": {"$ref": "#/definitions/PriceOfferTerms"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "deleted": {"type": "boolean"},
+        "createdBy": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "PriceRowDTO": {
+      "type": "object",
+      "title": "PriceRowDTO",
+      "properties": {
+        "discountLevel": {"$ref": "#/definitions/DiscountLevelDTO"},
+        "amount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "showPriceInOffer": {"type": "boolean"},
+        "discountPct": {
+          "format": "double",
+          "type": "number"
+        },
+        "priceIncMva": {
+          "format": "double",
+          "type": "number"
+        },
+        "manualPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "standardPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "combinedMaterials": {"$ref": "#/definitions/PriceRowDTO"},
+        "priceLevel": {"$ref": "#/definitions/PriceLevelDTO"},
+        "priceLevelPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "customerPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "dateUpdated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "dateCreated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "material": {"$ref": "#/definitions/MaterialDTO"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "SalesOrgDTO": {
+      "type": "object",
+      "title": "SalesOrgDTO",
+      "properties": {
+        "salesZone": {"type": "string"},
+        "city": {"type": "string"},
+        "salesOffice": {"type": "string"},
+        "postalCode": {"type": "string"},
+        "salesOfficeName": {"type": "string"},
+        "amountOfZones": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "salesOrganization": {"type": "string"}
+      }
+    },
+    "PriceOfferTerms": {
+      "type": "object",
+      "title": "PriceOfferTerms",
+      "properties": {
+        "customerRequireNotification": {"type": "boolean"},
+        "priceAdjustmentDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "salesOrg": {"type": "string"},
+        "agreementStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "invoiceInterval": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "newOrEstablishedCustomer": {"type": "string"},
+        "notificationMailAddress": {"type": "string"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "paymentCondition": {"type": "string"},
+        "additionForRoadTax": {"type": "boolean"},
+        "salesOffice": {"type": "string"},
+        "indexWaste": {"type": "string"},
+        "lastModifiedBy": {"type": "string"},
+        "metalSetDateForOffer": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "quarterlyAdjustment": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "requiredNumberOfDaysNotice": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "indexTransport": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "specialConditionAction": {"type": "string"},
+        "createdBy": {"type": "string"},
+        "indexRent": {"type": "string"},
+        "additionForAdminFee": {"type": "boolean"},
+        "contractTerm": {"type": "string"},
+        "monthsToFreezeCustomerFromAdjustments": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "agreementEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {"type": "string"},
+        "metalPricing": {"type": "string"}
+      }
+    },
+    "UserDTO": {
+      "type": "object",
+      "title": "UserDTO",
+      "properties": {
+        "associatedPlace": {"type": "string"},
+        "orgName": {"type": "string"},
+        "usernameAlias": {"type": "string"},
+        "regionalManagersPowerOfAttorney": {"type": "string"},
+        "jobTitle": {"type": "string"},
+        "regionName": {"type": "string"},
+        "fullName": {"type": "string"},
+        "powerOfAttorneyOA": {"type": "string"},
+        "adId": {"type": "string"},
+        "phoneNumber": {"type": "string"},
+        "salesRoleId": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "powerOfAttorneyFA": {"type": "string"},
+        "emailRegionalManager": {"type": "string"},
+        "name": {"type": "string"},
+        "orgNr": {"type": "string"},
+        "resourceNr": {"type": "string"},
+        "emailSalesManager": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "department": {"type": "string"},
+        "sureName": {"type": "string"},
+        "email": {"type": "string"},
+        "overallPowerOfAttorney": {"type": "string"},
+        "username": {"type": "string"}
+      }
+    },
+    "ApprovalRequest": {
+      "type": "object",
+      "title": "ApprovalRequest",
+      "properties": {
+        "dismissalReason": {"type": "string"},
+        "status": {"type": "string"}
+      }
+    },
+    "CustomerDTO": {
+      "type": "object",
+      "title": "CustomerDTO",
+      "properties": {
+        "country": {"type": "string"},
+        "regStrGrp": {"type": "string"},
+        "city": {"type": "string"},
+        "houseNumber": {"type": "string"},
+        "customerBranchList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/CustomerBranchDTO"}
+        },
+        "payer": {"type": "string"},
+        "division": {"type": "string"},
+        "changedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "customerType": {"type": "string"},
+        "businessPartnerCategory": {"type": "string"},
+        "motherCompany": {"type": "string"},
+        "contactPersons": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/ContactPersonDTO"}
+        },
+        "company": {"type": "string"},
+        "firmPostalNumber": {"type": "string"},
+        "distributionChannel": {"type": "string"},
+        "hasCentralAgreement": {"type": "string"},
+        "creditScore": {"type": "string"},
+        "permissionHazardousWaste": {"type": "string"},
+        "postBox": {"type": "string"},
+        "customerGroup": {"type": "string"},
+        "organizationNumber": {"type": "string"},
+        "postalNumber": {"type": "string"},
+        "nodeCustomerList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/NodeCustomerDTO"}
+        },
+        "timeZone": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "streetAddress": {"type": "string"},
+        "abcClassification": {"type": "string"},
+        "postBoxNumber": {"type": "string"},
+        "changedTime": {"type": "string"},
+        "name2": {"type": "string"},
+        "region": {"type": "string"},
+        "name1": {"type": "string"},
+        "isConstructionCustomer": {"type": "string"}
+      }
+    },
+    "PriceLevelDTO": {
+      "type": "object",
+      "title": "PriceLevelDTO",
+      "properties": {
+        "level": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "calculatedDiscount": {
+          "format": "double",
+          "type": "number"
+        },
+        "pctDiscount": {
+          "format": "double",
+          "type": "number"
+        },
+        "discount": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "SalesOfficePowerOfAttorneyDTO": {
+      "type": "object",
+      "title": "SalesOfficePowerOfAttorneyDTO",
+      "properties": {
+        "dangerousWaste": {"type": "string"},
+        "mailOrdinaryWasteLvlOne": {"type": "string"},
+        "salesOffice": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "salesOfficeName": {"type": "string"},
+        "mailOrdinaryWasteLvlTwo": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "region": {"type": "string"}
+      }
+    },
+    "ContactPersonCustomerDTO": {
+      "type": "object",
+      "title": "ContactPersonCustomerDTO",
+      "properties": {"customerNumber": {"type": "string"}}
+    },
+    "NodeCustomerDTO": {
+      "type": "object",
+      "title": "NodeCustomerDTO",
+      "properties": {
+        "hkunnr": {"type": "string"},
+        "kunnr": {"type": "string"}
+      }
+    },
+    "TermsDTO": {
+      "type": "object",
+      "title": "TermsDTO",
+      "properties": {
+        "customerRequireNotification": {"type": "boolean"},
+        "priceAdjustmentDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "agreementStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "invoiceInterval": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "newOrEstablishedCustomer": {"type": "string"},
+        "notificationMailAddress": {"type": "string"},
+        "paymentCondition": {"type": "string"},
+        "additionForRoadTax": {"type": "boolean"},
+        "salesOffice": {"type": "string"},
+        "indexWaste": {"type": "string"},
+        "metalSetDateForOffer": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "quarterlyAdjustment": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "requiredNumberOfDaysNotice": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "indexTransport": {"type": "string"},
+        "specialConditionAction": {"type": "string"},
+        "indexRent": {"type": "string"},
+        "additionForAdminFee": {"type": "boolean"},
+        "contractTerm": {"type": "string"},
+        "monthsToFreezeCustomerFromAdjustments": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "agreementEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {"type": "string"},
+        "metalPricing": {"type": "string"}
+      }
+    },
+    "ContactPerson": {
+      "type": "object",
+      "title": "ContactPerson",
+      "properties": {
+        "firstName": {"type": "string"},
+        "lastName": {"type": "string"},
+        "emailAddress": {"type": "string"},
+        "mobileNumber": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "MaterialPrice": {
+      "type": "object",
+      "title": "MaterialPrice",
+      "properties": {
+        "deviceType": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "materialNumber": {"type": "string"},
+        "createdBy": {"type": "string"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "pricingUnit": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "lastModifiedBy": {"type": "string"},
+        "quantumUnit": {"type": "string"},
+        "standardPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "validFrom": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "validTo": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "DiscountLevelDTO": {
+      "type": "object",
+      "title": "DiscountLevelDTO",
+      "properties": {
+        "level": {"type": "string"},
+        "calculatedDiscount": {"type": "string"},
+        "pctDiscount": {"type": "string"},
+        "discount": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "SalesRoleDTO": {
+      "type": "object",
+      "title": "SalesRoleDTO",
+      "properties": {
+        "defaultPowerOfAttorneyFa": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "userList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/UserDTO"}
+        },
+        "roleName": {"type": "string"},
+        "description": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "defaultPowerOfAttorneyOa": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "KeyCombinationDTO": {
+      "type": "object",
+      "title": "KeyCombinationDTO",
+      "properties": {
+        "keyCombination": {"type": "string"},
+        "description": {"type": "string"}
+      }
+    },
+    "TitleTypeDTO": {
+      "type": "object",
+      "title": "TitleTypeDTO",
+      "properties": {
+        "titleType": {"type": "string"},
+        "keyCombinations": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/KeyCombinationDTO"}
+        }
+      }
+    },
+    "PriceOfferDTO": {
+      "type": "object",
+      "title": "PriceOfferDTO",
+      "properties": {
+        "approver": {"$ref": "#/definitions/UserDTO"},
+        "dateIssued": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "salesEmployee": {"$ref": "#/definitions/UserDTO"},
+        "approvalDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "lastModifiedBy": {"type": "string"},
+        "contactPerson": {"$ref": "#/definitions/ContactPersonDTO"},
+        "dismissalReason": {"type": "string"},
+        "needsApproval": {"type": "boolean"},
+        "customerNumber": {"type": "string"},
+        "salesOfficeList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/SalesOfficeDTO"}
+        },
+        "customerName": {"type": "string"},
+        "dateUpdated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "priceOfferStatus": {"type": "string"},
+        "customerTerms": {"$ref": "#/definitions/TermsDTO"},
+        "dateCreated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "createdBy": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "activationDate": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "PriceOfferListDTO": {
+      "type": "object",
+      "title": "PriceOfferListDTO",
+      "properties": {
+        "salesEmployee": {"$ref": "#/definitions/SimpleSalesEmployeeDTO"},
+        "dateCreated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "dateUpdated": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "priceOfferStatus": {"type": "string"}
+      }
+    },
+    "ZoneDTO": {
+      "type": "object",
+      "title": "ZoneDTO",
+      "properties": {
+        "postalName": {"type": "string"},
+        "postalCode": {"type": "string"},
+        "priceRows": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRowDTO"}
+        },
+        "zoneId": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isStandardZone": {"type": "boolean"}
+      }
+    },
+    "InputStream": {
+      "type": "object",
+      "title": "InputStream"
+    },
+    "Zone": {
+      "type": "object",
+      "title": "Zone",
+      "properties": {
+        "postalName": {"type": "string"},
+        "postalCode": {"type": "string"},
+        "priceRows": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRow"}
+        },
+        "zoneId": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "isStandardZone": {"type": "boolean"}
+      }
+    },
+    "MaterialDiscountDTO": {
+      "type": "object",
+      "title": "MaterialDiscountDTO",
+      "properties": {
+        "level": {"type": "string"},
+        "calculatedDiscount": {"type": "string"},
+        "pctDiscount": {"type": "string"},
+        "discount": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    },
+    "Resource": {
+      "type": "object",
+      "title": "Resource",
+      "properties": {
+        "readable": {"type": "boolean"},
+        "file": {"type": "file"},
+        "filename": {"type": "string"},
+        "description": {"type": "string"},
+        "inputStream": {"$ref": "#/definitions/InputStream"},
+        "uri": {
+          "format": "uri",
+          "type": "string"
+        },
+        "open": {"type": "boolean"},
+        "url": {
+          "format": "url",
+          "type": "string"
+        }
+      }
+    },
+    "Terms": {
+      "type": "object",
+      "title": "Terms",
+      "properties": {
+        "customerRequireNotification": {"type": "boolean"},
+        "priceAdjustmentDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "agreementStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "invoiceInterval": {"type": "string"},
+        "newOrEstablishedCustomer": {"type": "string"},
+        "notificationMailAddress": {"type": "string"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "paymentCondition": {"type": "string"},
+        "additionForRoadTax": {"type": "boolean"},
+        "salesOffice": {"type": "string"},
+        "indexWaste": {"type": "string"},
+        "lastModifiedBy": {"type": "string"},
+        "metalSetDateForOffer": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "quarterlyAdjustment": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "requiredNumberOfDaysNotice": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "indexTransport": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "specialConditionAction": {"type": "string"},
+        "createdBy": {"type": "string"},
+        "indexRent": {"type": "string"},
+        "additionForAdminFee": {"type": "boolean"},
+        "contractTerm": {"type": "string"},
+        "monthsToFreezeCustomerFromAdjustments": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "agreementEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {"type": "string"},
+        "metalPricing": {"type": "string"}
+      }
+    },
+    "SimpleSalesEmployeeDTO": {
+      "type": "object",
+      "title": "SimpleSalesEmployeeDTO",
+      "properties": {"fullName": {"type": "string"}}
+    },
+    "Material": {
+      "type": "object",
+      "title": "Material",
+      "properties": {
+        "deviceType": {"type": "string"},
+        "materialStandardPrice": {"$ref": "#/definitions/MaterialPrice"},
+        "scaleQuantum": {
+          "format": "double",
+          "type": "number"
+        },
+        "salesOffice": {"type": "string"},
+        "materialType": {"type": "string"},
+        "quantumUnit": {"type": "string"},
+        "salesOrg": {"type": "string"},
+        "subCategoryId": {"type": "string"},
+        "subCategoryDescription": {"type": "string"},
+        "categoryDescription": {"type": "string"},
+        "classDescription": {"type": "string"},
+        "materialGroupDesignation": {"type": "string"},
+        "materialTypeDescription": {"type": "string"},
+        "salesZone": {"type": "string"},
+        "classId": {"type": "string"},
+        "materialNumber": {"type": "string"},
+        "pricingUnit": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "materialGroup": {"type": "string"},
+        "currency": {"type": "string"},
+        "designation": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "categoryId": {"type": "string"}
+      }
+    },
+    "MaterialDTO": {
+      "type": "object",
+      "title": "MaterialDTO",
+      "properties": {
+        "materialExpired": {"type": "boolean"},
+        "dimensionUnit": {"type": "string"},
+        "volumeUnit": {"type": "string"},
+        "subCategoryDescription": {"type": "string"},
+        "salesOrganization": {"type": "string"},
+        "categoryDescription": {"type": "string"},
+        "manufacturerMaterialNumber": {"type": "string"},
+        "materialTypeDescription": {"type": "string"},
+        "accountingRequirement": {"type": "string"},
+        "classId": {"type": "string"},
+        "lastChangedTime": {"type": "string"},
+        "materialGroupDescription": {"type": "string"},
+        "distributionChannel": {"type": "string"},
+        "height": {
+          "format": "double",
+          "type": "number"
+        },
+        "lastChangedTimestamp": {"type": "string"},
+        "maxLoad": {
+          "format": "double",
+          "type": "number"
+        },
+        "materialType": {"type": "string"},
+        "maxLoadUnit": {"type": "string"},
+        "subCategoryId": {"type": "string"},
+        "classDescription": {"type": "string"},
+        "materialDescription": {"type": "string"},
+        "volume": {
+          "format": "double",
+          "type": "number"
+        },
+        "netWeight": {
+          "format": "double",
+          "type": "number"
+        },
+        "depth": {
+          "format": "double",
+          "type": "number"
+        },
+        "material": {"type": "string"},
+        "materialGroup": {"type": "string"},
+        "width": {
+          "format": "double",
+          "type": "number"
+        },
+        "categoryId": {"type": "string"},
+        "lastChangedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "dimensions": {"type": "string"},
+        "weightUnit": {"type": "string"}
+      }
+    },
+    "CustomerBranchDTO": {
+      "type": "object",
+      "title": "CustomerBranchDTO",
+      "properties": {
+        "branchSystem": {"type": "string"},
+        "branchText": {"type": "string"},
+        "branch": {"type": "string"},
+        "branchSystemText": {"type": "string"}
+      }
+    },
+    "SalesOfficeDTO": {
+      "type": "object",
+      "title": "SalesOfficeDTO",
+      "properties": {
+        "zoneList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/ZoneDTO"}
+        },
+        "city": {"type": "string"},
+        "rentalList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRowDTO"}
+        },
+        "salesOffice": {"type": "string"},
+        "materialList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRowDTO"}
+        },
+        "postalCode": {"type": "string"},
+        "name": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "salesOrg": {"type": "string"},
+        "transportServiceList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRowDTO"}
+        }
+      }
+    },
+    "SalesOffice": {
+      "type": "object",
+      "title": "SalesOffice",
+      "properties": {
+        "zoneList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/Zone"}
+        },
+        "city": {"type": "string"},
+        "postalNumber": {"type": "string"},
+        "rentalList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRow"}
+        },
+        "salesOffice": {"type": "string"},
+        "materialList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRow"}
+        },
+        "salesOfficeName": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "salesOrg": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "transportServiceList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/PriceRow"}
+        }
+      }
+    },
+    "CustomerTermsDTO": {
+      "type": "object",
+      "title": "CustomerTermsDTO",
+      "properties": {
+        "customerRequireNotification": {"type": "boolean"},
+        "priceAdjustmentDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "year": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "source": {"type": "string"},
+        "number": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "agreementStartDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "invoiceInterval": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "newOrEstablishedCustomer": {"type": "string"},
+        "notificationMailAddress": {"type": "string"},
+        "lastModifiedDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "level": {"type": "string"},
+        "paymentCondition": {"type": "string"},
+        "additionForRoadTax": {"type": "boolean"},
+        "nodeNr": {"type": "string"},
+        "salesOffice": {"type": "string"},
+        "indexWaste": {"type": "string"},
+        "lastModifiedBy": {"type": "string"},
+        "metalSetDateForOffer": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "quarterlyAdjustment": {"type": "string"},
+        "customerNumber": {"type": "string"},
+        "customerName": {"type": "string"},
+        "requiredNumberOfDaysNotice": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "indexTransport": {"type": "string"},
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "specialConditionAction": {"type": "string"},
+        "createdBy": {"type": "string"},
+        "indexRent": {"type": "string"},
+        "additionForAdminFee": {"type": "boolean"},
+        "contractTerm": {"type": "string"},
+        "monthsToFreezeCustomerFromAdjustments": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "agreementEndDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "comment": {"type": "string"},
+        "metalPricing": {"type": "string"},
+        "region": {"type": "string"}
+      }
+    },
+    "SalesRole": {
+      "type": "object",
+      "title": "SalesRole",
+      "properties": {
+        "defaultPowerOfAttorneyFa": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "userList": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/User"}
+        },
+        "roleName": {"type": "string"},
+        "description": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "defaultPowerOfAttorneyOa": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "MaterialStdPriceDTO": {
+      "type": "object",
+      "title": "MaterialStdPriceDTO",
+      "properties": {
+        "deviceType": {"type": "string"},
+        "materialExpired": {"type": "string"},
+        "scaleQuantum": {
+          "format": "double",
+          "type": "number"
+        },
+        "formattedScaleQuantum": {"type": "string"},
+        "salesOffice": {"type": "string"},
+        "materialType": {"type": "string"},
+        "quantumUnit": {"type": "string"},
+        "standardPrice": {
+          "format": "double",
+          "type": "number"
+        },
+        "salesOrg": {"type": "string"},
+        "validFrom": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "materialData": {"$ref": "#/definitions/MaterialDTO"},
+        "material": {"type": "string"},
+        "pricingUnit": {"type": "string"},
+        "productGroup": {"type": "string"},
+        "zone": {"type": "string"},
+        "productGroupDesignation": {"type": "string"},
+        "materialTypeDesignation": {"type": "string"},
+        "formattedStandardPrice": {"type": "string"},
+        "currency": {"type": "string"},
+        "designation": {"type": "string"},
+        "validTo": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "ContactPersonDTO": {
+      "type": "object",
+      "title": "ContactPersonDTO",
+      "properties": {
+        "firstName": {"type": "string"},
+        "lastName": {"type": "string"},
+        "emailAddress": {"type": "string"},
+        "mobileNumber": {"type": "string"},
+        "id": {
+          "format": "int64",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "swagger": "2.0",
+  "info": {
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "contact": {},
+    "description": "Api Documentation",
+    "termsOfService": "urn:tos",
+    "title": "Api Documentation",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "ad-user-controller",
+      "description": "Ad User Controller"
+    },
+    {
+      "name": "bo-report-title-type-controller",
+      "description": "Bo Report Title Type Controller"
+    },
+    {
+      "name": "contact-person-controller",
+      "description": "Contact Person Controller"
+    },
+    {
+      "name": "customer-controller",
+      "description": "Customer Controller"
+    },
+    {
+      "name": "customer-terms-controller",
+      "description": "Customer Terms Controller"
+    },
+    {
+      "name": "discount-controller",
+      "description": "Discount Controller"
+    },
+    {
+      "name": "discount-level-controller",
+      "description": "Discount Level Controller"
+    },
+    {
+      "name": "home-controller",
+      "description": "Home Controller"
+    },
+    {
+      "name": "material-controller",
+      "description": "Material Controller"
+    },
+    {
+      "name": "pdf-service-controller",
+      "description": "Pdf Service Controller"
+    },
+    {
+      "name": "price-offer-controller",
+      "description": "Price Offer Controller"
+    },
+    {
+      "name": "price-office-template-controller",
+      "description": "Price Office Template Controller"
+    },
+    {
+      "name": "sales-office-power-of-attorney-controller",
+      "description": "Sales Office Power Of Attorney Controller"
+    },
+    {
+      "name": "sales-org-controller",
+      "description": "Sales Org Controller"
+    },
+    {
+      "name": "sales-role-controller",
+      "description": "Sales Role Controller"
+    },
+    {
+      "name": "standard-price-controller",
+      "description": "Standard Price Controller"
+    },
+    {
+      "name": "user-controller",
+      "description": "User Controller"
+    }
+  ]
+}
