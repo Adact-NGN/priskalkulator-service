@@ -31,21 +31,15 @@ public class StartUpDev {
         private static final Logger log = LoggerFactory.getLogger(StartUpDev.class);
 
         private final UserService userService;
-        private final PriceOfferService priceOfferService;
         private final SalesRoleService salesRoleService;
-        private final StandardPriceService priceService;
         private final MaterialService materialService;
 
         @Autowired
         public StartUpDev(UserService userService,
-                          PriceOfferService priceOfferService,
                           SalesRoleService salesRoleService,
-                          StandardPriceService priceService,
                           MaterialService materialService) {
                 this.userService = userService;
-                this.priceOfferService = priceOfferService;
                 this.salesRoleService = salesRoleService;
-                this.priceService = priceService;
                 this.materialService = materialService;
         }
 

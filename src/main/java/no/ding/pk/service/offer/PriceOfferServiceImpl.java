@@ -1,9 +1,11 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
@@ -39,6 +42,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
+    private final DiscountService discountService;
+
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
 
@@ -47,12 +52,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 CustomerTermsService customerTermsService,
+                                 DiscountService discountService, CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
+        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
     }
@@ -75,9 +81,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         entity.setContactPersonList(newPriceOffer.getContactPersonList());
 
+        // salesOrg, salesOffice, material, Discount
+        Map<String, Map<String, Map<String, Discount>>> discountMap = createDiscountMapForSalesOrg(newPriceOffer);
+
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(newPriceOffer.getSalesOfficeList().size() > 0) {
-                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
+                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber(), discountMap);
 
                 entity.setSalesOfficeList(salesOffices);
 
@@ -135,6 +144,57 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
         return materialNumbersForApproval.toString();
+    }
+
+    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
+        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
+        for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
+
+            // Collect all Material numbers in each price row lists.
+            Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
+            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
+            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
+
+            // Create sales office to material number map.
+            Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
+            salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
+
+            // Add map to sales org map, sales office, material number map.
+            discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
+        }
+
+        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
+
+        for (String salesOrg : discountMap.keySet()) {
+            if(!orgOfficeMaterialDiscount.containsKey(salesOrg)) {
+                orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
+            }
+
+            Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
+            for(String salesOffice : discountMap.get(salesOrg).keySet()) {
+                Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
+                List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
+
+                List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+
+                if(discounts != null && !discounts.isEmpty()) {
+                    discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
+                }
+
+                salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
+            }
+
+            orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
+        }
+
+        return orgOfficeMaterialDiscount;
+    }
+
+    private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
+        if(materialList == null) {
+            return new HashSet<>();
+        }
+        return materialList.stream().map(material -> material.getMaterial().getMaterialNumber()).collect(Collectors.toSet());
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
@@ -413,7 +473,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
-        // Exception thrown here
         List<String> materialsToApprove = convertMaterialsStringToList(priceOfferToApprove);
         List<String> approvedMaterials = new ArrayList<>();
 
@@ -449,6 +508,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(pr.getMaterial() == null) {
                 continue;
             }
+
             if(materialsToApprove.contains(pr.getMaterial().getMaterialNumber())) {
                 if(pr.getNeedsApproval() && !pr.isApproved()) {
                     pr.setApproved(isApproved);

@@ -1,8 +1,7 @@
 package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +14,9 @@ import javax.persistence.Table;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "discount_levels")
 public class DiscountLevel {
@@ -38,9 +40,6 @@ public class DiscountLevel {
     @ManyToOne
     @JoinColumn(name="discount_id", nullable = false)
     private Discount parent;
-    
-    public DiscountLevel() {
-    }
     
     public DiscountLevel(int level, Double discount, Double calculatedDiscount, Double pctDiscount) {
         this.level = level;
