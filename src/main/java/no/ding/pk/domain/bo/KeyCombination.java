@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * Key Combination => Nøkkelkombinasjon
+ */
 @Getter
 @Setter
 @Builder
@@ -16,13 +19,19 @@ public class KeyCombination {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Key Combination table name
+     */
     @Column
     private String keyCombination;
 
+    /**
+     * Key Combination description
+     */
     @Column
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "title_type_id", foreignKey = @ForeignKey(name = "FK_key_combination_title_type"))
-    private TitleType titleType;
+    @JoinColumn(name = "condition_code_id", foreignKey = @ForeignKey(name = "FK_key_combination_condition_code"))
+    private ConditionCode conditionCode;
 }

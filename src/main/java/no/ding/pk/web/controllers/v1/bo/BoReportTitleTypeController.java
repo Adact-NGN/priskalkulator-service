@@ -1,6 +1,6 @@
 package no.ding.pk.web.controllers.v1.bo;
 
-import no.ding.pk.domain.bo.TitleType;
+import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.service.bo.BoReportTitleTypeService;
 import no.ding.pk.web.dto.v1.bo.TitleTypeDTO;
 import org.modelmapper.ModelMapper;
@@ -36,8 +36,8 @@ public class BoReportTitleTypeController {
     @GetMapping(path = "/list")
     public List<TitleTypeDTO> list(@RequestParam(value = "type", required = false) String type) {
         log.debug("Requesting for all title types with key combinations.");
-        List<TitleType> titleTypes = service.getAllTitleTypes(type);
+        List<ConditionCode> conditionCodes = service.getAllTitleTypes(type);
 
-        return titleTypes.stream().map(titleType -> modelMapper.map(titleType, TitleTypeDTO.class)).toList();
+        return conditionCodes.stream().map(titleType -> modelMapper.map(titleType, TitleTypeDTO.class)).toList();
     }
 }

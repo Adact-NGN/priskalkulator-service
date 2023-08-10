@@ -1,7 +1,7 @@
 package no.ding.pk.web.controllers.v1.bo;
 
+import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.domain.bo.KeyCombination;
-import no.ding.pk.domain.bo.TitleType;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.service.bo.BoReportTitleTypeService;
 import no.ding.pk.web.dto.v1.bo.TitleTypeDTO;
@@ -37,8 +37,8 @@ class BoReportTitleTypeControllerTest {
 
     @BeforeEach
     public void setup() {
-        TitleType titleType = TitleType.builder()
-                .titleType("ZPTR")
+        ConditionCode conditionCode = ConditionCode.builder()
+                .code("ZPTR")
                 .build();
 
         KeyCombination keyCombination = KeyCombination.builder()
@@ -46,9 +46,9 @@ class BoReportTitleTypeControllerTest {
                 .description("Salgskontor per material per sone")
                 .build();
 
-        titleType.addKeyCombination(keyCombination);
+        conditionCode.addKeyCombination(keyCombination);
 
-        service.save(titleType);
+        service.save(conditionCode);
     }
 
     @Test
