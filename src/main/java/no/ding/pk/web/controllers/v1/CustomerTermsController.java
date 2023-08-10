@@ -34,8 +34,8 @@ public class CustomerTermsController {
 
     /**
      * Get list of {@code CustomerTerms}
-     * @param salesOffice Sales office to filter for, {@required false}.
-     * @param customerNumber customer number to filter for, {@required false}.
+     * @param salesOffice Sales office to filter for, { {@code @required}  false } .
+     * @param customerNumber customer number to filter for, { {@code @required}  false } .
      * @return List of {@code CustomerTermsDTO}
      */
     @GetMapping("/list")

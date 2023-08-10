@@ -12,7 +12,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 
@@ -140,5 +144,10 @@ public class DiscountServiceImpl implements DiscountService {
             return discountLevelRepository.findAllByParentSalesOrgAndParentZoneAndParentMaterialNumberInList(salesOrg, zone, materialNumberList);
         }
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, materialNumberList);
+    }
+
+    @Override
+    public List<Discount> findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials) {
+        return repository.findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materials);
     }
 }

@@ -22,4 +22,6 @@ public interface DiscountRepository extends JpaRepository<Discount, Long>, JpaSp
     List<Discount> findAllBySalesOrgAndMaterialNumberAndZoneInListQuery(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers, @Param("zone") String zone);
 
     List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("salesOffice") String salesOffice, @Param("zones") List<String> zones, @Param("materialNumbers") List<String> materialNumbers);
+
+    List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
 }
