@@ -1,5 +1,10 @@
 package no.ding.pk.domain.bo;
 
+import lombok.Builder;
+import lombok.Data;
+
+@Data
+@Builder
 public class BoReportCondition {
     String terms;
     Boolean hasSalesOrg;

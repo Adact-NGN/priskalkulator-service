@@ -223,6 +223,22 @@
 
         <!-- End Swagger -->
 
+        <!-- Drools with Kie file system -->
+
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-ci</artifactId>
+            <version>8.32.0.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-decisiontables</artifactId>
+            <version>8.32.0.Final</version>
+        </dependency>
+
+        <!-- End Drools and Kie file system -->
+
         <!-- PDF libs -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -397,7 +413,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>32.1.2-jre</version>
         </dependency>
 
         <dependency>
