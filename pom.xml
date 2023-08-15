@@ -33,6 +33,9 @@
         <datasource.hibernate.dialect>org.hibernate.dialect.MariaDB102Dialect</datasource.hibernate.dialect>
         <sap.api.salesorg.url>https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_ecom_salesorg_postal/srvd_a2x/sap/zapi_ecom_salesorg_postal/0001/SalesorgPostal</sap.api.salesorg.url>
         <pdf.template.file.name>priceOfferTemplate</pdf.template.file.name>
+
+        <drools-version>8.34.0.Final</drools-version>
+        <kie-spring.version>7.73.0.Final</kie-spring.version>
     </properties>
 
     <dependencyManagement>
@@ -228,14 +231,46 @@
         <dependency>
             <groupId>org.kie</groupId>
             <artifactId>kie-ci</artifactId>
-            <version>8.32.0.Final</version>
+            <version>${drools-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-decisiontables</artifactId>
+            <version>${drools-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <version>${drools-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${drools-version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>drools-decisiontables</artifactId>
-            <version>8.32.0.Final</version>
+            <artifactId>drools-core</artifactId>
+            <version>8.34.0.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <version>7.73.0.Final</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.drools</groupId>-->
+<!--            <artifactId>drools-ruleunits-engine</artifactId>-->
+<!--            <version>${version.drools}</version>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.drools</groupId>-->
+<!--            <artifactId>drools-engine</artifactId>-->
+<!--            <version>${version.drools}</version>-->
+<!--        </dependency>-->
 
         <!-- End Drools and Kie file system -->
 
@@ -557,6 +592,12 @@
                     <target>17</target>
                 </configuration>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.kie</groupId>-->
+<!--                <artifactId>kie-maven-plugin</artifactId>-->
+<!--                <version>${version.drools}</version>-->
+<!--                <extensions>true</extensions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 

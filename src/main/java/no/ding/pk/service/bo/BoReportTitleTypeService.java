@@ -15,6 +15,5 @@ public interface BoReportTitleTypeService {
 
     Map<String, String> getConditionCodeAndKeyCombination(BoReportCondition condtion);
 
-    Map<String, String> suggestConditionCodeAndKeyCombination(BoReportCondition condition,
-                                                                     SuggestedConditionCodeKeyCombination suggestion);
+    SuggestedConditionCodeKeyCombination suggestConditionCodeAndKeyCombination(BoReportCondition condition);
 }

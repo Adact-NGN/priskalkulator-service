@@ -1,27 +1,18 @@
-package no.ding.pk.rules;
-
 import no.ding.pk.domain.bo.BoReportCondition;
-global no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination suggestion;
+import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 
+global no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination suggestion;
 dialect "mvel"
 
 rule "Salgskontor per material per sone"
     when
-        BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
-        BoReportCondition(isPricedOnSalesOffice == true)
-        BoReportCondition(isCustomer == true)
-        BoReportCondition(isNode == false)
-        BoReportCondition(isZoneMaterial == true)
-        BoReportCondition(isWaste == false)
-        BoReportCondition(hasDevicePlacement == false)
-        BoReportCondition(isDeviceType == false)
     then
+        System.out.println("First rule hit");
         suggestion.setConditionCode("ZPTR");
         suggestion.setKeyCombination("Salgskontor per material per sone");
         suggestion.setKeyCombinationTableName("A615");
 end
-
 rule "Salgskontor per material per avfall per sone"
     when
         BoReportCondition(terms == "Generelle vilkår")
@@ -94,7 +85,7 @@ when
         suggestion.setKeyCombinationTableName("A704");
 end
 
-rule "Rabatt salgskontor per kunde per material per avfall"
+rule "Rabatt salgskontor per kunde per material per avfall 01"
 when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -112,7 +103,7 @@ when
         suggestion.setKeyCombinationTableName("?");
 end
 
-rule "Rabatt salgskontor per kunde per material per apparattype"
+rule "Rabatt salgskontor per kunde per material per apparattype 01"
 when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -130,7 +121,7 @@ when
         suggestion.setKeyCombinationTableName("A766");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material"
+rule "Rabatt salgskontor per apparatplass  per kunde per material 01"
 when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -148,7 +139,7 @@ when
         suggestion.setKeyCombinationTableName("A781");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 01"
 when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -166,7 +157,7 @@ when
         suggestion.setKeyCombinationTableName("?");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 01"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -184,7 +175,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattyp
         suggestion.setKeyCombinationTableName("A780");
 end
 
-rule "Rabatt per kunde/material"
+rule "Rabatt per kunde/material Tjeneste"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -202,7 +193,7 @@ rule "Rabatt per kunde/material"
         suggestion.setKeyCombinationTableName("A704");
 end
 
-rule "Rabatt salgskontor per kunde per material per avfall"
+rule "Rabatt salgskontor per kunde per material per avfall 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -220,7 +211,7 @@ rule "Rabatt salgskontor per kunde per material per avfall"
         suggestion.setKeyCombinationTableName("A785");
 end
 
-rule "Rabatt salgskontor per kunde per material per apparattype"
+rule "Rabatt salgskontor per kunde per material per apparattype 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -238,7 +229,7 @@ rule "Rabatt salgskontor per kunde per material per apparattype"
         suggestion.setKeyCombinationTableName("A766");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material"
+rule "Rabatt salgskontor per apparatplass  per kunde per material 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -256,7 +247,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material"
         suggestion.setKeyCombinationTableName("A781");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -274,7 +265,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall"
         suggestion.setKeyCombinationTableName("A784");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -292,7 +283,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattyp
         suggestion.setKeyCombinationTableName("A780");
 end
 
-rule "Rabatt per kunde/material"
+rule "Rabatt per kunde/material Sone"
     when
         BoReportCondition(terms == "Generelle vilkår (metall)" || terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -310,7 +301,7 @@ rule "Rabatt per kunde/material"
         suggestion.setKeyCombinationTableName("A704");
 end
 
-rule "Rabatt salgskontor per kunde per material per avfall"
+rule "Rabatt salgskontor per kunde per material per avfall 03"
     when
         BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -328,7 +319,7 @@ rule "Rabatt salgskontor per kunde per material per avfall"
         suggestion.setKeyCombinationTableName("A785");
 end
 
-rule "Rabatt salgskontor per kunde per material per apparattype"
+rule "Rabatt salgskontor per kunde per material per apparattype 03"
     when
         BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -364,7 +355,7 @@ rule "Rabatt salgskontor per kunde per sone  per material"
         suggestion.setKeyCombinationTableName("A795");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material"
+rule "Rabatt salgskontor per apparatplass  per kunde per material 03"
     when
         BoReportCondition(terms == "Generelle vilkår (metall)" || terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -382,7 +373,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material"
         suggestion.setKeyCombinationTableName("A781");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 03"
     when
         BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -400,7 +391,7 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall"
         suggestion.setKeyCombinationTableName("A784");
 end
 
-rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype"
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 03"
     when
         BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -436,7 +427,7 @@ rule "Rabatt kunde/SD-dokument/Material"
         suggestion.setKeyCombinationTableName("A798");
 end
 
-rule "Kundehiearki per material"
+rule "Kundehiearki per material 01"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -454,7 +445,7 @@ rule "Kundehiearki per material"
         suggestion.setKeyCombinationTableName("A767");
 end
 
-rule "Kundehiearki per material per avfall"
+rule "Kundehiearki per material per avfall 01"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -472,7 +463,7 @@ rule "Kundehiearki per material per avfall"
         suggestion.setKeyCombinationTableName("A786");
 end
 
-rule "Kundehiearki per material per apparattype"
+rule "Kundehiearki per material per apparattype 01"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -490,7 +481,7 @@ rule "Kundehiearki per material per apparattype"
         suggestion.setKeyCombinationTableName("A768");
 end
 
-rule "Kundehiearki per material"
+rule "Kundehiearki per material 02"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvikår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -508,7 +499,7 @@ rule "Kundehiearki per material"
         suggestion.setKeyCombinationTableName("A767");
 end
 
-rule "Kundehiearki per material per avfall"
+rule "Kundehiearki per material per avfall 02"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -526,7 +517,7 @@ rule "Kundehiearki per material per avfall"
         suggestion.setKeyCombinationTableName("A786");
 end
 
-rule "Kundehiearki per material per apparattype"
+rule "Kundehiearki per material per apparattype 02"
     when
         BoReportCondition(terms == "Generelle vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -544,7 +535,7 @@ rule "Kundehiearki per material per apparattype"
         suggestion.setKeyCombinationTableName("A768");
 end
 
-rule "Kundehiearki per material"
+rule "Kundehiearki per material 03"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -562,7 +553,7 @@ rule "Kundehiearki per material"
         suggestion.setKeyCombinationTableName("A767");
 end
 
-rule "Kundehiearki per material per avfall"
+rule "Kundehiearki per material per avfall 03"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)
@@ -580,7 +571,7 @@ rule "Kundehiearki per material per avfall"
         suggestion.setKeyCombinationTableName("A786");
 end
 
-rule "Kundehiearki per material per apparattype"
+rule "Kundehiearki per material per apparattype 03"
     when
         BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår")
         BoReportCondition(hasSalesOrg == true)

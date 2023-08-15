@@ -4,6 +4,7 @@ import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.repository.bo.ConditionCodeRepository;
+import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +24,12 @@ public class BoReportTitleTypeServiceImpl implements BoReportTitleTypeService {
     private static final Logger log = LoggerFactory.getLogger(BoReportTitleTypeServiceImpl.class);
 
     private final ConditionCodeRepository repository;
-    private final KieSession kieSession;
+    private final KieContainer kieContainer;
 
     @Autowired
-    public BoReportTitleTypeServiceImpl(ConditionCodeRepository repository, KieSession kieSession) {
+    public BoReportTitleTypeServiceImpl(ConditionCodeRepository repository, KieContainer kieContainer) {
         this.repository = repository;
-        this.kieSession = kieSession;
+        this.kieContainer = kieContainer;
     }
 
     @Override
@@ -58,21 +59,16 @@ public class BoReportTitleTypeServiceImpl implements BoReportTitleTypeService {
         return null;
     }
 
-    public Map<String, String> suggestConditionCodeAndKeyCombination(BoReportCondition condition,
-                                                                     SuggestedConditionCodeKeyCombination suggestion) {
-        String suggestedConditionCode = "";
-        String suggestedKeyCombination = "";
-        try {
-            kieSession.insert(condition);
-            kieSession.setGlobal("suggestConditionCode", suggestedConditionCode);
-            kieSession.setGlobal("suggestedKeyCombination", suggestedKeyCombination);
-            kieSession.fireAllRules();
-        } finally {
-            kieSession.dispose();
-        }
+    @Override
+    public SuggestedConditionCodeKeyCombination suggestConditionCodeAndKeyCombination(BoReportCondition condition) {
+        SuggestedConditionCodeKeyCombination localSuggestion = new SuggestedConditionCodeKeyCombination();
 
-        Map<String, String> suggestedConditionCodeAndKeyCombination = new HashMap<>();
-        suggestedConditionCodeAndKeyCombination.put(suggestedConditionCode, suggestedKeyCombination);
-        return suggestedConditionCodeAndKeyCombination;
+        KieSession kieSession = kieContainer.newKieSession();
+        kieSession.setGlobal("suggestion", localSuggestion);
+        kieSession.insert(condition);
+        kieSession.fireAllRules();
+        kieSession.dispose();
+
+        return localSuggestion;
     }
 }
