@@ -18,4 +18,8 @@ public class BoReportCondition {
     Boolean hasDevicePlacement;
     Boolean isDeviceType;
     Boolean hasSalesDocument;
+    Boolean isWasteDisposalMaterial;
+    Boolean isService;
+    Boolean isRental;
+    Boolean isProduct;
 }

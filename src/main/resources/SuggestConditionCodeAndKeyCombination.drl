@@ -25,6 +25,10 @@ rule "Salgskontor per material per avfall per sone"
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZPTR");
         suggestion.setKeyCombination("Salgskontor per material per avfall per sone");
@@ -43,6 +47,10 @@ rule "Salgskontor per material per avfall per sone Per AP"
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZPTR");
         suggestion.setKeyCombination("Salgskontor per material per avfall per sone Per AP");
@@ -61,6 +69,10 @@ when
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZPTR");
         suggestion.setKeyCombination("Salgskontor per material per sone per AP");
@@ -79,6 +91,10 @@ when
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt per kunde/material");
@@ -97,6 +113,10 @@ when
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == true)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per avfall");
@@ -115,6 +135,10 @@ when
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == true)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == true)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per apparattype");
@@ -133,6 +157,10 @@ when
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == true)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material");
@@ -151,6 +179,10 @@ when
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == true)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per avfall");
@@ -169,6 +201,10 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattyp
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == true)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == true)
+        BoReportCondition(isService == false)
+        BoReportCondition(isRental == false)
+        BoReportCondition(isProduct == false)
     then
         suggestion.setConditionCode("ZR05");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per apparattype");
@@ -187,6 +223,10 @@ rule "Rabatt per kunde/material Tjeneste"
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt per kunde/material");
@@ -205,6 +245,10 @@ rule "Rabatt salgskontor per kunde per material per avfall 02"
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per avfall");
@@ -223,6 +267,10 @@ rule "Rabatt salgskontor per kunde per material per apparattype 02"
         BoReportCondition(hasDevicePlacement == false)
         BoReportCondition(isDeviceType == true)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per apparattype");
@@ -241,6 +289,10 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material 02"
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material");
@@ -259,6 +311,10 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 02"
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == false)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per avfall");
@@ -277,6 +333,10 @@ rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattyp
         BoReportCondition(hasDevicePlacement == true)
         BoReportCondition(isDeviceType == true)
         BoReportCondition(hasSalesDocument == false)
+        BoReportCondition(isWasteDisposalMaterial == false)
+        BoReportCondition(isService == true)
+        BoReportCondition(isRental == true)
+        BoReportCondition(isProduct == true)
     then
         suggestion.setConditionCode("ZR02");
         suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per apparattype");
