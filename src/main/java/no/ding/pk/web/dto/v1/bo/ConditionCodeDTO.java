@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class TitleTypeDTO {
-    private String titleType;
+public class ConditionCodeDTO {
+    private String conditionCode;
     private List<KeyCombinationDTO> keyCombinations;
 }

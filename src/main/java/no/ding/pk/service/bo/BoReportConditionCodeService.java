@@ -7,9 +7,9 @@ import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import java.util.List;
 import java.util.Map;
 
-public interface BoReportTitleTypeService {
+public interface BoReportConditionCodeService {
 
-    List<ConditionCode> getAllTitleTypes(String type);
+    List<ConditionCode> getAllConditionCodes(String type);
 
     ConditionCode save(ConditionCode conditionCode);
 

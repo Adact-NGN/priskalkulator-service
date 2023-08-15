@@ -10,10 +10,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest
-class BoReportTitleTypeServiceImplTest {
+class BoReportConditionCodeServiceImplTest {
 
     @Autowired
-    private BoReportTitleTypeService boReportService;
+    private BoReportConditionCodeService boReportService;
 
     @Test
     public void whenCriteriaMatchingThenSuggestSalesOfficePerMaterialPerZone() {

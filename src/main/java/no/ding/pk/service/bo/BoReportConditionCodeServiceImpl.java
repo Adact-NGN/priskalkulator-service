@@ -12,28 +12,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static no.ding.pk.repository.specifications.TitleTypeSpecification.withTitleType;
 
 @Service
-public class BoReportTitleTypeServiceImpl implements BoReportTitleTypeService {
+public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeService {
 
-    private static final Logger log = LoggerFactory.getLogger(BoReportTitleTypeServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BoReportConditionCodeServiceImpl.class);
 
     private final ConditionCodeRepository repository;
     private final KieContainer kieContainer;
 
     @Autowired
-    public BoReportTitleTypeServiceImpl(ConditionCodeRepository repository, KieContainer kieContainer) {
+    public BoReportConditionCodeServiceImpl(ConditionCodeRepository repository, KieContainer kieContainer) {
         this.repository = repository;
         this.kieContainer = kieContainer;
     }
 
     @Override
-    public List<ConditionCode> getAllTitleTypes(String type) {
+    public List<ConditionCode> getAllConditionCodes(String type) {
         log.debug("Getting list of TitleType");
         return repository.findAll(Specification.where(withTitleType(type)));
     }

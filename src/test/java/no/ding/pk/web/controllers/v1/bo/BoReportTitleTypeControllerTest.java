@@ -3,8 +3,8 @@ package no.ding.pk.web.controllers.v1.bo;
 import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
-import no.ding.pk.service.bo.BoReportTitleTypeService;
-import no.ding.pk.web.dto.v1.bo.TitleTypeDTO;
+import no.ding.pk.service.bo.BoReportConditionCodeService;
+import no.ding.pk.web.dto.v1.bo.ConditionCodeDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ class BoReportTitleTypeControllerTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private BoReportTitleTypeService service;
+    private BoReportConditionCodeService service;
 
     @BeforeEach
     public void setup() {
@@ -53,33 +53,33 @@ class BoReportTitleTypeControllerTest {
 
     @Test
     public void shouldListAllTitleTypes() {
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list", TitleTypeDTO[].class);
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list", ConditionCodeDTO[].class);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO actual = responseEntity.getBody()[0];
+        ConditionCodeDTO actual = responseEntity.getBody()[0];
         assertThat(actual.getKeyCombinations(), hasSize(greaterThan(0)));
     }
 
     @Test
     public void shouldReturnEmptyListIfTitleTypeIsNotFound() {
         Map<String, String> params = Map.of("type", "ZR05");
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", TitleTypeDTO[].class,params);
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO[] actual = responseEntity.getBody();
+        ConditionCodeDTO[] actual = responseEntity.getBody();
         assertThat(actual, arrayWithSize(0));
     }
 
     @Test
     public void shouldReturnListIfTitleTypeIsFound() {
         Map<String, String> params = Map.of("type", "ZPTR");
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", TitleTypeDTO[].class,params);
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO[] actual = responseEntity.getBody();
+        ConditionCodeDTO[] actual = responseEntity.getBody();
         assertThat(actual, arrayWithSize(1));
     }
 }
