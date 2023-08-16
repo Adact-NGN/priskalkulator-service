@@ -60,6 +60,9 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
 
     @Override
     public SuggestedConditionCodeKeyCombination suggestConditionCodeAndKeyCombination(BoReportCondition condition) {
+
+        log.debug("Received BO condition: {}", condition);
+
         SuggestedConditionCodeKeyCombination localSuggestion = new SuggestedConditionCodeKeyCombination();
 
         KieSession kieSession = kieContainer.newKieSession();

@@ -27,6 +27,11 @@ class BoReportConditionCodeServiceImplTest {
                 .isWaste(false)
                 .hasDevicePlacement(false)
                 .isDeviceType(false)
+                .hasSalesDocument(false)
+                .isWasteDisposalMaterial(false)
+                .isService(false)
+                .isRental(false)
+                .isProduct(false)
                 .build();
 
         SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
@@ -34,6 +39,32 @@ class BoReportConditionCodeServiceImplTest {
         assertThat(suggestion.getConditionCode(), equalTo("ZPTR"));
         assertThat(suggestion.getKeyCombination(), equalTo("Salgskontor per material per sone"));
         assertThat(suggestion.getKeyCombinationTableName(), equalTo("A615"));
+    }
+
+    @Test
+    public void whenCriteriaMatchingThenSuggestSalesOfficePerMaterialPerWastePerZone() {
+        BoReportCondition condition = BoReportCondition.builder()
+                .terms("Generelle Vilkår")
+                .hasSalesOrg(true)
+                .isPricedOnSalesOffice(true)
+                .isCustomer(true)
+                .isNode(false)
+                .isZoneMaterial(true)
+                .isWaste(true)
+                .hasDevicePlacement(false)
+                .isDeviceType(false)
+                .hasSalesDocument(false)
+                .isWasteDisposalMaterial(false)
+                .isService(false)
+                .isRental(false)
+                .isProduct(false)
+                .build();
+
+        SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
+
+        assertThat(suggestion.getConditionCode(), equalTo("ZPTR"));
+        assertThat(suggestion.getKeyCombination(), equalTo("Salgskontor per material per avfall per sone"));
+        assertThat(suggestion.getKeyCombinationTableName(), equalTo("A783"));
     }
 
     @Test
@@ -49,6 +80,10 @@ class BoReportConditionCodeServiceImplTest {
                 .hasDevicePlacement(false)
                 .isDeviceType(false)
                 .hasSalesDocument(false)
+                .isWasteDisposalMaterial(true)
+                .isService(false)
+                .isRental(false)
+                .isProduct(false)
                 .build();
 
         SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
@@ -67,10 +102,14 @@ class BoReportConditionCodeServiceImplTest {
                 .isCustomer(true)
                 .isNode(false)
                 .isZoneMaterial(false)
-                .isWaste(true)
+                .isWaste(false)
                 .hasDevicePlacement(false)
                 .isDeviceType(false)
                 .hasSalesDocument(false)
+                .isWasteDisposalMaterial(false)
+                .isService(false)
+                .isRental(false)
+                .isProduct(false)
                 .build();
 
         SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
@@ -78,5 +117,31 @@ class BoReportConditionCodeServiceImplTest {
         assertThat(suggestion.getConditionCode(), equalTo("ZPRK"));
         assertThat(suggestion.getKeyCombination(), equalTo("Rabatt per kunde/material"));
         assertThat(suggestion.getKeyCombinationTableName(), equalTo("A704"));
+    }
+
+    @Test
+    public void whenCriteriaMatchingThenSuggestCustomerHierarchyPerMaterial() {
+        BoReportCondition condition = BoReportCondition.builder()
+                .terms("Kundens vilkår")
+                .hasSalesOrg(true)
+                .isPricedOnSalesOffice(false)
+                .isCustomer(false)
+                .isNode(true)
+                .isZoneMaterial(false)
+                .isWaste(false)
+                .hasDevicePlacement(false)
+                .isDeviceType(false)
+                .hasSalesDocument(false)
+                .isWasteDisposalMaterial(false)
+                .isService(false)
+                .isRental(false)
+                .isProduct(false)
+                .build();
+
+        SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
+
+        assertThat(suggestion.getConditionCode(), equalTo("ZH00"));
+        assertThat(suggestion.getKeyCombination(), equalTo("Kundehiearki per material"));
+        assertThat(suggestion.getKeyCombinationTableName(), equalTo("A767"));
     }
 }
