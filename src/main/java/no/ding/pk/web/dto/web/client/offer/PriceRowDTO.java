@@ -28,6 +28,7 @@ public class PriceRowDTO {
     private String materialDesignation;
     private String productGroupDesignation;
     private String deviceType;
+    private String devicePlacement;
     private Boolean showPriceInOffer;
     private Double manualPrice;
     private Double discountedPrice;

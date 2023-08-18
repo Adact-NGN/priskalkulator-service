@@ -1,3 +1,4 @@
+
 package no.ding.pk.service.bo;
 
 import no.ding.pk.domain.bo.BoReportCondition;
