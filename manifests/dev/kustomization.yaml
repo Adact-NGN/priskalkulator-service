@@ -1,6 +1,7 @@
 resources:
 - ../base
 - ingress.yaml
+- secrets.yaml
 
 namespace: priskalkulator-dev
 images:
