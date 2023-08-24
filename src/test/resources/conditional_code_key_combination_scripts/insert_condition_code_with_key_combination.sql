@@ -80,10 +80,9 @@ INSERT INTO condition_codes (code) VALUES ('ZBEH');
 SET @temp_id = (SELECT id FROM condition_codes WHERE code = 'ZBEH');
 
 INSERT INTO key_combinations (key_combination, description, condition_code_id) VALUES ('814', 'Behandlingsgebyr', @temp_id);
-# : sorg/sk/kunde/apptype/varegruppe
 
 INSERT INTO condition_codes (code) VALUES ('ZMIL');
 SET @temp_id = (SELECT id FROM condition_codes WHERE code = 'ZMIL');
 
-INSERT INTO key_combinations (key_combination, description, condition_code_id) VALUES ('777', 'Dersom miljøgebyr er satt til 0, må saken inn til OP.', @temp_id); #:Sorg/oppdr.giv/material; 776:sorg/oppdr.giv/varegruppe;803:sorg/oppdr.giv/AP/Varegruppe
+INSERT INTO key_combinations (key_combination, description, condition_code_id) VALUES ('777', 'Dersom miljøgebyr er satt til 0, må saken inn til OP.', @temp_id);
 

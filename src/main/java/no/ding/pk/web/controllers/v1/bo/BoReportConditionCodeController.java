@@ -2,13 +2,15 @@ package no.ding.pk.web.controllers.v1.bo;
 
 import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
+import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.bo.BoReportConditionCodeService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.bo.BoKeyCodeSuggestionDTO;
 import no.ding.pk.web.dto.v1.bo.ConditionCodeDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v1.bo.KeyCombinationDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +42,29 @@ public class BoReportConditionCodeController {
      * @return List of {@code ConditionCodeDTO}
      */
     @GetMapping(path = "/list")
-    public List<ConditionCodeDTO> list(@RequestParam(value = "type", required = false) String type) {
+    public List<ConditionCodeDTO> list(@RequestParam(value = "code", required = false) String code) {
         log.debug("Requesting for all title types with key combinations.");
-        List<ConditionCode> conditionCodes = service.getAllConditionCodes(type);
+        List<ConditionCode> conditionCodes = service.getAllConditionCodes(code);
 
         return conditionCodes.stream().map(titleType -> modelMapper.map(titleType, ConditionCodeDTO.class)).toList();
+    }
+
+    /**
+     * Get list of KeyCombination based on selected ConditionCode
+     * @param conditionCode condition code to look up key combinations for, not required.
+     * @return List of all key combinations, else if condition code is given all key combinations related to given code.
+     */
+    @GetMapping(path = "/list/key-combination")
+    public List<KeyCombinationDTO> listKeyCombinations(@RequestParam(name = "conditionCode", required = false) String conditionCode) {
+        if(StringUtils.isNotBlank(conditionCode)) {
+            List<KeyCombination> keyCombinations = service.getKeyCombinationByConditionCode(conditionCode);
+
+            return keyCombinations.stream().map(keyCombination -> modelMapper.map(keyCombination, KeyCombinationDTO.class)).toList();
+        }
+
+        List<KeyCombination> keyCombinations = service.getKeyCombinationList();
+
+        return keyCombinations.stream().map(keyCombination -> modelMapper.map(keyCombination, KeyCombinationDTO.class)).toList();
     }
 
     /**

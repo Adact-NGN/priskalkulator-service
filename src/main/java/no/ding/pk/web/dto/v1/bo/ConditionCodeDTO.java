@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class ConditionCodeDTO {
-    private String conditionCode;
+    private String code;
     private List<KeyCombinationDTO> keyCombinations;
 }

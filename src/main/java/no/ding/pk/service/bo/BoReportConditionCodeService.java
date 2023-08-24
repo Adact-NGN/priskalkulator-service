@@ -2,6 +2,7 @@ package no.ding.pk.service.bo;
 
 import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
+import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.domain.offer.PriceOffer;
 
@@ -21,4 +22,8 @@ public interface BoReportConditionCodeService {
     SuggestedConditionCodeKeyCombination suggestConditionCodeAndKeyCombination(BoReportCondition condition);
 
     Map<String, Map<String, SuggestedConditionCodeKeyCombination>> getSuggerstionsForPriceOfferBoConditionalMap(Map<String, Map<String, BoReportCondition>> priceOfferBoConditionalMap);
+
+    List<KeyCombination> getKeyCombinationByConditionCode(String conditionCode);
+
+    List<KeyCombination> getKeyCombinationList();
 }

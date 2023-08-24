@@ -2,12 +2,14 @@ package no.ding.pk.service.bo;
 
 import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
+import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.bo.ConditionCodeRepository;
+import no.ding.pk.repository.bo.KeyCombinationRepository;
 import no.ding.pk.web.enums.CustomerType;
 import org.apache.commons.lang3.StringUtils;
 import org.kie.api.runtime.KieContainer;
@@ -30,17 +32,19 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
     private static final Logger log = LoggerFactory.getLogger(BoReportConditionCodeServiceImpl.class);
 
     private final ConditionCodeRepository repository;
+    private final KeyCombinationRepository keyCombinationRepository;
     private final KieContainer kieContainer;
 
     @Autowired
-    public BoReportConditionCodeServiceImpl(ConditionCodeRepository repository, KieContainer kieContainer) {
+    public BoReportConditionCodeServiceImpl(ConditionCodeRepository repository, KeyCombinationRepository keyCombinationRepository, KieContainer kieContainer) {
         this.repository = repository;
+        this.keyCombinationRepository = keyCombinationRepository;
         this.kieContainer = kieContainer;
     }
 
     @Override
     public List<ConditionCode> getAllConditionCodes(String type) {
-        log.debug("Getting list of TitleType");
+        log.debug("Getting list of ConditionCode");
         return repository.findAll(Specification.where(withTitleType(type)));
     }
 
@@ -206,5 +210,16 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
         }
 
         return suggestions;
+    }
+
+    @Override
+    public List<KeyCombination> getKeyCombinationByConditionCode(String conditionCode) {
+        ConditionCode conditionCodeByCode = repository.findConditionCodeByCode(conditionCode);
+        return conditionCodeByCode.getKeyCombinations();
+    }
+
+    @Override
+    public List<KeyCombination> getKeyCombinationList() {
+        return keyCombinationRepository.findAll();
     }
 }

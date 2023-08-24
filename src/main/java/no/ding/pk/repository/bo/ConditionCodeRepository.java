@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConditionCodeRepository extends JpaRepository<ConditionCode, Long>, JpaSpecificationExecutor<ConditionCode> {
+    ConditionCode findConditionCodeByCode(String conditionCode);
 }
