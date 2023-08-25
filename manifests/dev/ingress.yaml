@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    #nginx.ingress.kubernetes.io/whitelist-source-range: "20.103.216.112/32"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "20.103.216.112/32"
   name: priskalkulator-ingress
   namespace: priskalkulator-dev
 spec:
