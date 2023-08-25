@@ -1,8 +1,5 @@
 package no.ding.pk.web.controllers.v1.bo;
 
-import no.ding.pk.domain.bo.ConditionCode;
-import no.ding.pk.domain.bo.KeyCombination;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.repository.bo.ConditionCodeRepository;
 import no.ding.pk.service.bo.BoReportConditionCodeService;
 import no.ding.pk.web.dto.v1.bo.ConditionCodeDTO;
@@ -15,10 +12,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.util.List;
 import java.util.Map;
@@ -33,10 +28,10 @@ import static org.hamcrest.Matchers.*;
         "/conditional_code_key_combination_scripts/drop_schemas.sql",
         "/conditional_code_key_combination_scripts/create_condition_code.sql",
         "/conditional_code_key_combination_scripts/create_key_combination.sql"
-})
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {
         "/conditional_code_key_combination_scripts/insert_condition_code_with_key_combination.sql"
-})
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class BoReportTitleTypeControllerTest {
 
     @LocalServerPort
@@ -51,6 +46,8 @@ class BoReportTitleTypeControllerTest {
     @Autowired
     private ConditionCodeRepository conditionCodeRepository;
     private String baseUrl;
+
+
 
     @BeforeEach
     public void setup() {
