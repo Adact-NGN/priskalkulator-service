@@ -1,6 +1,7 @@
 package no.ding.pk.domain.offer;
 
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -60,6 +61,10 @@ public class SalesOffice {
     @JoinColumn(name = "rental_list_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_rentalList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> rentalList;
+
+    public boolean hasSalesOrg() {
+        return StringUtils.isNotBlank(this.salesOrg);
+    }
 
     @Override
     public String toString() {

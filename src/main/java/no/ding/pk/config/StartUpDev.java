@@ -9,8 +9,6 @@ import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialService;
-import no.ding.pk.service.offer.PriceOfferService;
-import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.SalesRoleName;
 import org.slf4j.Logger;
@@ -99,7 +97,7 @@ public class StartUpDev {
                         salesEmployee = userService.save(salesEmployee, null);
                 }
 
-                SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName(SalesRoleName.SalgskonsulentRolleA.name());
+                SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName(SalesRoleName.Salgskonsulent.name());
 
                 if(salesConsultant != null && salesConsultant.getUserList() != null && !salesConsultant.getUserList().contains(salesEmployee)) {
                         salesConsultant.addUser(salesEmployee);

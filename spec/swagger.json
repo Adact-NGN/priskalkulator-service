@@ -184,6 +184,35 @@
       },
       "tags": ["price-offer-controller"]
     }},
+    "/api/v1/bo-report/condition-code/suggestions/price-offer/{id}": {"get": {
+      "summary": "getSuggestions",
+      "produces": ["application/json"],
+      "operationId": "getSuggestionsUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "additionalProperties": {
+              "additionalProperties": {"$ref": "#/definitions/BoKeyCodeSuggestionDTO"},
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "path",
+        "name": "id",
+        "format": "int64",
+        "description": "id",
+        "type": "integer",
+        "required": true
+      }],
+      "tags": ["bo-report-condition-code-controller"]
+    }},
     "/api/v1/sales-office-power-of-attorney/create": {"post": {
       "summary": "create",
       "produces": ["application/json"],
@@ -1421,6 +1450,31 @@
       }],
       "tags": ["ad-user-controller"]
     }},
+    "/api/v1/bo-report/condition-code/list/key-combination": {"get": {
+      "summary": "listKeyCombinations",
+      "produces": ["*/*"],
+      "operationId": "listKeyCombinationsUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/KeyCombinationDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "query",
+        "name": "conditionCode",
+        "description": "conditionCode",
+        "type": "string",
+        "required": false
+      }],
+      "tags": ["bo-report-condition-code-controller"]
+    }},
     "/api/v2/price-offer/delete/{id}": {"delete": {
       "summary": "delete",
       "produces": ["application/json"],
@@ -2152,6 +2206,31 @@
       ],
       "tags": ["discount-controller"]
     }},
+    "/api/v1/bo-report/condition-code/list": {"get": {
+      "summary": "list",
+      "produces": ["*/*"],
+      "operationId": "listUsingGET",
+      "responses": {
+        "200": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/definitions/ConditionCodeDTO"}
+          },
+          "description": "OK"
+        },
+        "401": {"description": "Unauthorized"},
+        "403": {"description": "Forbidden"},
+        "404": {"description": "Not Found"}
+      },
+      "parameters": [{
+        "in": "query",
+        "name": "code",
+        "description": "code",
+        "type": "string",
+        "required": false
+      }],
+      "tags": ["bo-report-condition-code-controller"]
+    }},
     "/api/discount/batch": {"post": {
       "summary": "createDiscounts",
       "produces": ["application/json"],
@@ -2581,31 +2660,6 @@
       },
       "tags": ["user-controller"]
     }},
-    "/api/v1/bo-report/title-type/list": {"get": {
-      "summary": "list",
-      "produces": ["*/*"],
-      "operationId": "listUsingGET",
-      "responses": {
-        "200": {
-          "schema": {
-            "type": "array",
-            "items": {"$ref": "#/definitions/TitleTypeDTO"}
-          },
-          "description": "OK"
-        },
-        "401": {"description": "Unauthorized"},
-        "403": {"description": "Forbidden"},
-        "404": {"description": "Not Found"}
-      },
-      "parameters": [{
-        "in": "query",
-        "name": "type",
-        "description": "type",
-        "type": "string",
-        "required": false
-      }],
-      "tags": ["bo-report-title-type-controller"]
-    }},
     "/ssl-test": {"get": {
       "summary": "inbound",
       "produces": ["*/*"],
@@ -2718,6 +2772,7 @@
         "customerName": {"type": "string"},
         "priceOfferStatus": {"type": "string"},
         "customerTerms": {"$ref": "#/definitions/PriceOfferTerms"},
+        "customerType": {"type": "string"},
         "createdDate": {
           "format": "date-time",
           "type": "string"
@@ -2785,6 +2840,8 @@
           "format": "int64",
           "type": "integer"
         },
+        "devicePlacement": {"type": "string"},
+        "deviceType": {"type": "string"},
         "amount": {
           "format": "int32",
           "type": "integer"
@@ -2828,6 +2885,15 @@
         "material": {"$ref": "#/definitions/Material"},
         "createdBy": {"type": "string"},
         "categoryId": {"type": "string"}
+      }
+    },
+    "BoKeyCodeSuggestionDTO": {
+      "type": "object",
+      "title": "BoKeyCodeSuggestionDTO",
+      "properties": {
+        "keyCombinationTableName": {"type": "string"},
+        "keyCombination": {"type": "string"},
+        "conditionCode": {"type": "string"}
       }
     },
     "Discount": {
@@ -2933,6 +2999,7 @@
         },
         "customerName": {"type": "string"},
         "customerTerms": {"$ref": "#/definitions/PriceOfferTerms"},
+        "customerType": {"type": "string"},
         "createdDate": {
           "format": "date-time",
           "type": "string"
@@ -2942,6 +3009,17 @@
         "id": {
           "format": "int64",
           "type": "integer"
+        }
+      }
+    },
+    "ConditionCodeDTO": {
+      "type": "object",
+      "title": "ConditionCodeDTO",
+      "properties": {
+        "code": {"type": "string"},
+        "keyCombinations": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/KeyCombinationDTO"}
         }
       }
     },
@@ -3382,17 +3460,6 @@
         "description": {"type": "string"}
       }
     },
-    "TitleTypeDTO": {
-      "type": "object",
-      "title": "TitleTypeDTO",
-      "properties": {
-        "titleType": {"type": "string"},
-        "keyCombinations": {
-          "type": "array",
-          "items": {"$ref": "#/definitions/KeyCombinationDTO"}
-        }
-      }
-    },
     "PriceOfferDTO": {
       "type": "object",
       "title": "PriceOfferDTO",
@@ -3423,6 +3490,7 @@
         },
         "priceOfferStatus": {"type": "string"},
         "customerTerms": {"$ref": "#/definitions/TermsDTO"},
+        "customerType": {"type": "string"},
         "dateCreated": {
           "format": "date-time",
           "type": "string"
@@ -3938,8 +4006,8 @@
       "description": "Ad User Controller"
     },
     {
-      "name": "bo-report-title-type-controller",
-      "description": "Bo Report Title Type Controller"
+      "name": "bo-report-condition-code-controller",
+      "description": "Bo Report Condition Code Controller"
     },
     {
       "name": "contact-person-controller",

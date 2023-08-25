@@ -1,29 +1,34 @@
 package no.ding.pk.web.controllers.v1.bo;
 
-import no.ding.pk.domain.bo.KeyCombination;
-import no.ding.pk.domain.bo.TitleType;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
-import no.ding.pk.service.bo.BoReportTitleTypeService;
-import no.ding.pk.web.dto.v1.bo.TitleTypeDTO;
+import no.ding.pk.web.dto.v1.bo.ConditionCodeDTO;
+import no.ding.pk.web.dto.v1.bo.KeyCombinationDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
+@Sql(value = {
+        "/conditional_code_key_combination_scripts/drop_schemas.sql",
+        "/conditional_code_key_combination_scripts/create_condition_code.sql",
+        "/conditional_code_key_combination_scripts/create_key_combination.sql"
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = {
+        "/conditional_code_key_combination_scripts/insert_condition_code_with_key_combination.sql"
+}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class BoReportTitleTypeControllerTest {
 
     @LocalServerPort
@@ -32,54 +37,54 @@ class BoReportTitleTypeControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private BoReportTitleTypeService service;
+    private String baseUrl;
 
     @BeforeEach
     public void setup() {
-        TitleType titleType = TitleType.builder()
-                .titleType("ZPTR")
-                .build();
-
-        KeyCombination keyCombination = KeyCombination.builder()
-                .keyCombination("A615")
-                .description("Salgskontor per material per sone")
-                .build();
-
-        titleType.addKeyCombination(keyCombination);
-
-        service.save(titleType);
+        baseUrl = "http://localhost:" + serverPort + "/api/v1/bo-report/condition-code";
     }
 
     @Test
-    public void shouldListAllTitleTypes() {
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list", TitleTypeDTO[].class);
+    public void shouldListAllConditionCodes() {
+
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list", ConditionCodeDTO[].class);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO actual = responseEntity.getBody()[0];
-        assertThat(actual.getKeyCombinations(), hasSize(greaterThan(0)));
+        List<ConditionCodeDTO> actual = List.of(responseEntity.getBody());
+        assertThat(actual, hasSize(greaterThan(0)));
+
+        ConditionCodeDTO firstActual = actual.get(0);
+        assertThat(firstActual.getCode(), notNullValue());
+        assertThat(firstActual.getKeyCombinations(), hasSize(greaterThan(0)));
     }
 
     @Test
-    public void shouldReturnEmptyListIfTitleTypeIsNotFound() {
-        Map<String, String> params = Map.of("type", "ZR05");
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", TitleTypeDTO[].class,params);
+    public void shouldReturnEmptyListIfConditionCodeIsNotFound() {
+        Map<String, String> params = Map.of("code", "ZR0X");
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?code={code}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO[] actual = responseEntity.getBody();
+        ConditionCodeDTO[] actual = responseEntity.getBody();
         assertThat(actual, arrayWithSize(0));
     }
 
     @Test
-    public void shouldReturnListIfTitleTypeIsFound() {
-        Map<String, String> params = Map.of("type", "ZPTR");
-        ResponseEntity<TitleTypeDTO[]> responseEntity = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/bo-report/title-type/list?type={type}", TitleTypeDTO[].class,params);
+    public void shouldReturnListIfConditionCodeIsFound() {
+        Map<String, String> params = Map.of("code", "ZPTR");
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?code={code}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
-        TitleTypeDTO[] actual = responseEntity.getBody();
+        ConditionCodeDTO[] actual = responseEntity.getBody();
         assertThat(actual, arrayWithSize(1));
+    }
+
+    @Test
+    public void shouldReturnAllKeyCombinationsWhenCodeIsNotGiven() {
+        ResponseEntity<KeyCombinationDTO[]> responseEntity  = restTemplate.getForEntity(baseUrl + "/list/key-combination", KeyCombinationDTO[].class);
+
+        assertThat(responseEntity.getStatusCode(), org.hamcrest.Matchers.equalTo(HttpStatus.OK));
     }
 }

@@ -8,22 +8,25 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Condition Code => Betingelsestype
+ */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "title_types")
+@Table(name = "condition_codes")
 @Entity
-public class TitleType {
+public class ConditionCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String titleType;
+    @Column(name = "code")
+    private String code;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "titleType")
+    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "conditionCode")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<KeyCombination> keyCombinations;
 
@@ -32,7 +35,7 @@ public class TitleType {
             keyCombinations = new ArrayList<>();
         }
 
-        keyCombination.setTitleType(this);
+        keyCombination.setConditionCode(this);
 
         keyCombinations.add(keyCombination);
     }

@@ -35,6 +35,12 @@ public class PriceRow extends Auditable {
     private Material material;
 
     @Column
+    private String deviceType;
+
+    @Column
+    private String devicePlacement;
+
+    @Column
     private Boolean showPriceInOffer;
 
     @Column
