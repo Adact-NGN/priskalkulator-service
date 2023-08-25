@@ -1,7 +1,5 @@
 package no.ding.pk.web.controllers.v1.bo;
 
-import no.ding.pk.repository.bo.ConditionCodeRepository;
-import no.ding.pk.service.bo.BoReportConditionCodeService;
 import no.ding.pk.web.dto.v1.bo.ConditionCodeDTO;
 import no.ding.pk.web.dto.v1.bo.KeyCombinationDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
 @Sql(value = {
         "/conditional_code_key_combination_scripts/drop_schemas.sql",
@@ -40,30 +37,11 @@ class BoReportTitleTypeControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private BoReportConditionCodeService service;
-
-    @Autowired
-    private ConditionCodeRepository conditionCodeRepository;
     private String baseUrl;
-
-
 
     @BeforeEach
     public void setup() {
         baseUrl = "http://localhost:" + serverPort + "/api/v1/bo-report/condition-code";
-//        ConditionCode conditionCode = ConditionCode.builder()
-//                .code("ZPTR")
-//                .build();
-//
-//        KeyCombination keyCombination = KeyCombination.builder()
-//                .keyCombination("A615")
-//                .description("Salgskontor per material per sone")
-//                .build();
-//
-//        conditionCode.addKeyCombination(keyCombination);
-//
-//        service.save(conditionCode);
     }
 
     @Test
@@ -83,8 +61,8 @@ class BoReportTitleTypeControllerTest {
 
     @Test
     public void shouldReturnEmptyListIfConditionCodeIsNotFound() {
-        Map<String, String> params = Map.of("code", "ZR05");
-        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?type={code}", ConditionCodeDTO[].class,params);
+        Map<String, String> params = Map.of("code", "ZR0X");
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?code={code}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
@@ -95,7 +73,7 @@ class BoReportTitleTypeControllerTest {
     @Test
     public void shouldReturnListIfConditionCodeIsFound() {
         Map<String, String> params = Map.of("code", "ZPTR");
-        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?type={code}", ConditionCodeDTO[].class,params);
+        ResponseEntity<ConditionCodeDTO[]> responseEntity = restTemplate.getForEntity(baseUrl + "/list?code={code}", ConditionCodeDTO[].class,params);
 
         assertThat(responseEntity.getBody(), notNullValue());
 
