@@ -386,6 +386,46 @@ class PriceOfferControllerTest {
         assertThat(salesOffices.size(), greaterThan(1));
     }
 
+    @Test
+    public void shouldPersistPriceOfferWithSeveralSalesOfficesAndZones() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithMultipleSoAndZones.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO actualPo = actual.getBody();
+
+        assertThat(actualPo, notNullValue());
+        List<SalesOfficeDTO> salesOffices = actualPo.getSalesOfficeList();
+
+        assertThat(salesOffices.size(), greaterThan(1));
+    }
+
+    @Test
+    public void shouldUpdatePriceOfferAfterChangesFromUser() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithMultipleSoAndZones.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> createdEntity = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(createdEntity.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO createdResponse = createdEntity.getBody();
+
+        PriceOfferDTO updatedPriceOfferDTO = createCompleteOfferDto("updatedPriceOfferAfterCreation.json");
+
+        updatedPriceOfferDTO.setId(createdResponse.getId());
+
+        String updateUrl = "/api/v2/price-offer/save/" + createdResponse.getId();
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.put(updateUrl, priceOfferDTO);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+
+    }
+
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {
         return PriceOffer.priceOfferBuilder()
                 .customerNumber("102520")
