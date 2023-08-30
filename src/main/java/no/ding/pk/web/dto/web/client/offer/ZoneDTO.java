@@ -18,6 +18,7 @@ import java.util.List;
 public class
 ZoneDTO {
     Long id;
+    String salesOffice;
     String number;
     String postalCode;
     String postalName;

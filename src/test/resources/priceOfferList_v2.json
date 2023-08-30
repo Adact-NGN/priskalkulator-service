@@ -745,20 +745,29 @@
       }
     ],
     "salesEmployee": {
-      
-      "adId": "dc804853-6a82-4022-8eb5-244fff724af2",
-      "name": "Kjetil",
-      "username": "kjetil.torvund.minde@ngn.no",
-      "usernameAlias": "vh2308",
-      "jobTitle": "Systemutvikler",
-      "fullName": "Kjetil Torvund Minde",
-      "resourceNr": "63940",
-      "phoneNumber": "+4790135757",
-      "email": "kjetil.torvund.minde@ngn.no",
-      "associatedPlace": "Larvik",
-      "powerOfAttorneyOA": "2",
-      "powerOfAttorneyFA": "2",
-      "department": "Adact"
+      "id": 6012,
+      "adId": "e2f1963a-072a-4414-8a0b-6a3aa6988e0c",
+      "orgNr": "100",
+      "orgName": null,
+      "regionName": null,
+      "sureName": "Brox",
+      "name": "Alexander",
+      "username": null,
+      "usernameAlias": null,
+      "jobTitle": "Markedskonsulent",
+      "fullName": "Alexander Brox",
+      "resourceNr": "63874",
+      "phoneNumber": "95838638",
+      "email": "alexander.brox@ngn.no",
+      "salesRoleId": null,
+      "associatedPlace": "Oslo",
+      "powerOfAttorneyOA": "5",
+      "powerOfAttorneyFA": "3",
+      "overallPowerOfAttorney": null,
+      "emailSalesManager": null,
+      "regionalManagersPowerOfAttorney": null,
+      "emailRegionalManager": null,
+      "department": null
     },
     "customerTerms": {
       
