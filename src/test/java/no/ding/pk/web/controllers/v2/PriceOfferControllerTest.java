@@ -10,10 +10,7 @@ import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
-import no.ding.pk.web.dto.web.client.offer.TermsDTO;
+import no.ding.pk.web.dto.web.client.offer.*;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
@@ -370,6 +367,23 @@ class PriceOfferControllerTest {
         actualPo.getSalesOfficeList().forEach(salesOfficeDTO -> salesOfficeDTO.getMaterialList().forEach(priceRowDTO -> deviceTypes.add(priceRowDTO.getDeviceType())));
 
         assertThat(deviceTypes.size(), greaterThan(1));
+    }
+
+    @Test
+    public void shouldPersistPriceOfferWithSeveralSalesOffices() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferDtoMultipleSO.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO actualPo = actual.getBody();
+
+        assertThat(actualPo, notNullValue());
+        List<SalesOfficeDTO> salesOffices = actualPo.getSalesOfficeList();
+
+        assertThat(salesOffices.size(), greaterThan(1));
     }
 
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {

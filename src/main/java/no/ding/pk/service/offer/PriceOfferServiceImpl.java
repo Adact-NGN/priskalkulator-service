@@ -155,12 +155,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
 
+            if(salesOffice.getZoneList() != null && !salesOffice.getZoneList().isEmpty()) {
+                salesOffice.getZoneList().stream().flatMap(zone -> zone.getPriceRows().stream()).map(priceRow -> priceRow.getMaterial().getMaterialNumber()).forEach(mateiralNumberSet::add);
+            }
+
             // Create sales office to material number map.
             Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
             salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
 
             // Add map to sales org map, sales office, material number map.
-            discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
+            if(discountMap.containsKey(salesOffice.getSalesOrg())) {
+                discountMap.get(salesOffice.getSalesOrg()).putAll(salesOfficeMaterialMap);
+            } else {
+                discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
+            }
         }
 
         Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
