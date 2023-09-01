@@ -156,7 +156,15 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
 
             if(salesOffice.getZoneList() != null && !salesOffice.getZoneList().isEmpty()) {
-                salesOffice.getZoneList().stream().flatMap(zone -> zone.getPriceRows().stream()).map(priceRow -> priceRow.getMaterial().getMaterialNumber()).forEach(mateiralNumberSet::add);
+                for (Zone zone : salesOffice.getZoneList()) {
+                    if(zone.getPriceRows() == null) {
+                        continue;
+                    }
+
+                    for (PriceRow priceRow : zone.getPriceRows()) {
+                        mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
+                    }
+                }
             }
 
             // Create sales office to material number map.

@@ -156,6 +156,7 @@
       "postalCode": "3933",
       "city": "PORSGRUNN",
       "zoneList": [
+
         {
           "salesOffice": "104",
           "number": "0000000002",
@@ -218,6 +219,22 @@
               "needsApproval": false
             }
           ]
+        },
+        {
+          "salesOffice": "104",
+          "number": "0000000003",
+          "postalCode": "3933",
+          "postalName": "Porsgrunn",
+          "isStandardZone": false,
+          "materialList": null
+        },
+        {
+          "salesOffice": "104",
+          "number": "0000000004",
+          "postalCode": "3933",
+          "postalName": "Porsgrunn",
+          "isStandardZone": false,
+          "materialList": []
         }
       ],
       "materialList": [
