@@ -121,7 +121,7 @@ public class PriceOfferController {
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ApprovalRequest approvalRequest) {
         log.debug("Approval request received with request body: {}", approvalRequest);
-        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getDismissalReason());
+        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getAdditionalInformation());
     }
     
     /**
@@ -189,8 +189,6 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-//        mapMaterialValues(priceOfferDTO, priceOffer);
-        
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         priceOffer = service.save(priceOffer);
         

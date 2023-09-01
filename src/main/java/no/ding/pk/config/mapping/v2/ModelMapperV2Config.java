@@ -109,7 +109,8 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(PriceOffer.class, PriceOfferDTO.class)
                 .addMapping(PriceOffer::getCreatedDate, PriceOfferDTO::setDateCreated)
                 .addMapping(PriceOffer::getLastModifiedDate, PriceOfferDTO::setDateUpdated)
-                .addMapping(PriceOffer::getDismissalReason, PriceOfferDTO::setDismissalReason)
+                .addMapping(PriceOffer::getAdditionalInformation, PriceOfferDTO::setAdditionalInformation)
+                .addMapping(PriceOffer::getGeneralComment, PriceOfferDTO::setGeneralComment)
                 .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
     }
 
@@ -125,7 +126,8 @@ public class ModelMapperV2Config {
         };
 
         modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
-                .addMapping(PriceOfferDTO::getDismissalReason, PriceOffer::setDismissalReason)
+                .addMapping(PriceOfferDTO::getAdditionalInformation, PriceOffer::setAdditionalInformation)
+                .addMapping(PriceOfferDTO::getGeneralComment, PriceOffer::setGeneralComment)
                 .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
     }
 

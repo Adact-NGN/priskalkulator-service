@@ -62,7 +62,10 @@ public class PriceOffer extends Offer implements Serializable {
     private Boolean needsApproval;
 
     @Column
-    private String dismissalReason;
+    private String generalComment;
+
+    @Column
+    private String additionalInformation; // Godkjenning/Avslagg
 
     @Column
     private Date activationDate;

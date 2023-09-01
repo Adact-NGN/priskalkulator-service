@@ -2743,6 +2743,7 @@
       "title": "PriceOffer",
       "properties": {
         "approver": {"$ref": "#/definitions/User"},
+        "additionalInformation": {"type": "string"},
         "contactPersonList": {
           "type": "array",
           "items": {"$ref": "#/definitions/ContactPerson"}
@@ -2762,7 +2763,7 @@
           "type": "string"
         },
         "lastModifiedBy": {"type": "string"},
-        "dismissalReason": {"type": "string"},
+        "generalComment": {"type": "string"},
         "needsApproval": {"type": "boolean"},
         "customerNumber": {"type": "string"},
         "salesOfficeList": {
@@ -3192,7 +3193,7 @@
       "type": "object",
       "title": "ApprovalRequest",
       "properties": {
-        "dismissalReason": {"type": "string"},
+        "additionalInformation": {"type": "string"},
         "status": {"type": "string"}
       }
     },
@@ -3465,6 +3466,7 @@
       "title": "PriceOfferDTO",
       "properties": {
         "approver": {"$ref": "#/definitions/UserDTO"},
+        "additionalInformation": {"type": "string"},
         "dateIssued": {
           "format": "date-time",
           "type": "string"
@@ -3476,7 +3478,7 @@
         },
         "lastModifiedBy": {"type": "string"},
         "contactPerson": {"$ref": "#/definitions/ContactPersonDTO"},
-        "dismissalReason": {"type": "string"},
+        "generalComment": {"type": "string"},
         "needsApproval": {"type": "boolean"},
         "customerNumber": {"type": "string"},
         "salesOfficeList": {
