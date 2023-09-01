@@ -23,6 +23,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -631,6 +632,65 @@ class PriceOfferServiceImplTest {
         List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), PriceOfferStatus.PENDING.getStatus());
 
         assertThat(actual, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldPersistMaterialWithDeviceType() {
+        String materialNumber = "50301";
+        String deviceType = "B-0040-FO";
+
+        MaterialPrice materialPrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(175.0)
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .validTo(new Date(253402214400000L))
+                .build();
+
+        Material material = Material.builder()
+                .salesOrg("100")
+                .salesOffice("100")
+                .materialNumber(materialNumber)
+                .deviceType(deviceType)
+                .materialTypeDescription("Tjeneste")
+                .materialType("DIEN")
+                .materialStandardPrice(materialPrice)
+                .materialGroup("0503")
+                .pricingUnit(1)
+                .build();
+
+        PriceRow priceRow = PriceRow.builder()
+                .material(material)
+                .discountLevel(2)
+                .needsApproval(false)
+                .build();
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOffice("100")
+                .materialList(List.of(priceRow))
+                .build();
+
+        User user = userService.findByEmail("alexander.brox@ngn.no");
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(user)
+                .salesOfficeList(List.of(salesOffice))
+                .approver(user)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .build();
+
+        PriceOffer saved = service.save(priceOffer);
+
+        Optional<PriceOffer> actual = service.findById(saved.getId());
+
+        assertThat(actual.isPresent(), is(true));
+
+        PriceOffer actualPriceOffer = actual.get();
+
+        Material actualMaterial = actualPriceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).getMaterial();
+
+        assertThat(actualMaterial.getDeviceType(), notNullValue());
+        assertThat(actualMaterial.getDeviceType(), equalTo(deviceType));
+
     }
 
     private void persistSalesRoles() {
