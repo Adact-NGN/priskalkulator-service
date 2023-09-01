@@ -72,10 +72,12 @@ public class ZoneServiceImpl implements ZoneService {
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, materialStdPrices, discountMap);
 
-                zone.setPriceRows(materials);
+                entity.setPriceRows(materials);
             }
 
-            returnZoneList.add(zone);
+//            entity = repository.save(entity);
+
+            returnZoneList.add(entity);
         }
 
         log.debug("Persisted {} amount of Zones", returnZoneList.size());

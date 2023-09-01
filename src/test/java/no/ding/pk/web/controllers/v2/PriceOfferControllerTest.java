@@ -386,6 +386,89 @@ class PriceOfferControllerTest {
         assertThat(salesOffices.size(), greaterThan(1));
     }
 
+    @Test
+    public void shouldPersistPriceOfferWithSeveralSalesOfficesAndZones() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithMultipleSoAndZones.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO actualPo = actual.getBody();
+
+        assertThat(actualPo, notNullValue());
+        List<SalesOfficeDTO> salesOffices = actualPo.getSalesOfficeList();
+
+        assertThat(salesOffices.size(), greaterThan(1));
+    }
+
+    @Test
+    public void shouldUpdatePriceOfferAfterChangesFromUser() throws IOException {
+        PriceOfferDTO priceOfferDTO = createCompleteOfferDto("priceOfferWithMultipleSoAndZones.json");
+
+        String createUrl = "/api/v2/price-offer/create";
+        ResponseEntity<PriceOfferDTO> createdEntity = restTemplate.postForEntity(createUrl, priceOfferDTO, PriceOfferDTO.class);
+
+        assertThat(createdEntity.getStatusCode(), is(HttpStatus.OK));
+
+        PriceOfferDTO createdResponse = createdEntity.getBody();
+
+        PriceOfferDTO updatedPriceOfferDTO = createCompleteOfferDto("updatedPriceOfferAfterCreation.json");
+
+        copyIdsFromCreatedPriceOfferToUpdated(createdResponse, updatedPriceOfferDTO);
+
+        String updateUrl = "/api/v2/price-offer/save/" + createdResponse.getId();
+        restTemplate.put(updateUrl, updatedPriceOfferDTO);
+
+        ResponseEntity<PriceOfferDTO> actual = restTemplate.getForEntity("/api/v2/price-offer/id/" + createdResponse.getId(), PriceOfferDTO.class);
+
+        assertThat(actual.getStatusCode(), is(HttpStatus.OK));
+
+
+    }
+
+    private void copyIdsFromCreatedPriceOfferToUpdated(PriceOfferDTO from, PriceOfferDTO to) {
+        to.setId(from.getId());
+
+        for (SalesOfficeDTO officeDTO : from.getSalesOfficeList()) {
+            SalesOfficeDTO toSalesOffice = to.getSalesOfficeList().stream().filter(salesOfficeDTO -> salesOfficeDTO.getSalesOffice().equals(officeDTO.getSalesOffice())).findAny().orElseGet(null);
+
+            if(toSalesOffice == null) {
+                continue;
+            }
+
+            toSalesOffice.setId(officeDTO.getId());
+
+            updatePriceRowsId(officeDTO.getMaterialList(), toSalesOffice.getMaterialList());
+            updatePriceRowsId(officeDTO.getRentalList(), toSalesOffice.getRentalList());
+            updatePriceRowsId(officeDTO.getTransportServiceList(), toSalesOffice.getTransportServiceList());
+
+            for (ZoneDTO fromZoneDTO : officeDTO.getZoneList()) {
+                ZoneDTO toZoneDto = toSalesOffice.getZoneList().stream().filter(zoneDTO -> zoneDTO.getNumber().equals(fromZoneDTO.getNumber())).findAny().orElse(null);
+
+                if(toZoneDto == null) {
+                    continue;
+                }
+
+                updatePriceRowsId(fromZoneDTO.getMaterialList(), toZoneDto.getMaterialList());
+            }
+        }
+    }
+
+    private void updatePriceRowsId(List<PriceRowDTO> fromPriceRowList, List<PriceRowDTO> toPriceRowList) {
+        if(fromPriceRowList == null) {
+            return;
+        }
+        for (PriceRowDTO fromPriceRowDTO : fromPriceRowList) {
+            PriceRowDTO toPriceRowDto = toPriceRowList.stream().filter(priceRow -> priceRow.getMaterial().equals(fromPriceRowDTO.getMaterial())).findAny().orElse(null);
+
+            if(toPriceRowDto != null) {
+                toPriceRowDto.setId(fromPriceRowDTO.getId());
+            }
+        }
+    }
+
     private static PriceOffer createPriceOffer(User salesEmployee, User approver, List<SalesOffice> salesOfficeDTOs) {
         return PriceOffer.priceOfferBuilder()
                 .customerNumber("102520")
