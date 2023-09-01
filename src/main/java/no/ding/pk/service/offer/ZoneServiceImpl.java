@@ -125,6 +125,9 @@ public class ZoneServiceImpl implements ZoneService {
         Set<String> materialNumberSet = new HashSet<>();
 
         for(Zone zone : zoneList) {
+            if(zone.getPriceRows() == null) {
+                continue;
+            }
             zone.getPriceRows().forEach(priceRow -> materialNumberSet.add(priceRow.getMaterial().getMaterialNumber()));
         }
 
