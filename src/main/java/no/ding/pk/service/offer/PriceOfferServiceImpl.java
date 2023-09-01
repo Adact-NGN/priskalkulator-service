@@ -9,10 +9,7 @@ import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.ApproverNotFoundException;
-import no.ding.pk.web.handlers.EmployeeNotProvidedException;
-import no.ding.pk.web.handlers.MissingApprovalStatusException;
-import no.ding.pk.web.handlers.PriceOfferNotFoundException;
+import no.ding.pk.web.handlers.*;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -71,6 +68,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         PriceOffer entity = getPriceOffer(newPriceOffer, salesEmployee);
 
+        entity.setApprover(salesEmployee);
+
         entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         if(newPriceOffer.getCustomerName() != null) {
             entity.setCustomerName(newPriceOffer.getCustomerName());
@@ -78,6 +77,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
+
+        if(StringUtils.isNotBlank(newPriceOffer.getGeneralComment())) {
+            entity.setGeneralComment(newPriceOffer.getGeneralComment());
+        }
+
+        if(StringUtils.isNotBlank(newPriceOffer.getAdditionalInformation())) {
+            entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
+        }
 
         entity.setContactPersonList(newPriceOffer.getContactPersonList());
 
@@ -388,7 +395,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment) {
+    public Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String additionalInformation) {
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
@@ -421,7 +428,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
-            priceOfferToApprove.setDismissalReason(comment);
+            priceOfferToApprove.setAdditionalInformation(additionalInformation);
         }
 
         priceOfferToApprove = repository.save(priceOfferToApprove);
@@ -445,8 +452,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new PriceOfferNotFoundException(message);
         }
 
-        // TODO: Do we need to check if the given user is allowed to execute this function?
-//        if(priceOfferToActivate.getApprover().equals(approver) || priceOfferToActivate.getSalesEmployee().equals(approver))
+        if(!priceOfferToActivate.getApprover().equals(approver) || !priceOfferToActivate.getSalesEmployee().equals(approver)) {
+            String message = String.format("Given approver, (id: %d), did not match the price offers assigned approver, (id: %d)", approverId, priceOfferToActivate.getApprover().getId());
+            throw new WrongApproverException(message);
+        }
 
         priceOfferToActivate.setCustomerTerms(customerTerms);
         priceOfferToActivate.setPriceOfferStatus(PriceOfferStatus.ACTIVATED.getStatus());

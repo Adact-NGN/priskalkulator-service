@@ -252,6 +252,7 @@ class PriceOfferServiceImplTest {
         priceOffer = service.save(priceOffer);
 
         assertThat(priceOffer, notNullValue());
+        assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
         assertThat(priceOffer.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
@@ -259,6 +260,7 @@ class PriceOfferServiceImplTest {
         priceOffer2 = service.save(priceOffer2);
 
         assertThat(priceOffer2, notNullValue());
+        assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
@@ -269,6 +271,8 @@ class PriceOfferServiceImplTest {
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
 
         PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
                 .salesOffice(104)
@@ -293,7 +297,7 @@ class PriceOfferServiceImplTest {
                 .materialList(List.of(priceRow))
                 .build();
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
-                .salesEmployee(dangerousWasteHolder)
+                .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice))
                 .needsApproval(true)
                 .build();
