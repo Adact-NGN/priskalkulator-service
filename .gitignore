@@ -1,3 +1,6 @@
+### Project files ###
+**/application-dev.properties
+
 ### Maven ###
 target/
 pom.xml.tag

@@ -6,7 +6,9 @@ import org.springframework.context.annotation.PropertySource;
 
 @Profile({"prod"})
 @Configuration
-@PropertySource({"classpath:db.properties"})
+@PropertySource({
+        "classpath:application-prod.properties",
+})
 public class ProdConfig {
     
 }
