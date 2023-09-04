@@ -248,8 +248,17 @@ public class PriceRowServiceImpl implements PriceRowService {
                 Discount discount = discountMap.get(salesOrg).get(salesOffice).get(entity.getMaterial().getMaterialNumber());
 
                 if(discount != null && !discount.getDiscountLevels().isEmpty()) {
-                    DiscountLevel dl = discount.getDiscountLevels().get(entity.getDiscountLevel());
-                    log.debug("Getting discount for material {}, with discount level {}", entity.getMaterial().getMaterialNumber(), entity.getDiscountLevel());
+                    Optional<DiscountLevel> optionalDl = discount.getDiscountLevels().stream().filter(dlevel -> dlevel.getLevel() == entity.getDiscountLevel()).findFirst();
+
+                    if(optionalDl.isEmpty()) {
+                        log.debug("Discount was found, but no discount level with value {} was found.", entity.getDiscountLevel());
+
+                        return;
+                    }
+
+                    DiscountLevel dl = optionalDl.get();
+
+                    log.debug("Getting discount for material {}, with discount level {}", entity.getMaterial().getMaterialNumber(), dl.getLevel());
 
                     if(dl.getDiscount() < 0.0) {
                         entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
