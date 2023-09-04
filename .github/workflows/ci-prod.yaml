@@ -1,16 +1,16 @@
-name: Create minor version
+name: Create major version
 
 on:
   pull_request:
     branches:
-      - develop
+      - main
     types:
       - closed
 
 jobs:
   if_merged:
     if: github.event.pull_request.merged == true
-    name: Bump Minor Version
+    name: Bump Major Version
     runs-on: ubuntu-latest
 
     steps:
@@ -42,7 +42,7 @@ jobs:
           echo "Minor $minor"
           patch=${version_parts[2]}
           echo "Patch $patch"
-          new_version="v$major.$((minor + 1)).$patch"
+          new_version="v$((major + 1)).$minor.$patch"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
