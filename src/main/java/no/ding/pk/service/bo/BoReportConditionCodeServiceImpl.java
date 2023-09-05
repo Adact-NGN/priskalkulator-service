@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static no.ding.pk.repository.specifications.TitleTypeSpecification.withTitleType;
 
@@ -214,8 +212,12 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
 
     @Override
     public List<KeyCombination> getKeyCombinationByConditionCode(String conditionCode) {
-        ConditionCode conditionCodeByCode = repository.findConditionCodeByCode(conditionCode);
-        return conditionCodeByCode.getKeyCombinations();
+        Optional<ConditionCode> conditionCodeByCode = repository.findConditionCodeByCode(conditionCode);
+
+        if(conditionCodeByCode.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return conditionCodeByCode.get().getKeyCombinations();
     }
 
     @Override
