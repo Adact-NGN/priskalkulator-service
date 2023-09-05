@@ -84,10 +84,16 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
     }
 
     private void createBoReportConditionMap(PriceOffer priceOffer, SalesOffice salesOffice, Map<String, BoReportCondition> soBoReportConditionMap, boolean isZoneMaterial, List<PriceRow> materialList) {
-        for (PriceRow priceRow : materialList) {
-            BoReportCondition condition = createBoReportCondition(priceOffer, salesOffice, priceRow, isZoneMaterial);
+        if(materialList != null) {
+            for (PriceRow priceRow : materialList) {
+                if (priceRow.getMaterial() != null) {
+                    BoReportCondition condition = createBoReportCondition(priceOffer, salesOffice, priceRow, isZoneMaterial);
 
-            soBoReportConditionMap.put(priceRow.getMaterial().getMaterialNumber(), condition);
+                    soBoReportConditionMap.put(priceRow.getMaterial().getMaterialNumber(), condition);
+                } else {
+                    log.debug("No material registered on price row.");
+                }
+            }
         }
     }
 
@@ -118,6 +124,10 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
     }
 
     private void setIsService(PriceRow priceRow, BoReportCondition condition) {
+        if(priceRow.getMaterial() == null) {
+            log.debug("No material registered on price row.");
+            return;
+        }
         if(StringUtils.isBlank(priceRow.getMaterial().getDesignation())) {
             condition.setIsService(false);
         }
@@ -126,6 +136,10 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
     }
 
     private void setRentalOrProduct(PriceRow priceRow, BoReportCondition condition) {
+        if(priceRow.getMaterial() == null) {
+            log.debug("No material registered on price row.");
+            return;
+        }
         if(StringUtils.isBlank(priceRow.getMaterial().getMaterialGroupDesignation())) {
             condition.setIsRental(false);
             condition.setIsProduct(false);
@@ -167,6 +181,9 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
     }
 
     private static void setWasteDisposalMaterial(PriceRow priceRow, BoReportCondition condition) {
+        if(priceRow.getMaterial() == null) {
+            return;
+        }
         if(StringUtils.equals(priceRow.getMaterial().getMaterialTypeDescription(), "Avfallsmateriale")) {
             condition.setIsWasteDisposalMaterial(true);
         }
