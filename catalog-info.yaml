@@ -11,8 +11,6 @@ metadata:
   name: priskalkulator-service
   description: Back-end for Priskalkulator
   tags: [java,maven]
-  annotations:
-    github.com/project-slug: Adact-NGN/priskalkulator-service
 spec:
   type: back-end
   lifecycle: experimental
@@ -45,7 +43,7 @@ spec:
   owner: calculator-team
   system: priskalkulator
   definition: |
----
+  ---
 apiVersion: backstage.io/v1alpha1
 kind: User
 metadata:
