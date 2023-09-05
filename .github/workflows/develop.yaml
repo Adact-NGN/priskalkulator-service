@@ -25,6 +25,6 @@ jobs:
       - name: Build with Maven
         env:
           ENVIRONMENT: dev
-        run: mvn -B package --file pom.xml -P$ENVIRONMENT
+        run: mvn -P$ENVIRONMENT -B package --file pom.xml
 
 
