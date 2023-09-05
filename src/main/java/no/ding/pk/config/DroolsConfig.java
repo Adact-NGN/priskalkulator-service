@@ -12,14 +12,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("no.ding.pk.service")
-public class RulesConfig {
+public class DroolsConfig {
 
-    public static final String drlFile = "SuggestConditionCodeAndKeyCombination.drl";
+    private static final String drlFile = "SuggestConditionCodeAndKeyCombination.drl";
+    private static final KieServices kieServices = KieServices.Factory.get();
 
     @Bean
     public KieContainer kieContainer() {
-        KieServices kieServices = KieServices.Factory.get();
-
         KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
         kieFileSystem.write(ResourceFactory.newClassPathResource(drlFile));
         KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
