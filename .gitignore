@@ -1,5 +1,5 @@
 ### Project files ###
-**/application-dev.properties
+**/application.properties
 
 ### Maven ###
 target/
