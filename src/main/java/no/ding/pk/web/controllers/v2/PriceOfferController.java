@@ -294,6 +294,7 @@ public class PriceOfferController {
             updatedOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
         }
 
+        // TODO: This probably overwrites what the service layer is doing :S
         if(priceOfferCandidateForApprovalAndIsNotApproved(updatedOffer)) {
             List<Integer> salesOffices = collectSalesOfficeNumbers(updatedOffer);
             

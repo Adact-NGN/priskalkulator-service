@@ -1,7 +1,7 @@
 package no.ding.pk.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,11 @@ public class GenerateSwaggerTest {
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         mockMvc.perform(MockMvcRequestBuilders.get("/v2/api-docs").accept(MediaType.APPLICATION_JSON))
                 .andDo((result -> {
-                    JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
-                    FileUtils.writeStringToFile(new File("spec/swagger.json"), jsonObject.toString(2), StandardCharsets.UTF_8);
+                    String contentAsString = result.getResponse().getContentAsString();
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    Object jsonObject = objectMapper.readValue(contentAsString, Object.class);
+                    String prettyJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
+                    FileUtils.writeStringToFile(new File("spec/swagger.json"), prettyJson, StandardCharsets.UTF_8);
                 }));
     }
 }

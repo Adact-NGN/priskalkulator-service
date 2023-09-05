@@ -1,11 +1,12 @@
 #
 # Build stage
 #
+ARG environment=dev
 FROM maven:3.8-openjdk-17-slim AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN mvn -P prod clean package
+RUN mvn -P ${environment} clean package
 
 #
 # Package stage
