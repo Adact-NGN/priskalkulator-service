@@ -120,7 +120,14 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
         setWasteDisposalMaterial(priceRow, condition);
 
         setRentalOrProduct(priceRow, condition);
+
+        setHasSalesDocument(priceOffer, condition);
         return condition;
+    }
+
+    private static void setHasSalesDocument(PriceOffer priceOffer, BoReportCondition condition) {
+        // To my knowledge, we do not have any means to determine this. Default to false
+        condition.setHasSalesDocument(false);
     }
 
     private void setIsService(PriceRow priceRow, BoReportCondition condition) {
@@ -182,11 +189,9 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
 
     private static void setWasteDisposalMaterial(PriceRow priceRow, BoReportCondition condition) {
         if(priceRow.getMaterial() == null) {
-            return;
+            condition.setIsWasteDisposalMaterial(false);
         }
-        if(StringUtils.equals(priceRow.getMaterial().getMaterialTypeDescription(), "Avfallsmateriale")) {
-            condition.setIsWasteDisposalMaterial(true);
-        }
+        condition.setIsWasteDisposalMaterial(StringUtils.equals(priceRow.getMaterial().getMaterialTypeDescription(), "Avfallsmateriale"));
     }
 
     @Override
