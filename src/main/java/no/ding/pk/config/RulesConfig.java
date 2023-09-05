@@ -16,6 +16,7 @@ public class RulesConfig {
 
     public static final String drlFile = "SuggestConditionCodeAndKeyCombination.drl";
 
+    //https://stackoverflow.com/questions/49295671/kieservices-factory-get-returns-null-in-kie-api7-6-0
     @Bean
     public KieContainer kieContainer() {
         KieServices kieServices = KieServices.Factory.get();
