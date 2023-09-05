@@ -585,6 +585,16 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>2.7.0</version>
+                        <configuration>
+                            <profiles>
+                                <profile>default</profile>
+                            </profiles>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
                         <version>3.2.2</version>
@@ -595,11 +605,11 @@
                                 </manifest>
                             </archive>
                             <excludes>
-                                <exclude>**/application.properties</exclude>
+                                <exclude>**/application-dev.properties</exclude>
                                 <exclude>**/application-prod.properties</exclude>
                             </excludes>
                             <includes>
-                                <include>**/application-dev.properties</include>
+                                <include>**/application.properties</include>
                             </includes>
                         </configuration>
                     </plugin>
@@ -630,6 +640,16 @@
             </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>2.7.0</version>
+                        <configuration>
+                            <profiles>
+                                <profile>prod</profile>
+                            </profiles>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
@@ -666,6 +686,16 @@
             </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>2.7.0</version>
+                        <configuration>
+                            <profiles>
+                                <profile>dev</profile>
+                            </profiles>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
