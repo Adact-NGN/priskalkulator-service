@@ -1,5 +1,3 @@
-# Sales roles
-
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (1, 1, 'Kundeveileder - frontlinr', 'KV');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (1, 1, 'Priskoordinator', 'PK');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Regionsjef', 'RS');
@@ -10,8 +8,6 @@ INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (3, 3, 'Fagkonsulent FA', 'FA');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Distriktssjef', 'DR');
 INSERT INTO sales_roles (default_power_of_attorney_fa, default_power_of_attorney_oa, description, role_name) VALUES (6, 6, 'Backoffice', 'BO');
-
-# Power of attorney
 
 INSERT IGNORE INTO sale_office_power_of_attorney_matrix(sales_office, sales_office_name, region) VALUES (100,'StorOslo','Oslofjord');
 INSERT IGNORE INTO sale_office_power_of_attorney_matrix(sales_office, sales_office_name, region) VALUES (101,'Asker/Bærum','Oslofjord');
