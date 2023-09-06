@@ -77,8 +77,11 @@ public class BoReportConditionCodeController {
         Optional<PriceOffer> priceOfferOptional = priceOfferService.findById(priceOfferId);
 
         if(priceOfferOptional.isEmpty()) {
+            log.debug("No price offer found with id: {}", priceOfferId);
             return new HashMap<>();
         }
+
+        log.debug("Found price offer with id, {}, finding suggestions.", priceOfferId);
 
         Map<String, Map<String, BoReportCondition>> priceOfferBoConditionalMap = service.buildBoReportConditionMapForPriceOffer(priceOfferOptional.get());
 

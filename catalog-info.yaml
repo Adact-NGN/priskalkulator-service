@@ -11,8 +11,6 @@ metadata:
   name: priskalkulator-service
   description: Back-end for Priskalkulator
   tags: [java,maven]
-  annotations:
-    github.com/project-slug: Adact-NGN/priskalkulator-service
 spec:
   type: back-end
   lifecycle: experimental
@@ -44,30 +42,31 @@ spec:
   lifecycle: experimental
   owner: calculator-team
   system: priskalkulator
-  definition: |
+  definition:
+    $text: ./spec/swagger.json
 ---
-apiVersion: backstage.io/v1alpha1
-kind: User
-metadata:
-  name: kjetil
-spec:
-  profile:
-    displayName: Kjetil Torvund Minde
-    email: kjetil.torvund.minde@ngn.no
-  #    picture: https://example.com/staff/jenny-with-party-hat.jpeg
-  memberOf: [calculator-team, employees]
----
-apiVersion: backstage.io/v1alpha1
-kind: User
-metadata:
-  name: thomas
-spec:
-  profile:
-    displayName: Thomas Nilsen
-    email: thomas.nilsen@ngn.no
-  #    picture: https://example.com/staff/jenny-with-party-hat.jpeg
-  memberOf: [ calculator-team, employees ]
----
+#apiVersion: backstage.io/v1alpha1
+#kind: User
+#metadata:
+#  name: kjetil
+#spec:
+#  profile:
+#    displayName: Kjetil Torvund Minde
+#    email: kjetil.torvund.minde@ngn.no
+#  #    picture: https://example.com/staff/jenny-with-party-hat.jpeg
+#  memberOf: [calculator-team, employees]
+#---
+#apiVersion: backstage.io/v1alpha1
+#kind: User
+#metadata:
+#  name: thomas
+#spec:
+#  profile:
+#    displayName: Thomas Nilsen
+#    email: thomas.nilsen@ngn.no
+#  #    picture: https://example.com/staff/jenny-with-party-hat.jpeg
+#  memberOf: [ calculator-team, employees ]
+#---
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
