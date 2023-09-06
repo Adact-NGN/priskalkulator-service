@@ -65,7 +65,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-//        LogicExpression salesOfficeExpression = LogicExpression.builder().field(MaterialField.SalesOffice).value(salesOffice).comparator(LogicComparator.Equal).build();
 
         Map<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(
                 ImmutableMap.of(materialExpression, LogicOperator.And,
