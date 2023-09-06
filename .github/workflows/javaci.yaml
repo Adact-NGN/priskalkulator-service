@@ -21,7 +21,7 @@ jobs:
           distribution: 'corretto'
           check-latest: true
           cache: 'maven'
-      - name: Build with Maven
+      - name: Getting secrets for env variables
         uses: oNaiPs/secrets-to-env-action@v1
         with:
           secrets: ${{ toJSON(secrets) }}
@@ -44,4 +44,5 @@ jobs:
           PK_MSAL_SECRET: $PK_MSAL_SECRET
           PK_MSAL_SCOPE: $PK_MSAL_SCOPE
           PK_MSAL_AD_USER_INFO_SELECT_LIST: $PK_MSAL_AD_USER_INFO_SELECT_LIST
+      - name: Build with Maven
         run: mvn -Dspring.profiles.active=$ENVIRONMENT -B package --file pom.xml
