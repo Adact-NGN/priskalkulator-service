@@ -4,5 +4,5 @@ resources:
 
 images:
 - name: dingipacr.azurecr.io/ding-ip-app-pk-service
-  newTag: v0.1.24
+  newTag: v0.24.25
 namespace: priskalkulator-prod
