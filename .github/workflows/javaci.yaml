@@ -45,6 +45,6 @@ jobs:
           PK_MSAL_SECRET: $PK_MSAL_SECRET
           PK_MSAL_SCOPE: $PK_MSAL_SCOPE
           PK_MSAL_AD_USER_INFO_SELECT_LIST: $PK_MSAL_AD_USER_INFO_SELECT_LIST
+        run: echo "$ENVIRONMENT with DB user $PK_DATASOURCE_USERNAME"
       - name: Build with Maven
-      - run: echo "$ENVIRONMENT with DB user $PK_DATASOURCE_USERNAME"
-      - run: mvn -Dspring.profiles.active=$ENVIRONMENT -B package --file pom.xml
+        run: mvn -Dspring.profiles.active=$ENVIRONMENT -B package --file pom.xml
