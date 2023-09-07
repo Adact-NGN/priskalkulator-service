@@ -1,12 +1,12 @@
 #
 # Build stage
-#
-ARG environment=dev
+# Set arguments with --build-arg [arg-variable]=[value]
 FROM maven:3.8-openjdk-17-slim AS build
+ARG ENVIRONMENT=dev
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN mvn -P${environment} -DskipTests clean package
+RUN echo "Building with environment set to: $ENVIRONMENT" | mvn -Dspring.profiles.active=$ENVIRONMENT -DskipTests clean package
 
 #
 # Package stage
