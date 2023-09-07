@@ -422,6 +422,10 @@
             <artifactId>spring-security-core</artifactId>
             <version>5.7.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -494,6 +498,11 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.3.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>2.7.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -550,63 +559,70 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <spring.profiles.active>default</spring.profiles.active>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-devtools</artifactId>
-                    <optional>true</optional>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <version>2.7.0</version>
-                        <configuration>
-                            <profiles>
-                                <profile>default</profile>
-                            </profiles>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.2</version>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>no.ding.pk.App</mainClass>
-                                </manifest>
-                            </archive>
-                            <excludes>
-                                <exclude>**/application-dev.properties</exclude>
-                                <exclude>**/application-prod.properties</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/application.properties</include>
-                            </includes>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <properties>
-<!--                                <groups>unittest</groups>-->
-                            </properties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
+<!--        <profile>-->
+<!--            <id>default</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--            </activation>-->
+<!--            <properties>-->
+<!--                <spring.profiles.active>default</spring.profiles.active>-->
+<!--            </properties>-->
+<!--            <dependencies>-->
+<!--                <dependency>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-devtools</artifactId>-->
+<!--                    <optional>true</optional>-->
+<!--                </dependency>-->
+<!--            </dependencies>-->
+<!--            <build>-->
+<!--                <plugins>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.springframework.boot</groupId>-->
+<!--                        <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--                        <version>2.7.0</version>-->
+<!--                        <configuration>-->
+<!--                            <profiles>-->
+<!--                                <profile>default</profile>-->
+<!--                            </profiles>-->
+<!--                        </configuration>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <goals>-->
+<!--                                    <goal>repackage</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-jar-plugin</artifactId>-->
+<!--                        <version>3.2.2</version>-->
+<!--                        <configuration>-->
+<!--                            <archive>-->
+<!--                                <manifest>-->
+<!--                                    <mainClass>no.ding.pk.App</mainClass>-->
+<!--                                </manifest>-->
+<!--                            </archive>-->
+<!--                            <excludes>-->
+<!--                                <exclude>**/application-dev.properties</exclude>-->
+<!--                                <exclude>**/application-prod.properties</exclude>-->
+<!--                            </excludes>-->
+<!--                            <includes>-->
+<!--                                <include>**/application.properties</include>-->
+<!--                            </includes>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
+<!--                    <plugin>-->
+<!--                        <artifactId>maven-surefire-plugin</artifactId>-->
+<!--                        <configuration>-->
+<!--                            <properties>-->
+<!--&lt;!&ndash;                                <groups>unittest</groups>&ndash;&gt;-->
+<!--                            </properties>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
+<!--                </plugins>-->
+<!--            </build>-->
+<!--        </profile>-->
         <profile>
             <id>prod</id>
             <properties>
@@ -627,11 +643,18 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>2.7.0</version>
-                        <configuration>
-                            <profiles>
-                                <profile>prod</profile>
-                            </profiles>
-                        </configuration>
+<!--                        <configuration>-->
+<!--                            <profiles>-->
+<!--                                <profile>prod</profile>-->
+<!--                            </profiles>-->
+<!--                        </configuration>-->
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -643,13 +666,13 @@
                                     <mainClass>no.ding.pk.App</mainClass>
                                 </manifest>
                             </archive>
-                            <excludes>
-                                <exclude>**/application.properties</exclude>
-                                <exclude>**/application-dev.properties</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/application-prod.properties</include>
-                            </includes>
+<!--                            <excludes>-->
+<!--                                <exclude>**/application-dev.properties</exclude>-->
+<!--                            </excludes>-->
+<!--                            <includes>-->
+<!--                                <include>**/application.properties</include>-->
+<!--                                <include>**/application-prod.properties</include>-->
+<!--                            </includes>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -673,11 +696,18 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>2.7.0</version>
-                        <configuration>
-                            <profiles>
-                                <profile>dev</profile>
-                            </profiles>
-                        </configuration>
+<!--                        <configuration>-->
+<!--                            <profiles>-->
+<!--                                <profile>dev</profile>-->
+<!--                            </profiles>-->
+<!--                        </configuration>-->
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>repackage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -689,13 +719,13 @@
                                     <mainClass>no.ding.pk.App</mainClass>
                                 </manifest>
                             </archive>
-                            <excludes>
-                                <exclude>**/application.properties</exclude>
-                                <exclude>**/application-prod.properties</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/application-dev.properties</include>
-                            </includes>
+<!--                            <excludes>-->
+<!--                                <exclude>**/application-prod.properties</exclude>-->
+<!--                            </excludes>-->
+<!--                            <includes>-->
+<!--                                <include>**/application.properties</include>-->
+<!--                                <include>**/application-dev.properties</include>-->
+<!--                            </includes>-->
                         </configuration>
                     </plugin>
                     <plugin>

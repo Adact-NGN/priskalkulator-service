@@ -36,7 +36,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     private LocalJSONUtils localJSONUtils;
 
     @Autowired
-    public SapMaterialServiceImpl(@Value(value = "${sap.api.material.url}") String materialServiceUrl,
+    public SapMaterialServiceImpl(@Value(value = "${PK_SAP_API_MATERIAL_URL}") String materialServiceUrl,
                                   SapHttpClient sapHttpClient,
                                   LocalJSONUtils localJSONUtils,
                                   @Qualifier("materialInMemoryCache") InMemory3DCache<String, String, MaterialDTO> inMemoryCache) {
