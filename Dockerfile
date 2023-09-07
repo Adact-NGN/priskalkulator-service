@@ -6,7 +6,7 @@ FROM maven:3.8-openjdk-17-slim AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN mvn -Dspring.profiles.active=${environment} -DskipTests clean package
+RUN mvn -P${environment} -DskipTests clean package
 
 #
 # Package stage
