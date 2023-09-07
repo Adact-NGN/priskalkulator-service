@@ -32,5 +32,4 @@ public class App {
                 .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
                 .paths(PathSelectors.any()).build();
     }
-
 }
