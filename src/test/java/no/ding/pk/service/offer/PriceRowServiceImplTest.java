@@ -59,7 +59,7 @@ public class PriceRowServiceImplTest {
 
         PriceRow wastePriceRow = PriceRow.builder()
         .customerPrice(2456.0)
-        .discountPct(0.02)
+        .discountLevelPct(0.02)
         .material(waste)
         .showPriceInOffer(true)
         .manualPrice(2400.0)

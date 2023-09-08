@@ -5133,11 +5133,11 @@
           "type" : "integer",
           "format" : "int32"
         },
-        "discountLevelPrice" : {
+        "discountLevelPct" : {
           "type" : "number",
           "format" : "double"
         },
-        "discountPct" : {
+        "discountLevelPrice" : {
           "type" : "number",
           "format" : "double"
         },
