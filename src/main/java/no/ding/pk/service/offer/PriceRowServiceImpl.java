@@ -1,3 +1,4 @@
+
 package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.Discount;
