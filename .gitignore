@@ -1,8 +1,4 @@
 ### Project files ###
-application.properties
-**/application.properties
-
-**/*/application.properties
 
 ### Maven ###
 target/
