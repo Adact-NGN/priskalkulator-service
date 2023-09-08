@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.handlers.UserNotFoundException;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -170,6 +171,6 @@ public class UserController {
             return modelMapper.map(byEmail, UserDTO.class);
         }
 
-        throw new RuntimeException("No user found by given email.");
+        throw new UserNotFoundException(String.format("User with email: {} not found.", email));
     }
 }
