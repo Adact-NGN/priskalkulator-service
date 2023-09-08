@@ -97,7 +97,9 @@ public class PriceOfferRepositoryTest {
 
     @Test
     public void shouldGetAllPriceOfferReadyForBoReport() {
-        
+        PriceOffer build = PriceOffer.priceOfferBuilder().build();
+
+        assertThat(build, notNullValue());
     }
 
     private void createCompleteOfferDtoList(User salesAndApproval) {
@@ -137,6 +139,8 @@ public class PriceOfferRepositoryTest {
                 .salesOfficeList(List.of(bergen))
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
+
+
 
         repository.save(priceOffer);
     }
@@ -178,7 +182,7 @@ public class PriceOfferRepositoryTest {
 
         PriceRow priceRow = PriceRow.builder()
                 .customerPrice(1000.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .material(material)
                 .showPriceInOffer(true)
                 .manualPrice(900.0)
@@ -217,7 +221,7 @@ public class PriceOfferRepositoryTest {
 
         PriceRow wastePriceRow = PriceRow.builder()
                 .customerPrice(2456.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .material(waste)
                 .showPriceInOffer(true)
                 .manualPrice(2400.0)
@@ -292,7 +296,7 @@ public class PriceOfferRepositoryTest {
 
         PriceRow priceRow = PriceRow.builder()
                 .customerPrice(1000.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .material(material)
                 .showPriceInOffer(true)
                 .manualPrice(900.0)
@@ -331,7 +335,7 @@ public class PriceOfferRepositoryTest {
 
         PriceRow wastePriceRow = PriceRow.builder()
                 .customerPrice(2456.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .material(waste)
                 .showPriceInOffer(true)
                 .manualPrice(2400.0)

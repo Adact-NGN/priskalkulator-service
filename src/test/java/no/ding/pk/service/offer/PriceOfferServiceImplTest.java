@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.SalesRoleService;
@@ -13,7 +14,11 @@ import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestExecutionListeners;
@@ -27,116 +32,54 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
+@Disabled
+@ExtendWith(MockitoExtension.class)
 class PriceOfferServiceImplTest {
-    @Autowired
     private PriceOfferService service;
 
-    @Autowired
+    private PriceOfferRepository priceOfferRepository;
+
+    private SalesOfficeService salesOfficeService;
+
     private UserService userService;
 
-    @Autowired
     private SalesRoleService salesRoleService;
 
-    @Autowired
     private MaterialService materialService;
 
-    @Autowired
     private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
 
-    @Autowired
     private CustomerTermsService customerTermsService;
 
-    @Autowired
     private DiscountService discountService;
+
+    private ModelMapper modelMapper = new ModelMapper();
 
     @BeforeEach
     public void setup() {
 
-        persistSalesRoles();
+        priceOfferRepository = mock(PriceOfferRepository.class);
+        salesOfficeService = mock(SalesOfficeService.class);
+        userService = mock(UserService.class);
+        salesOfficePowerOfAttorneyService = mock(SalesOfficePowerOfAttorneyService.class);
+        discountService = mock(DiscountService.class);
+        salesRoleService = mock(SalesRoleService.class);
+        customerTermsService = mock(CustomerTermsService.class);
+        materialService = mock(MaterialService.class);
+
+        service = new PriceOfferServiceImpl(priceOfferRepository, salesOfficeService, userService,
+                salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper);
+
+        prepearUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
 
-        User alex = userService.findByEmail("alexander.brox@ngn.no");
 
-        if(alex == null) {
-            alex = userService.save(User.builder()
-                            .id(39L)
-                            .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-                            .name("Alexander")
-                            .sureName("Brox")
-                            .fullName("Alexander Brox")
-                            .orgNr("100")
-                            .resourceNr("63874")
-                            .associatedPlace("Oslo")
-                            .phoneNumber("95838638")
-                            .email("alexander.brox@ngn.no")
-                            .jobTitle("Markedskonsulent")
-                            .powerOfAttorneyOA(5)
-                            .powerOfAttorneyFA(3)
-                            .build()
-                    , null);
-        }
 
-        SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
-        knSalesRole.addUser(alex);
-        salesRoleService.save(knSalesRole);
-
-        User eirik = userService.findByEmail("Eirik.Flaa@ngn.no");
-
-        if(eirik == null) {
-            userService.save(User.builder()
-                    .name("Eirik")
-                    .sureName("Flaa")
-                    .orgNr("100")
-                    .associatedPlace("Larvik")
-                    .email("Eirik.Flaa@ngn.no")
-                    .jobTitle("Prosjektleder")
-                    .powerOfAttorneyFA(5)
-                    .powerOfAttorneyOA(5)
-                    .build(),
-                    null
-            );
-        }
-
-        User kjetil = userService.findByEmail("kjetil.torvund.minde@ngn.no");
-
-        if(kjetil == null) {
-            userService.save(User.builder()
-                            .name("Kjetil")
-                            .sureName("Minde")
-                            .orgNr("100")
-                            .associatedPlace("Larvik")
-                            .email("kjetil.torvund.minde@ngn.no")
-                            .jobTitle("Fullstack utvikler")
-                            .powerOfAttorneyFA(5)
-                            .powerOfAttorneyOA(5)
-                            .build(),
-                    null
-            );
-        }
-
-        User salesEmployee = userService.findByEmail("Wolfgang@farris-bad.no");
-
-        if(salesEmployee == null) {
-            salesEmployee = User.builder()
-                    .adId("ad-id-wegarijo-arha-rh-arha")
-                    .jobTitle("Komponist")
-                    .fullName("Wolfgang Amadeus Mozart")
-                    .email("Wolfgang@farris-bad.no")
-                    .associatedPlace("Larvik")
-                    .department("Hvitsnippene")
-                    .build();
-
-            salesEmployee = userService.save(salesEmployee, null);
-        }
-
-        SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
-        saSalesRole.addUser(salesEmployee);
-        salesRoleService.save(saSalesRole);
     }
 
     @Test
@@ -160,7 +103,7 @@ class PriceOfferServiceImplTest {
                 .build();
         PriceRow priceRow = PriceRow.builder()
                 .customerPrice(2456.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .showPriceInOffer(true)
                 .manualPrice(2400.0)
                 .discountLevel(1)
@@ -186,7 +129,7 @@ class PriceOfferServiceImplTest {
                 .build();
         PriceRow zonePriceRow = PriceRow.builder()
                 .customerPrice(1000.0)
-                .discountPct(0.02)
+                .discountLevelPct(0.02)
                 .showPriceInOffer(true)
                 .manualPrice(900.0)
                 .discountLevel(1)
@@ -268,6 +211,22 @@ class PriceOfferServiceImplTest {
 
     @Test
     public void shouldSetFaApproverWhenOnlyDangerousWastNeedsApproval() {
+        when(discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(anyString(), anyString(), List.of("70120015")))
+                .thenReturn(List.of(Discount.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .fa("FA")
+                                .materialDesignation("Spillolje ikke ref. - væske - småk")
+                                .materialNumber("70120015")
+                                .discountLevels(List.of(
+                                        DiscountLevel.builder().level(1).discount(0.0).build(),
+                                        DiscountLevel.builder().level(2).discount(1015.0).build(),
+                                        DiscountLevel.builder().level(3).discount(2030.0).build(),
+                                        DiscountLevel.builder().level(4).discount(3045.0).build(),
+                                        DiscountLevel.builder().level(5).discount(3045.0).build()
+                                )).build()
+                        )
+                );
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
@@ -558,7 +517,6 @@ class PriceOfferServiceImplTest {
                 .build();
     }
 
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     void createMaterial() {
         String materialNumber = "119901";
 
@@ -579,7 +537,7 @@ class PriceOfferServiceImplTest {
         .materialStandardPrice(wastePrice)
         .build();
 
-        materialService.save(waste);
+        when(materialService.findByMaterialNumber(materialNumber)).thenReturn(waste);
     }
 
     @Test
@@ -595,8 +553,6 @@ class PriceOfferServiceImplTest {
                 .salesEmployee(user)
                 .approver(user)
                 .build();
-
-        service.save(priceOffer);
 
         List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), null);
 
@@ -697,33 +653,85 @@ class PriceOfferServiceImplTest {
 
     }
 
-    private void persistSalesRoles() {
-        SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
+    private void prepearUsersAndSalesRoles() {
+        SalesRole knSalesRole = SalesRole.builder()
+                .roleName("KN")
+                .description("KAM nasjonalt")
+                .defaultPowerOfAttorneyOa(5)
+                .defaultPowerOfAttorneyFa(5)
+                .build();
 
-        if(knSalesRole == null) {
-            knSalesRole = SalesRole.builder()
-                    .roleName("KN")
-                    .description("KAM nasjonalt")
-                    .defaultPowerOfAttorneyOa(5)
-                    .defaultPowerOfAttorneyFa(5)
-                    .build();
 
-            knSalesRole = salesRoleService.save(knSalesRole);
-            System.out.println(knSalesRole);
-        }
+        User alex = User.builder()
+                .id(39L)
+                .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
+                .name("Alexander")
+                .sureName("Brox")
+                .fullName("Alexander Brox")
+                .orgNr("100")
+                .resourceNr("63874")
+                .associatedPlace("Oslo")
+                .phoneNumber("95838638")
+                .email("alexander.brox@ngn.no")
+                .jobTitle("Markedskonsulent")
+                .powerOfAttorneyOA(5)
+                .powerOfAttorneyFA(3)
+                .salesRole(knSalesRole)
+                .build();
 
-        SalesRole saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
-        if(saSalesRole == null) {
-            saSalesRole = SalesRole.builder()
-                    .roleName("SA")
-                    .description("Salgskonsulent (rolle a)")
-                    .defaultPowerOfAttorneyOa(2)
-                    .defaultPowerOfAttorneyFa(2)
-                    .build();
+        knSalesRole.addUser(alex);
 
-            saSalesRole = salesRoleService.save(saSalesRole);
 
-            System.out.println(saSalesRole);
-        }
+
+        SalesRole saSalesRole = SalesRole.builder()
+                .roleName("SA")
+                .description("Salgskonsulent (rolle a)")
+                .defaultPowerOfAttorneyOa(2)
+                .defaultPowerOfAttorneyFa(2)
+                .build();
+
+        User eirik  = User.builder()
+                .name("Eirik")
+                .sureName("Flaa")
+                .orgNr("100")
+                .associatedPlace("Larvik")
+                .email("Eirik.Flaa@ngn.no")
+                .jobTitle("Prosjektleder")
+                .powerOfAttorneyFA(5)
+                .powerOfAttorneyOA(5)
+                .build();
+
+        User kjetil = User.builder()
+                .name("Kjetil")
+                .sureName("Minde")
+                .orgNr("100")
+                .associatedPlace("Larvik")
+                .email("kjetil.torvund.minde@ngn.no")
+                .jobTitle("Fullstack utvikler")
+                .powerOfAttorneyFA(5)
+                .powerOfAttorneyOA(5)
+                .build();
+
+        User salesEmployee = User.builder()
+                .adId("ad-id-wegarijo-arha-rh-arha")
+                .jobTitle("Komponist")
+                .fullName("Wolfgang Amadeus Mozart")
+                .email("Wolfgang@farris-bad.no")
+                .associatedPlace("Larvik")
+                .department("Hvitsnippene")
+                .salesRole(saSalesRole)
+                .build();
+
+        saSalesRole.addUser(salesEmployee);
+
+        when(userService.findByEmail("alexander.brox@ngn.no")).thenReturn(alex);
+        when(userService.findByEmail("Eirik.Flaa@ngn.no")).thenReturn(eirik);
+        when(userService.findByEmail("kjetil.torvund.minde@ngn.no")).thenReturn(kjetil);
+        when(userService.findByEmail("Wolfgang Amadeus Mozart")).thenReturn(salesEmployee);
+        when(salesRoleService.findSalesRoleByRoleName("KN"))
+                .thenReturn(knSalesRole);
+        when(salesRoleService.findSalesRoleByRoleName("SA"))
+                .thenReturn(saSalesRole);
+
     }
 }

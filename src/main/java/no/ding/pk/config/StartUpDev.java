@@ -241,7 +241,7 @@ public class StartUpDev {
                                         Material residualWasteMaterial) {
                 return PriceRow.builder()
                         .customerPrice(customerPrice)
-                        .discountPct(0.02)
+                        .discountLevelPct(0.02)
                         .showPriceInOffer(true)
                         .manualPrice(manualPrice)
                         .discountLevel(1)
