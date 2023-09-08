@@ -27,7 +27,7 @@ public class PriceRow extends Auditable {
     private Double customerPrice;
 
     @Column
-    private Double discountPct;
+    private Double discountLevelPct;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
     @JoinColumn(name = "material_id", referencedColumnName = "id",
@@ -115,7 +115,7 @@ public class PriceRow extends Auditable {
                 "lastModifiedBy = " + lastModifiedBy + ", " +
                 "lastModifiedDate = " + lastModifiedDate + ", " +
                 "customerPrice = " + customerPrice + ", " +
-                "discountPct = " + discountPct + ", " +
+                "discountPct = " + discountLevelPct + ", " +
                 "material = " + material + ", " +
                 "showPriceInOffer = " + showPriceInOffer + ", " +
                 "manualPrice = " + manualPrice + ", " +

@@ -111,7 +111,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
-        entity.setDiscountPct(materialPriceRow.getDiscountPct());
+        entity.setDiscountLevelPct(materialPriceRow.getDiscountLevelPct());
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
         entity.setManualPrice(materialPriceRow.getManualPrice());
 
@@ -222,7 +222,11 @@ public class PriceRowServiceImpl implements PriceRowService {
             }
         }
 
-        calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
+        if(entity.getManualPrice() != null) {
+            entity.setDiscountedPrice(entity.getManualPrice());
+        } else {
+            calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
+        }
 
         if(materialPriceRow.hasCombinedMaterials()) {
             List<PriceRow> combinedMaterialPriceRows = new ArrayList<>();
@@ -258,14 +262,16 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                     DiscountLevel dl = optionalDl.get();
 
-                    log.debug("Getting discount for material {}, with discount level {}", entity.getMaterial().getMaterialNumber(), dl.getLevel());
+                    log.debug("Getting discount for material {}, with discount level {}, with discount {}", entity.getMaterial().getMaterialNumber(), dl.getLevel(), dl.getDiscount());
+
+                    entity.setDiscountLevelPct(dl.getPctDiscount());
+                    entity.setDiscountLevelPrice(dl.getDiscount());
 
                     if(dl.getDiscount() < 0.0) {
                         entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
                     } else {
                         entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
                     }
-                    entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
                 } else {
                     log.debug("No discount found for material {} for sales office {} in sales org {}",
                             entity.getMaterial().getMaterialNumber(), salesOffice, salesOrg);

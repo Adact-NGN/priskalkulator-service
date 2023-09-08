@@ -22,7 +22,7 @@ import java.util.Date;
 public class PriceRowDTO {
     private Long id;
     private Double customerPrice;
-    private Double discountPct;
+    private Double discountLevelPct;
     private String material;
     private String designation;
     private String materialDesignation;
