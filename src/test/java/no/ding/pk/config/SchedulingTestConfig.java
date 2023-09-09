@@ -14,6 +14,7 @@ import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,7 @@ import no.ding.pk.web.mappers.MapperService;
 
 import javax.persistence.EntityManagerFactory;
 
-@Configuration
+@TestConfiguration
 @Profile({ "unit-test" })
 @ComponentScan("no.ding.pk.service")
 public class SchedulingTestConfig {

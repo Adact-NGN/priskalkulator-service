@@ -1,5 +1,6 @@
 package no.ding.pk.service;
 
+import no.ding.pk.config.AbstractSpringIntegrationTest;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
@@ -14,11 +15,11 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest
+//@SpringBootTest
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
 @TestPropertySource("/h2-db.properties")
 //@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
-class SalesOfficePowerOfAttorneyServiceImplTest {
+class SalesOfficePowerOfAttorneyServiceImplTest extends AbstractSpringIntegrationTest {
 //    https://auto1.tech/integration-test-speedup/
 //    https://www.baeldung.com/spring-tests
 
