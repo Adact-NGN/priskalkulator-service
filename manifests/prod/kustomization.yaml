@@ -1,8 +1,17 @@
 resources:
 - ../base
 - ingress.yaml
+- secrets.yaml
 
 images:
 - name: dingipacr.azurecr.io/ding-ip-app-pk-service
   newTag: v0.24.25
 namespace: priskalkulator-prod
+
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: ding-ip-app-pk-service
+    path: deployment-patch.yaml
