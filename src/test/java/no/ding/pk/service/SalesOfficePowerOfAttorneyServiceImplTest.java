@@ -19,6 +19,8 @@ import static org.hamcrest.Matchers.notNullValue;
 @TestPropertySource("/h2-db.properties")
 //@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
 class SalesOfficePowerOfAttorneyServiceImplTest {
+//    https://auto1.tech/integration-test-speedup/
+//    https://www.baeldung.com/spring-tests
 
     @Autowired
     private SalesOfficePowerOfAttorneyService service;
