@@ -23,6 +23,7 @@ public class PriceRowDTO {
     private Long id;
     private Double customerPrice;
     private Double discountLevelPct;
+    private Double discountLevelPrice;
     private String material;
     private String designation;
     private String materialDesignation;
@@ -62,5 +63,32 @@ public class PriceRowDTO {
         }
 
         return sb.toString();
+    }
+
+    @JsonProperty("discountedPrice")
+    public void setDiscountedPrice(Double discounted) {
+        this.discountedPrice = discounted;
+    }
+
+    @JsonProperty("discountedPrice")
+    public Double getDiscountedPrice() {
+        if(manualPrice != null) {
+            return manualPrice;
+        }
+
+        if(standardPrice != null) {
+            if(discountLevelPct != null) {
+                return standardPrice - (standardPrice * discountLevelPct);
+            }
+            if(discountLevelPrice != null) {
+                if(discountLevelPrice < 0.0) {
+                    return standardPrice + discountLevelPrice;
+                } else {
+                    return standardPrice - discountLevelPrice;
+                }
+            }
+        }
+
+        return null;
     }
 }
