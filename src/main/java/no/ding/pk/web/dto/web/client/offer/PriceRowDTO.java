@@ -32,6 +32,7 @@ public class PriceRowDTO {
     private String devicePlacement;
     private Boolean showPriceInOffer;
     private Double manualPrice;
+    @JsonIgnore
     private Double discountedPrice;
     private Integer priceLevel;
     private Double priceLevelPrice;

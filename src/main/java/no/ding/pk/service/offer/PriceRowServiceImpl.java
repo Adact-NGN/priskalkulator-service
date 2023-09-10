@@ -264,8 +264,18 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                     log.debug("Getting discount for material {}, with discount level {}, with discount {}", entity.getMaterial().getMaterialNumber(), dl.getLevel(), dl.getDiscount());
 
-                    entity.setDiscountLevelPct(dl.getPctDiscount());
-                    entity.setDiscountLevelPrice(dl.getDiscount());
+                    Double discountLevelPct = dl.getPctDiscount();
+                    Double discountLevelPrice = dl.getDiscount();
+
+                    if(discountLevelPct == null && discountLevelPrice != null) {
+                        if(discountLevelPrice < 0.0) {
+                            discountLevelPct = ((discountLevelPrice * -1.0) * 100) / entity.getStandardPrice();
+                        } else {
+                            discountLevelPct = (discountLevelPrice * 100) / entity.getStandardPrice();
+                        }
+                    }
+                    entity.setDiscountLevelPct(discountLevelPct);
+                    entity.setDiscountLevelPrice(discountLevelPrice);
 
                     if(dl.getDiscount() < 0.0) {
                         entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
