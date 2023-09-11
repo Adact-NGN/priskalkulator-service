@@ -130,7 +130,7 @@ public class PriceRowServiceImplUnitTest {
 
         assertThat(actualPriceRow.getDiscountedPrice(), lessThan(actualPriceRow.getStandardPrice()));
 
-        double expectedDiscountPercentage = 180.0 * 100 / priceRow.getStandardPrice();
+        double expectedDiscountPercentage = 180.0 / priceRow.getStandardPrice();
 
         assertThat(actualPriceRow.getDiscountLevelPct(), equalTo(expectedDiscountPercentage));
 
