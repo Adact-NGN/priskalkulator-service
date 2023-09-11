@@ -66,11 +66,13 @@ public class PriceRowDTO {
         return sb.toString();
     }
 
+    @JsonIgnore
     @JsonProperty("discountedPrice")
     public void setDiscountedPrice(Double discounted) {
         this.discountedPrice = discounted;
     }
 
+    @JsonIgnore
     @JsonProperty("discountedPrice")
     public Double getDiscountedPrice() {
         if(manualPrice != null) {
@@ -79,7 +81,7 @@ public class PriceRowDTO {
 
         if(standardPrice != null) {
             if(discountLevelPct != null) {
-                return standardPrice - (standardPrice * discountLevelPct);
+                return standardPrice - (discountLevelPct * 100) / standardPrice;
             }
             if(discountLevelPrice != null) {
                 if(discountLevelPrice < 0.0) {
