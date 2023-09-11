@@ -26,7 +26,7 @@ public class ConditionCode {
     @Column(name = "code")
     private String code;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "conditionCode")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "conditionCode")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<KeyCombination> keyCombinations;
 

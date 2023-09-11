@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import no.ding.pk.domain.User;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
@@ -28,8 +30,9 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "price_offer_template")
 public class PriceOfferTemplate extends Offer implements Serializable {
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "pot_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_offer_template_salesOfficeList"))
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<SalesOffice> salesOfficeList;
 
     @ManyToOne(optional = false)
