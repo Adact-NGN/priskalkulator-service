@@ -71,9 +71,13 @@ apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: calculator-team
+  description: The amazing Price Calculator development team.
 spec:
   type: team
   children: []
+  members:
+    - kjetil.torvund.minde
+    - thomas.nilsen
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
