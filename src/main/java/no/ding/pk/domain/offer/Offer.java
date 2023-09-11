@@ -35,7 +35,7 @@ public class Offer extends Auditable {
     @Column
     private String customerType;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ContactPerson> contactPersonList;
 

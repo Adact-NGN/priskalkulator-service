@@ -42,7 +42,7 @@ public class PriceOffer extends Offer implements Serializable {
     @Column(length = 21844)
     private String materialsForApproval;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "po_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_salesOfficeList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<SalesOffice> salesOfficeList;
