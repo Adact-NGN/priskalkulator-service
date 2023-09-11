@@ -82,11 +82,11 @@ public class PriceOfferController {
      * @return list of price offers connected to sales employee, else empty list.
      */
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
+    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
         List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
         
         if(!priceOffers.isEmpty()) {
-            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffers, PriceOfferDTO.class)).collect(Collectors.toList());
+            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
         }
         
         return new ArrayList<>();
@@ -131,7 +131,7 @@ public class PriceOfferController {
      * @return List of price offers for approver
      */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferDTO> listByApprover(@PathVariable("approverId") Long approverId,
+    public List<PriceOfferListDTO> listByApprover(@PathVariable("approverId") Long approverId,
                                               @RequestParam(value = "status", required = false) String priceOfferStatus) {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndPriceOfferStatus(approverId, priceOfferStatus);
         
@@ -139,7 +139,7 @@ public class PriceOfferController {
             log.debug("Found price offers, {}, for approver", priceOffers.size());
             PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
             log.debug("Mapped {} amount", priceOfferDTOS.length);
-            return Arrays.stream(priceOfferDTOS).toList();
+            return Arrays.stream(priceOfferDTOS).map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).toList();
         }
 
         log.debug("No price offers for approver {} was found.", approverId);
@@ -285,8 +285,6 @@ public class PriceOfferController {
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
-//        mapMaterialValues(priceOfferDTO, updatedOffer);
-        
         updatedOffer = service.save(updatedOffer);
 
         if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
@@ -360,12 +358,12 @@ public class PriceOfferController {
      * @return List of all price offers ready for BO-report.
      */
     @GetMapping(path = "/bo-report/ready", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOffer> getPriceOffersReadyForBoReport() {
+    public List<PriceOfferListDTO> getPriceOffersReadyForBoReport() {
         log.debug("Getting all offers ready for BO-report");
 
         List<PriceOffer> priceOffersForBoReport = service.findAllPriceOffersRadyForBoReport();
 
-        log.debug("Ammount of offers for BO-report: {}", priceOffersForBoReport.size());
-        return priceOffersForBoReport;
+        log.debug("Amount of offers for BO-report: {}", priceOffersForBoReport.size());
+        return priceOffersForBoReport.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).toList();
     }
 }
