@@ -274,9 +274,9 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                     if(discountLevelPct == null && discountLevelPrice != null) {
                         if(discountLevelPrice < 0.0) {
-                            discountLevelPct = ((discountLevelPrice * -1.0) * 100) / entity.getStandardPrice();
+                            discountLevelPct = ((discountLevelPrice * -1.0)) / entity.getStandardPrice();
                         } else {
-                            discountLevelPct = (discountLevelPrice * 100) / entity.getStandardPrice();
+                            discountLevelPct = (discountLevelPrice) / entity.getStandardPrice();
                         }
                     }
                     entity.setDiscountLevelPct(discountLevelPct);

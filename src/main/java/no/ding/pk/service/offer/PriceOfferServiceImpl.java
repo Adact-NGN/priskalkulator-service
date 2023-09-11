@@ -74,6 +74,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(newPriceOffer.getCustomerName() != null) {
             entity.setCustomerName(newPriceOffer.getCustomerName());
         }
+        entity.setCustomerType(newPriceOffer.getCustomerType());
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
