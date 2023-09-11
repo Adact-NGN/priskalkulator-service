@@ -135,21 +135,9 @@ public class PriceRowServiceImpl implements PriceRowService {
             Material material = getMaterial(materialPriceRow.getMaterial());
             log.debug("PriceRow->Material: {}", material);
 
-            EntityManager em = emFactory.createEntityManager();
-            log.debug("Is material attached: {}", em.contains(material));
-
             if(material.getId() == null) {
 
-                em.getTransaction().begin();
-                List materials;
-
-                if(StringUtils.isNotBlank(material.getDeviceType())) {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
-                } else {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
-                }
-                em.getTransaction().commit();
-                em.close();
+                List materials = getMaterials(material);
 
                 if(materials != null && materials.size() > 0) {
                     Material persistedMaterial = (Material) materials.get(0);
@@ -240,6 +228,23 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         return repository.save(entity);
+    }
+
+    private List getMaterials(Material material) {
+        EntityManager em = emFactory.createEntityManager();
+        log.debug("Is material attached: {}", em.contains(material));
+
+        em.getTransaction().begin();
+        List materials;
+
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+        } else {
+            materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+        }
+        em.getTransaction().commit();
+        em.close();
+        return materials;
     }
 
     private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
