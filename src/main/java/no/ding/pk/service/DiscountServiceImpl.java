@@ -4,10 +4,12 @@ import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
+import no.ding.pk.service.cache.PingInMemory3DCache;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +26,31 @@ public class DiscountServiceImpl implements DiscountService {
 
     private final DiscountRepository repository;
     private final DiscountLevelRepository discountLevelRepository;
+
+    @Value("${cache.max.amount.items:5000}")
+    private Integer capacity;
+    private PingInMemory3DCache<String, String, Discount> discountCache;
     
     @Autowired
     public DiscountServiceImpl(DiscountRepository repository, DiscountLevelRepository discountLevelRepository) {
         this.repository = repository;
         this.discountLevelRepository = discountLevelRepository;
+
+        discountCache = new PingInMemory3DCache<>(capacity);
+
+        updateCache();
+    }
+
+    private void updateCache() {
+
+        List<Discount> discounts = repository.findAll();
+
+        for(Discount discount : discounts) {
+            String salesOrg = discount.getSalesOrg();
+            String salesOffice = discount.getSalesOffice();
+
+            discountCache.put(salesOrg, salesOffice, discount);
+        }
     }
 
     @Override
@@ -45,7 +67,11 @@ public class DiscountServiceImpl implements DiscountService {
         Optional<Discount> opt = repository.findById(id);
         if(opt.isPresent()) {
             updateDiscountLevels(discount);
-            return repository.save(discount);
+            Discount saved = repository.save(discount);
+
+            updateCache();
+
+            return saved;
         }
         return null;
     }
@@ -63,8 +89,12 @@ public class DiscountServiceImpl implements DiscountService {
         log.debug("Saving {} amount of Discount objects.", discounts.size());
         addDiscountLevelsToDiscountList(discounts);
         log.debug("Prepeared {} discounts added to list.", discounts.size());
-        
-        return repository.saveAll(discounts);
+
+        List<Discount> discountList = repository.saveAll(discounts);
+
+        updateCache();
+
+        return discountList;
     }
 
     private void addDiscountLevelsToDiscountList(List<Discount> discounts) {

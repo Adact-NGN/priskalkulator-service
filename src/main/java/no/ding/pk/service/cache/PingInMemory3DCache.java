@@ -31,20 +31,17 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
     
     private Date expires;
 
-    // private final Map<K, InMemory2DCache<T, CacheObject<V>>> cacheMap;
     private final Map<K, Cache<T, CacheObject<V>>> cacheMap;
     
     public PingInMemory3DCache(@Value("${cache.max.amount.items:5000}") Integer capacity) {
         this.capacity = capacity;
         log.debug("Max item cache size: {}", this.capacity);
-        // cacheMap = new HashMap<K, InMemory2DCache<T, CacheObject<V>>>();
         cacheMap = new HashMap<K, Cache<T, CacheObject<V>>>();
     }
     
     public void put(K groupKey, T objectKey, V value) {
         synchronized (cacheMap) {
             if(!cacheMap.containsKey(groupKey)) {
-                // InMemory2DCache<T, CacheObject<V>> cache = new PingInMemory2DCache<>();
                 Cache<T, CacheObject<V>> caffeine = Caffeine.newBuilder()
                 .maximumSize(capacity)
                 .expireAfterWrite(1, TimeUnit.HOURS)

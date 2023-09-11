@@ -4,6 +4,7 @@ import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
 import no.ding.pk.web.dto.sap.MaterialDTO;
@@ -28,7 +29,9 @@ public class ModelMapperV2Config {
     private static final Logger log = LoggerFactory.getLogger(ModelMapperV2Config.class);
 
     @Bean(name = "modelMapperV2")
-    public ModelMapper modelMapperV2(MaterialService materialRepository, SalesRoleRepository salesRoleRepository) {
+    public ModelMapper modelMapperV2(MaterialService materialRepository,
+                                     SalesRoleRepository salesRoleRepository,
+                                     DiscountService discountService) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
