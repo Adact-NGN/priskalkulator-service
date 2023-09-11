@@ -135,21 +135,9 @@ public class PriceRowServiceImpl implements PriceRowService {
             Material material = getMaterial(materialPriceRow.getMaterial());
             log.debug("PriceRow->Material: {}", material);
 
-            EntityManager em = emFactory.createEntityManager();
-            log.debug("Is material attached: {}", em.contains(material));
-
             if(material.getId() == null) {
 
-                em.getTransaction().begin();
-                List materials;
-
-                if(StringUtils.isNotBlank(material.getDeviceType())) {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
-                } else {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
-                }
-                em.getTransaction().commit();
-                em.close();
+                List materials = getMaterials(material);
 
                 if(materials != null && materials.size() > 0) {
                     Material persistedMaterial = (Material) materials.get(0);
@@ -242,6 +230,23 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
+    private List getMaterials(Material material) {
+        EntityManager em = emFactory.createEntityManager();
+        log.debug("Is material attached: {}", em.contains(material));
+
+        em.getTransaction().begin();
+        List materials;
+
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+        } else {
+            materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+        }
+        em.getTransaction().commit();
+        em.close();
+        return materials;
+    }
+
     private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
         if(discountMap == null || discountMap.isEmpty()) {
             log.debug("No discount map provided for material: {}", entity.getMaterial().getMaterialNumber());
@@ -264,8 +269,18 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                     log.debug("Getting discount for material {}, with discount level {}, with discount {}", entity.getMaterial().getMaterialNumber(), dl.getLevel(), dl.getDiscount());
 
-                    entity.setDiscountLevelPct(dl.getPctDiscount());
-                    entity.setDiscountLevelPrice(dl.getDiscount());
+                    Double discountLevelPct = dl.getPctDiscount();
+                    Double discountLevelPrice = dl.getDiscount();
+
+                    if(discountLevelPct == null && discountLevelPrice != null) {
+                        if(discountLevelPrice < 0.0) {
+                            discountLevelPct = ((discountLevelPrice * -1.0) * 100) / entity.getStandardPrice();
+                        } else {
+                            discountLevelPct = (discountLevelPrice * 100) / entity.getStandardPrice();
+                        }
+                    }
+                    entity.setDiscountLevelPct(discountLevelPct);
+                    entity.setDiscountLevelPrice(discountLevelPrice);
 
                     if(dl.getDiscount() < 0.0) {
                         entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
