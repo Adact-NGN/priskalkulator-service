@@ -59,11 +59,12 @@ spec:
 #apiVersion: backstage.io/v1alpha1
 #kind: User
 #metadata:
-#  name: thomas
+#  name: eirik.flaa
+#  namespace: default
 #spec:
 #  profile:
-#    displayName: Thomas Nilsen
-#    email: thomas.nilsen@ngn.no
+#    displayName: Eirik Flaa
+#    email: eirik.flaa@ngn.no
 #  #    picture: https://example.com/staff/jenny-with-party-hat.jpeg
 #  memberOf: [ calculator-team, employees ]
 #---
@@ -71,9 +72,13 @@ apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: calculator-team
+  description: The amazing Price Calculator development team.
 spec:
   type: team
   children: []
+  members:
+    - kjetil.torvund.minde
+    - thomas.nilsen
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
