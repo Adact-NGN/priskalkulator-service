@@ -11,6 +11,7 @@ import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
+import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import org.apache.commons.io.IOUtils;
@@ -156,10 +157,12 @@ class PriceOfferControllerTest {
         customerTerms.setPaymentCondition("15 dgr");
         customerTerms.setInvoiceInterval("Hver 14.dag");
 
+        ActivatePriceOfferRequest offerRequest = new ActivatePriceOfferRequest(customerTerms, "Activate it");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<TermsDTO> request = new HttpEntity<>(customerTerms, headers);
+        HttpEntity<ActivatePriceOfferRequest> request = new HttpEntity<>(offerRequest, headers);
 
         String activateOfferUrl = "/api/v2/price-offer/activate/" + createdPriceOffer.getBody().getSalesEmployee().getId() + "/" + createdPriceOffer.getBody().getId();
         ResponseEntity<Boolean> actual = restTemplate.exchange(activateOfferUrl, HttpMethod.PUT, request, Boolean.class);
