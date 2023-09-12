@@ -13,4 +13,6 @@ public interface UserService {
     boolean delete(Long id);
     User removeSalesRoleFromUser(User user);
     User findByEmail(String salesEmployeeEmail);
+
+    List<User> findByEmailInList(List<String> superAdmins);
 }

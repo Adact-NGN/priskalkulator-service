@@ -437,7 +437,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms) {
+    public Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
         User approver = userService.findById(approverId).orElse(null);
 
         if(approver == null) {
@@ -455,6 +455,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(!priceOfferToActivate.getApprover().equals(approver) || !priceOfferToActivate.getSalesEmployee().equals(approver)) {
             String message = String.format("Given approver, (id: %d), did not match the price offers assigned approver, (id: %d)", approverId, priceOfferToActivate.getApprover().getId());
             throw new WrongApproverException(message);
+        }
+
+        if(StringUtils.isNotBlank(generalComment)) {
+            priceOfferToActivate.setGeneralComment(generalComment);
         }
 
         priceOfferToActivate.setCustomerTerms(customerTerms);

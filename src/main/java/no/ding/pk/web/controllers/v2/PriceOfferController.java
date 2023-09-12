@@ -10,10 +10,12 @@ import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.offer.TermsDTO;
+import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -96,17 +98,21 @@ public class PriceOfferController {
      * Activate price offer
      * @param approverId id for {@code User}
      * @param priceOfferId id for price offer
-     * @param customerTermsDTO completed customer terms to be added to the price offer.
+     * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
     @PutMapping(path = "/activate/{approverId}/{priceOfferId}")
     public Boolean activatePriceOffer(@PathVariable("approverId") Long approverId,
                                       @PathVariable("priceOfferId") Long priceOfferId,
-                                      @RequestBody TermsDTO customerTermsDTO) {
+                                      @RequestBody ActivatePriceOfferRequest activatePriceOfferRequest) {
         log.debug("Activating price offer with id {} by user with id {}", priceOfferId, approverId);
 
-        PriceOfferTerms customerTerms = modelMapper.map(customerTermsDTO, PriceOfferTerms.class);
-        return service.activatePriceOffer(approverId, priceOfferId, customerTerms);
+        if(activatePriceOfferRequest.getTerms() == null) {
+            throw new MissingTermsInRequestPayloadException();
+        }
+
+        PriceOfferTerms customerTerms = modelMapper.map(activatePriceOfferRequest.getTerms(), PriceOfferTerms.class);
+        return service.activatePriceOffer(approverId, priceOfferId, customerTerms, activatePriceOfferRequest.getGeneralComment());
     }
     
     /**
