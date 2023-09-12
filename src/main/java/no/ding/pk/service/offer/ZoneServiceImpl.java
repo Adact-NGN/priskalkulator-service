@@ -80,6 +80,9 @@ public class ZoneServiceImpl implements ZoneService {
             returnZoneList.add(entity);
         }
 
+
+
+
         log.debug("Persisted {} amount of Zones", returnZoneList.size());
         return returnZoneList;
     }

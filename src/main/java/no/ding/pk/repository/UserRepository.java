@@ -1,7 +1,6 @@
 package no.ding.pk.repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u where u.email = :email")
     User findByEmailIgnoreCase(@Param("email") String employeeEail);
+
+    List<User> findAllByEmailIn(List<String> superAdmins);
 }

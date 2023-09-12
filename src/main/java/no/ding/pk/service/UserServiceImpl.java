@@ -138,5 +138,10 @@ public class UserServiceImpl implements UserService {
 		log.debug("Search for User with email: {}", employeeEail);
 		return repository.findByEmailIgnoreCase(employeeEail);
 	}
-	
+
+	@Override
+	public List<User> findByEmailInList(List<String> superAdmins) {
+		return repository.findAllByEmailIn(superAdmins);
+	}
+
 }

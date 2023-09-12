@@ -24,7 +24,7 @@ public interface PriceOfferService {
 
     Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment);
 
-    Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms);
+    Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment);
 
     List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
 

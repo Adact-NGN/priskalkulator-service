@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
@@ -19,13 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -426,7 +419,7 @@ class PriceOfferServiceImplTest {
                 .build();
 
 
-        Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms);
+        Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms, null);
 
         assertThat(actual, is(true));
     }
