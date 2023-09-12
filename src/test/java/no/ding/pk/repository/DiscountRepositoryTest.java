@@ -14,9 +14,7 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -55,6 +53,39 @@ public class DiscountRepositoryTest {
         Discount actual = repository.findBySalesOrgAndMaterialNumberAndZone(salesOrg, materialNumber, zone);
 
         assertThat(actual, notNullValue());
+    }
+
+    @Test
+    public void shouldGetDiscountLevelsForZones() {
+        List<Discount> actual = repository.findAll(Specification.where(withZone("3")).and(withSalesOrg("100")).and(withSalesOffice("100"))
+                .and(withMaterialNumber("50101")));
+
+        assertThat(actual, hasSize(1));
+    }
+
+    @Test
+    public void shouldNotGetAnyDiscountsForMaterialWithZoneWhenZoneIsNotGiven() {
+        List<Discount> actual = repository.findAll(Specification.where(withZone(null)).and(withSalesOrg("100")).and(withSalesOffice("100"))
+                .and(withMaterialNumber("50101")));
+
+        assertThat(actual, hasSize(0));
+    }
+
+    @Test
+    public void shouldGetDiscountLevelsForNonZoneMaterials() {
+        List<Discount> actual = repository.findAll(Specification.where(withZone(null)).and(withSalesOrg("100")).and(withSalesOffice("100"))
+                .and(withMaterialNumber("160406")));
+
+        assertThat(actual, hasSize(1));
+    }
+
+    @Test
+    public void shouldGetDiscountsForMaterialsInListAndZoneList() {
+        List<String> zoneList = List.of("1");
+        List<String> materialNumbers = List.of("50101");
+        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
+
+        assertThat(actual, hasSize(greaterThan(0)));
     }
 
     @Test
