@@ -39,7 +39,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private static final Logger log = LoggerFactory.getLogger(StandardPriceServiceImpl.class);
     
     @Value("${sap.api.standard.price.url}")
-    private final String standardPriceSapUrl = "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet";
+    private String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
     
