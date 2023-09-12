@@ -5,13 +5,13 @@ resources:
 
 images:
 - name: dingipacr.azurecr.io/ding-ip-app-pk-service
-  newTag: v0.24.25
+  newTag: v0.40.25
 namespace: priskalkulator-prod
 
 patches:
-  - target:
-      group: apps
-      version: v1
-      kind: Deployment
-      name: ding-ip-app-pk-service
-    path: deployment-patch.yaml
+- path: deployment-patch.yaml
+  target:
+    group: apps
+    kind: Deployment
+    name: ding-ip-app-pk-service
+    version: v1
