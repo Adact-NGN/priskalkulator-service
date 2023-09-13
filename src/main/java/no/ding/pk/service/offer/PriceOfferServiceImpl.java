@@ -452,11 +452,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new PriceOfferNotFoundException(message);
         }
 
-        if(!priceOfferToActivate.getApprover().equals(approver) || !priceOfferToActivate.getSalesEmployee().equals(approver)) {
-            String message = String.format("Given approver, (id: %d), did not match the price offers assigned approver, (id: %d)", approverId, priceOfferToActivate.getApprover().getId());
-            throw new WrongApproverException(message);
-        }
-
         if(StringUtils.isNotBlank(generalComment)) {
             priceOfferToActivate.setGeneralComment(generalComment);
         }
