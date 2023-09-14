@@ -106,7 +106,9 @@ public class DiscountServiceImpl implements DiscountService {
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice))
+                .and(hasDiscountLevelInZone(zones))
+                .and(matchMaterialNumberInList(materialNumbers))));
     }
 
     private List<String> cleanUpAndGetMaterialNumbersAsList(String materialNumber) {
@@ -117,13 +119,16 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber) {
-        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
     }
 
     @Override
     public List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneAndMaterialNumber(String salesOrg, String salesOffice,
                                                                                   String zone, String materialNumber) {
-        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withSalesOffice(salesOffice)).and(withMaterialNumber(materialNumber)));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg))
+                .and(hasDiscountLevelInZone(zone))
+                .and(withSalesOffice(salesOffice))
+                .and(withMaterialNumber(materialNumber)));
     }
 
     @Override

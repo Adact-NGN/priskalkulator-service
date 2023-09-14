@@ -36,6 +36,9 @@ public class DiscountLevel {
     @Column
     private Double pctDiscount;
 
+    @Column
+    private Integer zone;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="discount_id", nullable = false)
@@ -88,10 +91,18 @@ public class DiscountLevel {
         this.parent = parent;
     }
 
+    public Integer getZone() {
+        return zone;
+    }
+
+    public void setZone(Integer zone) {
+        this.zone = zone;
+    }
+
     @Override
     public String toString() {
         return "DiscountLevel [id=" + id + ", level=" + level + ", discount=" + discount + ", calculatedDiscount="
-                + calculatedDiscount + ", pctDiscount=" + pctDiscount + "]";
+                + calculatedDiscount + ", pctDiscount=" + pctDiscount + ", zone=" + zone + "]";
     }
 
     @Override
