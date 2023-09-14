@@ -11,7 +11,6 @@ import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 @Builder
 @Data
 public class ActivatePriceOfferRequest {
-    private Long activatedById;
     private TermsDTO terms;
     private String generalComment;
 }
