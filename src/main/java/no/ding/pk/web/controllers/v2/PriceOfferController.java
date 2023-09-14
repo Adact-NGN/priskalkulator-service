@@ -96,23 +96,24 @@ public class PriceOfferController {
 
     /**
      * Activate price offer
-     * @param approverId id for {@code User}
+     * @param activatedById id for {@code User}
      * @param priceOfferId id for price offer
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
-    @PutMapping(path = "/activate/{approverId}/{priceOfferId}")
-    public Boolean activatePriceOffer(@PathVariable("approverId") Long approverId,
+    @PutMapping(path = "/activate/{activatedById}/{priceOfferId}")
+    public ResponseEntity<Boolean> activatePriceOffer(@PathVariable("activatedById") Long activatedById,
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ActivatePriceOfferRequest activatePriceOfferRequest) {
-        log.debug("Activating price offer with id {} by user with id {}", priceOfferId, approverId);
+        log.debug("Price offer with id {} is activated by user with id {}", priceOfferId, activatedById);
 
         if(activatePriceOfferRequest.getTerms() == null) {
             throw new MissingTermsInRequestPayloadException();
         }
 
         PriceOfferTerms customerTerms = modelMapper.map(activatePriceOfferRequest.getTerms(), PriceOfferTerms.class);
-        return service.activatePriceOffer(approverId, priceOfferId, customerTerms, activatePriceOfferRequest.getGeneralComment());
+        Boolean activated = service.activatePriceOffer(activatedById, priceOfferId, customerTerms, activatePriceOfferRequest.getGeneralComment());
+        return ResponseEntity.ok(activated);
     }
     
     /**

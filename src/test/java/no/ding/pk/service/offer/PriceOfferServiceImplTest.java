@@ -70,9 +70,6 @@ class PriceOfferServiceImplTest {
         prepearUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
-
-
-
     }
 
     @Test

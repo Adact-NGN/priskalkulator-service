@@ -437,19 +437,24 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
-        User approver = userService.findById(approverId).orElse(null);
-
-        if(approver == null) {
-            String message = String.format("No approver with given id %d was found.", approverId);
-            throw new ApproverNotFoundException(message);
-        }
-
+    public Boolean activatePriceOffer(Long activatedById, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
         PriceOffer priceOfferToActivate = repository.findById(priceOfferId).orElse(null);
 
         if(priceOfferToActivate == null) {
             String message = String.format("No PriceOffer with given id %d was found.", priceOfferId);
             throw new PriceOfferNotFoundException(message);
+        }
+
+        if(StringUtils.isBlank(priceOfferToActivate.getPriceOfferStatus())) {
+            String message = "Given Price offer has no status assigned.";
+
+            throw new WrongStatusException(message);
+        }
+
+        if(!PriceOfferStatus.isApproved(priceOfferToActivate.getPriceOfferStatus())) {
+            String message = String.format("Price offer can not be activated. Expected status is 'APPROVED', got %s", priceOfferToActivate.getPriceOfferStatus());
+
+            throw new WrongStatusException(message);
         }
 
         if(StringUtils.isNotBlank(generalComment)) {
@@ -461,6 +466,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         priceOfferToActivate = repository.save(priceOfferToActivate);
 
+        disableExistingContract(priceOfferToActivate);
+
+        log.debug("Activated new terms for sales offices in list: {}", priceOfferToActivate.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
+
+        return true;
+    }
+
+    private void disableExistingContract(PriceOffer priceOfferToActivate) {
         for(SalesOffice salesOffice : priceOfferToActivate.getSalesOfficeList()) {
             endExistingCustomerTerms(priceOfferToActivate, salesOffice);
 
@@ -474,10 +487,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             customerTermsService.save(salesOffice.getSalesOffice(), priceOfferToActivate.getCustomerNumber(), priceOfferToActivate.getCustomerName(), newCustomerTerms);
         }
-
-        log.debug("Activated new terms for sales offices in list: {}", priceOfferToActivate.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
-
-        return true;
     }
 
     private void endExistingCustomerTerms(PriceOffer priceOfferToActivate, SalesOffice salesOffice) {

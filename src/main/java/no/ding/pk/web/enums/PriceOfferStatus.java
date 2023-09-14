@@ -35,6 +35,10 @@ public enum PriceOfferStatus {
         return getApprovalStates().contains(status);
     }
 
+    public static boolean isApproved(String priceOfferStatus) {
+        return APPROVED.status.equals(priceOfferStatus);
+    }
+
     public String getStatus() {
         return status;
     }

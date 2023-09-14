@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
@@ -52,11 +53,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
+@TestPropertySource(locations = {"classpath:h2-db.properties"})
 class PriceOfferControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PriceOfferRepository priceOfferRepository;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -150,6 +154,15 @@ class PriceOfferControllerTest {
 
         assertThat(createdPriceOffer.getStatusCode(), is(HttpStatus.OK));
         assertThat(createdPriceOffer, notNullValue());
+
+        Optional<PriceOffer> byId = priceOfferRepository.findById(createdPriceOffer.getBody().getId());
+
+        assertThat(byId.isPresent(), is(true));
+
+        PriceOffer persistedPriceOffer = byId.get();
+        persistedPriceOffer.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
+
+        priceOfferRepository.save(persistedPriceOffer);
 
         TermsDTO customerTerms = createdPriceOffer.getBody().getCustomerTerms();
         customerTerms.setMetalPricing("Fastpris (opp til kr -500,- pr. tonn)");
