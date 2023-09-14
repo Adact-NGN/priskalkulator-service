@@ -101,7 +101,7 @@ public class PriceOfferController {
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
-    @PutMapping(path = "/activate/{priceOfferId}")
+    @PutMapping(path = "/activate/{activatedById}/{priceOfferId}")
     public ResponseEntity<Boolean> activatePriceOffer(@PathVariable("activatedById") Long activatedById,
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ActivatePriceOfferRequest activatePriceOfferRequest) {
