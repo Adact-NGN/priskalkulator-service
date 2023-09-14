@@ -102,7 +102,7 @@ public class PriceOfferController {
      * @return true if price offer is updated, else false
      */
     @PutMapping(path = "/activate/{priceOfferId}")
-    public Boolean activatePriceOffer(@PathVariable("activatedById") Long activatedById,
+    public ResponseEntity<Boolean> activatePriceOffer(@PathVariable("activatedById") Long activatedById,
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ActivatePriceOfferRequest activatePriceOfferRequest) {
         log.debug("Price offer with id {} is activated by user with id {}", priceOfferId, activatedById);
@@ -112,7 +112,8 @@ public class PriceOfferController {
         }
 
         PriceOfferTerms customerTerms = modelMapper.map(activatePriceOfferRequest.getTerms(), PriceOfferTerms.class);
-        return service.activatePriceOffer(activatedById, priceOfferId, customerTerms, activatePriceOfferRequest.getGeneralComment());
+        Boolean activated = service.activatePriceOffer(activatedById, priceOfferId, customerTerms, activatePriceOfferRequest.getGeneralComment());
+        return ResponseEntity.ok(activated);
     }
     
     /**
