@@ -2,22 +2,17 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.DiscountLevelRepository;
+import no.ding.pk.repository.DiscountRepository;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,21 +31,23 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@Disabled("Need to isolate the scope")
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-public class DiscountServiceImplTest {
+
+public class DiscountServiceImplTest extends AbstractIntegrationConfig {
 
     @Autowired
+    private DiscountRepository discountRepository;
+
+    @Autowired
+    private DiscountLevelRepository discountLevelRepository;
+
     private DiscountService service;
 
     private List<Discount> testData;
 
     @BeforeEach
     public void setup() throws IOException {
+        service = new DiscountServiceImpl(discountRepository, discountLevelRepository);
+
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(Objects.requireNonNull(classLoader.getResource("discounts_simple.json")).getFile());
@@ -129,7 +126,7 @@ public class DiscountServiceImplTest {
 
         assertThat(actual.size(), greaterThan(0));
 
-        assertThat(actual.get(0).getDiscountLevels().get(0).getZone(), equalTo("01"));
+        assertThat(actual.get(0).getDiscountLevels().get(0).getZone(), equalTo(1));
     }
 
     @Test

@@ -30,7 +30,7 @@ import static org.hamcrest.core.StringContains.containsString;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class CustomerServiceTest {
 
-    private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder";
+    private final String url = "https://saptest.norskgjenvinning.no/sap/opu/odata4/sap/zapi_hp_customers2/srvd_a2x/sap/zapi_hp_customers/0001/Kunder";
     // private String url = "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZAPI_ECOM_CUSTOMERS_V2/ZC_ECOM_CUSTOMER";
 
     private CustomerServiceImpl service = new CustomerServiceImpl("AZURE_ECOM", "AzureEcom@NGN2022", url, new ObjectMapper());

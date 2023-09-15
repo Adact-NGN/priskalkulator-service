@@ -2,9 +2,19 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.AbstractIntegrationConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.offer.MaterialPriceRepository;
+import no.ding.pk.repository.offer.MaterialRepository;
+import no.ding.pk.service.offer.MaterialPriceService;
+import no.ding.pk.service.offer.MaterialPriceServiceImpl;
+import no.ding.pk.service.offer.MaterialService;
+import no.ding.pk.service.offer.MaterialServiceImpl;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
@@ -16,6 +26,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
@@ -41,29 +52,58 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-public class UserServiceTest {
-    
-    @Autowired
+//@SpringBootTest
+//@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
+//@TestPropertySource("/h2-db.properties")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+public class UserServiceTest extends AbstractIntegrationConfig {
+
+    private MaterialService materialService;
+
     private UserService service;
     
-    @Autowired
     private SalesRoleService salesRoleService;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
     private ModelMapper modelMapper;
     
     private List<User> testData;
-    
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    private MaterialPriceService materialPriceService;
+
+    @Autowired
+    private MaterialPriceRepository materialPriceRepository;
+
     @BeforeEach
     public void setup() throws IOException {
+
+        service = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
+
+        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository);
+
+        objectMapper = new ObjectMapper();
+
+        ModelMapperV2Config modelMapperV2Config = new ModelMapperV2Config();
+
+        materialService = new MaterialServiceImpl(materialRepository, materialPriceService);
+        modelMapper = modelMapperV2Config.modelMapperV2(materialService, salesRoleRepository);
+
+        userRepository.deleteAll();
+        salesRoleRepository.deleteAll();
+
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
@@ -135,10 +175,9 @@ public class UserServiceTest {
         if(userObject == null) {
             userObject = testData.get(0);
         }
-        userObject.setSalesRole(salesRole);
-        
-        userObject = service.save(userObject, userObject.getId());
-        
+
+        userObject = service.updateSalesRoleForUser(userObject, salesRole);
+
         Optional<User> actual = service.findById(userObject.getId());
         
         assertThat(actual.isPresent(), is(true));
@@ -233,8 +272,9 @@ public class UserServiceTest {
         if(userObject == null) {
             userObject = testData.get(0);
         }
+
         userObject.setSalesRole(firstSalesRole);
-        
+
         userObject.setPowerOfAttorneyFA(1);
         userObject.setPowerOfAttorneyOA(1);
         
@@ -252,11 +292,11 @@ public class UserServiceTest {
         
         User newUserObject = SerializationUtils.clone(actualUser);
         newUserObject.setId(userObject.getId());
-        
-        newUserObject.setSalesRole(otherSalesRole);
+
         newUserObject.setPowerOfAttorneyFA(2);
         newUserObject.setPowerOfAttorneyOA(2);
-        
+        service.updateSalesRoleForUser(newUserObject, otherSalesRole);
+
         newUserObject.setSureName("Minde");
         
         actualUser = service.save(newUserObject, newUserObject.getId());

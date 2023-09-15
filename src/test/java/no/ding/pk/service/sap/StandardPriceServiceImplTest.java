@@ -1,4 +1,4 @@
-package no.ding.pk.service;
+package no.ding.pk.service.sap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.service.cache.InMemory3DCache;

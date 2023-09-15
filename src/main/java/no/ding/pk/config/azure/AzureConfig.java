@@ -14,17 +14,13 @@ import java.net.MalformedURLException;
 public class AzureConfig {
     private final Logger log = LoggerFactory.getLogger(AzureConfig.class);
 
-    @Value("${CLIENT_ID}")
-    private String clientId;
-    @Value("${AUTHORITY}")
-    private String authority;
-    @Value("${SECRET}")
-    private String secret;
-    @Value("${SCOPE}")
-    private String scope;
-
     @Bean
-    public ConfidentialClientApplication confidentialClientApplication() throws MalformedURLException {
+    public ConfidentialClientApplication confidentialClientApplication(
+            @Value("${CLIENT_ID}") String clientId,
+            @Value("${AUTHORITY}") String authority,
+            @Value("${SECRET}") String secret,
+            @Value("${SCOPE}") String scope
+            ) throws MalformedURLException {
         log.debug("Building ConfidentialClientApplication with client id: " + clientId);
         return ConfidentialClientApplication.builder(clientId,
                         ClientCredentialFactory.createFromSecret(secret))
