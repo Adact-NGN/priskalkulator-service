@@ -161,7 +161,7 @@ public class DiscountServiceImpl implements DiscountService {
         if(!StringUtils.isBlank(zone) && StringUtils.isNumeric(zone)) {
             return discountLevelRepository.findByParentSalesOrgAndParentSalesOfficeAndZoneAndParent_MaterialNumberIn(salesOrg, salesOffice, Integer.valueOf(zone), materialNumberList);
         }
-        return discountLevelRepository.findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberInList(salesOrg, salesOffice, materialNumberList);
+        return discountLevelRepository.findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberIn(salesOrg, salesOffice, materialNumberList);
     }
 
     @Override
