@@ -34,7 +34,7 @@ public class DiscountSpecifications {
         }
     }
 
-    public static Specification<Discount> hasDiscountLevelInZone(String zone) {
+    public static Specification<Discount> hasDiscountLevelInZone(Integer zone) {
         if(zone == null) {
             return null;
         }
@@ -44,7 +44,7 @@ public class DiscountSpecifications {
         };
     }
 
-    public static Specification<Discount> hasDiscountLevelZoneInList(List<String> zones) {
+    public static Specification<Discount> hasDiscountLevelZoneInList(List<Integer> zones) {
         return (root, query, criteriaBuilder) -> {
             Join<DiscountLevel, Discount> discountLevels = root.join("discountLevels");
             return discountLevels.in(zones);

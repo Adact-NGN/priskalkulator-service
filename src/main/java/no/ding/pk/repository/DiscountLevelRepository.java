@@ -19,9 +19,12 @@ public interface DiscountLevelRepository extends JpaRepository<DiscountLevel, Lo
 
     List<DiscountLevel> findAllByParentSalesOrgAndParentMaterialNumber(String salesOrg, String materialNumber);
 
-    @Query("select dl from DiscountLevel dl where dl.parent.salesOrg = :salesOrg and dl.parent.zone = :zone and dl.parent.materialNumber IN :materialNumbers")
-    List<DiscountLevel> findAllByParentSalesOrgAndParentZoneAndParentMaterialNumberInList(@Param("salesOrg") String salesOrg, @Param("zone") String zone, @Param("materialNumbers") List<String> materialNumber);
+    List<DiscountLevel> findByParentSalesOrgAndZoneAndParent_MaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("zone") Integer zone, @Param("materialNumbers") List<String> materialNumber);
 
     @Query("select dl from DiscountLevel dl where dl.parent.salesOrg = :salesOrg and dl.parent.materialNumber IN :materialNumbers")
     List<DiscountLevel> findAllByParentSalesOrgAndParentMaterialNumberInList(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers);
+
+    List<DiscountLevel> findByParentSalesOrgAndParentSalesOfficeAndZoneAndParent_MaterialNumberIn(String salesOrg, String salesOffice, Integer integer, List<String> materialNumberList);
+
+    List<DiscountLevel> findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberInList(String salesOrg, String salesOffice, List<String> materialNumberList);
 }

@@ -129,7 +129,7 @@ public class DiscountServiceImplTest {
 
         assertThat(actual.size(), greaterThan(0));
 
-        assertThat(actual.get(0).getZone(), equalTo("01"));
+        assertThat(actual.get(0).getDiscountLevels().get(0).getZone(), equalTo("01"));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class DiscountServiceImplTest {
         addMissingDiscounts();
 
         List<String> materialNumbers = List.of("113103");
-        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber("100", materialNumbers.get(0), null);
+        List<DiscountLevel> actual = service.findAllDiscountLevelsForDiscountBySalesOrgAndSalesOfficeAndMaterialNumber("100", "100", materialNumbers.get(0), null);
 
         assertThat(actual.size(), greaterThanOrEqualTo(5));
     }
@@ -172,7 +172,7 @@ public class DiscountServiceImplTest {
     }
 
     protected void addMissingDiscounts() {
-        List<String> toPersist = service.findAll().stream().map(Discount::getMaterialNumber).collect(Collectors.toList());
+        List<String> toPersist = service.findAll().stream().map(Discount::getMaterialNumber).toList();
 
         List<Discount> discounts = testData.stream().filter(discount -> !toPersist.contains(discount.getMaterialNumber())).collect(Collectors.toList());
 
