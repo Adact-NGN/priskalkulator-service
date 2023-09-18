@@ -25,11 +25,5 @@ public class App {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Profile("!test")
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
-                .paths(PathSelectors.any()).build();
-    }
+
 }

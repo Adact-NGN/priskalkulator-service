@@ -13,4 +13,8 @@ public class AzureConfig {
         return mock(ConfidentialClientApplication.class);
     }
 
+//    @Bean
+//    public ObjectMapper objectMapper() {
+//        return new ObjectMapper();
+//    }
 }

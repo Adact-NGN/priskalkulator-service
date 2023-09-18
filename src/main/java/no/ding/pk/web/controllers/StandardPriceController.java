@@ -1,16 +1,12 @@
 package no.ding.pk.web.controllers;
 
-import no.ding.pk.service.sap.StandardPriceServiceImpl;
+import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,10 +16,10 @@ public class StandardPriceController {
 
     private final Logger log = LoggerFactory.getLogger(StandardPriceController.class);
     
-    private final StandardPriceServiceImpl service;
+    private final StandardPriceService service;
     
     @Autowired
-    public StandardPriceController(StandardPriceServiceImpl priceService) {
+    public StandardPriceController(StandardPriceService priceService) {
         this.service = priceService;
     }
     

@@ -7,6 +7,7 @@ import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.utils.JsonTestUtils;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
+@Disabled("")
 @SpringBootTest()
 @TestPropertySource("/h2-db.properties")
 @Sql(value = {

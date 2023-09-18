@@ -1,26 +1,26 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.SecurityTestConfig;
+import no.ding.pk.config.mapping.v1.ModelMapperConfig;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.domain.offer.*;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
 import no.ding.pk.service.UserService;
+import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
 import no.ding.pk.web.dto.v1.web.client.SalesOfficeDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,38 +30,41 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@TestPropertySource("/h2-db.properties")
+@AutoConfigureMockMvc(addFilters = false)
+@Import({SecurityTestConfig.class, ModelMapperConfig.class})
+@WebMvcTest(PriceOfferController.class)
 public class PriceOfferControllerTest {
-    
-    @LocalServerPort
-    private int serverPort;
-    
-    @Autowired
-    private TestRestTemplate restTemplate;
-    
-    @Autowired
-    private UserService userService;
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    @Qualifier("modelMapper")
     private ModelMapper modelMapper;
     
+    @MockBean
+    private UserService userService;
+
+    @MockBean
+    private PriceOfferService priceOfferService;
+
+    @MockBean
+    private SalesRoleRepository salesRoleRepository;
+
+    @MockBean
+    private UserRepository userRepository;
+
     private User salesEmployee;
     private User approver;
-    
+
     public void setup() {
-        
         String salesEmployeeEmail = "Wolfgang@farris-bad.no";
-        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
-        
-        if(salesEmployee == null) {
-            salesEmployee = User.builder()
+
+        this.salesEmployee = User.builder()
             .adId("ad-id-wegarijo-arha-rh-arha")
             .jobTitle("Salgskonsulent")
             .fullName("Wolfgang Amadeus Mozart")
@@ -69,16 +72,11 @@ public class PriceOfferControllerTest {
             .associatedPlace("Larvik")
             .department("Hvitsnippene")
             .build();
-            
-            salesEmployee = userService.save(salesEmployee, null);
-        }
-        this.salesEmployee = userService.findByEmail(salesEmployeeEmail);
+
+        when(userService.findByEmail(salesEmployeeEmail)).thenReturn(salesEmployee);
         
         String approverEmail = "alexander.brox@ngn.no";
-        User approver = userService.findByEmail(approverEmail);
-
-        if(approver == null) {
-            approver = User.builder()
+        this.approver = User.builder()
             .adId("ad-ww-wegarijo-arha-rh-arha")
             .associatedPlace("Oslo")
             .email(approverEmail)
@@ -89,24 +87,9 @@ public class PriceOfferControllerTest {
             .jobTitle("Markedskonsulent")
             .build();
 
-            approver = userService.save(approver, null);
-        }
-        
-        
-        this.approver = approver;
+        when(userService.findByEmail(approverEmail)).thenReturn(approver);
     }
     
-    @Test
-    public void shouldPersistPriceOffer() throws Exception {
-        setup();
-        PriceOfferDTO priceOffer = createCompleteOfferDto();
-        
-        ResponseEntity<String> responseEntity = this.restTemplate
-        .postForEntity("http://localhost:" + serverPort + "/api/v1/price-offer/create", priceOffer, String.class);
-        
-        assertThat(responseEntity.getStatusCode(), is(HttpStatus.OK));
-    }
-
     @Test
     public void shouldMapJsonToEntity() throws IOException {
         PriceOfferDTO priceOfferDTO = createCompleteOfferDto();

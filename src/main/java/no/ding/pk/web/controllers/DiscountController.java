@@ -27,7 +27,7 @@ public class DiscountController {
     private final DiscountService service;
 
     @Autowired
-    public DiscountController(@Qualifier("discountServiceImpl") DiscountService service) {
+    public DiscountController(DiscountService service) {
         this.service = service;
     }
 
@@ -103,7 +103,7 @@ public class DiscountController {
      */
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Discount updateDiscount(@PathVariable("id") Long id, @RequestBody Discount discount) {
-        log.debug("Updating Disvount object with id: " + id);
+        log.debug("Updating Discount object with id: " + id);
         return service.update(id, discount);
     }
 }

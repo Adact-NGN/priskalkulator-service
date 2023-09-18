@@ -26,7 +26,7 @@ public class DiscountLevelController {
     private final DiscountService service;
 
     @Autowired
-    public DiscountLevelController(@Qualifier("discountServiceImpl") DiscountService service) {
+    public DiscountLevelController(DiscountService service) {
         this.service = service;
     }
 
