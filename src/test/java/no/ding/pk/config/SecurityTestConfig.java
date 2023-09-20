@@ -1,8 +1,7 @@
 package no.ding.pk.config;
 
 //import com.azure.spring.cloud.autoconfigure.aad.AadResourceServerWebSecurityConfigurerAdapter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.test.context.TestConfiguration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -33,11 +32,6 @@ public class SecurityTestConfig
                 .jwt();
 
         return httpSecurity.build();
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 
 //    @Override

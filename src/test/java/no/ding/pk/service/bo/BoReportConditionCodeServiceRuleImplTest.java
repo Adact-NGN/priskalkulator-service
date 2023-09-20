@@ -10,7 +10,7 @@ import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.repository.bo.ConditionCodeRepository;
 import no.ding.pk.repository.bo.KeyCombinationRepository;
-import no.ding.pk.service.CustomerService;
+import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.service.UserAzureAdService;
 import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.utils.LocalJSONUtils;

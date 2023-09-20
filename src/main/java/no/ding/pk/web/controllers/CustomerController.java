@@ -1,6 +1,6 @@
 package no.ding.pk.web.controllers;
 
-import no.ding.pk.service.CustomerService;
+import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.web.dto.sap.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
 import org.apache.commons.lang3.StringUtils;
