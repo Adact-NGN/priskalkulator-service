@@ -1,17 +1,23 @@
 package no.ding.pk.config;
 
-import static org.mockito.Mockito.mock;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.aad.msal4j.ConfidentialClientApplication;
+import no.ding.pk.repository.DiscountLevelRepository;
+import no.ding.pk.repository.DiscountRepository;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.offer.*;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.service.converters.PdfService;
 import no.ding.pk.service.offer.PriceRowService;
 import no.ding.pk.service.offer.SalesOfficeService;
-import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.template.HandlebarsTemplateService;
 import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
-
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.mappers.MapperService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,26 +25,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.aad.msal4j.ConfidentialClientApplication;
-
-import no.ding.pk.repository.DiscountLevelRepository;
-import no.ding.pk.repository.DiscountRepository;
-import no.ding.pk.repository.SalesRoleRepository;
-import no.ding.pk.repository.UserRepository;
-import no.ding.pk.repository.offer.CustomerTermsRepository;
-import no.ding.pk.repository.offer.MaterialPriceRepository;
-import no.ding.pk.repository.offer.MaterialRepository;
-import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
-import no.ding.pk.repository.offer.PriceRowRepository;
-import no.ding.pk.repository.offer.SalesOfficeRepository;
-import no.ding.pk.repository.offer.ZoneRepository;
-import no.ding.pk.service.cache.InMemory3DCache;
-import no.ding.pk.service.cache.PingInMemory3DCache;
-import no.ding.pk.web.mappers.MapperService;
-
 import javax.persistence.EntityManagerFactory;
+
+import static org.mockito.Mockito.mock;
 
 @Configuration
 @Profile({ "unit-test" })
@@ -72,10 +61,10 @@ public class SchedulingTestConfig {
         return mock(MapperService.class);
     }
 
-    @Bean
-    public SapMaterialService materialService() {
-        return mock(SapMaterialService.class);
-    }
+//    @Bean
+//    public SapMaterialService materialService() {
+//        return mock(SapMaterialService.class);
+//    }
 
     @Bean
     public UserRepository userRepository() {

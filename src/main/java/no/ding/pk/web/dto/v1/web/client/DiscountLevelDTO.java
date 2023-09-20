@@ -9,4 +9,5 @@ public class DiscountLevelDTO {
     private Double discount;
     private String calculatedDiscount;
     private String pctDiscount;
+    private Integer zone;
 }

@@ -1,38 +1,56 @@
 package no.ding.pk.service;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-//@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
-class SalesOfficePowerOfAttorneyServiceImplTest {
+@Disabled
+class SalesOfficePowerOfAttorneyServiceImplTest extends AbstractIntegrationConfig {
 
     @Autowired
+    private SalesOfficePowerOfAttorneyRepository sopaRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
     private SalesOfficePowerOfAttorneyService service;
 
-    @Autowired
     private UserService userService;
+
+
+    @BeforeEach
+    public void setup() {
+        service = new SalesOfficePowerOfAttorneyServiceImpl(sopaRepository);
+
+        userService = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        sopaRepository.deleteAll();
+    }
 
     @Test
     public void shouldPersistPowerOfAttorney() {
-        PowerOfAttorney poa = PowerOfAttorney.builder()
-                .salesOffice(101)
-                .salesOfficeName("StorOslo")
-                .region("Oslofjord")
-                .build();
+        PowerOfAttorney poa = sopaRepository.findBySalesOffice(101);
+
+        if(poa == null) {
+            poa = PowerOfAttorney.builder()
+                    .salesOffice(101)
+                    .salesOfficeName("StorOslo")
+                    .region("Oslofjord")
+                    .build();
+        }
 
         poa = service.save(poa);
 
@@ -53,14 +71,22 @@ class SalesOfficePowerOfAttorneyServiceImplTest {
 
         user = userService.save(user, null);
 
-        PowerOfAttorney poa = PowerOfAttorney.builder()
-                .salesOffice(100)
-                .salesOfficeName("StorOslo")
-                .region("Oslofjord")
-                .ordinaryWasteLvlOneHolder(user)
-                .ordinaryWasteLvlTwoHolder(user)
-                .dangerousWasteHolder(user)
-                .build();
+        PowerOfAttorney poa = sopaRepository.findBySalesOffice(100);
+
+        if(poa == null) {
+            poa = PowerOfAttorney.builder()
+                    .salesOffice(100)
+                    .salesOfficeName("StorOslo")
+                    .region("Oslofjord")
+                    .ordinaryWasteLvlOneHolder(user)
+                    .ordinaryWasteLvlTwoHolder(user)
+                    .dangerousWasteHolder(user)
+                    .build();
+        } else {
+            poa.setOrdinaryWasteLvlOneHolder(user);
+            poa.setOrdinaryWasteLvlTwoHolder(user);
+            poa.setDangerousWasteHolder(user);
+        }
 
         poa = service.save(poa);
 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Transactional
@@ -130,6 +131,28 @@ public class UserServiceImpl implements UserService {
 		
 		user = repository.save(user);
 		salesRoleRepository.save(userSalesRole);
+		return user;
+	}
+
+	@Override
+	public User updateSalesRoleForUser(User user, SalesRole salesRole) {
+		if(user.getSalesRole() == null) {
+			salesRole.addUser(user);
+
+			return repository.save(user);
+		}
+
+		if(Objects.equals(user.getSalesRole(), salesRole)) {
+			return user;
+		}
+
+		if(!Objects.equals(user.getSalesRole(), salesRole)) {
+			user = removeSalesRoleFromUser(user);
+
+			salesRole.addUser(user);
+
+			return repository.save(user);
+		}
 		return user;
 	}
 

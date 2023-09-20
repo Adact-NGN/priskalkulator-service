@@ -101,12 +101,24 @@ public class DiscountServiceImpl implements DiscountService {
 
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
-            List <String> zoneList = Arrays.asList(zones.split(","));
-            return repository.findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
+            List <Integer> zoneList = Arrays.stream(zones.split(",")).map(this::mapNumericStringToInteger).filter(Optional::isPresent).map(Optional::get).toList();
+            return repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
         }
 
+        List <Integer> zoneList = Arrays.stream(zones.split(",")).map(this::mapNumericStringToInteger).filter(Optional::isPresent).map(Optional::get).toList();
+
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
-        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withZone(zones)).and(matchMaterialNumberInList(materialNumbers))));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice))
+                .and(hasDiscountLevelZoneInList(zoneList))
+                .and(matchMaterialNumberInList(materialNumbers))));
+    }
+
+    private Optional<Integer> mapNumericStringToInteger(String numericString) {
+        if(StringUtils.isNumeric(numericString)) {
+            return Optional.of(Integer.valueOf(numericString));
+        }
+
+        return Optional.empty();
     }
 
     private List<String> cleanUpAndGetMaterialNumbersAsList(String materialNumber) {
@@ -117,29 +129,39 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<Discount> findAllBySalesOrgAndZoneAndMaterialNumber(String salesOrg, String zone, String materialNumber) {
-        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg)).and(withMaterialNumber(materialNumber)));
     }
 
     @Override
     public List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneAndMaterialNumber(String salesOrg, String salesOffice,
                                                                                   String zone, String materialNumber) {
-        return repository.findAll(Specification.where(withZone(zone)).and(withSalesOrg(salesOrg)).and(withSalesOffice(salesOffice)).and(withMaterialNumber(materialNumber)));
+        Integer numericZone = null;
+
+        if(StringUtils.isNumeric(zone)) {
+            numericZone = Integer.valueOf(zone);
+        }
+
+        return repository.findAll(Specification.where(withSalesOrg(salesOrg))
+                .and(hasDiscountLevelInZone(numericZone))
+                .and(withSalesOffice(salesOffice))
+                .and(withMaterialNumber(materialNumber)));
     }
 
     @Override
-    public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg,
+    public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String salesOffice,
             String materialNumber, Integer level) {
         return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, level);
     }
 
     @Override
-    public List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg,
-                                                                                           String materialNumbers, String zone) {
+    public List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg,
+                                                                                                         String salesOffice,
+                                                                                                         String materialNumbers, String zone) {
         List<String> materialNumberList = Arrays.asList(materialNumbers.split(","));
         if(!StringUtils.isBlank(zone) && StringUtils.isNumeric(zone)) {
-            return discountLevelRepository.findAllByParentSalesOrgAndParentZoneAndParentMaterialNumberInList(salesOrg, zone, materialNumberList);
+            return discountLevelRepository.findByParentSalesOrgAndParentSalesOfficeAndZoneAndParent_MaterialNumberIn(salesOrg, salesOffice, Integer.valueOf(zone), materialNumberList);
         }
-        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberInList(salesOrg, materialNumberList);
+        return discountLevelRepository.findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberIn(salesOrg, salesOffice, materialNumberList);
     }
 
     @Override

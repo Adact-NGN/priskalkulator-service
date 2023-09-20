@@ -39,9 +39,6 @@ public class Discount {
     private String materialNumber;
     
     @Column
-    private String zone;
-    
-    @Column
     private String deviceType;
     
     @Column
@@ -109,14 +106,6 @@ public class Discount {
     
     public void setId(long id) {
         this.id = id;
-    }
-    
-    public String getZone() {
-        return zone;
-    }
-    
-    public void setZone(String zone) {
-        this.zone = zone;
     }
     
     public String getDeviceType() {

@@ -192,8 +192,7 @@ public class PriceOfferController {
         log.debug("Got new Price offer object: " + priceOfferDTO);
         
         if(priceOfferDTO.getSalesEmployee() == null) throw new EmployeeNotProvidedException();
-        if(priceOfferDTO.getCustomerNumber() == null) throw new CustomerNotProvidedException();
-        
+
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());

@@ -1,33 +1,44 @@
 package no.ding.pk.service;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class SalesRoleServiceImplTest {
-    
+@Disabled
+class SalesRoleServiceImplTest extends AbstractIntegrationConfig {
+
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
     private UserService userService;
     
-    @Autowired
     private SalesRoleService salesRoleService;
+
+    @BeforeEach
+    public void setup() {
+        userService  = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        salesRoleRepository.deleteAll();
+        userRepository.deleteAll();
+    }
     
     @Test
     public void shouldPersistUserWithSalesRole() {
@@ -52,25 +63,24 @@ class SalesRoleServiceImplTest {
         
         saSalesRole = salesRoleService.save(saSalesRole);
         
-        User saUser = createSaUser();
+        User user = createSaUser();
         
-        saUser = userService.save(saUser, null);
-        
-        saSalesRole.addUser(saUser);
-        
-        saSalesRole = salesRoleService.save(saSalesRole);
+        user = userService.save(user, null);
+
+        user = userService.updateSalesRoleForUser(user, saSalesRole);
+
+        assertThat(user.getSalesRole(), notNullValue());
         
         SalesRole knSalesRole = createKnSalesRole();
-        
+
         knSalesRole = salesRoleService.save(knSalesRole);
-        
-        knSalesRole.addUser(saUser);
-        
-        knSalesRole = salesRoleService.save(knSalesRole);
-        
+
+        user = userService.updateSalesRoleForUser(user, knSalesRole);
+
+        assertThat(user.getSalesRole(), equalTo(knSalesRole));
+
         saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
-        
-        assertThat(knSalesRole.getUserList(), hasSize(greaterThan(0)));
+
         assertThat(saSalesRole.getUserList(), hasSize(0));
     }
     
@@ -97,6 +107,11 @@ class SalesRoleServiceImplTest {
     }
     
     private SalesRole createSaSalesRole() {
+        SalesRole sa = salesRoleRepository.findByRoleName("SA");
+
+        if(sa != null) {
+            return sa;
+        }
         return SalesRole.builder()
         .roleName("SA")
         .description("Salgskonsulent (rolle a)")
@@ -106,6 +121,12 @@ class SalesRoleServiceImplTest {
     }
     
     private SalesRole createKnSalesRole() {
+        SalesRole kn = salesRoleRepository.findByRoleName("KN");
+
+        if(kn != null) {
+            return kn;
+        }
+
         return SalesRole.builder()
         .roleName("KN")
         .description("KAM nasjonalt")

@@ -12,15 +12,13 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withMaterialNumber;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withSalesOrg;
-import static no.ding.pk.repository.specifications.DiscountSpecifications.withZone;
+import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 @DataJpaTest
@@ -40,9 +38,6 @@ public class DiscountRepositoryTest {
     private final String salesOrg = "100";
     private final String salesOffice = "100";
     private final String materialNumber = "50101";
-    private final String zone = "1";
-    private final String materialDesignation = "Hageavfall, trær og røtter";
-    private final double standardPrice = 1573.5;
 
     @Test
     public void shouldPersistAndGetDiscountAndDiscountLevelObjects() {
@@ -52,9 +47,10 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldGetSpecificDiscount() {
-        Discount actual = repository.findBySalesOrgAndMaterialNumberAndZone(salesOrg, materialNumber, zone);
+        Specification<Discount> specification = withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withMaterialNumber(materialNumber));
+        Optional<Discount> actual = repository.findOne(specification);
 
-        assertThat(actual, notNullValue());
+        assertThat(actual.isPresent(), is(true));
     }
 
     @Test
@@ -78,7 +74,7 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldGetDiscountForMaterialInListWithSingleMaterial() {
-        List<Discount> materialList = repository.findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(salesOrg, List.of("161201"));
+        List<Discount> materialList = repository.findAllBySalesOrgAndDiscountLevelsZoneIsNullAndMaterialNumberIn(salesOrg, List.of("161201"));
 
         List<Discount> distinctList = materialList.stream().distinct().collect(Collectors.toList());
 
@@ -87,7 +83,7 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldGetDiscountForMaterialInListWithMultipleMaterials() {
-        List<Discount> materialList = repository.findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(salesOrg, List.of("50106","50107","50108","50109"));
+        List<Discount> materialList = repository.findAllBySalesOrgAndDiscountLevelsZoneIsNullAndMaterialNumberIn(salesOrg, List.of("50106","50107","50108","50109"));
 
         List<Discount> distinctList = materialList.stream().distinct().collect(Collectors.toList());
 
@@ -96,16 +92,26 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldNotGetDiscountForMaterialWithZones() {
-        List<Discount> materialList = repository.findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(salesOrg, List.of(materialNumber));
+        List<Discount> materialList = repository.findAllBySalesOrgAndDiscountLevelsZoneIsNullAndMaterialNumberIn(salesOrg, List.of(materialNumber));
 
         assertThat(materialList, hasSize(0));
     }
 
     @Test
     public void shouldGetDiscountForMaterialWithZones() {
-        List<Discount> discountList = repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withZone(null)).and(withMaterialNumber("50106"))));
+
+        Integer zone = 1;
+        Specification<Discount> specification = withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withMaterialNumber(materialNumber).and(hasDiscountLevelInZone(zone)));
+        List<Discount> discountList = repository.findAll(specification);
 
         assertThat(discountList, hasSize(greaterThan(0)));
     }
 
+    @Test
+    public void shouldGetDiscountForMaterialWithoutZones() {
+        Specification<Discount> specification = withSalesOrg("100").and(withSalesOffice("100")).and(withMaterialNumber("C-02L")).and(hasDiscountLevelInZone(null));
+        List<Discount> discountList = repository.findAll(specification);
+
+        assertThat(discountList, hasSize(greaterThan(0)));
+    }
 }

@@ -2,18 +2,25 @@ package no.ding.pk.service.offer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.AbstractIntegrationConfig;
+import no.ding.pk.config.ObjectMapperConfig;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.repository.offer.ZoneRepository;
 import no.ding.pk.service.DiscountService;
+import no.ding.pk.service.sap.StandardPriceService;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.transaction.Transactional;
@@ -35,21 +42,33 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@SpringBootTest
-@Transactional
-@TestPropertySource("/h2-db.properties")
-class ZoneServiceImplTest {
+@Import({ObjectMapperConfig.class})
+class ZoneServiceImplTest extends AbstractIntegrationConfig {
 
-    @Autowired
     private ZoneService service;
 
     @Autowired
+    private ZoneRepository zoneRepository;
+
+    @MockBean
     private DiscountService discountService;
 
     private List<Discount> testData;
 
+    @MockBean
+    private PriceRowService priceRowService;
+
+    @MockBean
+    private StandardPriceService standardPriceService;
+
+    @Autowired
+    private ObjectMapper om;
+
+
     @BeforeEach
     public void setup() throws IOException {
+        service = new ZoneServiceImpl(zoneRepository, priceRowService, discountService, standardPriceService);
+
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(Objects.requireNonNull(classLoader.getResource("discounts.json")).getFile());
@@ -63,8 +82,6 @@ class ZoneServiceImplTest {
         testData = new ArrayList<>();
 
         JSONArray results = new JSONArray(json);
-
-        ObjectMapper om = new ObjectMapper();
 
         for(int i = 0; i < results.length(); i++) {
             JSONObject jsonObject = results.getJSONObject(i);

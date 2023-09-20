@@ -94,7 +94,6 @@ public class UserController {
         } else {
             log.debug("User has not been assigned a Sales Role");
         }
-        
 
         return modelMapper.map(createdUser, UserDTO.class);
     }

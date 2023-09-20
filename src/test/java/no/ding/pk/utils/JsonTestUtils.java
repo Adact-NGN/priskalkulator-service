@@ -1,13 +1,17 @@
 package no.ding.pk.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.platform.commons.util.StringUtils;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -36,5 +40,12 @@ public class JsonTestUtils {
         ObjectMapper objectMapper = new ObjectMapper();
 
         return objectMapper.readValue(json, PriceOfferDTO.class);
+    }
+
+    public static <T> T getResponseBody(MvcResult mvcResult, Class<T> clazz) throws UnsupportedEncodingException {
+        String jsonString = mvcResult.getResponse().getContentAsString();
+
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssz").create();
+        return gson.fromJson(jsonString, clazz);
     }
 }

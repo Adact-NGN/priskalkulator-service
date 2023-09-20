@@ -1,0 +1,1 @@
+ALTER TABLE discount_matrix DROP COLUMN zone;

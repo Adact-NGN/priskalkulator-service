@@ -1,26 +1,32 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.offer.CustomerTerms;
+import no.ding.pk.repository.offer.CustomerTermsRepository;
 import org.joda.time.LocalDateTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest
-@Transactional
 @TestPropertySource("/h2-db.properties")
-public class CustomerTermsServiceImplTest {
+public class CustomerTermsServiceImplTest extends AbstractIntegrationConfig {
+
+    private CustomerTermsService service;
 
     @Autowired
-    private CustomerTermsService service;
+    private CustomerTermsRepository customerRepository;
+
+    @BeforeEach
+    public void setup() {
+        service = new CustomerTermsServiceImpl(customerRepository);
+    }
 
     @Test
     void testFindActiveTermsForCustomerForSalesOfficeAndSalesOrgWhereEndDateIsNull() {

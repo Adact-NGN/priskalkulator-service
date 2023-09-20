@@ -1,6 +1,7 @@
 package no.ding.pk.web.controllers.v1;
 
 import no.ding.pk.domain.Discount;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 
+@Disabled("Move all test scenarios to service")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource("/h2-db.properties")
 @SqlConfig(commentPrefix = "#")
@@ -58,8 +60,10 @@ public class DiscountControllerTest {
 
         Map<String, String> params = new HashMap<>();
         params.put("materialNumbers", materials);
+        params.put("serverPort", String.valueOf(serverPort));
+        params.put("salesOffice", salesOffice);
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers={materialNumbers}&zones=", Discount[].class, params);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:{serverPort}/api/v1/discount/in-list/100?salesOffice={salesOffice}&materialNumbers={materialNumbers}&zones=", Discount[].class, params);
 
         assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
     }

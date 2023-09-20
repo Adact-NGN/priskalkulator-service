@@ -6,6 +6,8 @@ import java.util.List;
 
 @Getter
 public enum PriceOfferStatus {
+    ARCHIVED("ARCHIVED"),
+    DRAFT("DRAFT"),
     PENDING("PENDING"),
     REJECTED("REJECTED"),
     APPROVED("APPROVED"),

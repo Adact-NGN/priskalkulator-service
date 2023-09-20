@@ -77,17 +77,16 @@ public class SalesRole implements Serializable {
     }
     
     public void addUser(User user) {
+        if(userList == null) {
+            userList = new ArrayList<>();
+        }
 
         if(userList.contains(user)) {
             return;
         }
 
         user.setSalesRole(this);
-        
-        if(userList == null) {
-            userList = new ArrayList<>();
-        }
-        
+
         userList.add(user);
     }
     

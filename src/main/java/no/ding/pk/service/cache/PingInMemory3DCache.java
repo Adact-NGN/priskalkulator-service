@@ -1,27 +1,16 @@
 package no.ding.pk.service.cache;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import no.ding.pk.domain.cache.CacheObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-
-import no.ding.pk.domain.cache.CacheObject;
-import no.ding.pk.service.offer.MaterialService;
-import no.ding.pk.service.sap.SapMaterialService;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
@@ -47,7 +36,7 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
                 // InMemory2DCache<T, CacheObject<V>> cache = new PingInMemory2DCache<>();
                 Cache<T, CacheObject<V>> caffeine = Caffeine.newBuilder()
                 .maximumSize(capacity)
-                .expireAfterWrite(1, TimeUnit.HOURS)
+//                .expireAfterWrite(1, TimeUnit.HOURS)
                 .build();
                 
                 cacheMap.put(groupKey, caffeine);
@@ -55,7 +44,7 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
             
             CacheObject<V> cacheObject;
             if(cacheMap.get(groupKey).getIfPresent(objectKey) != null) {
-                if(cacheMap.get(groupKey).getIfPresent(objectKey).getValue().equals(value)) {
+                if(Objects.requireNonNull(cacheMap.get(groupKey).getIfPresent(objectKey)).getValue().equals(value)) {
                     log.debug("Group {} already contains objectKey {} and given object.", groupKey, objectKey);
                     return;
                 }
@@ -83,6 +72,10 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
             }
             
             CacheObject<V> c = cacheMap.get(groupKey).getIfPresent(key);
+
+            if(c == null) {
+                return null;
+            }
             c.accessed++;
             
             c.setLastAccessed(System.currentTimeMillis());
@@ -93,10 +86,10 @@ public class PingInMemory3DCache<K, T, V> implements InMemory3DCache<K, T, V> {
     public List<V> getAllInList(K groupKey) {
         synchronized (cacheMap) {
             if(cacheMap.get(groupKey) != null) {
-                List<CacheObject<V>> all = cacheMap.get(groupKey).asMap().entrySet().stream().map(obj -> obj.getValue()).collect(Collectors.toList());
+                List<CacheObject<V>> all = cacheMap.get(groupKey).asMap().values().stream().toList();
 
                 if(!all.isEmpty()) {
-                    return all.stream().map(obj -> obj.getValue()).collect(Collectors.toList());
+                    return all.stream().map(CacheObject::getValue).collect(Collectors.toList());
                 }
             }
             

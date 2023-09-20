@@ -26,38 +26,44 @@ public class DiscountLevelController {
     private final DiscountService service;
 
     @Autowired
-    public DiscountLevelController(@Qualifier("discountServiceImpl") DiscountService service) {
+    public DiscountLevelController(DiscountService service) {
         this.service = service;
     }
 
     /**
      * Get discount level for a specific material which  belongs to a given material. The material resides under a sales organization and sales office.
-     * @param salesOrg Sales organization number
+     *
+     * @param salesOrg       Sales organization number
+     * @param salesOffice    Sales office number
      * @param materialNumber Material number
-     * @param level Discount level
+     * @param level          Discount level
      * @return A list with all the discount levels returned for the criteria given, else empty list.
      */
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getSpecificDiscountLevel(@RequestParam("salesOrg") String salesOrg,
-    @RequestParam("materialNumber") String materialNumber,
-    @RequestParam(name = "level", required = false) Integer level) {
-        log.debug(String.format("Getting discount level for: salesOrg: %s materialNumber: %s level: %d", salesOrg, materialNumber, level));
-        return service.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, materialNumber, level);
+                                                        @RequestParam("salesOffice") String salesOffice,
+                                                        @RequestParam("materialNumber") String materialNumber,
+                                                        @RequestParam(name = "level", required = false) Integer level) {
+        log.debug("Getting discount level for: salesOrg: {}, salesOffice: {}, materialNumber: {} level: {}", salesOrg, salesOffice, materialNumber, level);
+        return service.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, materialNumber, level);
     }
 
     /**
      * Get a list of discount levels for a specific material or a list of material numbers.
      *
-     * @param salesOrg       Sales organization number
-     * @param materialNumber Material number or a comma separated number list.
+     * @param salesOrg       Sales organization number.
+     * @param salesOffice    Sales office number.
+     * @param materialNumbers Material number or a comma separated number list.
      * @param zone           Specify for which zone to get discount levels for.
      * @return A list of all the discount levels for one or multiple materials, else empty list.
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getAllDiscountLevelsForSpecificDiscount(@RequestParam("salesOrg") String salesOrg,
-    @RequestParam("materialNumber") String materialNumber, @RequestParam(value = "zone", required = false) String zone) {
-        log.debug(String.format("Getting all discount levels for: salesOrg: %s materialNumber: %s", salesOrg, materialNumber));
-        return service.findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(salesOrg, materialNumber, zone);
+                                                                       @RequestParam("salesOffice") String salesOffice,
+                                                                       @RequestParam("materialNumbers") String materialNumbers,
+                                                                       @RequestParam(value = "zone", required = false) String zone) {
+        log.debug(String.format("Getting all discount levels for: salesOrg: %s materialNumber: %s", salesOrg, materialNumbers));
+        return service.findAllDiscountLevelsForDiscountBySalesOrgAndSalesOfficeAndMaterialNumber(salesOrg, salesOffice, materialNumbers, zone);
     }
 
     /**

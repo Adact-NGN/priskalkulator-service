@@ -24,7 +24,7 @@ public class MaterialController {
     private final SapMaterialService service;
 
     @Autowired
-    public MaterialController(@Qualifier("sapMaterialServiceImpl") SapMaterialService service) {
+    public MaterialController(SapMaterialService service) {
         this.service = service;
     }
 
