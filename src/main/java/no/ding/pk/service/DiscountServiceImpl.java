@@ -105,11 +105,8 @@ public class DiscountServiceImpl implements DiscountService {
             return repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
         }
 
-        List <Integer> zoneList = Arrays.stream(zones.split(",")).map(this::mapNumericStringToInteger).filter(Optional::isPresent).map(Optional::get).toList();
-
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");
         return repository.findAll(Specification.where(withSalesOrg(salesOrg).and(withSalesOffice(salesOffice))
-                .and(hasDiscountLevelZoneInList(zoneList))
                 .and(matchMaterialNumberInList(materialNumbers))));
     }
 
