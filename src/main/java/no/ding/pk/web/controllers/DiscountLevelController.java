@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/discount/level")
+@RequestMapping({"/api/discount/level", "/api/v1/discount/level"})
 public class DiscountLevelController {
 
     private final static Logger log = LoggerFactory.getLogger(DiscountLevelController.class);
