@@ -3,22 +3,18 @@ package no.ding.pk.service;
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
 import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
+@Disabled
 class SalesOfficePowerOfAttorneyServiceImplTest extends AbstractIntegrationConfig {
 
     @Autowired

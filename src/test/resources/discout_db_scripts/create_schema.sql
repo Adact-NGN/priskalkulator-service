@@ -1,7 +1,6 @@
 create table if not exists discount_matrix
 (
-    id                   bigint       not null AUTO_INCREMENT
-        primary key,
+    id                   bigint       not null AUTO_INCREMENT primary key,
     device_type          varchar(255) null,
     material_designation varchar(255) null,
     material_number      varchar(255) not null,

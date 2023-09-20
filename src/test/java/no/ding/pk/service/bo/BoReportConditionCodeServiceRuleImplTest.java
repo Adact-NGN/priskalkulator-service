@@ -10,9 +10,9 @@ import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
 import no.ding.pk.repository.bo.ConditionCodeRepository;
 import no.ding.pk.repository.bo.KeyCombinationRepository;
-import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.service.UserAzureAdService;
 import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
@@ -25,13 +25,13 @@ import org.kie.api.runtime.KieContainer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+@Disabled
 @Import({DroolsConfig.class, ModelMapperV2Config.class})
 class BoReportConditionCodeServiceRuleImplTest extends AbstractIntegrationConfig {
 

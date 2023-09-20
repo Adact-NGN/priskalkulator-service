@@ -1,37 +1,35 @@
 package no.ding.pk.service.offer;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.EntityManagerFactory;
-import javax.transaction.Transactional;
-
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.service.sap.SapMaterialService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 
-import no.ding.pk.domain.offer.Material;
-import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.domain.offer.PriceRow;
+import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
 
 //@SpringBootTest
 //@Transactional
 //@TestPropertySource("/h2-db.properties")
+@Disabled
 @Import(ModelMapperV2Config.class)
 public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 

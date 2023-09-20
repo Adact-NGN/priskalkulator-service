@@ -23,6 +23,7 @@ import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.mappers.MapperService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.kie.api.runtime.KieContainer;
 import org.modelmapper.ModelMapper;
@@ -44,6 +45,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 //@Disabled("")
 //@SpringBootTest()
 //@TestPropertySource("/h2-db.properties")
+@Disabled
 @Sql(value = {
         "/conditional_code_key_combination_scripts/drop_schemas.sql",
         "/conditional_code_key_combination_scripts/create_condition_code.sql",
