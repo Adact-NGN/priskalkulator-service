@@ -1,17 +1,37 @@
 package no.ding.pk.service.bo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.aad.msal4j.ConfidentialClientApplication;
+import no.ding.pk.config.AbstractIntegrationConfig;
+import no.ding.pk.config.DroolsConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.domain.bo.KeyCombination;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.repository.bo.ConditionCodeRepository;
+import no.ding.pk.repository.bo.KeyCombinationRepository;
+import no.ding.pk.service.CustomerService;
+import no.ding.pk.service.UserAzureAdService;
+import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.utils.JsonTestUtils;
+import no.ding.pk.utils.LocalJSONUtils;
+import no.ding.pk.utils.SapHttpClient;
+import no.ding.pk.web.dto.sap.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.mappers.MapperService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.kie.api.runtime.KieContainer;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -24,9 +44,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
-@Disabled("")
-@SpringBootTest()
-@TestPropertySource("/h2-db.properties")
+//@Disabled("")
+//@SpringBootTest()
+//@TestPropertySource("/h2-db.properties")
 @Sql(value = {
         "/conditional_code_key_combination_scripts/drop_schemas.sql",
         "/conditional_code_key_combination_scripts/create_condition_code.sql",
@@ -35,13 +55,59 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 @Sql(value = {
         "/conditional_code_key_combination_scripts/insert_condition_code_with_key_combination.sql"
 })
-public class BoReportConditionCodeServiceImplTest {
+@Import({DroolsConfig.class, ModelMapperV2Config.class})
+public class BoReportConditionCodeServiceImplTest extends AbstractIntegrationConfig {
 
-    @Autowired
     private BoReportConditionCodeService service;
 
     @Autowired
+    private ConditionCodeRepository conditionCodeRepository;
+
+    @Autowired
+    private KeyCombinationRepository keyCombinationRepository;
+
+    @Autowired
+    private KieContainer kieContainer;
+
+    @Autowired
+    @Qualifier("modelMapperV2")
     private ModelMapper modelMapper;
+
+    @MockBean
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private CustomerService customerService;
+
+    @MockBean
+    private ConfidentialClientApplication confidentialClientApplication;
+
+    @MockBean
+    private MapperService mapperService;
+
+    @MockBean
+    private LocalJSONUtils localJSONUtils;
+
+    @MockBean
+    private UserAzureAdService userAzureAdServiceImpl;
+
+    @MockBean
+    private SapHttpClient sapHttpClient;
+
+    @MockBean
+    @Qualifier("materialInMemoryCache")
+    private InMemory3DCache<String, String, MaterialDTO> inMemory3DCache;
+
+    @MockBean
+    @Qualifier("standardPriceInMemoryCache")
+    private InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache;
+
+    @BeforeEach
+    public void setup() {
+        service = new BoReportConditionCodeServiceImpl(conditionCodeRepository,
+                keyCombinationRepository,
+                kieContainer);
+    }
 
     @Test
     public void shouldGetConditionCodeList() {

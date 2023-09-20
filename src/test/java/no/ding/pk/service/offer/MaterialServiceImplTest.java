@@ -1,10 +1,14 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.repository.offer.MaterialRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.transaction.Transactional;
@@ -12,13 +16,20 @@ import javax.transaction.Transactional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest
-@Transactional
-@TestPropertySource("/h2-db.properties")
-public class MaterialServiceImplTest {
+public class MaterialServiceImplTest extends AbstractIntegrationConfig {
     
-    @Autowired
     private MaterialService service;
+
+    @MockBean
+    private MaterialPriceService materialPriceService;
+
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    @BeforeEach
+    public void setup() {
+        service = new MaterialServiceImpl(materialRepository, materialPriceService);
+    }
 
     private void createMaterial() {
         String materialNumber = "119901";

@@ -96,7 +96,7 @@ class BoReportTitleTypeControllerTest {
         Gson gson = new Gson();
         ConditionCode[] actual = gson.fromJson(jsonString, ConditionCode[].class);
 
-        assertThat(actual, arrayWithSize(greaterThan(0)));
+       assertThat(actual, arrayWithSize(greaterThan(0)));
     }
 
     @Test

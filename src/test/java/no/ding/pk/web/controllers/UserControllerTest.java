@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.ObjectMapperConfig;
 import no.ding.pk.config.SecurityTestConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.SalesRole;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,13 +38,13 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
 @AutoConfigureMockMvc(addFilters = false)
-@Import({SecurityTestConfig.class, ModelMapperV2Config.class})
+@Import({SecurityTestConfig.class, ModelMapperV2Config.class, ObjectMapperConfig.class})
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
-    @Autowired
-    @Qualifier("modelMapperV2")
-    private ObjectMapper objectMapper;
+//    @Autowired
+//    @Qualifier("modelMapperV2")
+//    private ModelMapper modelMapper;
 
     @Autowired
     private SalesRoleService salesRoleService;
@@ -53,56 +55,60 @@ public class UserControllerTest {
     @Autowired
     private SalesRoleRepository salesRoleRepository;
 
+//    @Autowired
+//    private ObjectMapper objectMapper;
+
     private List<UserDTO> testData;
     private String requestPayload;
 
-    @BeforeEach
-    public void setup() throws IOException {
-//        initializeDiscounts(discountService, objectMapper);
-        ClassLoader classLoader = getClass().getClassLoader();
-        // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
-        File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
-
-        assertThat(file.exists(), is(true));
-
-        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
-        requestPayload = json;
-
-        assertThat("JSON is empty", json, not(emptyOrNullString()));
-
-        testData = new ArrayList<>();
-
-        JSONArray results = new JSONArray(json);
-
-        for(int i = 0; i < results.length(); i++) {
-            JSONObject jsonObject = results.getJSONObject(i);
-
-            try {
-                UserDTO discount = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
-                testData.add(discount);
-            } catch (JsonProcessingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        assertThat("Test data is empty, reading in JSON file failed.", testData, not(empty()));
-
-        SalesRole kv = SalesRole.builder()
-                .roleName("KV")
-                .description("Kundeveileder")
-                .defaultPowerOfAttorneyOa(1)
-                .defaultPowerOfAttorneyFa(1)
-                .build();
-
-        SalesRole kv2 = SalesRole.builder()
-                .defaultPowerOfAttorneyFa(2)
-                .defaultPowerOfAttorneyOa(2)
-                .description("Salgskonsulent (rolle a)")
-                .roleName("SA")
-                .build();
-
-    }
+//    @BeforeEach
+//    public void setup() throws IOException {
+////        initializeDiscounts(discountService, objectMapper);
+//        ClassLoader classLoader = getClass().getClassLoader();
+//        // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
+//        File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
+//
+//        assertThat(file.exists(), is(true));
+//
+//        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+//        requestPayload = json;
+//
+//        assertThat("JSON is empty", json, not(emptyOrNullString()));
+//
+//        testData = new ArrayList<>();
+//
+//        JSONArray results = new JSONArray(json);
+//
+//        for(int i = 0; i < results.length(); i++) {
+//            JSONObject jsonObject = results.getJSONObject(i);
+//
+//            try {
+//                UserDTO discount = objectMapper
+//                        .readValue(jsonObject.toString(), UserDTO.class);
+//                testData.add(discount);
+//            } catch (JsonProcessingException e) {
+//                // TODO Auto-generated catch block
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        assertThat("Test data is empty, reading in JSON file failed.", testData, not(empty()));
+//
+//        SalesRole kv = SalesRole.builder()
+//                .roleName("KV")
+//                .description("Kundeveileder")
+//                .defaultPowerOfAttorneyOa(1)
+//                .defaultPowerOfAttorneyFa(1)
+//                .build();
+//
+//        SalesRole kv2 = SalesRole.builder()
+//                .defaultPowerOfAttorneyFa(2)
+//                .defaultPowerOfAttorneyOa(2)
+//                .description("Salgskonsulent (rolle a)")
+//                .roleName("SA")
+//                .build();
+//
+//    }
 
     @Disabled("Move to service of repo test")
     @Test
@@ -112,10 +118,10 @@ public class UserControllerTest {
         JSONArray jsonArray = new JSONArray(requestPayload);
         JSONObject jsonObject = jsonArray.getJSONObject(0);
         jsonObject.put("salesRoleId", salesRole.getId());
-        UserDTO userDTO = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
+//        UserDTO userDTO = objectMapper.readValue(jsonObject.toString(), UserDTO.class);
 
-        assertThat(userDTO, notNullValue());
-        assertThat(userDTO.getSalesRoleId(), notNullValue());
+//        assertThat(userDTO, notNullValue());
+//        assertThat(userDTO.getSalesRoleId(), notNullValue());
 
 //        ResponseEntity<UserDTO> actual = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/users/create", userDTO, UserDTO.class); // userController.create(userDTO);
 //

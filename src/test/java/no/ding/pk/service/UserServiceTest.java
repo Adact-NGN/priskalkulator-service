@@ -52,11 +52,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-//@SpringBootTest
-//@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-//@TestPropertySource("/h2-db.properties")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class UserServiceTest extends AbstractIntegrationConfig {
 
     private MaterialService materialService;

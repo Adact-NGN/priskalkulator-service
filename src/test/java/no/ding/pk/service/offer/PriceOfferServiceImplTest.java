@@ -2,6 +2,7 @@ package no.ding.pk.service.offer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
@@ -29,11 +31,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Disabled
-@ExtendWith(MockitoExtension.class)
-class PriceOfferServiceImplTest {
+@Disabled("This needs to be a complete integration test")
+class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
 
+    @Autowired
     private PriceOfferRepository priceOfferRepository;
 
     private SalesOfficeService salesOfficeService;
@@ -55,7 +57,6 @@ class PriceOfferServiceImplTest {
     @BeforeEach
     public void setup() {
 
-        priceOfferRepository = mock(PriceOfferRepository.class);
         salesOfficeService = mock(SalesOfficeService.class);
         userService = mock(UserService.class);
         salesOfficePowerOfAttorneyService = mock(SalesOfficePowerOfAttorneyService.class);
