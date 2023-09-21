@@ -12,9 +12,4 @@ public class AzureConfig {
     public ConfidentialClientApplication confidentialClientApplication() {
         return mock(ConfidentialClientApplication.class);
     }
-
-//    @Bean
-//    public ObjectMapper objectMapper() {
-//        return new ObjectMapper();
-//    }
 }

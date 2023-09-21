@@ -102,7 +102,32 @@ public class DiscountServiceImpl implements DiscountService {
         if(StringUtils.isNotBlank(zones)) {
             log.debug("Zone is defined. Trying to get all materials in list with defined zone.");
             List <Integer> zoneList = Arrays.stream(zones.split(",")).map(this::mapNumericStringToInteger).filter(Optional::isPresent).map(Optional::get).toList();
-            return repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
+            List<Discount> discounts = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, zoneList, materialNumbers);
+
+            List<Discount> returnList = new ArrayList<>();
+
+            for(Discount discount : discounts) {
+                Discount d = Discount.builder()
+                        .salesOrg(discount.getSalesOrg())
+                        .salesOffice(discount.getSalesOffice())
+                        .materialNumber(discount.getMaterialNumber())
+                        .deviceType(discount.getDeviceType())
+                        .materialDesignation(discount.getMaterialDesignation())
+                        .standardPrice(discount.getStandardPrice())
+                        .fa(discount.getFa())
+                        .discountLevels(new ArrayList<>())
+                        .build();
+
+                for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
+                    if(zoneList.contains(discountLevel.getZone())) {
+                        d.getDiscountLevels().add(discountLevel);
+                    }
+                }
+
+                returnList.add(d);
+            }
+
+            return returnList;
         }
 
         log.debug("Zone is not defined. Trying to get all materials in list with no defined zone.");

@@ -21,7 +21,7 @@ public interface DiscountRepository extends JpaRepository<Discount, Long>, JpaSp
 //    @Query("select distinct d from Discount d where d.salesOrg = :salesOrg and d.zone = :zone and d.materialNumber in :materialNumbers")
     List<Discount> findAllBySalesOrgAndMaterialNumberInAndDiscountLevelsZone(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers, @Param("zone") Integer zone);
 
-    @Query("select d from Discount d left join DiscountLevel dl on dl.parent.id = d.id and d.salesOrg = :salesOrg and d.salesOffice = :salesOffice and dl.zone in :zones and d.materialNumber in :materialNumbers")
+    @Query("select distinct d from Discount as d inner join d.discountLevels as dl where d.salesOffice = :salesOffice and d.salesOrg = :salesOrg and dl.zone in :zones and d.materialNumber in :materialNumbers")
     List<Discount> findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("salesOffice") String salesOffice, @Param("zones") List<Integer> zones, @Param("materialNumbers") List<String> materialNumbers);
 
     List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
