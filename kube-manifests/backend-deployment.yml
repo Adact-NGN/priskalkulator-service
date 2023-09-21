@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ding-ip-app-pk-service
+  labels:
+    app: ding-ip-app-pk-service
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ding-ip-app-pk-service
+  template: 
+    metadata:
+      labels:
+        app: ding-ip-app-pk-service
+        tier: backend
+    spec:
+      containers:
+        - name: ding-ip-app-pk-service
+          image: dingipacr.azurecr.io/ding-ip-app-pk-service
+          ports:
+            - containerPort: 80

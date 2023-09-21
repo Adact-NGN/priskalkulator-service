@@ -1,0 +1,96 @@
+name: Create minor version
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    name: Bump Minor Version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        id: step1
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retrieve Previous Release Version
+        if: steps.step1.outcome == 'success'
+        id: get_previous_version
+        run: |
+          previous_version=$(git describe --tags --abbrev=0)
+          echo "Previous version: $previous_version"
+          echo "previous_version=$previous_version" >> $GITHUB_OUTPUT
+
+      - name: Increment Version
+        if: steps.get_previous_version.outcome == 'success'
+        id: increment_version
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous version: $previous_version"
+          IFS='.' read -ra version_parts <<< "$previous_version"
+          major=${version_parts[0]//[!0-9]/}
+          echo "Major $major"
+          minor=${version_parts[1]}
+          echo "Minor $minor"
+          patch=${version_parts[2]}
+          echo "Patch $patch"
+          new_version="v$major.$((minor + 1)).$patch"
+          echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT 
+
+      - uses: actions/checkout@v3
+        if: steps.increment_version.outcome == 'success'
+        id: checkout_code
+        with:
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
+      - name: Bump Version
+        if: steps.checkout_code.outcome == 'success'
+        id: bump_version
+        working-directory: manifests/dev/
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          echo "New Version: [$new_version]"
+          # Update your project files or use the appropriate command to bump the version
+          pwd
+          kustomize edit set image dingipacr.azurecr.io/ding-ip-app-pk-service=:${{ steps.increment_version.outputs.new_version }}
+          less kustomization.yaml
+      - name: Commit and Push Changes
+        if: steps.bump_version.outcome == 'success'
+        id: commit_n_push
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          pwd
+          git config user.name "kjetilatngn"
+          git config user.email "kjetil.torvund.minde@ngn.no"
+          git commit -am "$previous_version -> $new_version"
+          git push
+
+      - name: Create and push tag
+        if: steps.commit_n_push.outcome == 'success'
+        id: create_tag
+        run: |
+          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
+          echo "Previous Version: [$previous_version]"
+          new_version=${{ steps.increment_version.outputs.new_version }}
+          git tag ${{ steps.increment_version.outputs.new_version }} -a -m "$previous_version -> $new_version"
+          git push origin ${{ steps.increment_version.outputs.new_version }}
+
+      - name: Create and push Release
+        if: steps.commit_n_push.create_tag == 'success'
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --release

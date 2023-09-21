@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: priskalkulator-ingress
+  namespace: priskalkulator-prod
+spec:
+  defaultBackend:
+    service:
+      name: ding-ip-app-pk
+      port:
+        number: 8080
+  ingressClassName: nginx
+  rules:
+    - host: priskalkulator.ngn.no
+      http:
+        paths:
+          - backend:
+              service:
+                name: ding-ip-app-pk
+                port:
+                  number: 8080
+            path: /service(/|$)(.*)
+            pathType: Prefix
+  tls:
+    - hosts:
+        - priskalkulator.ngn.no
+      secretName: wildcard-ngn-no

@@ -1,36 +1,35 @@
 package no.ding.pk.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
-import javax.persistence.EntityManager;
-
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@Ignore
-@Profile("itest")
-@RunWith(SpringRunner.class)
+@Disabled
+@ActiveProfiles({"itest"})
 @SpringBootTest
-@TestPropertySource("/azure-db.properties")
+@TestPropertySource("/application.properties")
 public class UserRepositoryITest {
-
-    @Autowired
-    private EntityManager entityManager;
 
     @Autowired
     private UserRepository repository;
 
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
 
     @Test
     public void shouldConnectToTheRemoteDatabase() {
-        assertThat(true, equalTo(true));
+        assertThat(repository, notNullValue());
     }
-    
+
 }

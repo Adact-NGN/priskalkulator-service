@@ -1,0 +1,152 @@
+{
+    "createdBy": null,
+    "createdDate": null,
+    "lastModifiedBy": null,
+    "lastModifiedDate": null,
+    "id": null,
+    "customerNumber": "5162",
+    "salesOfficeList": [
+        {
+            "id": null,
+            "customerNumber": null,
+            "salesOrg": "100",
+            "salesOffice": "127",
+            "name": "Sarpsborg/Fredrikstad",
+            "postalNumber": "1601",
+            "city": "FREDRIKSTAD",
+            "materialList": [
+                {
+                    "createdBy": null,
+                    "createdDate": null,
+                    "lastModifiedBy": null,
+                    "lastModifiedDate": null,
+                    "id": null,
+                    "customerPrice": 2456.0,
+                    "discountPct": 0.02,
+                    "material": {
+                        "id": null,
+                        "materialNumber": "119901",
+                        "designation": "Restavfall",
+                        "deviceType": null,
+                        "materialStandardPrice": {
+                            "createdBy": null,
+                            "createdDate": null,
+                            "lastModifiedBy": null,
+                            "lastModifiedDate": null,
+                            "id": null,
+                            "materialNumber": "119901",
+                            "standardPrice": 2456.0
+                        },
+                        "pricingUnit": 1000,
+                        "quantumUnit": "KG"
+                    },
+                    "showPriceInOffer": true,
+                    "manualPrice": 2400.0,
+                    "priceLevel": 1,
+                    "priceLevelPrice": 56.0,
+                    "standardPrice": null,
+                    "amount": 1,
+                    "priceIncMva": 2448.0
+                }
+            ],
+            "zoneList": [
+                {
+                    "id": null,
+                    "number": "0000000001",
+                    "postalCode": "1601",
+                    "postalName": null,
+                    "isStandardZone": true,
+                    "materialList": [
+                        {
+                            "createdBy": null,
+                            "createdDate": null,
+                            "lastModifiedBy": null,
+                            "lastModifiedDate": null,
+                            "id": null,
+                            "customerPrice": 1000.0,
+                            "discountPct": 0.02,
+                            "material": {
+                                "id": null,
+                                "materialNumber": "50101",
+                                "designation": "Lift - Utsett",
+                                "deviceType": null,
+                                "materialStandardPrice": {
+                                    "createdBy": null,
+                                    "createdDate": null,
+                                    "lastModifiedBy": null,
+                                    "lastModifiedDate": null,
+                                    "id": null,
+                                    "materialNumber": "50101",
+                                    "standardPrice": 1131.0
+                                },
+                                "pricingUnit": 1,
+                                "quantumUnit": "ST"
+                            },
+                            "showPriceInOffer": true,
+                            "manualPrice": 900.0,
+                            "priceLevel": 1,
+                            "priceLevelPrice": 100.0,
+                            "standardPrice": null,
+                            "amount": 1,
+                            "priceIncMva": 1125.0
+                        }
+                    ]
+                }
+            ],
+            "transportServiceList": null,
+            "rentalList": null
+        }
+    ],
+    "salesEmployee": {
+        "id": 1,
+        "adId": "ad-id-wegarijo-arha-rh-arha",
+        "orgNr": null,
+        "orgName": null,
+        "regionName": null,
+        "sureName": null,
+        "name": null,
+        "username": null,
+        "usernameAlias": null,
+        "jobTitle": "Komponist",
+        "fullName": "Wolfgang Amadeus Mozart",
+        "resourceNr": null,
+        "phoneNumber": null,
+        "email": "Wolfgang@farris-bad.no",
+        "associatedPlace": "Larvik",
+        "powerOfAttorneyOA": null,
+        "powerOfAttorneyFA": null,
+        "overallPowerOfAttorney": null,
+        "emailSalesManager": null,
+        "regionalManagersPowerOfAttorney": null,
+        "emailRegionalManager": null,
+        "department": "Hvitsnippene"
+    },
+    "needsApproval": true,
+    "approver": null,
+    "approved": false,
+    "approvalDate": null,
+    "dateIssued": null,
+    "customerTerms": {
+        "id": null,
+        "contractTerm": "Generelle vilkår",
+        "agreementStartDate": 1670228466309,
+        "agreementEndDate": null,
+        "metalPricing": null,
+        "metalSetDateForOffer": null,
+        "paymentCondition": null,
+        "invoiceInterval": null,
+        "additionForRoadTax": null,
+        "additionForAdminFee": false,
+        "newOrEstablishedCustomer": null,
+        "quarterlyAdjustment": null,
+        "customerRequireNotification": null,
+        "notificationMailAddress": null,
+        "requiredNumberOfDaysNotice": null,
+        "monthsToFreezeCustomerFromAdjustments": null,
+        "indexWaste": null,
+        "indexRent": null,
+        "indexTransport": null,
+        "priceAdjustmentDate": null,
+        "specialConditionAction": null
+    }
+}

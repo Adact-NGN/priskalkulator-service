@@ -1,0 +1,39 @@
+{
+  "@odata.context": "$metadata#Materials",
+  "@odata.metadataEtag": "W/\"20230123085849\"",
+  "value": [
+    {
+      "Material": "119901",
+      "SalesOrganization": "100",
+      "DistributionChannel": "01",
+      "MaterialDescription": "Restavfall",
+      "ManufacturerMaterialNumber": "",
+      "MaterialGroup": "9912",
+      "MaterialGroupDescription": "Bl. næringsavfall",
+      "MaterialType": "ZWAF",
+      "MaterialTypeDescription": "Avfallsmateriale",
+      "AccountingRequirement": "ZB",
+      "MaterialExpired": "",
+      "Volume": 0.000,
+      "VolumeUnit": "",
+      "NetWeight": 0.000,
+      "WeightUnit": "KG",
+      "Dimensions": "",
+      "Depth": 0.000,
+      "Width": 0.000,
+      "Height": 0.000,
+      "DimensionUnit": "",
+      "MaxLoad": 0.000,
+      "MaxLoadUnit": "",
+      "CategoryId": "00300",
+      "CategoryDescription": "Avfall",
+      "SubCategoryId": "0030000100",
+      "SubCategoryDescription": "Blandet avfall",
+      "ClassId": "",
+      "ClassDescription": "",
+      "LastChangedTimestamp": 20221107084021,
+      "LastChangedTime": "09:40:21",
+      "LastChangedDate": "2022-11-07"
+    }
+  ]
+}

@@ -1,0 +1,1593 @@
+{
+    "priceOfferObject": {
+        "id": 37,
+        "customerNumber": "5162",
+        "customer": {
+            "city": "Oslo",
+            "company": "100",
+            "country": "NO",
+            "creditScore": "",
+            "customerGroup": "Organisasjon",
+            "customerNumber": "5162",
+            "customerType": "Node",
+            "distributionChannel": "01",
+            "firmPostalNumber": "",
+            "houseNumber": "",
+            "motherCompany": "",
+            "name1": "Europris Telem Notodden",
+            "name2": "",
+            "organizationNumber": "",
+            "payer": "",
+            "postBox": "",
+            "postBoxNumber": "",
+            "postalNumber": "0001",
+            "regStrGrp": "0301",
+            "region": "",
+            "streetAddress": ".",
+            "timeZone": "CET",
+            "abcClassification": "",
+            "contactPersons": [],
+            "customerBranchList": [],
+            "changedDate": 1631145600000,
+            "changedTime": "18:18:55",
+            "nodeCustomerList": []
+        },
+        "customerName": "Europris Telem Notodden",
+        "salesEmployee": {
+            "id": 2,
+            "adId": "ad-id-wegarijo-arha-rh-arha",
+            "orgNr": "100",
+            "orgName": null,
+            "regionName": null,
+            "sureName": null,
+            "name": null,
+            "username": null,
+            "usernameAlias": null,
+            "jobTitle": "Komponist",
+            "fullName": "Wolfgang Amadeus Mozart",
+            "resourceNr": null,
+            "phoneNumber": null,
+            "email": "Wolfgang@farris-bad.no",
+            "associatedPlace": "Larvik",
+            "powerOfAttorneyOA": 2,
+            "powerOfAttorneyFA": 2,
+            "overallPowerOfAttorney": null,
+            "emailSalesManager": null,
+            "regionalManagersPowerOfAttorney": null,
+            "emailRegionalManager": null,
+            "department": "Hvitsnippene"
+        },
+        "needsApproval": true,
+        "approver": null,
+        "isApproved": false,
+        "approvalDate": null,
+        "dateIssued": null,
+        "customerTerms": {
+            "id": 65,
+            "additionForAdminFee": null,
+            "additionForRoadTax": null,
+            "agreementEndDate": null,
+            "agreementStartDate": 1675340721857,
+            "contractTerm": "Generelle vilkår",
+            "customerRequireNotification": null,
+            "indexRent": null,
+            "indexTransport": null,
+            "indexWaste": null,
+            "invoiceInterval": null,
+            "metalPricing": null,
+            "metalSetDateForOffer": null,
+            "monthsToFreezeCustomerFromAdjustments": null,
+            "newOrEstablishedCustomer": null,
+            "notificationMailAddress": null,
+            "paymentCondition": null,
+            "priceAdjustmentDate": null,
+            "quarterlyAdjustment": null,
+            "requiredNumberOfDaysNotice": null,
+            "specialConditionAction": null
+        },
+        "createdDate": "2023-02-02T12:25:23.000Z",
+        "lastModifiedBy": null,
+        "lastModifiedDate": "2023-02-02T12:25:23.000Z",
+        "salesOfficeList": [
+            {
+                "id": 62,
+                "materialGroupsHandler": {
+                    "_materialGroups": [
+                        {
+                            "materialType": "Avfallsmateriale",
+                            "list": [
+                                {
+                                    "id": 3,
+                                    "priceRowId": 38,
+                                    "currency": null,
+                                    "designation": "Restavfall",
+                                    "deviceType": null,
+                                    "material": "119901",
+                                    "materialDesignation": "Restavfall",
+                                    "materialTypeDesignation": "Avfallsmateriale",
+                                    "priceUnit": 1000,
+                                    "materialGroupDesignation": "Avfallsmateriale",
+                                    "quantumUnit": "KG",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0.000",
+                                    "standardPrice": 0,
+                                    "manualPrice": 2296,
+                                    "customerPrice": 2296,
+                                    "combinedMaterials": []
+                                },
+                                {
+                                    "id": 5,
+                                    "priceRowId": 39,
+                                    "currency": null,
+                                    "designation": "Bølgepapp",
+                                    "deviceType": null,
+                                    "material": "122110",
+                                    "materialDesignation": "Bølgepapp",
+                                    "materialTypeDesignation": "Avfallsmateriale",
+                                    "priceUnit": 1000,
+                                    "materialGroupDesignation": "Avfallsmateriale",
+                                    "quantumUnit": "KG",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0.000",
+                                    "standardPrice": 0,
+                                    "manualPrice": -200,
+                                    "customerPrice": -200,
+                                    "combinedMaterials": []
+                                },
+                                {
+                                    "id": 7,
+                                    "priceRowId": 40,
+                                    "currency": null,
+                                    "designation": "Blandet glassemballasje med metall",
+                                    "deviceType": null,
+                                    "material": "132201",
+                                    "materialDesignation": "Blandet glassemballasje med metall",
+                                    "materialTypeDesignation": "Avfallsmateriale",
+                                    "priceUnit": 1000,
+                                    "materialGroupDesignation": "Avfallsmateriale",
+                                    "quantumUnit": "KG",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0.000",
+                                    "standardPrice": 0,
+                                    "manualPrice": 749,
+                                    "customerPrice": 749,
+                                    "combinedMaterials": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "transportMaterialGroupsHandler": {
+                    "_materialGroups": [
+                        {
+                            "materialType": "Tjeneste",
+                            "list": [
+                                {
+                                    "id": 19,
+                                    "priceRowId": 43,
+                                    "currency": null,
+                                    "designation": "Flatvogn - Oppmøte",
+                                    "deviceType": null,
+                                    "material": "50305",
+                                    "materialDesignation": "Flatvogn - Oppmøte",
+                                    "materialTypeDesignation": "Tjeneste",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Tjeneste",
+                                    "quantumUnit": "ST",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 581,
+                                    "customerPrice": 581,
+                                    "combinedMaterials": [
+                                        {
+                                            "createdBy": null,
+                                            "createdDate": 1675340723000,
+                                            "lastModifiedBy": null,
+                                            "lastModifiedDate": 1675340723000,
+                                            "id": 41,
+                                            "customerPrice": 73,
+                                            "discountPct": 0.02,
+                                            "material": {
+                                                "id": 21,
+                                                "materialNumber": "50321",
+                                                "designation": "Flatvogn - Henting plastsekk",
+                                                "materialGroup": null,
+                                                "materialGroupDesignation": "Tjeneste",
+                                                "materialType": null,
+                                                "materialTypeDescription": "Tjeneste",
+                                                "deviceType": null,
+                                                "materialStandardPrice": {
+                                                    "createdBy": null,
+                                                    "createdDate": 1675340723000,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": 1675340723000,
+                                                    "id": 22,
+                                                    "materialNumber": "50321",
+                                                    "standardPrice": 73,
+                                                    "validFrom": null,
+                                                    "validTo": null
+                                                },
+                                                "currency": null,
+                                                "pricingUnit": 1,
+                                                "quantumUnit": "ST",
+                                                "scaleQuantum": "0",
+                                                "salesZone": null
+                                            },
+                                            "showPriceInOffer": true,
+                                            "manualPrice": 73,
+                                            "discountLevel": 1,
+                                            "discountLevelPrice": 56,
+                                            "standardPrice": null,
+                                            "amount": 1,
+                                            "priceIncMva": 73,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "createdBy": null,
+                                            "createdDate": 1675340723000,
+                                            "lastModifiedBy": null,
+                                            "lastModifiedDate": 1675340723000,
+                                            "id": 42,
+                                            "customerPrice": 7.5,
+                                            "discountPct": 0.02,
+                                            "material": {
+                                                "id": 23,
+                                                "materialNumber": "B-0660",
+                                                "designation": "Beholder - 660L",
+                                                "materialGroup": null,
+                                                "materialGroupDesignation": "Avfall - Utstyr",
+                                                "materialType": null,
+                                                "materialTypeDescription": "Avfall - Utstyr",
+                                                "deviceType": null,
+                                                "materialStandardPrice": {
+                                                    "createdBy": null,
+                                                    "createdDate": 1675340723000,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": 1675340723000,
+                                                    "id": 24,
+                                                    "materialNumber": "B-0660",
+                                                    "standardPrice": 7.5,
+                                                    "validFrom": null,
+                                                    "validTo": null
+                                                },
+                                                "currency": null,
+                                                "pricingUnit": 1,
+                                                "quantumUnit": "DAG",
+                                                "scaleQuantum": "0",
+                                                "salesZone": null
+                                            },
+                                            "showPriceInOffer": true,
+                                            "manualPrice": 7.5,
+                                            "discountLevel": 1,
+                                            "discountLevelPrice": 56,
+                                            "standardPrice": null,
+                                            "amount": 1,
+                                            "priceIncMva": 7.5,
+                                            "combinedMaterials": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": 25,
+                                    "priceRowId": 47,
+                                    "currency": null,
+                                    "designation": "Komprimatorbil - Oppmøte",
+                                    "deviceType": null,
+                                    "material": "50405",
+                                    "materialDesignation": "Komprimatorbil - Oppmøte",
+                                    "materialTypeDesignation": "Tjeneste",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Tjeneste",
+                                    "quantumUnit": "ST",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 329,
+                                    "customerPrice": 329,
+                                    "combinedMaterials": [
+                                        {
+                                            "createdBy": null,
+                                            "createdDate": 1675340723000,
+                                            "lastModifiedBy": null,
+                                            "lastModifiedDate": 1675340723000,
+                                            "id": 44,
+                                            "customerPrice": 73,
+                                            "discountPct": 0.02,
+                                            "material": {
+                                                "id": 27,
+                                                "materialNumber": "50421",
+                                                "designation": "Komprimatorbil - Henting plastsekk",
+                                                "materialGroup": null,
+                                                "materialGroupDesignation": "Tjeneste",
+                                                "materialType": null,
+                                                "materialTypeDescription": "Tjeneste",
+                                                "deviceType": null,
+                                                "materialStandardPrice": {
+                                                    "createdBy": null,
+                                                    "createdDate": 1675340723000,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": 1675340723000,
+                                                    "id": 28,
+                                                    "materialNumber": "50421",
+                                                    "standardPrice": 73,
+                                                    "validFrom": null,
+                                                    "validTo": null
+                                                },
+                                                "currency": null,
+                                                "pricingUnit": 1,
+                                                "quantumUnit": "ST",
+                                                "scaleQuantum": "0",
+                                                "salesZone": null
+                                            },
+                                            "showPriceInOffer": true,
+                                            "manualPrice": 73,
+                                            "discountLevel": 1,
+                                            "discountLevelPrice": 56,
+                                            "standardPrice": null,
+                                            "amount": 1,
+                                            "priceIncMva": 73,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "createdBy": null,
+                                            "createdDate": 1675340723000,
+                                            "lastModifiedBy": null,
+                                            "lastModifiedDate": 1675340723000,
+                                            "id": 45,
+                                            "customerPrice": 7.5,
+                                            "discountPct": 0.02,
+                                            "material": {
+                                                "id": 29,
+                                                "materialNumber": "B-0140",
+                                                "designation": "Beholder - 140L",
+                                                "materialGroup": null,
+                                                "materialGroupDesignation": "Avfall - Utstyr",
+                                                "materialType": null,
+                                                "materialTypeDescription": "Avfall - Utstyr",
+                                                "deviceType": null,
+                                                "materialStandardPrice": {
+                                                    "createdBy": null,
+                                                    "createdDate": 1675340723000,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": 1675340723000,
+                                                    "id": 30,
+                                                    "materialNumber": "B-0140",
+                                                    "standardPrice": 7.5,
+                                                    "validFrom": null,
+                                                    "validTo": null
+                                                },
+                                                "currency": null,
+                                                "pricingUnit": 1,
+                                                "quantumUnit": "DAG",
+                                                "scaleQuantum": "0",
+                                                "salesZone": null
+                                            },
+                                            "showPriceInOffer": true,
+                                            "manualPrice": 7.5,
+                                            "discountLevel": 1,
+                                            "discountLevelPrice": 56,
+                                            "standardPrice": null,
+                                            "amount": 1,
+                                            "priceIncMva": 7.5,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "createdBy": null,
+                                            "createdDate": 1675340723000,
+                                            "lastModifiedBy": null,
+                                            "lastModifiedDate": 1675340723000,
+                                            "id": 46,
+                                            "customerPrice": 20,
+                                            "discountPct": 0.02,
+                                            "material": {
+                                                "id": 31,
+                                                "materialNumber": "C-10CL",
+                                                "designation": "Container - 10 m3 (combi) - Lukket",
+                                                "materialGroup": null,
+                                                "materialGroupDesignation": "Avfall - Utstyr",
+                                                "materialType": null,
+                                                "materialTypeDescription": "Avfall - Utstyr",
+                                                "deviceType": null,
+                                                "materialStandardPrice": {
+                                                    "createdBy": null,
+                                                    "createdDate": 1675340723000,
+                                                    "lastModifiedBy": null,
+                                                    "lastModifiedDate": 1675340723000,
+                                                    "id": 32,
+                                                    "materialNumber": "C-10CL",
+                                                    "standardPrice": 20,
+                                                    "validFrom": null,
+                                                    "validTo": null
+                                                },
+                                                "currency": null,
+                                                "pricingUnit": 1,
+                                                "quantumUnit": "ST",
+                                                "scaleQuantum": "0",
+                                                "salesZone": null
+                                            },
+                                            "showPriceInOffer": true,
+                                            "manualPrice": 20,
+                                            "discountLevel": 1,
+                                            "discountLevelPrice": 56,
+                                            "standardPrice": null,
+                                            "amount": 1,
+                                            "priceIncMva": 20,
+                                            "combinedMaterials": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "rentalMaterialGroupsHandler": {
+                    "_materialGroups": [
+                        {
+                            "materialType": "Avfall - Utstyr",
+                            "list": [
+                                {
+                                    "id": 23,
+                                    "priceRowId": 48,
+                                    "currency": null,
+                                    "designation": "Beholder - 660L",
+                                    "deviceType": null,
+                                    "material": "B-0660",
+                                    "materialDesignation": "Beholder - 660L",
+                                    "materialTypeDesignation": "Avfall - Utstyr",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Avfall - Utstyr",
+                                    "quantumUnit": "DAG",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 7.5,
+                                    "customerPrice": 7.5,
+                                    "combinedMaterials": []
+                                },
+                                {
+                                    "id": 31,
+                                    "priceRowId": 49,
+                                    "currency": null,
+                                    "designation": "Container - 10 m3 (combi) - Lukket",
+                                    "deviceType": null,
+                                    "material": "C-10CL",
+                                    "materialDesignation": "Container - 10 m3 (combi) - Lukket",
+                                    "materialTypeDesignation": "Avfall - Utstyr",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Avfall - Utstyr",
+                                    "quantumUnit": "ST",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 20,
+                                    "customerPrice": 20,
+                                    "combinedMaterials": []
+                                },
+                                {
+                                    "id": 33,
+                                    "priceRowId": 50,
+                                    "currency": null,
+                                    "designation": "Container - 35 m3 (krok) Åpen",
+                                    "deviceType": null,
+                                    "material": "C-35K",
+                                    "materialDesignation": "Container - 35 m3 (krok) Åpen",
+                                    "materialTypeDesignation": "Avfall - Utstyr",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Avfall - Utstyr",
+                                    "quantumUnit": "ST",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 36,
+                                    "customerPrice": 36,
+                                    "combinedMaterials": []
+                                },
+                                {
+                                    "id": 35,
+                                    "priceRowId": 51,
+                                    "currency": null,
+                                    "designation": "Bur - til EE-avfall 160x120x120",
+                                    "deviceType": null,
+                                    "material": "B-0B-E",
+                                    "materialDesignation": "Bur - til EE-avfall 160x120x120",
+                                    "materialTypeDesignation": "Avfall - Utstyr",
+                                    "priceUnit": 1,
+                                    "materialGroupDesignation": "Avfall - Utstyr",
+                                    "quantumUnit": "ST",
+                                    "salesOffice": "127",
+                                    "salesOrg": 100,
+                                    "scaleQuantity": "0",
+                                    "standardPrice": 0,
+                                    "manualPrice": 7.5,
+                                    "customerPrice": 7.5,
+                                    "combinedMaterials": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "customerNumber": null,
+                "salesOffice": "127",
+                "salesOfficeName": "Sarpsborg/Fredrikstad",
+                "salesOrg": "100",
+                "postalNumber": "1601",
+                "city": "FREDRIKSTAD",
+                "zones": [
+                    {
+                        "materialGroupsHandler": {
+                            "_materialGroups": [
+                                {
+                                    "materialType": "Tjeneste",
+                                    "list": [
+                                        {
+                                            "id": 9,
+                                            "priceRowId": 52,
+                                            "currency": null,
+                                            "designation": "Krok - Utsett",
+                                            "deviceType": null,
+                                            "material": "50201",
+                                            "materialDesignation": "Krok - Utsett",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "1",
+                                            "manualPrice": 1301,
+                                            "customerPrice": 1301,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 11,
+                                            "priceRowId": 53,
+                                            "currency": null,
+                                            "designation": "Krok - Tømming",
+                                            "deviceType": null,
+                                            "material": "50203",
+                                            "materialDesignation": "Krok - Tømming",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "1",
+                                            "manualPrice": 1937,
+                                            "customerPrice": 1937,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 13,
+                                            "priceRowId": 54,
+                                            "currency": null,
+                                            "designation": "Lift - Utsett",
+                                            "deviceType": null,
+                                            "material": "50101",
+                                            "materialDesignation": "Lift - Utsett",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "1",
+                                            "manualPrice": 979,
+                                            "customerPrice": 979,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 15,
+                                            "priceRowId": 55,
+                                            "currency": null,
+                                            "designation": "Lift - Bytting",
+                                            "deviceType": null,
+                                            "material": "50102",
+                                            "materialDesignation": "Lift - Bytting",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "1",
+                                            "manualPrice": 1242,
+                                            "customerPrice": 1242,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 17,
+                                            "priceRowId": 56,
+                                            "currency": null,
+                                            "designation": "Lift - Innhenting",
+                                            "deviceType": null,
+                                            "material": "50104",
+                                            "materialDesignation": "Lift - Innhenting",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "1",
+                                            "manualPrice": 1242,
+                                            "customerPrice": 1242,
+                                            "combinedMaterials": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "zoneId": "1",
+                        "postalCode": "1601",
+                        "postalName": "FREDRIKSTAD",
+                        "isStandardZone": true
+                    },
+                    {
+                        "materialGroupsHandler": {
+                            "_materialGroups": [
+                                {
+                                    "materialType": "Tjeneste",
+                                    "list": [
+                                        {
+                                            "id": 9,
+                                            "priceRowId": 57,
+                                            "currency": null,
+                                            "designation": "Krok - Utsett",
+                                            "deviceType": null,
+                                            "material": "50201",
+                                            "materialDesignation": "Krok - Utsett",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "2",
+                                            "manualPrice": 1301,
+                                            "customerPrice": 1301,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 11,
+                                            "priceRowId": 58,
+                                            "currency": null,
+                                            "designation": "Krok - Tømming",
+                                            "deviceType": null,
+                                            "material": "50203",
+                                            "materialDesignation": "Krok - Tømming",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "2",
+                                            "manualPrice": 1937,
+                                            "customerPrice": 1937,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 13,
+                                            "priceRowId": 59,
+                                            "currency": null,
+                                            "designation": "Lift - Utsett",
+                                            "deviceType": null,
+                                            "material": "50101",
+                                            "materialDesignation": "Lift - Utsett",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "2",
+                                            "manualPrice": 979,
+                                            "customerPrice": 979,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 15,
+                                            "priceRowId": 60,
+                                            "currency": null,
+                                            "designation": "Lift - Bytting",
+                                            "deviceType": null,
+                                            "material": "50102",
+                                            "materialDesignation": "Lift - Bytting",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "2",
+                                            "manualPrice": 1242,
+                                            "customerPrice": 1242,
+                                            "combinedMaterials": []
+                                        },
+                                        {
+                                            "id": 17,
+                                            "priceRowId": 61,
+                                            "currency": null,
+                                            "designation": "Lift - Innhenting",
+                                            "deviceType": null,
+                                            "material": "50104",
+                                            "materialDesignation": "Lift - Innhenting",
+                                            "materialTypeDesignation": "Tjeneste",
+                                            "priceUnit": 1,
+                                            "materialGroupDesignation": "Tjeneste",
+                                            "quantumUnit": "ST",
+                                            "salesOffice": "127",
+                                            "salesOrg": "100",
+                                            "scaleQuantity": "0",
+                                            "standardPrice": 0,
+                                            "zone": "2",
+                                            "manualPrice": 1242,
+                                            "customerPrice": 1242,
+                                            "combinedMaterials": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "zoneId": "2",
+                        "postalCode": "1601",
+                        "postalName": "FREDRIKSTAD",
+                        "isStandardZone": false
+                    }
+                ]
+            }
+        ]
+    },
+    "tableRows": [
+        {
+            "salesoffice": true,
+            "type": "salesOffice",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                "left"
+            ],
+            "rowData": [
+                "Sarpsborg/Fredrikstad"
+            ]
+        },
+        {
+            "group": true,
+            "type": "group",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "Avfallsmateriale"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "119901",
+                "Restavfall",
+                2296,
+                1000,
+                "KG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "122110",
+                "Bølgepapp",
+                -200,
+                1000,
+                "KG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "132201",
+                "Blandet glassemballasje med metall",
+                749,
+                1000,
+                "KG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "blank": true,
+            "type": "blank",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                ""
+            ],
+            "rowData": [
+                ""
+            ]
+        },
+        {
+            "zone": true,
+            "type": "sone",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "TRANSPORT SONE 1"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50201",
+                "Krok - Utsett",
+                1301,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50203",
+                "Krok - Tømming",
+                1937,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50101",
+                "Lift - Utsett",
+                979,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50102",
+                "Lift - Bytting",
+                1242,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50104",
+                "Lift - Innhenting",
+                1242,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "blank": true,
+            "type": "blank",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                ""
+            ],
+            "rowData": [
+                ""
+            ]
+        },
+        {
+            "zone": true,
+            "type": "sone",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "TRANSPORT SONE 2"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50201",
+                "Krok - Utsett",
+                1301,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50203",
+                "Krok - Tømming",
+                1937,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50101",
+                "Lift - Utsett",
+                979,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50102",
+                "Lift - Bytting",
+                1242,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50104",
+                "Lift - Innhenting",
+                1242,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "blank": true,
+            "type": "blank",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                ""
+            ],
+            "rowData": [
+                ""
+            ]
+        },
+        {
+            "group": true,
+            "type": "group",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "Flatvogn Transport"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50305",
+                "Flatvogn - Oppmøte",
+                581,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50321",
+                "+ Flatvogn - Henting plastsekk",
+                73,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "B-0660",
+                "+ Beholder - 660L",
+                7.5,
+                1,
+                "DAG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "blank": true,
+            "type": "blank",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                ""
+            ],
+            "rowData": [
+                ""
+            ]
+        },
+        {
+            "group": true,
+            "type": "group",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "Komprimatorbil Transport"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50405",
+                "Komprimatorbil - Oppmøte",
+                329,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "50421",
+                "+ Komprimatorbil - Henting plastsekk",
+                73,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "B-0140",
+                "+ Beholder - 140L",
+                7.5,
+                1,
+                "DAG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "C-10CL",
+                "+ Container - 10 m3 (combi) - Lukket",
+                20,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "blank": true,
+            "type": "blank",
+            "colspan": [
+                6
+            ],
+            "textAlign": [
+                ""
+            ],
+            "rowData": [
+                ""
+            ]
+        },
+        {
+            "group": true,
+            "type": "group",
+            "colspan": [
+                0,
+                5
+            ],
+            "textAlign": [
+                "",
+                "left"
+            ],
+            "rowData": [
+                null,
+                "LEIE"
+            ]
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "B-0660",
+                "Beholder - 660L",
+                7.5,
+                1,
+                "DAG"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "C-10CL",
+                "Container - 10 m3 (combi) - Lukket",
+                20,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "C-35K",
+                "Container - 35 m3 (krok) Åpen",
+                36,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        },
+        {
+            "colspan": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "rowData": [
+                null,
+                "B-0B-E",
+                "Bur - til EE-avfall 160x120x120",
+                7.5,
+                1,
+                "ST"
+            ],
+            "textAlign": [
+                "",
+                "left",
+                "left",
+                "right",
+                "center",
+                "center"
+            ],
+            "type": "dataRow"
+        }
+    ]
+}

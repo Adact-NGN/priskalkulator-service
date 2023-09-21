@@ -1,0 +1,40 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: ding-ip-app-pk-service
+  #namespace: ding-ip-app-pk-service-dev
+  labels:
+    app: ding-ip-app-pk
+    tier: backend
+spec:
+  progressDeadlineSeconds: 3600
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ding-ip-app-pk
+      tier: backend
+  template: 
+    metadata:
+      labels:
+        app: ding-ip-app-pk
+        tier: backend
+        intility-logging: default
+    spec:
+#      imagePullSecrets:
+#        - name: 'dingipacr9837c956-auth'
+      containers:
+        - name: ding-ip-app-pk
+          image: dingipacr.azurecr.io/ding-ip-app-pk-service:latest
+          imagePullPolicy: Always
+          envFrom:
+          - secretRef:
+              name: ding-ip-app-pk-dev-secrets
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+#              cpu: "500m"
+              memory: "1Gi"
+          ports:
+            - containerPort: 8080

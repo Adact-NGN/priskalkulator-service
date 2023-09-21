@@ -1,0 +1,73 @@
+package no.ding.pk.utils;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+
+@Component
+public class SapHttpClient {
+
+    private final static Logger log = LoggerFactory.getLogger(SapHttpClient.class);
+
+    private final String sapUsername;
+
+    private final String sapPassword;
+
+    public SapHttpClient(@Value(value = "${sap.username}") String sapUsername, @Value(value = "${sap.password}") String sapPassword) {
+        this.sapUsername = sapUsername;
+        this.sapPassword = sapPassword;
+    }
+
+    public HttpRequest createGetRequest(String urlString, MultiValueMap<String, String> params) {
+        if(StringUtils.isBlank(sapUsername) || StringUtils.isBlank(sapPassword)) {
+            log.debug("Credentials for SAP service is empty");
+            throw new RuntimeException("Credentials for SAP service is empty");
+        }
+
+        if(!UrlValidator.getInstance().isValid(urlString)) {
+            log.debug("Cannot execute GET request, malformed URL: {}", urlString);
+            throw new RuntimeException(String.format("Cannot execute GET request, malformed URL: %s", urlString));
+        }
+
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder
+        .fromUriString(urlString);
+
+        if(params != null) {
+            urlBuilder.queryParams(params);
+        }
+
+        UriComponents url = urlBuilder.build();
+
+        return HttpRequest.newBuilder()
+        .GET()
+        .uri(url.toUri())
+        .header(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword))
+        .build();
+    }
+
+    public HttpResponse<String> getResponse(HttpRequest request) {
+        HttpClient client = HttpClient.newBuilder()
+        .build();
+
+        try {
+            return client.send(request, BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+
+
+            throw new Error(e.getMessage());
+        }
+    }
+}

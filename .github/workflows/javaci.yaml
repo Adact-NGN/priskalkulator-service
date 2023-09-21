@@ -1,0 +1,45 @@
+name: Validate feature and bug
+
+on: 
+  push:
+    branches:
+      - "feature/**"
+      - "bug/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          check-latest: true
+          cache: 'maven'
+      - name: Build with Maven
+        env:
+          ENVIRONMENT: dev
+          PK_DATASOURCE_USERNAME: ${{ secrets.PK_DATASOURCE_USERNAME }}
+          PK_DATASOURCE_PASSWORD: ${{ secrets.PK_DATASOURCE_PASSWORD }}
+          PK_DATASOURCE_URL: ${{ secrets.PK_DATASOURCE_URL }}
+          PK_SAP_USERNAME: ${{ secrets.PK_SAP_USERNAME }}
+          PK_SAP_PASSWORD: ${{ secrets.PK_SAP_PASSWORD }}
+          PK_SAP_API_CUSTOMER_URL: ${{ secrets.PK_SAP_API_CUSTOMER_URL }}
+          PK_SAP_API_CONTACT_PERSON_URL: ${{ secrets.PK_SAP_API_CONTACT_PERSON_URL }}
+          PK_SAP_API_STANDARD_PRICE_URL: ${{ secrets.PK_SAP_API_STANDARD_PRICE_URL }}
+          PK_SAP_API_SALESORG_URL: ${{ secrets.PK_SAP_API_SALESORG_URL }}
+          PK_SAP_API_MATERIAL_URL: ${{ secrets.PK_SAP_API_MATERIAL_URL }}
+          PK_PDF_TEMPLATE_FILE_NAME: ${{ secrets.PK_PDF_TEMPLATE_FILE_NAME }}
+          PK_AD_APP_ID_URI: ${{ secrets.PK_AD_APP_ID_URI }}
+          PK_MSAL_AD_AUTHORITY: ${{ secrets.PK_MSAL_AD_AUTHORITY }}
+          PK_MSAL_CLIENT_ID: ${{ secrets.PK_MSAL_CLIENT_ID }}
+          PK_MSAL_SECRET: ${{ secrets.PK_MSAL_SECRET }}
+          PK_MSAL_SCOPE: ${{ secrets.PK_MSAL_SCOPE }}
+          PK_MSAL_AD_USER_INFO_SELECT_LIST: ${{ secrets.PK_MSAL_AD_USER_INFO_SELECT_LIST }}
+        run: mvn -B package --file pom.xml

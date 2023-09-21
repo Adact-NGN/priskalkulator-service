@@ -1,0 +1,2 @@
+create table if not exists users();
+create table if not exists sales_roles(id bigint not null primary key auto_increment, default_power_of_attorney_fa int null, default_power_of_attorney_oa int null, description varchar(255) null, role_name varchar(255) null UNIQUE);

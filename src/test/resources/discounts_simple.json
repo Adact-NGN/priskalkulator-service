@@ -1,0 +1,249 @@
+[
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "113103",
+        "materialDesignation": "Hageavfall, trær og røtter",
+        "standardPrice": 1573.5,
+
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1573.5,
+                "pctDiscount": 0,
+                "zone": "02"
+            },
+            {
+                "level": 2,
+                "discount": 79,
+                "calculatedDiscount": 1494.5,
+                "pctDiscount": 0.10,
+                "zone": "02"
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1473.5,
+                "pctDiscount": 0.127,
+                "zone": "02"
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1423.5,
+                "pctDiscount": 0.19,
+                "zone": "02"
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 1373.5,
+                "pctDiscount": 0.254,
+                "zone": "02"
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "113104",
+        "materialDesignation": "Hageavfall, kvernet",
+        "standardPrice": 1194.5,
+
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1194.5,
+                "pctDiscount": 0,
+                "zone": "01"
+            },
+            {
+                "level": 2,
+                "discount": 50,
+                "calculatedDiscount": 1144.5,
+                "pctDiscount": 0.042,
+                "zone": "01"
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1094.5,
+                "pctDiscount": 0.084,
+                "zone": "01"
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1044.5,
+                "pctDiscount": 0.126,
+                "zone": "01"
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 994.5,
+                "pctDiscount": 0.167,
+                "zone": "01"
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "113104",
+        "materialDesignation": "Hageavfall, kvernet",
+        "standardPrice": 1194.5,
+        "discountLevels": [
+            {
+                "level": 1,
+                "discount": 0,
+                "calculatedDiscount": 1194.5,
+                "pctDiscount": 0,
+                "zone": "02"
+            },
+            {
+                "level": 2,
+                "discount": 50,
+                "calculatedDiscount": 1144.5,
+                "pctDiscount": 0.042,
+                "zone": "02"
+            },
+            {
+                "level": 3,
+                "discount": 100,
+                "calculatedDiscount": 1094.5,
+                "pctDiscount": 0.084,
+                "zone": "02"
+            },
+            {
+                "level": 4,
+                "discount": 150,
+                "calculatedDiscount": 1044.5,
+                "pctDiscount": 0.126,
+                "zone": "02"
+            },
+            {
+                "level": 5,
+                "discount": 200,
+                "calculatedDiscount": 994.5,
+                "pctDiscount": 0.167,
+                "zone": "02"
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "C-05L-L",
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "C-06L",
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
+    },
+    {
+        "salesOrg": "100",
+        "salesOffice": "100",
+        "materialNumber": "C-08L",
+        "deviceType": null,
+        "materialDesignation": null,
+        "standardPrice": null,
+        "discountLevels": [
+            {
+
+                "level": 0,
+                "discount": 0.0,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 1,
+                "discount": 0.05,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 2,
+                "discount": 0.1,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            },
+            {
+
+                "level": 3,
+                "discount": 0.15,
+                "calculatedDiscount": null,
+                "pctDiscount": null
+            }
+        ]
+    }
+]

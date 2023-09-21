@@ -1,0 +1,24 @@
+{
+    "__metadata": {
+        "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(Gyldigfra=datetime'2022-09-13T00%3A00%3A00',Salgsorg='100',Salgskontor='104',Material='50101')",
+        "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(Gyldigfra=datetime'2022-09-13T00%3A00%3A00',Salgsorg='100',Salgskontor='104',Material='50101')",
+        "type": "ZPRICES_SRV.ZZStandPris"
+    },
+    "Gyldigfra": "/Date(1663027200000)/",
+    "Salgsorg": "100",
+    "Salgskontor": "104",
+    "Material": "50101",
+    "Betegnelse": "Lift - Utsett",
+    "Apparattype": "",
+    "Sone": "01",
+    "Skalakvantum": "0",
+    "StandardPris": "1131.00",
+    "Valuta": "",
+    "Prisenhet": "1",
+    "Kvantumsenhet": "ST",
+    "Gyldigtil": "/Date(253402214400000)/",
+    "Varegruppe": "0501",
+    "Varegruppebetegnelse": "Tj. Lift",
+    "Materialtype": "DIEN",
+    "Materialbeskrivelse": "Tjeneste"
+}

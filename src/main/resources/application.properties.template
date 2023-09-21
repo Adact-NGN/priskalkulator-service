@@ -1,0 +1,64 @@
+debug=false
+spring.profiles.active=default
+
+# DB config
+spring.datasource.username=${PK_DATASOURCE_USERNAME}
+spring.datasource.password=${PK_DATASOURCE_PASSWORD}
+
+spring.datasource.hikari.maxLifetime=30000
+# connections = ((core_count * 2) + effective_spindle_count) src: https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing#the-formula
+spring.datasource.hikari.maximum-pool-size=5
+spring.datasource.hikari.minimum-idle=5
+
+# spring.jpa.show-sql=@datasource.show.sql@
+#spring.jpa.show-sql=true
+spring.datasource.url=${PK_DATASOURCE_URL}
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDB102Dialect
+
+spring.sql.init.mode=always
+spring.sql.init.platform=mariadb
+
+spring.jpa.open-in-view=false
+
+#spring.jackson.deserialization.read-date-timestamps-as-nanoseconds=false
+
+#server.port=8080
+
+spring.output.ansi.enabled=ALWAYS
+
+logging.level.no.ding.pk=DEBUG
+logging.level.org.springframework.web=DEBUG
+logging.level.com.microsoft.aad.msal4j=@logging.level@
+
+# SAP config
+sap.username=${PK_SAP_USERNAME}
+sap.password=${PK_SAP_PASSWORD}
+sap.api.customer.url=${PK_SAP_APU_CUSTOMER_URL}
+sap.api.contact.person.url=${PK_SAP_API_CONTACT_PERSON_URL}
+sap.api.standard.price.url=${PK_SAP_APU_STANDARD_PRICE_URL}
+sap.api.salesorg.url=${PK_SAP_API_SALESORG_URL}
+sap.api.material.url=${PK_SAP_API_MATERIAL_URL}
+
+# Cache settings
+cache.ttl=3600000
+cache.max.amount.items=5000
+
+# Swagger
+spring.mvc.pathmatch.matching-strategy=ant-path-matcher
+
+# PDF config
+pdf.template.file.name=${PK_PDF_TEMPLATE_FILE_NAME}
+
+# Azure Oauth2 (https://learn.microsoft.com/en-us/azure/developer/java/spring-framework/secure-your-restful-api-using-spring-cloud-azure)
+spring.cloud.azure.active-directory.enabled=true
+spring.cloud.azure.active-directory.app-id-uri=${PK_AD_APP_ID_URI}
+
+graph.url=https://graph.microsoft.com/v1.0
+
+AUTHORITY=${PK_MSAL_AD_AUTHORITY}
+CLIENT_ID=${PK_MSAL_CLIENT_ID}
+SECRET=${PK_MSAL_SECRET}
+SCOPE=${PK_MSAL_SCOPE}
+AD_USER_INFO_SELECT_LIST=${PK_MSAL_AD_USER_INFO_SELECT_LIST}
