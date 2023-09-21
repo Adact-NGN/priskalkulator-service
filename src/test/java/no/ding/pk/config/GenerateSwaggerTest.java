@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -17,11 +19,9 @@ import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@Disabled("Cannot build application context without dependencies")
-//@ExtendWith(SpringExtension.class)
-//@AutoConfigureMockMvc(addFilters = false)
-//@ContextConfiguration(classes = {WebTestConfig.class})
-//@WebAppConfiguration
+@Disabled("ObjectMapper is null")
+@ContextConfiguration(classes = {WebTestConfig.class})
+@WebAppConfiguration
 @SpringBootTest(properties = {
         "sap.username=sapUser",
         "sap.password=sapPassword",
@@ -51,7 +51,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         "SCOPE=AD_SCOPE",
         "AD_USER_INFO_SELECT_LIST=AD_USER_INFO_LIST"
 }, classes = {
-        AzureConfig.class
+        AzureConfig.class,
+        ObjectMapperConfig.class,
+        SpringFoxConfig.class
 })
 public class GenerateSwaggerTest {
 

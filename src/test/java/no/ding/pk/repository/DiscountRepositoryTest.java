@@ -13,20 +13,19 @@ import org.springframework.test.context.jdbc.SqlMergeMode;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static no.ding.pk.repository.specifications.DiscountSpecifications.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.Matchers.*;
 
 @DataJpaTest
 @TestPropertySource("/h2-db.properties")
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discout_db_scripts/drop_schema.sql", "/discout_db_scripts/create_schema.sql"})
-@Sql(value = {"/discout_db_scripts/discount_matrix.sql", "/discout_db_scripts/discount_levels.sql"})
+@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
+@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
 public class DiscountRepositoryTest {
 
     @Autowired
@@ -113,5 +112,27 @@ public class DiscountRepositoryTest {
         List<Discount> discountList = repository.findAll(specification);
 
         assertThat(discountList, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldFilterOutMaterialsByZone() {
+        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn("100", "100", List.of(1), List.of("50101"));
+
+        assertThat(actual, hasSize(1));
+
+        Set<Integer> zoneList = actual.get(0).getDiscountLevels().stream().map(DiscountLevel::getZone).collect(Collectors.toSet());
+
+        assertThat(zoneList.contains(1), is(true));
+    }
+
+    @Test
+    public void shouldFilterOutMultipleMaterialsByZone() {
+        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn("100", "100", List.of(1), List.of("50101","50102"));
+
+        assertThat(actual, hasSize(2));
+
+        Set<Integer> zoneList = actual.get(0).getDiscountLevels().stream().map(DiscountLevel::getZone).collect(Collectors.toSet());
+
+        assertThat(zoneList.contains(1), is(true));
     }
 }

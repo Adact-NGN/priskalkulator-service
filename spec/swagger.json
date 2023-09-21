@@ -17,9 +17,6 @@
     "name" : "ad-user-controller",
     "description" : "Ad User Controller"
   }, {
-    "name" : "basic-error-controller",
-    "description" : "Basic Error Controller"
-  }, {
     "name" : "bo-report-condition-code-controller",
     "description" : "Bo Report Condition Code Controller"
   }, {
@@ -50,8 +47,8 @@
     "name" : "price-offer-controller",
     "description" : "Price Offer Controller"
   }, {
-    "name" : "price-office-template-controller",
-    "description" : "Price Office Template Controller"
+    "name" : "price-offer-template-controller",
+    "description" : "Price Offer Template Controller"
   }, {
     "name" : "sales-office-power-of-attorney-controller",
     "description" : "Sales Office Power Of Attorney Controller"
@@ -499,6 +496,12 @@
           "required" : true,
           "type" : "string"
         }, {
+          "name" : "salesOffice",
+          "in" : "query",
+          "description" : "salesOffice",
+          "required" : true,
+          "type" : "string"
+        }, {
           "name" : "salesOrg",
           "in" : "query",
           "description" : "salesOrg",
@@ -534,9 +537,15 @@
         "operationId" : "getAllDiscountLevelsForSpecificDiscountUsingGET",
         "produces" : [ "application/json" ],
         "parameters" : [ {
-          "name" : "materialNumber",
+          "name" : "materialNumbers",
           "in" : "query",
-          "description" : "materialNumber",
+          "description" : "materialNumbers",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salesOffice",
+          "in" : "query",
+          "description" : "salesOffice",
           "required" : true,
           "type" : "string"
         }, {
@@ -1346,7 +1355,7 @@
       "put" : {
         "tags" : [ "user-controller" ],
         "summary" : "save",
-        "operationId" : "saveUsingPUT_4",
+        "operationId" : "saveUsingPUT_5",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -1618,6 +1627,158 @@
                 "$ref" : "#/definitions/Discount"
               }
             }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/discount/level" : {
+      "get" : {
+        "tags" : [ "discount-level-controller" ],
+        "summary" : "getSpecificDiscountLevel",
+        "operationId" : "getSpecificDiscountLevelUsingGET_1",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "level",
+          "in" : "query",
+          "description" : "level",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "name" : "materialNumber",
+          "in" : "query",
+          "description" : "materialNumber",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salesOffice",
+          "in" : "query",
+          "description" : "salesOffice",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salesOrg",
+          "in" : "query",
+          "description" : "salesOrg",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/DiscountLevel"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/discount/level/list" : {
+      "get" : {
+        "tags" : [ "discount-level-controller" ],
+        "summary" : "getAllDiscountLevelsForSpecificDiscount",
+        "operationId" : "getAllDiscountLevelsForSpecificDiscountUsingGET_1",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "materialNumbers",
+          "in" : "query",
+          "description" : "materialNumbers",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salesOffice",
+          "in" : "query",
+          "description" : "salesOffice",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "salesOrg",
+          "in" : "query",
+          "description" : "salesOrg",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "zone",
+          "in" : "query",
+          "description" : "zone",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/DiscountLevel"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/discount/level/{id}" : {
+      "put" : {
+        "tags" : [ "discount-level-controller" ],
+        "summary" : "updateDiscountLevel",
+        "operationId" : "updateDiscountLevelUsingPUT_1",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "discountLevel",
+          "description" : "discountLevel",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/DiscountLevel"
+          }
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/DiscountLevel"
+            }
+          },
+          "201" : {
+            "description" : "Created"
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2000,7 +2161,7 @@
     },
     "/api/v1/price-offer-template" : {
       "post" : {
-        "tags" : [ "price-office-template-controller" ],
+        "tags" : [ "price-offer-template-controller" ],
         "summary" : "createTemplate",
         "operationId" : "createTemplateUsingPOST",
         "consumes" : [ "application/json" ],
@@ -2023,6 +2184,103 @@
           },
           "201" : {
             "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "save",
+        "operationId" : "saveUsingPUT_3",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "priceOfferTemplate",
+          "description" : "priceOfferTemplate",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/PriceOfferTemplate"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/PriceOfferTemplate"
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/list" : {
+      "get" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "getAllTemplates",
+        "operationId" : "getAllTemplatesUsingGET",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/PriceOfferTemplate"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/{id}" : {
+      "get" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "getTemplateById",
+        "operationId" : "getTemplateByIdUsingGET",
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/PriceOfferTemplate"
+            }
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2382,7 +2640,7 @@
       "put" : {
         "tags" : [ "sales-office-power-of-attorney-controller" ],
         "summary" : "save",
-        "operationId" : "saveUsingPUT_3",
+        "operationId" : "saveUsingPUT_4",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3189,7 +3447,7 @@
       "put" : {
         "tags" : [ "user-controller" ],
         "summary" : "save",
-        "operationId" : "saveUsingPUT_5",
+        "operationId" : "saveUsingPUT_6",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3230,7 +3488,7 @@
         }
       }
     },
-    "/api/v2/price-offer/activate/{approverId}/{priceOfferId}" : {
+    "/api/v2/price-offer/activate/{activatedById}/{priceOfferId}" : {
       "put" : {
         "tags" : [ "price-offer-controller" ],
         "summary" : "activatePriceOffer",
@@ -3238,19 +3496,19 @@
         "consumes" : [ "application/json" ],
         "produces" : [ "*/*" ],
         "parameters" : [ {
-          "name" : "approverId",
+          "name" : "activatedById",
           "in" : "path",
-          "description" : "approverId",
+          "description" : "activatedById",
           "required" : true,
           "type" : "integer",
           "format" : "int64"
         }, {
           "in" : "body",
-          "name" : "customerTermsDTO",
-          "description" : "customerTermsDTO",
+          "name" : "activatePriceOfferRequest",
+          "description" : "activatePriceOfferRequest",
           "required" : true,
           "schema" : {
-            "$ref" : "#/definitions/TermsDTO"
+            "$ref" : "#/definitions/ActivatePriceOfferRequest"
           }
         }, {
           "name" : "priceOfferId",
@@ -3346,7 +3604,7 @@
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/definitions/PriceOffer"
+                "$ref" : "#/definitions/PriceOfferListDTO"
               }
             }
           },
@@ -3527,7 +3785,7 @@
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/definitions/PriceOfferDTO"
+                "$ref" : "#/definitions/PriceOfferListDTO"
               }
             }
           },
@@ -3563,7 +3821,7 @@
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/definitions/PriceOfferDTO"
+                "$ref" : "#/definitions/PriceOfferListDTO"
               }
             }
           },
@@ -3624,201 +3882,6 @@
         }
       }
     },
-    "/error" : {
-      "get" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingGET",
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        }
-      },
-      "head" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingHEAD",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "204" : {
-            "description" : "No Content"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          }
-        }
-      },
-      "post" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingPOST",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "201" : {
-            "description" : "Created"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        }
-      },
-      "put" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingPUT",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "201" : {
-            "description" : "Created"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        }
-      },
-      "delete" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingDELETE",
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "204" : {
-            "description" : "No Content"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          }
-        }
-      },
-      "options" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingOPTIONS",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "204" : {
-            "description" : "No Content"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          }
-        }
-      },
-      "patch" : {
-        "tags" : [ "basic-error-controller" ],
-        "summary" : "error",
-        "operationId" : "errorUsingPATCH",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "*/*" ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "type" : "object",
-              "additionalProperties" : {
-                "type" : "object"
-              }
-            }
-          },
-          "204" : {
-            "description" : "No Content"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          }
-        }
-      }
-    },
     "/health" : {
       "get" : {
         "tags" : [ "home-controller" ],
@@ -3871,6 +3934,18 @@
     }
   },
   "definitions" : {
+    "ActivatePriceOfferRequest" : {
+      "type" : "object",
+      "properties" : {
+        "generalComment" : {
+          "type" : "string"
+        },
+        "terms" : {
+          "$ref" : "#/definitions/TermsDTO"
+        }
+      },
+      "title" : "ActivatePriceOfferRequest"
+    },
     "ApprovalRequest" : {
       "type" : "object",
       "properties" : {
@@ -4258,9 +4333,6 @@
         "standardPrice" : {
           "type" : "number",
           "format" : "double"
-        },
-        "zone" : {
-          "type" : "string"
         }
       },
       "title" : "Discount"
@@ -4287,6 +4359,10 @@
         "pctDiscount" : {
           "type" : "number",
           "format" : "double"
+        },
+        "zone" : {
+          "type" : "integer",
+          "format" : "int32"
         }
       },
       "title" : "DiscountLevel"
@@ -4310,6 +4386,10 @@
         },
         "pctDiscount" : {
           "type" : "string"
+        },
+        "zone" : {
+          "type" : "integer",
+          "format" : "int32"
         }
       },
       "title" : "DiscountLevelDTO"
@@ -4655,37 +4735,6 @@
         }
       },
       "title" : "MaterialStdPriceDTO"
-    },
-    "ModelAndView" : {
-      "type" : "object",
-      "properties" : {
-        "empty" : {
-          "type" : "boolean"
-        },
-        "model" : {
-          "type" : "object"
-        },
-        "modelMap" : {
-          "type" : "object",
-          "additionalProperties" : {
-            "type" : "object"
-          }
-        },
-        "reference" : {
-          "type" : "boolean"
-        },
-        "status" : {
-          "type" : "string",
-          "enum" : [ "ACCEPTED", "ALREADY_REPORTED", "BAD_GATEWAY", "BAD_REQUEST", "BANDWIDTH_LIMIT_EXCEEDED", "CHECKPOINT", "CONFLICT", "CONTINUE", "CREATED", "DESTINATION_LOCKED", "EXPECTATION_FAILED", "FAILED_DEPENDENCY", "FORBIDDEN", "FOUND", "GATEWAY_TIMEOUT", "GONE", "HTTP_VERSION_NOT_SUPPORTED", "IM_USED", "INSUFFICIENT_SPACE_ON_RESOURCE", "INSUFFICIENT_STORAGE", "INTERNAL_SERVER_ERROR", "I_AM_A_TEAPOT", "LENGTH_REQUIRED", "LOCKED", "LOOP_DETECTED", "METHOD_FAILURE", "METHOD_NOT_ALLOWED", "MOVED_PERMANENTLY", "MOVED_TEMPORARILY", "MULTIPLE_CHOICES", "MULTI_STATUS", "NETWORK_AUTHENTICATION_REQUIRED", "NON_AUTHORITATIVE_INFORMATION", "NOT_ACCEPTABLE", "NOT_EXTENDED", "NOT_FOUND", "NOT_IMPLEMENTED", "NOT_MODIFIED", "NO_CONTENT", "OK", "PARTIAL_CONTENT", "PAYLOAD_TOO_LARGE", "PAYMENT_REQUIRED", "PERMANENT_REDIRECT", "PRECONDITION_FAILED", "PRECONDITION_REQUIRED", "PROCESSING", "PROXY_AUTHENTICATION_REQUIRED", "REQUESTED_RANGE_NOT_SATISFIABLE", "REQUEST_ENTITY_TOO_LARGE", "REQUEST_HEADER_FIELDS_TOO_LARGE", "REQUEST_TIMEOUT", "REQUEST_URI_TOO_LONG", "RESET_CONTENT", "SEE_OTHER", "SERVICE_UNAVAILABLE", "SWITCHING_PROTOCOLS", "TEMPORARY_REDIRECT", "TOO_EARLY", "TOO_MANY_REQUESTS", "UNAUTHORIZED", "UNAVAILABLE_FOR_LEGAL_REASONS", "UNPROCESSABLE_ENTITY", "UNSUPPORTED_MEDIA_TYPE", "UPGRADE_REQUIRED", "URI_TOO_LONG", "USE_PROXY", "VARIANT_ALSO_NEGOTIATES" ]
-        },
-        "view" : {
-          "$ref" : "#/definitions/View"
-        },
-        "viewName" : {
-          "type" : "string"
-        }
-      },
-      "title" : "ModelAndView"
     },
     "NodeCustomerDTO" : {
       "type" : "object",
@@ -5860,15 +5909,6 @@
         }
       },
       "title" : "UserDTO"
-    },
-    "View" : {
-      "type" : "object",
-      "properties" : {
-        "contentType" : {
-          "type" : "string"
-        }
-      },
-      "title" : "View"
     },
     "Zone" : {
       "type" : "object",
