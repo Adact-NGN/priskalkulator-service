@@ -241,11 +241,26 @@ public class PriceRowServiceImpl implements PriceRowService {
         Discount discount = getDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber(), discountMap);
 
         if(discount == null) {
+            log.debug("No discount level found for {}", entity.getMaterial().getMaterialNumber());
             return null;
         }
 
+        Double standardPrice = entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
 
-        return null;
+        Double manualPrice = entity.getManualPrice();
+
+        Integer currentLevel = 1;
+        for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
+            Double tempDiscount = standardPrice - discountLevel.getDiscount();
+
+            if(manualPrice < tempDiscount) {
+                currentLevel++;
+            } else {
+                break;
+            }
+        }
+
+        return currentLevel;
     }
 
     private Discount getDiscountLevel(String salesOrg, String salesOffice, String materialNumber, Map<String, Map<String, Map<String, Discount>>> discountMap) {
