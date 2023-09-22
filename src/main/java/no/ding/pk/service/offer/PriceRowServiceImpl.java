@@ -180,13 +180,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                         Material fromSap = modelMapper.map(sapMaterial, Material.class);
 
                         if(StringUtils.isBlank(fromSap.getDeviceType()) || fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
-                            if(materialPrice != null) {
-                                fromSap.setDeviceType(materialPrice.getDeviceType());
-                                fromSap.setQuantumUnit(materialPrice.getQuantumUnit());
-                                fromSap.setPricingUnit(materialPrice.getPricingUnit());
-
-                                materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
-                            }
+                            updateMaterialWithMaterialPriceValues(materialPriceRow, materialPrice, fromSap);
                         }
 
                         log.debug("Mapping result: {}", fromSap);
@@ -202,13 +196,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             } else {
                 log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
 
-                if(materialPrice != null) {
-                    material.setDeviceType(materialPrice.getDeviceType());
-                    material.setQuantumUnit(materialPrice.getQuantumUnit());
-                    material.setPricingUnit(materialPrice.getPricingUnit());
-                } else {
-                    log.debug("No material prices found.");
-                }
+                updateMaterialWithMaterialPriceValues(entity, materialPrice, material);
 
                 entity.setMaterial(material);
             }
@@ -239,6 +227,20 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         return repository.save(entity);
+    }
+
+    private static void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
+        if(materialPrice != null) {
+            material.setDeviceType(materialPrice.getDeviceType());
+            material.setQuantumUnit(materialPrice.getQuantumUnit());
+            material.setPricingUnit(materialPrice.getPricingUnit());
+
+            material.setMaterialStandardPrice(materialPrice);
+
+            materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+        } else {
+            log.debug("No material prices found.");
+        }
     }
 
     private Integer getEquivalentDiscountLevel(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
