@@ -4,20 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
+import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +86,14 @@ public class PriceOfferController {
         
         PriceOffer priceOffer = mapToEntity(priceOfferDTO);
 
+
+        StopWatch watch = new StopWatch();
+        watch.start();
+        PriceOffer offer = service.save(priceOffer);
+        watch.stop();
+        log.debug("Time used to create price offer: {} ms", watch.getTime());
         log.debug("PriceOffer created, returning...");
-        return service.save(priceOffer);
+        return offer;
     }
 
     private PriceOffer mapToEntity(PriceOfferDTO priceOfferDto) {
@@ -125,7 +125,11 @@ public class PriceOfferController {
 
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         updatedOffer = service.save(updatedOffer);
+        watch.stop();
+        log.debug("Time used to update price offer: {} ms", watch.getTime());
         
         return updatedOffer;
     }

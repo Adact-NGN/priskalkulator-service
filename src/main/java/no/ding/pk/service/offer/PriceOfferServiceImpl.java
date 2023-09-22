@@ -272,19 +272,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                     } else {
                         approvalUsers.add(poa.getDangerousWasteHolder());
                     }
-                } else {
-                    if (highestDiscountLevel > 5) {
-                        if(poa.getOrdinaryWasteLvlTwoHolder() == null) {
-                            log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
-                        } else {
-                            approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
-                        }
+                } else if (highestDiscountLevel > 5) {
+                    if (poa.getOrdinaryWasteLvlTwoHolder() == null) {
+                        log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
                     } else {
-                        if(poa.getOrdinaryWasteLvlOneHolder() == null) {
-                            log.debug("No sales manager elected for approval of ordinary waste for sales office {}", salesOfficeNumber);
-                        } else {
-                            approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
-                        }
+                        approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                    }
+                } else {
+                    if (poa.getOrdinaryWasteLvlOneHolder() == null) {
+                        log.debug("No sales manager elected for approval of ordinary waste for sales office {}", salesOfficeNumber);
+                    } else {
+                        approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
                     }
                 }
             }

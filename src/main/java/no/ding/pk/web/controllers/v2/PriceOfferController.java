@@ -9,14 +9,13 @@ import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
-import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,7 +195,11 @@ public class PriceOfferController {
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+        StopWatch watch = new StopWatch();
+        watch.start();
         priceOffer = service.save(priceOffer);
+        watch.stop();
+        log.debug("Time used to create price offer: {} ms", watch.getTime());
         
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
@@ -291,7 +294,11 @@ public class PriceOfferController {
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         updatedOffer = service.save(updatedOffer);
+        watch.stop();
+        log.debug("Time used to update price offer: {} ms", watch.getTime());
 
         if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
             updatedOffer.setNeedsApproval(true);

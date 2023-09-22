@@ -212,6 +212,13 @@ public class PriceRowServiceImpl implements PriceRowService {
 
         if(entity.getManualPrice() != null) {
             entity.setDiscountedPrice(entity.getManualPrice());
+
+            Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice, discountMap);
+            if(discountLevel != null) {
+                entity.setDiscountLevel(discountLevel);
+            } else {
+                log.info("Could not get discount level equivalent for manual price.");
+            }
         } else {
             calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
         }
@@ -228,6 +235,46 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         return repository.save(entity);
+    }
+
+    private Integer getEquivalentDiscountLevel(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+        Discount discount = getDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber(), discountMap);
+
+        if(discount == null) {
+            log.debug("No discount level found for {}", entity.getMaterial().getMaterialNumber());
+            return null;
+        }
+
+        Double standardPrice = entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
+
+        Double manualPrice = entity.getManualPrice();
+
+        Integer currentLevel = 1;
+        for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
+            Double tempDiscount = standardPrice - discountLevel.getDiscount();
+
+            if(manualPrice < tempDiscount) {
+                currentLevel++;
+            } else {
+                break;
+            }
+        }
+
+        return currentLevel;
+    }
+
+    private Discount getDiscountLevel(String salesOrg, String salesOffice, String materialNumber, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+        if(discountMap.containsKey(salesOrg)) {
+            Map<String, Map<String, Discount>> salesOrgDiscountMap = discountMap.get(salesOrg);
+            if(salesOrgDiscountMap != null && salesOrgDiscountMap.containsKey(salesOffice)) {
+                Map<String, Discount> salesOfficeDiscountMap = salesOrgDiscountMap.get(salesOffice);
+
+                if(salesOfficeDiscountMap.containsKey(materialNumber)) {
+                    return salesOfficeDiscountMap.get(materialNumber);
+                }
+            }
+        }
+        return null;
     }
 
     private List getMaterials(Material material) {
