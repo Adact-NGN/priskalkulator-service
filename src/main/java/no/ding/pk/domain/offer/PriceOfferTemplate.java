@@ -9,16 +9,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +21,10 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "price_offer_template")
 public class PriceOfferTemplate extends Offer implements Serializable {
+
+    @Column
+    private Boolean isSharable;
+
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "pot_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_offer_template_salesOfficeList"))
     @LazyCollection(LazyCollectionOption.FALSE)

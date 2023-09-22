@@ -74,6 +74,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
             MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPrices);
+            log.debug("Found standard price for material: {}: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice, discountMap);
 
             returnList.add(entity);
@@ -98,6 +99,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                           MaterialPrice materialPrice,
                           Map<String, Map<String, Map<String, Discount>>> discountMap) {
         log.debug("Price Row: {}", materialPriceRow);
+        log.debug("Material Price: {}", materialPrice);
 
         PriceRow entity = new PriceRow();
 
@@ -204,6 +206,8 @@ public class PriceRowServiceImpl implements PriceRowService {
                     material.setDeviceType(materialPrice.getDeviceType());
                     material.setQuantumUnit(materialPrice.getQuantumUnit());
                     material.setPricingUnit(materialPrice.getPricingUnit());
+                } else {
+                    log.debug("No material prices found.");
                 }
 
                 entity.setMaterial(material);
@@ -242,6 +246,11 @@ public class PriceRowServiceImpl implements PriceRowService {
 
         if(discount == null) {
             log.debug("No discount level found for {}", entity.getMaterial().getMaterialNumber());
+            return null;
+        }
+
+        if(entity.getMaterial() == null || entity.getMaterial().getMaterialStandardPrice() == null || entity.getMaterial().getMaterialStandardPrice().getStandardPrice() == null) {
+            log.debug("Could not get material information for calculating discount level: {}", entity);
             return null;
         }
 

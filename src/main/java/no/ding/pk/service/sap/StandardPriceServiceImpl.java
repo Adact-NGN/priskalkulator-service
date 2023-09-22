@@ -131,6 +131,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             List<MaterialStdPriceDTO> materialStdPriceDTO = jsonToMaterialStdPriceDTO(response);
 
             if(materialStdPriceDTO.isEmpty()) {
+                log.debug("Material standard price is empty.");
                 return null;
             }
 
@@ -161,6 +162,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 return priceDTOS;
             }
         }
+
+        log.debug("Could not get any standard prices.");
+
         return new ArrayList<>();
     }
 

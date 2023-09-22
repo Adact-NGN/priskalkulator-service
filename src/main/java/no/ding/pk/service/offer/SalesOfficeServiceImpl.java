@@ -70,6 +70,8 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
 
                 List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
 
+                log.debug("Material prices fetched: {}", materialStdPrices.size());
+
                 if (salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
                     log.debug("Adding Sales office material list");
                     List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
