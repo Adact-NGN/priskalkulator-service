@@ -229,15 +229,19 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
-    private static void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
+    private void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
         if(materialPrice != null) {
             material.setDeviceType(materialPrice.getDeviceType());
             material.setQuantumUnit(materialPrice.getQuantumUnit());
             material.setPricingUnit(materialPrice.getPricingUnit());
 
-            material.setMaterialStandardPrice(materialPrice);
-
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+            if(material.getMaterialStandardPrice() == null) {
+                material.setMaterialStandardPrice(materialPrice);
+            } else {
+                modelMapper.map(materialPrice, material.getMaterialStandardPrice());
+            }
+
         } else {
             log.debug("No material prices found.");
         }
@@ -385,32 +389,34 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     private void updateMaterial(Material to, Material from) {
         log.debug("To: {}, from: {}", to, from);
-        to.setDesignation(from.getDesignation());
-        to.setMaterialGroup(from.getMaterialGroup());
-        to.setMaterialGroupDesignation(from.getMaterialGroupDesignation());
-        to.setMaterialType(from.getMaterialType());
-        to.setMaterialTypeDescription(from.getMaterialTypeDescription());
-        to.setDeviceType(from.getDeviceType());
-        
-        to.setCurrency(from.getCurrency());
-        to.setPricingUnit(from.getPricingUnit());
-        to.setQuantumUnit(from.getQuantumUnit());
-        to.setSalesZone(from.getSalesZone());
-
-        to.setCategoryId(from.getCategoryId());
-        to.setCategoryDescription(from.getCategoryDescription());
-        to.setSubCategoryId(from.getSubCategoryId());
-        to.setSubCategoryDescription(from.getSubCategoryDescription());
-        to.setClassId(from.getClassId());
-        to.setClassDescription(from.getClassDescription());
+        modelMapper.map(from, to);
+//        to.setDesignation(from.getDesignation());
+//        to.setMaterialGroup(from.getMaterialGroup());
+//        to.setMaterialGroupDesignation(from.getMaterialGroupDesignation());
+//        to.setMaterialType(from.getMaterialType());
+//        to.setMaterialTypeDescription(from.getMaterialTypeDescription());
+//        to.setDeviceType(from.getDeviceType());
+//
+//        to.setCurrency(from.getCurrency());
+//        to.setPricingUnit(from.getPricingUnit());
+//        to.setQuantumUnit(from.getQuantumUnit());
+//        to.setSalesZone(from.getSalesZone());
+//
+//        to.setCategoryId(from.getCategoryId());
+//        to.setCategoryDescription(from.getCategoryDescription());
+//        to.setSubCategoryId(from.getSubCategoryId());
+//        to.setSubCategoryDescription(from.getSubCategoryDescription());
+//        to.setClassId(from.getClassId());
+//        to.setClassDescription(from.getClassDescription());
     }
     
     private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {
         log.debug("To: {}, from: {}", to, from);
-        to.setStandardPrice(from.getStandardPrice());
-        to.setValidFrom(from.getValidFrom());
-        to.setValidTo(from.getValidTo());
-        to.setDeviceType(from.getDeviceType());
+        modelMapper.map(from, to);
+//        to.setStandardPrice(from.getStandardPrice());
+//        to.setValidFrom(from.getValidFrom());
+//        to.setValidTo(from.getValidTo());
+//        to.setDeviceType(from.getDeviceType());
     }
     
 }

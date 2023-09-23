@@ -247,11 +247,22 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         MaterialField.SalesOrganization.getValue(), salesOrg, 
         MaterialField.MaterialExpired.getValue()
         ));
-        
-        if(StringUtils.isNotBlank(materialNumber)) {
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.Material.getValue(), materialNumber));
-        }
 
+        addMaterialNumber(materialNumber, filterQuery);
+
+        addZone(zone, filterQuery);
+
+        addDeviceType(deviceType, filterQuery, "and %s eq '%s'", MaterialField.DeviceCategory);
+        return filterQuery.toString();
+    }
+
+    private static void addDeviceType(String deviceType, StringBuilder filterQuery, String format, MaterialField deviceCategory) {
+        if (StringUtils.isNotBlank(deviceType)) {
+            filterQuery.append(String.format(format, deviceCategory.getValue(), deviceType));
+        }
+    }
+
+    private static void addZone(String zone, StringBuilder filterQuery) {
         if(StringUtils.isNotBlank(zone)) {
             if(zone.length() < 2) {
                 zone = "0" + zone;
@@ -260,13 +271,12 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         } else {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
-
-        if(StringUtils.isNotBlank(deviceType)) {
-            filterQuery.append(String.format("and %s eq '%s'", MaterialField.DeviceCategory.getValue(), deviceType));
-        }
-        return filterQuery.toString();
     }
-    
+
+    private static void addMaterialNumber(String materialNumber, StringBuilder filterQuery) {
+        addDeviceType(materialNumber, filterQuery, " and %s eq '%s'", MaterialField.Material);
+    }
+
     private HttpResponse<String> sendRequest(HttpRequest request) {
         HttpClient client = HttpClient.newBuilder()
         .build();

@@ -1,27 +1,19 @@
 package no.ding.pk.service.offer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
 import no.ding.pk.domain.Discount;
-import no.ding.pk.service.DiscountService;
 import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.domain.offer.PriceRow;
+import no.ding.pk.domain.offer.Zone;
+import no.ding.pk.repository.offer.ZoneRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.sap.StandardPriceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import no.ding.pk.domain.offer.PriceRow;
-import no.ding.pk.domain.offer.Zone;
-import no.ding.pk.repository.offer.ZoneRepository;
+import javax.transaction.Transactional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -70,18 +62,13 @@ public class ZoneServiceImpl implements ZoneService {
             List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOrg, salesOffice, zone.getZoneId());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
-                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, materialStdPrices, discountMap);
+                List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, zone.getZoneId(), materialStdPrices, discountMap);
 
                 entity.setPriceRows(materials);
             }
 
-//            entity = repository.save(entity);
-
             returnZoneList.add(entity);
         }
-
-
-
 
         log.debug("Persisted {} amount of Zones", returnZoneList.size());
         return returnZoneList;
