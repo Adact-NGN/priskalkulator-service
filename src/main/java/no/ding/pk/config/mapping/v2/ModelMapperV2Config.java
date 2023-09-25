@@ -12,6 +12,7 @@ import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -54,6 +55,15 @@ public class ModelMapperV2Config {
                 .addMapping(MaterialDTO::getClassId, Material::setClassId)
                 .addMapping(MaterialDTO::getClassDescription, Material::setClassDescription)
         ;
+
+        PropertyMap<Material, Material> skipModifiedFieldsMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                skip().setId(null);
+            }
+        };
+
+        modelMapper.addMappings(skipModifiedFieldsMap);
 
         modelMapper.typeMap(ZoneDTO.class, Zone.class)
                 .addMapping(ZoneDTO::getNumber, Zone::setZoneId)
