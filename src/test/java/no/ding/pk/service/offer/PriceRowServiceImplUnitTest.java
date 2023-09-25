@@ -54,6 +54,107 @@ public class PriceRowServiceImplUnitTest {
     }
 
     @Test
+    public void shouldUpdateMaterialWithNewValues() {
+        String materialNumber = "50103";
+
+        MaterialPrice oldMaterialPrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(1817.0)
+                .build();
+
+        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(oldMaterialPrice);
+
+        Material oldMaterial = Material.builder()
+                .id(1L)
+                .materialNumber(materialNumber)
+                .designation("Lift - Tømming")
+                .materialGroupDesignation("Tj. Lift")
+                .materialTypeDescription("Tjeneste")
+                .materialStandardPrice(oldMaterialPrice)
+                .build();
+
+        when(materialService.save(any())).thenAnswer(invocationOnMock -> {
+            Material updatedMaterial = (Material) invocationOnMock.getArguments()[0];
+            return updatedMaterial;
+        });
+
+        EntityManager entityManager = mock(EntityManager.class);
+        when(entityManager.getTransaction()).thenReturn(mock(EntityTransaction.class));
+        Query query = mock(Query.class);
+        when(query.setParameter(anyString(), anyString())).thenReturn(query);
+        when(query.getResultList()).thenReturn(List.of(oldMaterial));
+        when(entityManager.createNamedQuery(anyString())).thenReturn(query);
+        when(emFactory.createEntityManager()).thenReturn(entityManager);
+
+        PriceRow priceRow = PriceRow.builder()
+                .material(oldMaterial)
+                .standardPrice(1817.0)
+                .discountLevel(3)
+                .build();
+
+        when(repository.save(any())).thenReturn(priceRow);
+
+        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(oldMaterialPrice);
+
+        List<DiscountLevel> discountLevels = List.of(
+                DiscountLevel.builder()
+                        .level(1)
+                        .discount(0.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(2)
+                        .discount(90.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(3)
+                        .discount(180.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(4)
+                        .discount(315.0)
+                        .build(),
+                DiscountLevel.builder()
+                        .level(5)
+                        .discount(468.0)
+                        .build()
+        );
+        Discount discount = Discount.builder()
+                .materialNumber(materialNumber)
+                .discountLevels(discountLevels)
+                .build();
+        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
+
+        MaterialPrice updatedMaterialPrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .pricingUnit(1)
+                .standardPrice(1917.0)
+                .build();
+
+        Material updatedMaterial = Material.builder()
+                .materialNumber(materialNumber)
+                .pricingUnit(1)
+                .designation("Lift - Tømming")
+                .materialGroupDesignation("Tj. Lift")
+                .materialTypeDescription("Tjeneste")
+                .materialStandardPrice(updatedMaterialPrice)
+                .build();
+
+        PriceRow updatedPriceRow = PriceRow.builder()
+                .material(updatedMaterial)
+                .standardPrice(1817.0)
+                .discountLevel(3)
+                .build();
+
+        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1", List.of(updatedMaterialPrice),
+                discountMap);
+
+        PriceRow actualPriceRow = actual.get(0);
+
+        updatedMaterial.setId(1L);
+        assertThat(actualPriceRow.getMaterial(), equalTo(updatedMaterial));
+    }
+
+    @Test
     public void shouldSetDiscountPctByStandardPriceAndDiscountLevelPrice() {
         String materialNumber = "50103";
 
