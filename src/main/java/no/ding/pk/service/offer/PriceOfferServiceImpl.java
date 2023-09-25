@@ -76,6 +76,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         entity.setCustomerName(newPriceOffer.getCustomerName());
 
+        entity.setStreetAddress(newPriceOffer.getStreetAddress());
+        entity.setPostalNumber(newPriceOffer.getPostalNumber());
+        entity.setCity(newPriceOffer.getCity());
+
+        entity.setOrganizationNumber(newPriceOffer.getOrganizationNumber());
+
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());

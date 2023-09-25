@@ -26,6 +26,7 @@ public class PriceOfferDTO {
     private String streetAddress;
     private String postalNumber;
     private String city;
+    private String organizationNumber;
     private ContactPersonDTO contactPerson;
     private List<SalesOfficeDTO> salesOfficeList;
     private Date dateUpdated;

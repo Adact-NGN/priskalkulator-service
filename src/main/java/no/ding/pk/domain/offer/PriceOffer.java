@@ -65,6 +65,7 @@ public class PriceOffer extends Offer implements Serializable {
                       String streetAddress,
                       String postalNumber,
                       String city,
+                      String organizationNumber,
                       List<SalesOffice> salesOfficeList, User salesEmployee,
                       Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
                       String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
@@ -72,6 +73,7 @@ public class PriceOffer extends Offer implements Serializable {
                 streetAddress,
                 postalNumber,
                 city,
+                organizationNumber,
                 contactPersonList, approvalDate,
                 dateIssued);
 

@@ -47,12 +47,14 @@ public class PriceOfferTemplate extends Offer implements Serializable {
                               String streetAddress,
                               String postalNumber,
                               String city,
+                              String organizationNumber,
                               List<ContactPerson> contactPersonList, List<SalesOffice> salesOfficeList, User salesEmployee,
                               User approver, Date approvalDate, Date dateIssued, PriceOfferTerms customerTerms) {
         super(id, deleted, customerNumber, customerName, customerType,
                 streetAddress,
                 postalNumber,
                 city,
+                organizationNumber,
                 contactPersonList, approvalDate, dateIssued);
 
         this.salesOfficeList = salesOfficeList;
