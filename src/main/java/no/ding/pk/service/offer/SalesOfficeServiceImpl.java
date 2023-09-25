@@ -97,6 +97,8 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                     log.debug("Finished adding rental materials");
                 }
 
+                entity = repository.save(entity);
+
                 if (salesOffice.getZoneList() != null && salesOffice.getZoneList().size() > 0) {
                     log.debug("Adding zones service material list");
                     List<Zone> zones = zoneService.saveAll(salesOffice.getZoneList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
