@@ -236,11 +236,11 @@ public class PriceRowServiceImpl implements PriceRowService {
             material.setPricingUnit(materialPrice.getPricingUnit());
 
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
-            if(material.getMaterialStandardPrice() == null) {
-                material.setMaterialStandardPrice(materialPrice);
-            } else {
-                modelMapper.map(materialPrice, material.getMaterialStandardPrice());
-            }
+//            if(material.getMaterialStandardPrice() == null) {
+//                material.setMaterialStandardPrice(materialPrice);
+//            } else {
+//                modelMapper.map(materialPrice, material.getMaterialStandardPrice());
+//            }
 
         } else {
             log.debug("No material prices found.");
