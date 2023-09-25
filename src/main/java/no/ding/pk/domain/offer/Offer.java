@@ -35,6 +35,15 @@ public class Offer extends Auditable {
     @Column
     private String customerType;
 
+    @Column
+    private String streetAddress;
+
+    @Column
+    private String postalNumber;
+
+    @Column
+    private String city;
+
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ContactPerson> contactPersonList;

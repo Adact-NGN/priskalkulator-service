@@ -12,6 +12,7 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
+import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
 import org.apache.commons.lang3.StringUtils;
@@ -191,6 +192,7 @@ public class PriceOfferController {
         log.debug("Got new Price offer object: " + priceOfferDTO);
         
         if(priceOfferDTO.getSalesEmployee() == null) throw new EmployeeNotProvidedException();
+        if(priceOfferDTO.getCustomerName() == null) throw new CustomerNotProvidedException("Customer name not provided.");
 
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 

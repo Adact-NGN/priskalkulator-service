@@ -1,10 +1,6 @@
 package no.ding.pk.domain.offer;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import no.ding.pk.domain.User;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -12,17 +8,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -75,10 +61,18 @@ public class PriceOffer extends Offer implements Serializable {
     private PriceOfferTerms customerTerms;
 
     @Builder(builderMethodName = "priceOfferBuilder")
-    public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
+    public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType,
+                      String streetAddress,
+                      String postalNumber,
+                      String city,
+                      List<SalesOffice> salesOfficeList, User salesEmployee,
+                      Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
                       String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
-        super(id, deleted, customerNumber, customerName, customerType, contactPersonList, approvalDate,
+        super(id, deleted, customerNumber, customerName, customerType,
+                streetAddress,
+                postalNumber,
+                city,
+                contactPersonList, approvalDate,
                 dateIssued);
 
         this.needsApproval = needsApproval;
