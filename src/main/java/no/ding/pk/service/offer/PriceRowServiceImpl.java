@@ -131,7 +131,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
         entity.setApproved(materialPriceRow.getApproved());
 
-        entity = repository.save(entity);
+//        entity = repository.save(entity);
 
         if(materialPriceRow.getMaterial() != null) {
             Material material = getMaterial(materialPriceRow.getMaterial());
@@ -168,7 +168,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                         materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
                     }
 
-                    persistedMaterial = materialService.save(persistedMaterial);
+//                    persistedMaterial = materialService.save(persistedMaterial);
 
                     entity.setMaterial(persistedMaterial);
                 } else {
@@ -185,7 +185,7 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                         log.debug("Mapping result: {}", fromSap);
 
-                        material = materialService.save(fromSap);
+//                        material = materialService.save(fromSap);
                     } else {
                         log.debug("Could not find material {} for salesorg {}", material.getMaterialNumber(), salesOrg);
                     }
@@ -226,7 +226,8 @@ public class PriceRowServiceImpl implements PriceRowService {
             entity.setCombinedMaterials(combinedMaterialPriceRows);
         }
 
-        return repository.save(entity);
+//        return repository.save(entity);
+        return entity;
     }
 
     private void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
