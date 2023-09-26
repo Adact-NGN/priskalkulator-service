@@ -121,6 +121,10 @@ public class ModelMapperV2Config {
                 .addMapping(PriceOffer::getLastModifiedDate, PriceOfferDTO::setDateUpdated)
                 .addMapping(PriceOffer::getAdditionalInformation, PriceOfferDTO::setAdditionalInformation)
                 .addMapping(PriceOffer::getGeneralComment, PriceOfferDTO::setGeneralComment)
+                .addMapping(PriceOffer::getOrganizationNumber, PriceOfferDTO::setOrganizationNumber)
+                .addMapping(PriceOffer::getStreetAddress, PriceOfferDTO::setStreetAddress)
+                .addMapping(PriceOffer::getPostalNumber, PriceOfferDTO::setPostalNumber)
+                .addMapping(PriceOffer::getCity, PriceOfferDTO::setCity)
                 .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
     }
 
@@ -138,6 +142,10 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
                 .addMapping(PriceOfferDTO::getAdditionalInformation, PriceOffer::setAdditionalInformation)
                 .addMapping(PriceOfferDTO::getGeneralComment, PriceOffer::setGeneralComment)
+                .addMapping(PriceOfferDTO::getOrganizationNumber, PriceOffer::setOrganizationNumber)
+                .addMapping(PriceOfferDTO::getStreetAddress, PriceOffer::setStreetAddress)
+                .addMapping(PriceOfferDTO::getPostalNumber, PriceOffer::setPostalNumber)
+                .addMapping(PriceOfferDTO::getCity, PriceOffer::setCity)
                 .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
     }
 
