@@ -3,9 +3,6 @@ package no.ding.pk.service.sap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
-import no.ding.pk.service.sap.SapMaterialService;
-import no.ding.pk.service.sap.StandardPriceService;
-import no.ding.pk.service.sap.StandardPriceServiceImpl;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.hamcrest.core.Is;
@@ -60,7 +57,7 @@ public class StandardPriceServiceImplTest {
     public void setup() {
         this.workingDir = Path.of("", "src/test/resources");
         InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache = new PingInMemory3DCache<>(capacity);
-        service = new StandardPriceServiceImpl(new ObjectMapper(), 
+        service = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", new ObjectMapper(),
         inMemoryCache,
         sapMaterialService,
         sapHttpClient, modelMapper);

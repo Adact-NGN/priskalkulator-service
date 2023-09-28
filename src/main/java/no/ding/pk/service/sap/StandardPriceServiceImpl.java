@@ -38,7 +38,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     private static final Logger log = LoggerFactory.getLogger(StandardPriceServiceImpl.class);
     
-    @Value("${sap.api.standard.price.url}")
     private String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
@@ -52,10 +51,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Autowired
     public StandardPriceServiceImpl(
+            @Value("${sap.api.standard.price.url}")
+            String standardPriceSapUrl,
             ObjectMapper objectMapper,
             @Qualifier("standardPriceInMemoryCache") InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache,
             SapMaterialService sapMaterialService,
             SapHttpClient sapHttpClient, @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+        this.standardPriceSapUrl = standardPriceSapUrl;
         this.objectMapper = objectMapper;
         this.inMemoryCache = inMemoryCache;
         this.sapHttpClient = sapHttpClient;
