@@ -13,7 +13,8 @@ public enum PriceOfferStatus {
     APPROVED("APPROVED"),
     SENT_TO_COSTUMER("SENT_TO_COSTUMER"),
     ACTIVATED("ACTIVATED"),
-    SENT_TO_SAP("SENT_TO_SAP");
+    SENT_TO_SAP("SENT_TO_SAP"),
+    COMPLETED("COMPLETED");
 
     private final String status;
 
