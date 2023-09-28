@@ -3,40 +3,44 @@ package no.ding.pk.service.offer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.AbstractIntegrationConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
-import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.service.DiscountService;
-import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
-import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.service.UserService;
+import no.ding.pk.service.*;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
+import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.service.sap.StandardPriceService;
+import no.ding.pk.service.sap.StandardPriceServiceImpl;
+import no.ding.pk.utils.SapHttpClient;
+import no.ding.pk.web.dto.sap.MaterialDTO;
+import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.net.ssl.SSLSession;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-@Disabled("This needs to be a complete integration test")
 class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
-
-    @Autowired
-    private PriceOfferRepository priceOfferRepository;
 
     private SalesOfficeService salesOfficeService;
 
@@ -53,20 +57,43 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private DiscountService discountService;
 
     private ModelMapper modelMapper = new ModelMapper();
+    private SapHttpClient sapHttpClient;
+    private SapMaterialService sapMaterialService;
+
 
     @BeforeEach
     public void setup() {
 
-        salesOfficeService = mock(SalesOfficeService.class);
-        userService = mock(UserService.class);
-        salesOfficePowerOfAttorneyService = mock(SalesOfficePowerOfAttorneyService.class);
-        discountService = mock(DiscountService.class);
-        salesRoleService = mock(SalesRoleService.class);
-        customerTermsService = mock(CustomerTermsService.class);
-        materialService = mock(MaterialService.class);
+        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
 
-        service = new PriceOfferServiceImpl(priceOfferRepository, salesOfficeService, userService,
-                salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper);
+        materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
+
+        sapMaterialService = mock(SapMaterialService.class);
+
+        PriceRowService priceRowService = new PriceRowServiceImpl(getPriceRowRepository(),
+                materialService,
+                materialPriceService,
+                getEmFactory(),
+                sapMaterialService,
+                modelMapper);
+
+        discountService = mock(DiscountService.class);
+        InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
+        ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
+        sapHttpClient = mock(SapHttpClient.class);
+        StandardPriceService standardPriceService = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", getObjectMapper(), standardPriceInMemoryCache, sapMaterialService, sapHttpClient, modelMapper);
+        ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, discountService, standardPriceService);
+
+        salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
+        userService = new UserServiceImpl(getUserRepository(), getSalesRoleRepository());
+        salesOfficePowerOfAttorneyService = new SalesOfficePowerOfAttorneyServiceImpl(getSalesOfficePowerOfAttorneyRepository());
+        salesRoleService = new SalesRoleServiceImpl(getSalesRoleRepository());
+        customerTermsService = new CustomerTermsServiceImpl(getCustomerTermsRepository());
+
+
+        service = new PriceOfferServiceImpl(getPriceOfferRepository(), salesOfficeService, userService,
+                salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper,
+                List.of(100));
 
         prepearUsersAndSalesRoles();
         createMaterial();
@@ -75,6 +102,13 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldPersistPriceOffer() throws JsonProcessingException {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(new Date())
@@ -202,37 +236,31 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldSetFaApproverWhenOnlyDangerousWastNeedsApproval() {
-        when(discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(anyString(), anyString(), List.of("70120015")))
-                .thenReturn(List.of(Discount.builder()
-                                .salesOrg("100")
-                                .salesOffice("104")
-                                .fa("FA")
-                                .materialDesignation("Spillolje ikke ref. - væske - småk")
-                                .materialNumber("70120015")
-                                .discountLevels(List.of(
-                                        DiscountLevel.builder().level(1).discount(0.0).build(),
-                                        DiscountLevel.builder().level(2).discount(1015.0).build(),
-                                        DiscountLevel.builder().level(3).discount(2030.0).build(),
-                                        DiscountLevel.builder().level(4).discount(3045.0).build(),
-                                        DiscountLevel.builder().level(5).discount(3045.0).build()
-                                )).build()
-                        )
-                );
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
 
         User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
 
-        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
-                .salesOffice(104)
-                .salesOfficeName("Skien")
-                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
-                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
-                .dangerousWasteHolder(dangerousWasteHolder)
-                .build();
-        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
 
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
 
         Material material = createDangerousMaterial();
         PriceRow priceRow = PriceRow.builder()
@@ -260,19 +288,29 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldSetOrdinaryLvlOneApproverWhenDangerousWastAndOrdinaryMaterialNeedsApproval() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
 
-        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
-                .salesOffice(104)
-                .salesOfficeName("Skien")
-                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
-                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
-                .dangerousWasteHolder(dangerousWasteHolder)
-                .build();
-        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
 
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
 
         Material ordinaryMaterial = createOrdinaryMaterial();
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
@@ -305,23 +343,48 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceOffer actual = service.save(priceOffer);
 
         assertThat(actual.getApprover(), notNullValue());
-        assertThat(actual.getApprover(), equalTo(ordinaryWasteHolder));
+        assertThat(actual.getApprover(), equalTo(dangerousWasteHolder));
     }
 
     @Test
     public void shouldSetOrdinaryLvlTwoWhenDiscountLevelIsAtItsHighest() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        when(sapMaterialService.getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
+                        .material("159904")
+                        .categoryDescription("Degaussing harddisker")
+                        .salesOrganization("100")
+                .build()));
+
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
 
-        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder()
-                .salesOffice(104)
-                .salesOfficeName("Skien")
-                .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
-                .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
-                .dangerousWasteHolder(dangerousWasteHolder)
-                .build();
-        salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
+
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
+                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
+            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
+
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
 
         Material ordinaryMaterial = createOrdinaryMaterial();
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
@@ -332,7 +395,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         Material dangerousMaterial = createDangerousMaterial();
-        PriceRow priceRow = PriceRow.builder()
+        PriceRow faPriceRow = PriceRow.builder()
                 .material(dangerousMaterial)
                 .standardPrice(16566.00)
                 .discountLevel(3)
@@ -342,7 +405,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesOrg("100")
                 .salesOfficeName("Skien")
                 .salesOffice("104")
-                .materialList(List.of(priceRow, ordinaryWastePriceRow))
+                .materialList(List.of(
+                        faPriceRow,
+                        ordinaryWastePriceRow))
                 .build();
 
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
@@ -357,8 +422,128 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getApprover(), equalTo(ordinaryWasteHolderLvl2));
     }
 
+    private static HttpResponse<String> createResponse() {
+        return new HttpResponse<>() {
+            @Override
+            public int statusCode() {
+                return 200;
+            }
+
+            @Override
+            public HttpRequest request() {
+                return null;
+            }
+
+            @Override
+            public Optional<HttpResponse<String>> previousResponse() {
+                return Optional.empty();
+            }
+
+            @Override
+            public HttpHeaders headers() {
+                return null;
+            }
+
+            @Override
+            public String body() {
+                return "{\n" +
+                        "    \"d\": {\n" +
+                        "        \"results\": [\n" +
+                        "            {\n" +
+                        "                \"__metadata\": {\n" +
+                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
+                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
+                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
+                        "                },\n" +
+                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
+                        "                \"SalesOrganization\": \"100\",\n" +
+                        "                \"SalesOffice\": \"104\",\n" +
+                        "                \"Material\": \"159904\",\n" +
+                        "                \"MaterialDescription\": \"Degaussing harddisker\",\n" +
+                        "                \"DeviceCategory\": \"\",\n" +
+                        "                \"SalesZone\": \"\",\n" +
+                        "                \"ScaleQuantity\": \"0\",\n" +
+                        "                \"StandardPrice\": \"170.00\",\n" +
+                        "                \"Valuta\": \"\",\n" +
+                        "                \"PricingUnit\": \"1\",\n" +
+                        "                \"QuantumUnit\": \"ST\",\n" +
+                        "                \"MaterialExpired\": \"\",\n" +
+                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
+                        "                \"MaterialGroup\": \"1599\",\n" +
+                        "                \"MaterialGroupDescription\": \"Blandet EE-avfall\",\n" +
+                        "                \"MaterialType\": \"ZWAF\",\n" +
+                        "                \"MaterialTypeDescription\": \"Avfallsmateriale\"\n" +
+                        "            },\n" +
+                        "           {\n" +
+                        "                \"__metadata\": {\n" +
+                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
+                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
+                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
+                        "                },\n" +
+                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
+                        "                \"SalesOrganization\": \"100\",\n" +
+                        "                \"SalesOffice\": \"100\",\n" +
+                        "                \"Material\": \"70120015\",\n" +
+                        "                \"MaterialDescription\": \"Ikke refunderbar spillolje,Småemb\",\n" +
+                        "                \"DeviceCategory\": \"\",\n" +
+                        "                \"SalesZone\": \"\",\n" +
+                        "                \"ScaleQuantity\": \"0.000\",\n" +
+                        "                \"StandardPrice\": \"16566.00\",\n" +
+                        "                \"Valuta\": \"\",\n" +
+                        "                \"PricingUnit\": \"1000\",\n" +
+                        "                \"QuantumUnit\": \"KG\",\n" +
+                        "                \"MaterialExpired\": \"\",\n" +
+                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
+                        "                \"MaterialGroup\": \"7012\",\n" +
+                        "                \"MaterialGroupDescription\": \"Spillolje, ikke ref.\",\n" +
+                        "                \"MaterialType\": \"ZAFA\",\n" +
+                        "                \"MaterialTypeDescription\": \"Farlig Avfallsmateriale\"\n" +
+                        "            }" +
+                        "        ]\n" +
+                        "    }\n" +
+                        "}";
+            }
+
+            @Override
+            public Optional<SSLSession> sslSession() {
+                return Optional.empty();
+            }
+
+            @Override
+            public URI uri() {
+                return null;
+            }
+
+            @Override
+            public HttpClient.Version version() {
+                return null;
+            }
+        };
+    }
+
     @Test
     public void shouldEndExistingCustomerTermsAndAddNewWhenNewPriceOfferIsActivated() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        when(sapMaterialService.getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt())).thenReturn(
+                List.of(
+                        MaterialDTO.builder()
+                                .material("159904")
+                                .materialDescription("Degaussing harddisker")
+                                .salesOrganization("100")
+                                .build(),
+                        MaterialDTO.builder()
+                                .material("70120015")
+                                .materialDescription("Ikke refunderbar spillolje,Småemb")
+                                .salesOrganization("100")
+                                .build()
+                ));
+
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
@@ -390,16 +575,18 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(3)
                 .needsApproval(false)
                 .build();
+        String salesOfficeNumber = "100";
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOrg("100")
                 .salesOfficeName("Skien")
-                .salesOffice("104")
+                .salesOffice(salesOfficeNumber)
                 .materialList(List.of(priceRow, ordinaryWastePriceRow))
                 .build();
 
+        String customerNumber = "169239";
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .customerName("Monica")
-                .customerNumber("169239")
+                .customerNumber(customerNumber)
                 .salesEmployee(salesEmployee)
                 .salesOfficeList(List.of(salesOffice))
                 .needsApproval(true)
@@ -407,8 +594,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         priceOffer = service.save(priceOffer);
 
+        List<CustomerTerms> activeTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber);
+        assertThat(activeTermsList, hasSize(1));
+
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
-                .customerNumber("169239")
+                .customerNumber(customerNumber)
                 .customerName("Monica")
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(currentDateTime.toDate())
@@ -420,6 +610,10 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         Boolean actual = service.activatePriceOffer(salesEmployee.getId(), priceOffer.getId(), priceOfferTerms, null);
 
         assertThat(actual, is(true));
+
+        List<CustomerTerms> actualActiveTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber).stream().filter(customerTerms -> customerTerms.getAgreementEndDate() == null).toList();
+
+        assertThat(actualActiveTermsList, hasSize(1));
     }
 
     private void createDiscountMatrix() {
@@ -511,28 +705,47 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     void createMaterial() {
         String materialNumber = "119901";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-        .materialNumber(materialNumber)
-        .standardPrice(2456.00)
-        .build();
-        
-        Material waste = Material.builder()
-        .designation("Restavfall")
-        .materialNumber(materialNumber)
-        .pricingUnit(1000)
-        .quantumUnit("KG")
-        .materialGroup("9912")
-        .materialGroupDesignation("Bl. næringsavfall")
-        .materialType("ZWAF")
-        .materialTypeDescription("Avfallsmateriale")
-        .materialStandardPrice(wastePrice)
-        .build();
+        MaterialPrice wastePrice = getMaterialPriceRepository().findByMaterialNumber(materialNumber);
 
-        when(materialService.findByMaterialNumber(materialNumber)).thenReturn(waste);
+        if(wastePrice == null) {
+            wastePrice = MaterialPrice.builder()
+                    .materialNumber(materialNumber)
+                    .standardPrice(2456.00)
+                    .build();
+
+            wastePrice = getMaterialPriceRepository().save(wastePrice);
+        }
+
+        Material waste = materialService.findByMaterialNumber(materialNumber);
+
+        if(waste == null) {
+            waste = Material.builder()
+                    .designation("Restavfall")
+                    .materialNumber(materialNumber)
+                    .pricingUnit(1000)
+                    .quantumUnit("KG")
+                    .materialGroup("9912")
+                    .materialGroupDesignation("Bl. næringsavfall")
+                    .materialType("ZWAF")
+                    .materialTypeDescription("Avfallsmateriale")
+                    .materialStandardPrice(wastePrice)
+                    .build();
+
+            materialService.save(waste);
+        }
+
     }
 
     @Test
     public void shouldListAllPriceOfferForApprover() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         User user = userService.findByEmail("alexander.brox@ngn.no");
         List<SalesOffice> salesOfficeList = List.of(SalesOffice
                 .builder()
@@ -545,6 +758,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .approver(user)
                 .build();
 
+        service.save(priceOffer);
+
         List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), null);
 
         assertThat(actual, hasSize(greaterThan(0)));
@@ -552,6 +767,14 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldListAllPriceOfferForApproverWithStatusPending() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         User user = userService.findByEmail("alexander.brox@ngn.no");
         MaterialPrice materialPrice = MaterialPrice.builder()
                 .materialNumber("119901")
@@ -587,6 +810,14 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldPersistMaterialWithDeviceType() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
         String materialNumber = "50301";
         String deviceType = "B-0040-FO";
 
@@ -645,12 +876,18 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     private void prepearUsersAndSalesRoles() {
-        SalesRole knSalesRole = SalesRole.builder()
-                .roleName("KN")
-                .description("KAM nasjonalt")
-                .defaultPowerOfAttorneyOa(5)
-                .defaultPowerOfAttorneyFa(5)
-                .build();
+        SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
+
+        if(knSalesRole == null) {
+            knSalesRole = SalesRole.builder()
+                    .roleName("KN")
+                    .description("KAM nasjonalt")
+                    .defaultPowerOfAttorneyOa(5)
+                    .defaultPowerOfAttorneyFa(5)
+                    .build();
+
+            knSalesRole = salesRoleService.save(knSalesRole);
+        }
 
 
         User alex = User.builder()
@@ -670,9 +907,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesRole(knSalesRole)
                 .build();
 
+        alex = userService.save(alex, null);
+
         knSalesRole.addUser(alex);
 
-
+        knSalesRole = salesRoleService.save(knSalesRole);
 
         SalesRole saSalesRole = SalesRole.builder()
                 .roleName("SA")
@@ -692,6 +931,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .powerOfAttorneyOA(5)
                 .build();
 
+        userService.save(eirik, null);
+
         User kjetil = User.builder()
                 .name("Kjetil")
                 .sureName("Minde")
@@ -703,6 +944,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .powerOfAttorneyOA(5)
                 .build();
 
+        userService.save(kjetil, null);
+
         User salesEmployee = User.builder()
                 .adId("ad-id-wegarijo-arha-rh-arha")
                 .jobTitle("Komponist")
@@ -710,19 +953,23 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .email("Wolfgang@farris-bad.no")
                 .associatedPlace("Larvik")
                 .department("Hvitsnippene")
-                .salesRole(saSalesRole)
+//                .salesRole(saSalesRole)
                 .build();
+
+        salesEmployee = userService.save(salesEmployee, null);
 
         saSalesRole.addUser(salesEmployee);
 
-        when(userService.findByEmail("alexander.brox@ngn.no")).thenReturn(alex);
-        when(userService.findByEmail("Eirik.Flaa@ngn.no")).thenReturn(eirik);
-        when(userService.findByEmail("kjetil.torvund.minde@ngn.no")).thenReturn(kjetil);
-        when(userService.findByEmail("Wolfgang Amadeus Mozart")).thenReturn(salesEmployee);
-        when(salesRoleService.findSalesRoleByRoleName("KN"))
-                .thenReturn(knSalesRole);
-        when(salesRoleService.findSalesRoleByRoleName("SA"))
-                .thenReturn(saSalesRole);
+        salesRoleService.save(saSalesRole);
+
+//        when(userService.findByEmail("alexander.brox@ngn.no")).thenReturn(alex);
+//        when(userService.findByEmail("Eirik.Flaa@ngn.no")).thenReturn(eirik);
+//        when(userService.findByEmail("kjetil.torvund.minde@ngn.no")).thenReturn(kjetil);
+//        when(userService.findByEmail("Wolfgang Amadeus Mozart")).thenReturn(salesEmployee);
+//        when(salesRoleService.findSalesRoleByRoleName("KN"))
+//                .thenReturn(knSalesRole);
+//        when(salesRoleService.findSalesRoleByRoleName("SA"))
+//                .thenReturn(saSalesRole);
 
     }
 }

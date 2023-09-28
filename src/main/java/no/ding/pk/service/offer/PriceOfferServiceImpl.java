@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
+    private List<Integer> salesOfficesWhichRequiresOwnFaApprover;
 
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
@@ -50,7 +52,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
                                  DiscountService discountService, CustomerTermsService customerTermsService,
-                                 @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+                                 @Qualifier("modelMapperV2") ModelMapper modelMapper,
+                                 @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
@@ -58,6 +61,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
+        this.salesOfficesWhichRequiresOwnFaApprover = salesOfficesWhichRequiresOwnFaApprover;
     }
 
     @Override
@@ -267,14 +271,16 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 }
             }
 
+            log.debug("Highest discount level registered: {}", highestDiscountLevel);
+
             Integer salesOfficeNumber = Integer.valueOf(listEntry.getKey());
             PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(salesOfficeNumber);
 
             if(poa == null) {
                 log.debug("No power of attorney found for sales office {}", salesOfficeNumber);
-                log.debug("Unable to set any approved for given price offer");
+                log.debug("Unable to set any approver for given price offer");
             } else {
-                if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                if(hasFaMaterialForApproval && salesOfficesWhichRequiresOwnFaApprover.contains(salesOfficeNumber)) {
                     if(poa.getDangerousWasteHolder() == null) {
                         log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
                     } else {
@@ -285,6 +291,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                         log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
                     } else {
                         approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                    }
+                } else if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                    if(poa.getDangerousWasteHolder() == null) {
+                        log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
+                    } else {
+                        approvalUsers.add(poa.getDangerousWasteHolder());
                     }
                 } else {
                     if (poa.getOrdinaryWasteLvlOneHolder() == null) {
