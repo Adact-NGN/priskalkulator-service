@@ -345,7 +345,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private static void collectMaterial(List<PriceRow> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
-            if(pr.getNeedsApproval() && !pr.isApproved()) {
+            if(pr.getDiscountLevel() != null && pr.getNeedsApproval() && !pr.isApproved()) {
                 materialsInPriceOffer.add(pr);
             }
         }

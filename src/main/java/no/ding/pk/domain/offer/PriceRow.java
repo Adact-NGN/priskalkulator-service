@@ -94,16 +94,11 @@ public class PriceRow extends Auditable {
     }
 
     public Boolean getNeedsApproval() {
-
         return needsApproval != null && needsApproval;
     }
 
-    public Boolean getApproved() {
+    public Boolean isApproved() {
         return approved != null && approved;
-    }
-
-    public boolean isApproved() {
-        return getApproved();
     }
 
     @Override

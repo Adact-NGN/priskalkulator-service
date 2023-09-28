@@ -284,6 +284,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(actual.getApprover(), notNullValue());
         assertThat(actual.getApprover(), equalTo(dangerousWasteHolder));
+
+        assertThat(actual.getSalesOfficeList().get(0).getMaterialList().get(0).isApproved(), is(false));
     }
 
     @Test
@@ -875,6 +877,114 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     }
 
+    @Test
+    public void shouldSetPriceOfferStatusBackToPendingWhenDiscountLevelIsChanged() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        List<String> materialNumbers = List.of("159904", "70120015");
+
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        User salesConsultant = userService.findByEmail("birte.sundmo@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
+
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
+                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
+            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
+
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
+
+        String salesOrg = "100";
+        String salesOffice = "104";
+        Material normalWaste = Material.builder()
+                .materialNumber("159904")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(170.0)
+                                .pricingUnit(1)
+                                .materialNumber("159904")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Degaussing harddisker")
+                .build();
+
+        PriceRow normalWasteRow = PriceRow.builder()
+                .material(normalWaste)
+                .standardPrice(170.0)
+                .discountLevel(2)
+                .needsApproval(false)
+                .build();
+        Material dangerousWaste = Material.builder()
+                .materialNumber("70120015")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(16566.0)
+                                .pricingUnit(1000)
+                                .materialNumber("70120015")
+                                .quantumUnit("KG")
+                                .build())
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .build();
+        PriceRow dangerousWasteRow = PriceRow.builder()
+                .material(dangerousWaste)
+                .standardPrice(16566.0)
+                .needsApproval(false)
+                .build();
+
+        SalesOffice salesOffice1 = SalesOffice.builder()
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .salesOfficeName("Skien")
+                .materialList(List.of(
+                        normalWasteRow,
+                        dangerousWasteRow
+                ))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesConsultant)
+                .salesOfficeList(List.of(salesOffice1))
+                .needsApproval(false)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setDiscountLevel(3);
+
+        PriceOffer actual = service.save(priceOffer);
+
+        assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+    }
+
     private void prepearUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
@@ -888,7 +998,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             knSalesRole = salesRoleService.save(knSalesRole);
         }
-
 
         User alex = User.builder()
                 .id(39L)
@@ -953,23 +1062,43 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .email("Wolfgang@farris-bad.no")
                 .associatedPlace("Larvik")
                 .department("Hvitsnippene")
-//                .salesRole(saSalesRole)
                 .build();
 
         salesEmployee = userService.save(salesEmployee, null);
 
+
+
+//        SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName("SA");
+
+//        if(salesConsultant == null) {
+//            salesConsultant = SalesRole.builder()
+//                    .roleName("SA")
+//                    .description("Salgskonsulent (rolle a)")
+//                    .defaultPowerOfAttorneyFa(2)
+//                    .defaultPowerOfAttorneyOa(2)
+//                    .build();
+//
+//            salesConsultant = salesRoleService.save(salesConsultant);
+//        }
+
+        User consultant = User.builder()
+                .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
+                .name("Birte")
+                .sureName("Sundmo")
+                .fullName("Birte Sundmo")
+                .orgNr("100")
+                .orgName("NG")
+                .associatedPlace("Oslo")
+                .email("birte.sundmo@ngn.no")
+                .powerOfAttorneyFA(2)
+                .powerOfAttorneyOA(2)
+                .build();
+
+        consultant = userService.save(consultant,null);
+
         saSalesRole.addUser(salesEmployee);
+        saSalesRole.addUser(consultant);
 
         salesRoleService.save(saSalesRole);
-
-//        when(userService.findByEmail("alexander.brox@ngn.no")).thenReturn(alex);
-//        when(userService.findByEmail("Eirik.Flaa@ngn.no")).thenReturn(eirik);
-//        when(userService.findByEmail("kjetil.torvund.minde@ngn.no")).thenReturn(kjetil);
-//        when(userService.findByEmail("Wolfgang Amadeus Mozart")).thenReturn(salesEmployee);
-//        when(salesRoleService.findSalesRoleByRoleName("KN"))
-//                .thenReturn(knSalesRole);
-//        when(salesRoleService.findSalesRoleByRoleName("SA"))
-//                .thenReturn(saSalesRole);
-
     }
 }
