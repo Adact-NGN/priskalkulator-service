@@ -9,7 +9,10 @@ import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.*;
+import no.ding.pk.web.handlers.EmployeeNotProvidedException;
+import no.ding.pk.web.handlers.MissingApprovalStatusException;
+import no.ding.pk.web.handlers.PriceOfferNotFoundException;
+import no.ding.pk.web.handlers.WrongStatusException;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -24,7 +27,8 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.withApproverId;
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.withPriceOfferStatus;
 
 @Transactional
 @Service
@@ -116,6 +120,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
 
         if(!materialsForApproval.isEmpty()) {
+            log.debug("Materials needs approving by responsible person.");
             entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
             String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
@@ -128,12 +133,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             } else {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
             }
-        } else {
-            log.debug("No materials needs to be approved, set price offer as APPROVED.");
-            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
-        }
-
-        if(newPriceOffer.getApprover() != null) {
+        } else if(newPriceOffer.getApprover() != null) {
+            log.debug("Setting approver from new price offer object.");
             User approver = checkUserObject(newPriceOffer.getApprover());
 
             if(approver != null) {
@@ -142,6 +143,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 approver = getApproverForOffer(materialsForApproval);
                 entity.setApprover(approver);
             }
+        } else {
+            log.debug("No materials needs to be approved, set price offer as APPROVED.");
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
         if(newPriceOffer.getCustomerTerms() != null) {
