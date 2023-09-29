@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -98,7 +99,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", new ArrayList<>(), null);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", new HashMap<>(), null);
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));

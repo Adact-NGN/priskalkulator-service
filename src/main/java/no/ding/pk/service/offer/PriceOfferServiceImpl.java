@@ -48,7 +48,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
-    private List<Integer> salesOfficesWhichRequiresOwnFaApprover;
+    private final List<Integer> salesOfficesWhichRequiresOwnFaApprover;
 
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
@@ -126,12 +126,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             entity.setMaterialsForApproval(materialNumbersForApproval);
 
-            User approver = getApproverForOffer(materialsForApproval);
+            User approver = getApproverForOffer(materialsForApproval, entity.getSalesEmployee());
 
             if(approver != null) {
                 entity.setApprover(approver);
             } else {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
+            }
+
+            if(approver != null && approver.equals(entity.getSalesEmployee())) {
+                log.debug("Sales employee has the rights to approve the price offer. Set it to approved.");
+                entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
             }
         } else if(newPriceOffer.getApprover() != null) {
             log.debug("Setting approver from new price offer object.");
@@ -140,7 +145,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             if(approver != null) {
                 entity.setApprover(approver);
             } else {
-                approver = getApproverForOffer(materialsForApproval);
+                approver = getApproverForOffer(materialsForApproval, entity.getSalesEmployee());
                 entity.setApprover(approver);
             }
         } else {
@@ -253,7 +258,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return entity;
     }
 
-    private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval) {
+    private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval, User salesEmployee) {
         Set<User> approvalUsers = new HashSet<>();
 
         for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
@@ -296,8 +301,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                     } else {
                         approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
                     }
+                } else if (salesEmployee.getPowerOfAttorneyOA() >= highestDiscountLevel) {
+                    log.debug("Sales employee has the correct level to approve this.");
+                    approvalUsers.add(salesEmployee);
                 } else if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
-                    if(poa.getDangerousWasteHolder() == null) {
+                    if (poa.getDangerousWasteHolder() == null) {
                         log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
                     } else {
                         approvalUsers.add(poa.getDangerousWasteHolder());
@@ -345,7 +353,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private static void collectMaterial(List<PriceRow> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
-            if(pr.getDiscountLevel() != null && pr.getNeedsApproval() && !pr.isApproved()) {
+            if(pr.getDiscountLevel() != null && !pr.isApproved()) {
                 materialsInPriceOffer.add(pr);
             }
         }
@@ -443,7 +451,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
                 if(priceOfferToApprove.getApprover() == null) {
                     Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
-                    User approver = getApproverForOffer(materialsForApproval);
+                    User approver = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
                     priceOfferToApprove.setApprover(approver);
                 }

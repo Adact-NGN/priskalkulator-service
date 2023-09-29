@@ -68,7 +68,7 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
 
-                List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
+                Map<String, MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
 
                 log.debug("Material prices fetched: {}", materialStdPrices.size());
 

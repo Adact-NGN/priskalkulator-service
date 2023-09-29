@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class StandardPriceServiceImpl implements StandardPriceService {
@@ -125,7 +127,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
 
     @Override
-    public List<MaterialPrice> getStandardPriceForSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String zone) {
+    public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -143,10 +145,12 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             addMaterialDataToStandardPrice(materialStdPriceDTO, materialDTOMap);
 
-            return List.of(modelMapper.map(materialStdPriceDTO, MaterialPrice[].class));
+            List<MaterialPrice> materialPrices = List.of(modelMapper.map(materialStdPriceDTO, MaterialPrice[].class));
+
+            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getMaterialNumber, Function.identity()));
         }
         
-        return new ArrayList<>();
+        return new HashMap<>();
     }
 
     @Override
@@ -180,25 +184,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         log.debug("Created request: " + request.toString());
 
         return sapHttpClient.getResponse(request);
-    }
-
-    @Override
-    public List<MaterialStdPriceDTO> getStandardPriceForMaterialInList(String salesOrg, String salesOffice, List<String> materialNumbers) {
-        List<MaterialStdPriceDTO> materialStdPriceDTOS = new ArrayList<>();
-
-        for(String material : materialNumbers) {
-
-            List<MaterialStdPriceDTO> standardPriceForMaterial = getStandardPriceDTO(salesOrg, salesOffice, material);
-            
-            materialStdPriceDTOS.addAll(standardPriceForMaterial);
-
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
-
-            Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
-
-            addMaterialDataToStandardPrice(materialStdPriceDTOS, materialDTOMap);
-        }
-        return materialStdPriceDTOS;
     }
 
     private void initiateCacheBuild(String salesOrg, String salesOffice) {

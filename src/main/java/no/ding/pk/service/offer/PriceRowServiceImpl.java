@@ -62,18 +62,18 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     @Override
     public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice,
-                                  List<MaterialPrice> materialStdPrices,
+                                  Map<String, MaterialPrice> materialStdPriceMap,
                                   Map<String, Map<String, Map<String, Discount>>> discountMap) {
-        return saveAll(priceRowList, salesOrg, salesOffice, null, materialStdPrices, discountMap);
+        return saveAll(priceRowList, salesOrg, salesOffice, null, materialStdPriceMap, discountMap);
     }
     
     @Override
     public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone,
-                                  List<MaterialPrice> materialStdPrices,
+                                  Map<String, MaterialPrice> materialStdPriceMap,
                                   Map<String, Map<String, Map<String, Discount>>> discountMap) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPrices);
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPriceMap);
             log.debug("Found standard price for material: {}: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice, discountMap);
 
@@ -84,15 +84,17 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private MaterialPrice getMaterialPriceForMaterial(Material material, List<MaterialPrice> materialStdPrices) {
-        if(materialStdPrices == null || materialStdPrices.isEmpty()) {
+    private MaterialPrice getMaterialPriceForMaterial(Material material, Map<String, MaterialPrice> materialStdPriceMap) {
+        if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
         if(StringUtils.isNotBlank(material.getDeviceType())) {
-            return materialStdPrices.stream().filter(materialPrice ->
-                    materialPrice.getMaterialNumber().equals(material.getMaterialNumber()) && materialPrice.getDeviceType().equals(material.getDeviceType())).findFirst().orElse(null);
+            Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
+                    .filter(smpe -> smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()))
+                    .findFirst();
+            return priceEntry.map(Map.Entry::getValue).orElse(null);
         }
-        return materialStdPrices.stream().filter(materialPrice -> materialPrice.getMaterialNumber().equals(material.getMaterialNumber())).findFirst().orElse(null);
+        return materialStdPriceMap.getOrDefault(material.getMaterialNumber(), null);
     }
 
     private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone,

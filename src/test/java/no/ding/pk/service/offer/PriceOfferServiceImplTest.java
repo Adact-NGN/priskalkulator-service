@@ -21,6 +21,9 @@ import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLSession;
@@ -39,6 +42,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@SqlConfig(commentPrefix = "#")
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
+@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
+@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
 class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
 
@@ -95,7 +102,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper,
                 List.of(100));
 
-        prepearUsersAndSalesRoles();
+        prepareUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
     }
@@ -484,7 +491,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         "                },\n" +
                         "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
                         "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"100\",\n" +
+                        "                \"SalesOffice\": \"104\",\n" +
                         "                \"Material\": \"70120015\",\n" +
                         "                \"MaterialDescription\": \"Ikke refunderbar spillolje,Småemb\",\n" +
                         "                \"DeviceCategory\": \"\",\n" +
@@ -500,7 +507,32 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         "                \"MaterialGroupDescription\": \"Spillolje, ikke ref.\",\n" +
                         "                \"MaterialType\": \"ZAFA\",\n" +
                         "                \"MaterialTypeDescription\": \"Farlig Avfallsmateriale\"\n" +
-                        "            }" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"__metadata\": {\n" +
+                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
+                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
+                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
+                        "                },\n" +
+                        "                \"ValidFrom\": \"/Date(1695945600000)/\",\n" +
+                        "                \"SalesOrganization\": \"100\",\n" +
+                        "                \"SalesOffice\": \"104\",\n" +
+                        "                \"Material\": \"50301\",\n" +
+                        "                \"MaterialDescription\": \"Flatvogn - Utsett\",\n" +
+                        "                \"DeviceCategory\": \"B-0-S\",\n" +
+                        "                \"SalesZone\": \"\",\n" +
+                        "                \"ScaleQuantity\": \"0\",\n" +
+                        "                \"StandardPrice\": \"13.00\",\n" +
+                        "                \"Valuta\": \"\",\n" +
+                        "                \"PricingUnit\": \"1\",\n" +
+                        "                \"QuantumUnit\": \"ST\",\n" +
+                        "                \"MaterialExpired\": \"\",\n" +
+                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
+                        "                \"MaterialGroup\": \"0503\",\n" +
+                        "                \"MaterialGroupDescription\": \"Tj.  Flatvogn\",\n" +
+                        "                \"MaterialType\": \"DIEN\",\n" +
+                        "                \"MaterialTypeDescription\": \"Tjeneste\"\n" +
+                        "            }"+
                         "        ]\n" +
                         "    }\n" +
                         "}";
@@ -557,7 +589,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .agreementStartDate(currentDateTime.minusYears(1).toDate())
                 .salesEmployee(salesEmployee.getEmail())
                 .salesOrg("100")
-                .salesOffice("100")
+                .salesOffice("104")
                 .build();
 
         customerTermsService.save(oldCustomerTerms.getSalesOffice(), oldCustomerTerms.getCustomerNumber(), oldCustomerTerms.getCustomerName(), oldCustomerTerms);
@@ -566,7 +598,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
                 .material(ordinaryMaterial)
                 .standardPrice(170.00)
-                .discountLevel(6)
+                .discountLevel(5)
                 .needsApproval(false)
                 .build();
 
@@ -577,7 +609,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(3)
                 .needsApproval(false)
                 .build();
-        String salesOfficeNumber = "100";
+        String salesOfficeNumber = "104";
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOrg("100")
                 .salesOfficeName("Skien")
@@ -605,7 +637,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(currentDateTime.toDate())
                 .salesOrg("100")
-                .salesOffice("100")
+                .salesOffice("104")
                 .build();
 
 
@@ -958,13 +990,37 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .needsApproval(false)
                 .build();
 
+        Material deviceType = Material.builder()
+                .materialNumber("50301")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .deviceType("B-0-S")
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(13.00)
+                                .pricingUnit(1)
+                                .materialNumber("50301")
+                                .deviceType("B-0-S")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Flatvogn - Utsett")
+                .build();
+
+        PriceRow deviceTypeRow = PriceRow.builder()
+                .material(deviceType)
+                .standardPrice(13.00)
+                .needsApproval(false)
+                .build();
+
         SalesOffice salesOffice1 = SalesOffice.builder()
                 .salesOrg(salesOrg)
                 .salesOffice(salesOffice)
                 .salesOfficeName("Skien")
                 .materialList(List.of(
                         normalWasteRow,
-                        dangerousWasteRow
+                        dangerousWasteRow,
+                        deviceTypeRow
                 ))
                 .build();
 
@@ -985,7 +1041,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
     }
 
-    private void prepearUsersAndSalesRoles() {
+    private void prepareUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
         if(knSalesRole == null) {
@@ -1065,21 +1121,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         salesEmployee = userService.save(salesEmployee, null);
-
-
-
-//        SalesRole salesConsultant = salesRoleService.findSalesRoleByRoleName("SA");
-
-//        if(salesConsultant == null) {
-//            salesConsultant = SalesRole.builder()
-//                    .roleName("SA")
-//                    .description("Salgskonsulent (rolle a)")
-//                    .defaultPowerOfAttorneyFa(2)
-//                    .defaultPowerOfAttorneyOa(2)
-//                    .build();
-//
-//            salesConsultant = salesRoleService.save(salesConsultant);
-//        }
 
         User consultant = User.builder()
                 .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
