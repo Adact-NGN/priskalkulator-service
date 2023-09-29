@@ -21,6 +21,9 @@ import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLSession;
@@ -39,6 +42,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@SqlConfig(commentPrefix = "#")
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
+@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
+@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
 class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
 
@@ -95,7 +102,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper,
                 List.of(100));
 
-        prepearUsersAndSalesRoles();
+        prepareUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
     }
@@ -284,6 +291,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(actual.getApprover(), notNullValue());
         assertThat(actual.getApprover(), equalTo(dangerousWasteHolder));
+
+        assertThat(actual.getSalesOfficeList().get(0).getMaterialList().get(0).isApproved(), is(false));
     }
 
     @Test
@@ -482,7 +491,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         "                },\n" +
                         "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
                         "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"100\",\n" +
+                        "                \"SalesOffice\": \"104\",\n" +
                         "                \"Material\": \"70120015\",\n" +
                         "                \"MaterialDescription\": \"Ikke refunderbar spillolje,Småemb\",\n" +
                         "                \"DeviceCategory\": \"\",\n" +
@@ -498,7 +507,32 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         "                \"MaterialGroupDescription\": \"Spillolje, ikke ref.\",\n" +
                         "                \"MaterialType\": \"ZAFA\",\n" +
                         "                \"MaterialTypeDescription\": \"Farlig Avfallsmateriale\"\n" +
-                        "            }" +
+                        "            },\n" +
+                        "            {\n" +
+                        "                \"__metadata\": {\n" +
+                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
+                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
+                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
+                        "                },\n" +
+                        "                \"ValidFrom\": \"/Date(1695945600000)/\",\n" +
+                        "                \"SalesOrganization\": \"100\",\n" +
+                        "                \"SalesOffice\": \"104\",\n" +
+                        "                \"Material\": \"50301\",\n" +
+                        "                \"MaterialDescription\": \"Flatvogn - Utsett\",\n" +
+                        "                \"DeviceCategory\": \"B-0-S\",\n" +
+                        "                \"SalesZone\": \"\",\n" +
+                        "                \"ScaleQuantity\": \"0\",\n" +
+                        "                \"StandardPrice\": \"13.00\",\n" +
+                        "                \"Valuta\": \"\",\n" +
+                        "                \"PricingUnit\": \"1\",\n" +
+                        "                \"QuantumUnit\": \"ST\",\n" +
+                        "                \"MaterialExpired\": \"\",\n" +
+                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
+                        "                \"MaterialGroup\": \"0503\",\n" +
+                        "                \"MaterialGroupDescription\": \"Tj.  Flatvogn\",\n" +
+                        "                \"MaterialType\": \"DIEN\",\n" +
+                        "                \"MaterialTypeDescription\": \"Tjeneste\"\n" +
+                        "            }"+
                         "        ]\n" +
                         "    }\n" +
                         "}";
@@ -555,7 +589,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .agreementStartDate(currentDateTime.minusYears(1).toDate())
                 .salesEmployee(salesEmployee.getEmail())
                 .salesOrg("100")
-                .salesOffice("100")
+                .salesOffice("104")
                 .build();
 
         customerTermsService.save(oldCustomerTerms.getSalesOffice(), oldCustomerTerms.getCustomerNumber(), oldCustomerTerms.getCustomerName(), oldCustomerTerms);
@@ -564,7 +598,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceRow ordinaryWastePriceRow = PriceRow.builder()
                 .material(ordinaryMaterial)
                 .standardPrice(170.00)
-                .discountLevel(6)
+                .discountLevel(5)
                 .needsApproval(false)
                 .build();
 
@@ -575,7 +609,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(3)
                 .needsApproval(false)
                 .build();
-        String salesOfficeNumber = "100";
+        String salesOfficeNumber = "104";
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOrg("100")
                 .salesOfficeName("Skien")
@@ -603,7 +637,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
                 .agreementStartDate(currentDateTime.toDate())
                 .salesOrg("100")
-                .salesOffice("100")
+                .salesOffice("104")
                 .build();
 
 
@@ -875,7 +909,139 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     }
 
-    private void prepearUsersAndSalesRoles() {
+    @Test
+    public void shouldSetPriceOfferStatusBackToPendingWhenDiscountLevelIsChanged() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        List<String> materialNumbers = List.of("159904", "70120015");
+
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        User salesConsultant = userService.findByEmail("birte.sundmo@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
+
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
+                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
+            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
+
+            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
+
+        String salesOrg = "100";
+        String salesOffice = "104";
+        Material normalWaste = Material.builder()
+                .materialNumber("159904")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(170.0)
+                                .pricingUnit(1)
+                                .materialNumber("159904")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Degaussing harddisker")
+                .build();
+
+        PriceRow normalWasteRow = PriceRow.builder()
+                .material(normalWaste)
+                .standardPrice(170.0)
+                .discountLevel(2)
+                .needsApproval(false)
+                .build();
+        Material dangerousWaste = Material.builder()
+                .materialNumber("70120015")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(16566.0)
+                                .pricingUnit(1000)
+                                .materialNumber("70120015")
+                                .quantumUnit("KG")
+                                .build())
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .build();
+        PriceRow dangerousWasteRow = PriceRow.builder()
+                .material(dangerousWaste)
+                .standardPrice(16566.0)
+                .needsApproval(false)
+                .build();
+
+        Material deviceType = Material.builder()
+                .materialNumber("50301")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .deviceType("B-0-S")
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(13.00)
+                                .pricingUnit(1)
+                                .materialNumber("50301")
+                                .deviceType("B-0-S")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Flatvogn - Utsett")
+                .build();
+
+        PriceRow deviceTypeRow = PriceRow.builder()
+                .material(deviceType)
+                .standardPrice(13.00)
+                .needsApproval(false)
+                .build();
+
+        SalesOffice salesOffice1 = SalesOffice.builder()
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .salesOfficeName("Skien")
+                .materialList(List.of(
+                        normalWasteRow,
+                        dangerousWasteRow,
+                        deviceTypeRow
+                ))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesConsultant)
+                .salesOfficeList(List.of(salesOffice1))
+                .needsApproval(false)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setDiscountLevel(3);
+
+        PriceOffer actual = service.save(priceOffer);
+
+        assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+    }
+
+    private void prepareUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
         if(knSalesRole == null) {
@@ -888,7 +1054,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             knSalesRole = salesRoleService.save(knSalesRole);
         }
-
 
         User alex = User.builder()
                 .id(39L)
@@ -953,23 +1118,28 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .email("Wolfgang@farris-bad.no")
                 .associatedPlace("Larvik")
                 .department("Hvitsnippene")
-//                .salesRole(saSalesRole)
                 .build();
 
         salesEmployee = userService.save(salesEmployee, null);
 
+        User consultant = User.builder()
+                .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
+                .name("Birte")
+                .sureName("Sundmo")
+                .fullName("Birte Sundmo")
+                .orgNr("100")
+                .orgName("NG")
+                .associatedPlace("Oslo")
+                .email("birte.sundmo@ngn.no")
+                .powerOfAttorneyFA(2)
+                .powerOfAttorneyOA(2)
+                .build();
+
+        consultant = userService.save(consultant,null);
+
         saSalesRole.addUser(salesEmployee);
+        saSalesRole.addUser(consultant);
 
         salesRoleService.save(saSalesRole);
-
-//        when(userService.findByEmail("alexander.brox@ngn.no")).thenReturn(alex);
-//        when(userService.findByEmail("Eirik.Flaa@ngn.no")).thenReturn(eirik);
-//        when(userService.findByEmail("kjetil.torvund.minde@ngn.no")).thenReturn(kjetil);
-//        when(userService.findByEmail("Wolfgang Amadeus Mozart")).thenReturn(salesEmployee);
-//        when(salesRoleService.findSalesRoleByRoleName("KN"))
-//                .thenReturn(knSalesRole);
-//        when(salesRoleService.findSalesRoleByRoleName("SA"))
-//                .thenReturn(saSalesRole);
-
     }
 }

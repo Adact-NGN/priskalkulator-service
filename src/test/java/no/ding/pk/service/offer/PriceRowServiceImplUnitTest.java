@@ -145,7 +145,7 @@ public class PriceRowServiceImplUnitTest {
                 .discountLevel(3)
                 .build();
 
-        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1", List.of(updatedMaterialPrice),
+        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1", Map.of(updatedMaterialPrice.getMaterialNumber(), updatedMaterialPrice),
                 discountMap);
 
         PriceRow actualPriceRow = actual.get(0);
@@ -221,7 +221,7 @@ public class PriceRowServiceImplUnitTest {
                 .build();
         Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", List.of(materialPrice),
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
                 discountMap);
 
         PriceRow actualPriceRow = actual.get(0);
@@ -307,7 +307,7 @@ public class PriceRowServiceImplUnitTest {
                 .build();
         Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", List.of(materialPrice),
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
                 discountMap);
 
         assertThat(actual.get(0).getDiscountLevel(), is(1));
@@ -381,7 +381,7 @@ public class PriceRowServiceImplUnitTest {
                 .build();
         Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", List.of(materialPrice),
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
                 discountMap);
 
         assertThat(actual.get(0).getDiscountLevel(), is(2));
@@ -455,7 +455,7 @@ public class PriceRowServiceImplUnitTest {
                 .build();
         Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", List.of(materialPrice),
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
                 discountMap);
 
         assertThat(actual.get(0).getDiscountLevel(), is(6));
