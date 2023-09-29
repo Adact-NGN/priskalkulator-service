@@ -25,6 +25,7 @@
         <drools-version>7.59.0.Final</drools-version>
 
         <kie-spring.version>7.73.0.Final</kie-spring.version>
+        <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
     </properties>
 
     <dependencyManagement>
@@ -147,7 +148,7 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${org.mapstruct.version}</version>
         </dependency>
 
         <dependency>
@@ -475,6 +476,14 @@
                     <configuration>
                         <source>11</source>
                         <target>11</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${org.mapstruct.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <showWarnings>true</showWarnings>
                     </configuration>
                 </plugin>
                 <plugin>

@@ -53,8 +53,7 @@ public class ModelMapperV2Config {
                 .addMapping(MaterialDTO::getSubCategoryId, Material::setSubCategoryId)
                 .addMapping(MaterialDTO::getSubCategoryDescription, Material::setSubCategoryDescription)
                 .addMapping(MaterialDTO::getClassId, Material::setClassId)
-                .addMapping(MaterialDTO::getClassDescription, Material::setClassDescription)
-        ;
+                .addMapping(MaterialDTO::getClassDescription, Material::setClassDescription);
 
         PropertyMap<Material, Material> skipModifiedFieldsMap = new PropertyMap<>() {
             @Override

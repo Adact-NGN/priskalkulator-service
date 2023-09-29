@@ -57,6 +57,7 @@ public class Offer extends Auditable {
     @Column
     private Date dateIssued;
 
+    @Column
     public List<ContactPerson> getContactPersonList() {
         return contactPersonList;
     }
