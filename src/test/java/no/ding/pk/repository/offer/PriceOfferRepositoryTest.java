@@ -2,6 +2,8 @@ package no.ding.pk.repository.offer;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
+import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
@@ -50,11 +52,13 @@ public class PriceOfferRepositoryTest {
 
     @Test
     public void shouldCreatePriceOfferTemplateAndPersistIt() {
-        PriceOfferTemplate priceOfferTemplate = (PriceOfferTemplate) createCompleteOfferTemplate();
+        PriceOfferTemplate priceOfferTemplate = createCompleteOfferTemplate();
 
         priceOfferTemplate = offerTemplateRepository.save(priceOfferTemplate);
 
         assertThat(priceOfferTemplate.getId(), notNullValue());
+        assertThat(priceOfferTemplate.getSharedWith(), hasSize(greaterThan(0)));
+        assertThat(priceOfferTemplate.getMaterials(), hasSize(greaterThan(0)));
     }
 
     @Test
@@ -145,10 +149,10 @@ public class PriceOfferRepositoryTest {
         repository.save(priceOffer);
     }
 
-    private Offer createCompleteOfferTemplate() {
+    private PriceOfferTemplate createCompleteOfferTemplate() {
         User salesEmployee = createEmployee();
 
-        User approver = User.builder()
+        User sharedWithUser = User.builder()
                 .adId("ad-ww-wegarijo-arha-rh-arha")
                 .associatedPlace("Oslo")
                 .email("alexander.brox@ngn.no")
@@ -159,104 +163,28 @@ public class PriceOfferRepositoryTest {
                 .jobTitle("Markedskonsulent")
                 .build();
 
-        approver = userRepository.save(approver);
-
-        PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
-                .agreementStartDate(new Date())
-                .contractTerm("Generelle vilkår")
-                .additionForAdminFee(false)
-                .build();
+        sharedWithUser = userRepository.save(sharedWithUser);
 
         MaterialPrice materialPrice = MaterialPrice.builder()
                 .materialNumber("50101")
                 .standardPrice(1131.0)
                 .build();
 
-        Material material = Material.builder()
-                .materialNumber("50101")
-                .designation("Lift - Utsett")
-                .pricingUnit(1)
-                .quantumUnit("ST")
-                .materialStandardPrice(materialPrice)
+        TemplateMaterial material = TemplateMaterial.builder()
+                .material("50101")
                 .build();
 
-        PriceRow priceRow = PriceRow.builder()
-                .customerPrice(1000.0)
-                .discountLevelPct(0.02)
-                .material(material)
-                .showPriceInOffer(true)
-                .manualPrice(900.0)
-                .discountLevel(1)
-                .discountLevelPrice(100.0)
-                .amount(1)
-                .priceIncMva(1125.0)
+        TemplateMaterial waste = TemplateMaterial.builder()
+                .material("119901")
                 .build();
 
-        List<PriceRow> priceRowList = new ArrayList<>();
-        priceRowList.add(priceRow);
 
-        Zone zone = Zone.builder()
-                .postalCode("1601")
-                .postalName(null)
-                .zoneId("0000000001")
-                .isStandardZone(true)
-                .priceRows(priceRowList)
+        return PriceOfferTemplate.builder()
+                .author(salesEmployee)
+                .materials(List.of(material, waste))
+                .isShareable(true)
+                .sharedWith(List.of(sharedWithUser))
                 .build();
-
-        List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
-
-        MaterialPrice wastePrice = MaterialPrice.builder()
-                .materialNumber("119901")
-                .standardPrice(2456.00)
-                .build();
-
-        Material waste = Material.builder()
-                .materialNumber("119901")
-                .designation("Restavfall")
-                .pricingUnit(1000)
-                .quantumUnit("KG")
-                .materialStandardPrice(wastePrice)
-                .build();
-
-        PriceRow wastePriceRow = PriceRow.builder()
-                .customerPrice(2456.0)
-                .discountLevelPct(0.02)
-                .material(waste)
-                .showPriceInOffer(true)
-                .manualPrice(2400.0)
-                .discountLevel(1)
-                .discountLevelPrice(56.0)
-                .amount(1)
-                .priceIncMva(2448.0)
-                .build();
-
-        List<PriceRow> wastePriceRowList = new ArrayList<>();
-        wastePriceRowList.add(wastePriceRow);
-
-        SalesOffice salesOffice = SalesOffice.builder()
-                .city("FREDRIKSTAD")
-                .salesOfficeName("Sarpsborg/Fredrikstad")
-                .salesOffice("127")
-                .salesOrg("100")
-                .postalNumber("1601")
-                .zoneList(zoneList)
-                .materialList(wastePriceRowList)
-                .build();
-
-        List<SalesOffice> salesOfficeList = new ArrayList<>();
-        salesOfficeList.add(salesOffice);
-
-        PriceOfferTemplate priceOffer = PriceOfferTemplate.priceOfferTemplateBuilder()
-                .customerNumber("5162")
-                .salesOfficeList(salesOfficeList)
-                .salesEmployee(salesEmployee)
-                .approver(approver)
-                .build();
-
-        priceOffer.setCustomerTerms(priceOfferTerms);
-
-        return priceOffer;
     }
 
     private Offer createCompleteOffer() {

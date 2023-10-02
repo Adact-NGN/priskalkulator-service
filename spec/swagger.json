@@ -2187,7 +2187,7 @@
         }
       }
     },
-    "/api/v1/price-offer-template" : {
+    "/api/v1/price-offer-template/create" : {
       "post" : {
         "tags" : [ "price-offer-template-controller" ],
         "summary" : "createTemplate",
@@ -2196,54 +2196,18 @@
         "produces" : [ "application/json" ],
         "parameters" : [ {
           "in" : "body",
-          "name" : "newTemplate",
-          "description" : "newTemplate",
+          "name" : "newTemplateDto",
+          "description" : "newTemplateDto",
           "required" : true,
           "schema" : {
-            "$ref" : "#/definitions/PriceOfferTemplate"
+            "$ref" : "#/definitions/PriceOfferTemplateDTO"
           }
         } ],
         "responses" : {
           "200" : {
             "description" : "OK",
             "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
-            }
-          },
-          "201" : {
-            "description" : "Created"
-          },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        }
-      },
-      "put" : {
-        "tags" : [ "price-offer-template-controller" ],
-        "summary" : "save",
-        "operationId" : "saveUsingPUT_3",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "priceOfferTemplate",
-          "description" : "priceOfferTemplate",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/definitions/PriceOfferTemplate"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
           },
           "201" : {
@@ -2273,9 +2237,47 @@
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/definitions/PriceOfferTemplate"
+                "$ref" : "#/definitions/PriceOfferTemplateDTO"
               }
             }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/save" : {
+      "put" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "save",
+        "operationId" : "saveUsingPUT_3",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "priceOfferTemplateDto",
+          "description" : "priceOfferTemplateDto",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/PriceOfferTemplateDTO"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
+            }
+          },
+          "201" : {
+            "description" : "Created"
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2294,7 +2296,7 @@
         "tags" : [ "price-offer-template-controller" ],
         "summary" : "getTemplateById",
         "operationId" : "getTemplateByIdUsingGET",
-        "produces" : [ "*/*" ],
+        "produces" : [ "application/json" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2307,7 +2309,7 @@
           "200" : {
             "description" : "OK",
             "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
           },
           "401" : {
@@ -5015,85 +5017,42 @@
       },
       "title" : "PriceOfferListDTO"
     },
-    "PriceOfferTemplate" : {
+    "PriceOfferTemplateDTO" : {
       "type" : "object",
       "properties" : {
-        "approvalDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "approver" : {
-          "$ref" : "#/definitions/User"
-        },
-        "city" : {
+        "author" : {
           "type" : "string"
-        },
-        "contactPersonList" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "#/definitions/ContactPerson"
-          }
-        },
-        "createdBy" : {
-          "type" : "string"
-        },
-        "createdDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "customerName" : {
-          "type" : "string"
-        },
-        "customerNumber" : {
-          "type" : "string"
-        },
-        "customerTerms" : {
-          "$ref" : "#/definitions/PriceOfferTerms"
-        },
-        "customerType" : {
-          "type" : "string"
-        },
-        "dateIssued" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "deleted" : {
-          "type" : "boolean"
         },
         "id" : {
           "type" : "integer",
           "format" : "int64"
         },
-        "isSharable" : {
+        "isShareable" : {
           "type" : "boolean"
         },
-        "lastModifiedBy" : {
-          "type" : "string"
-        },
-        "lastModifiedDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "organizationNumber" : {
-          "type" : "string"
-        },
-        "postalNumber" : {
-          "type" : "string"
-        },
-        "salesEmployee" : {
-          "$ref" : "#/definitions/User"
-        },
-        "salesOfficeList" : {
+        "materials" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/SalesOffice"
+            "$ref" : "#/definitions/TemplateMaterialDTO"
           }
         },
-        "streetAddress" : {
+        "name" : {
           "type" : "string"
+        },
+        "sharedWith" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "zoneBasedMaterials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterialDTO"
+          }
         }
       },
-      "title" : "PriceOfferTemplate"
+      "title" : "PriceOfferTemplateDTO"
     },
     "PriceOfferTerms" : {
       "type" : "object",
@@ -5621,6 +5580,22 @@
         }
       },
       "title" : "SimpleSalesEmployeeDTO"
+    },
+    "TemplateMaterialDTO" : {
+      "type" : "object",
+      "properties" : {
+        "deviceType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "material" : {
+          "type" : "string"
+        }
+      },
+      "title" : "TemplateMaterialDTO"
     },
     "Terms" : {
       "type" : "object",
