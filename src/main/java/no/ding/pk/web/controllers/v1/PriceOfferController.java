@@ -10,9 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,8 +45,18 @@ public class PriceOfferController {
      * @return List of {@code PriceOffer}
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('SCOPE_Sales')")
-    public List<PriceOffer> list() {
+//    @PreAuthorize("hasAuthority('SCOPE_Sales')")
+    @RolesAllowed({"Admin", ""})
+    public List<PriceOffer> list(@RequestHeader(name = "Authorization") String token, Principal principal) {
+        log.debug("The token received: {}", token);
+        log.debug("Principal: {}", principal);
+        log.debug("Name: {}", principal.getName());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        log.debug("Current principal name: {}", currentPrincipalName);
+        log.debug("Authentication: {}", authentication);
+
         List<PriceOffer> priceOfferList = service.findAll();
         
         if(!priceOfferList.isEmpty()) {

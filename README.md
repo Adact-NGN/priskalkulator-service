@@ -130,7 +130,7 @@ For more information about the usage of Sap APIs: [Integrasjon SAP til Hubspot](
 
 # Build, Test and Debug
 ## Building
-Building the service application:
+Building the service application for specific environment:
 ```
 mvn clean install -P <profile-name>
 ```
@@ -145,7 +145,7 @@ Available profiles:
 ## Testing
 Run tests with:
 ```
-mvn clean test -P <profile-name>
+mvn clean test
 ```
 
 ## Running the application:
@@ -153,6 +153,28 @@ mvn clean test -P <profile-name>
 mvn spring-boot:run
 ```
 No need for profile here, since profiles is only for setting values during build.
+If you want to simulate an environment you can specify a profile.
+
+Given environment variables must be set:
+
+- PK_DATASOURCE_USERNAME=<db_username>
+- PK_DATASOURCE_PASSWORD=<db_password>
+- PK_DATASOURCE_URL=<db_url>
+- PK_SAP_USERNAME=<sap_username>
+- PK_SAP_PASSWORD=<sap_password>
+- PK_SAP_API_CUSTOMER_URL=<sap_customer_url>
+- PK_SAP_API_CONTACT_PERSON_URL=<sap_contacts_url>
+- PK_SAP_API_STANDARD_PRICE_URL=<sap_zzpriceset_url>
+- PK_SAP_API_SALESORG_URL=<sap_salesorgpostal_url>
+- PK_SAP_API_MATERIAL_URL=<sap_materials_url>
+- PK_PDF_TEMPLATE_FILE_NAME=<pdf_template_filename>
+- PK_AD_APP_ID_URI=<ad_application_id_uri>
+- PK_MSAL_AD_AUTHORITY=https://login.microsoftonline.com/<ad_tenant_id>/
+- PK_MSAL_CLIENT_ID=<ad_client_id>
+- PK_MSAL_SECRET=<ad_reg_application_secret>
+- PK_MSAL_SCOPE=https://graph.microsoft.com/.default
+- PK_MSAL_AD_USER_INFO_SELECT_LIST=id,employeeId,userPrincipalName,displayName,givenName,surename,department,jobTitle,mail,mailNickname,mobilePhone,city
+
 
 ## Debug
 
@@ -170,6 +192,10 @@ You get the pod names with:
 ```
 kubectl get pod
 ```
+
+### Watch logs in Kibana (Elastic search)
+
+Kibana[https://09e62e096d464c27aacabaa3e166bf3f.elastic.intility.no:9243/app/discover]
 
 ## Troubleshooting AKS
 
