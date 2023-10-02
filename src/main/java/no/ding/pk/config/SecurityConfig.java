@@ -18,6 +18,7 @@ public class SecurityConfig extends AadResourceServerWebSecurityConfigurerAdapte
         super.configure(http);
         http.authorizeHttpRequests()
                 .anyRequest().permitAll()
-                .and().csrf().disable();
+                .and()
+                .csrf().disable();
     }
 }

@@ -1,6 +1,6 @@
 package no.ding.pk.service.offer;
 
-import no.ding.pk.domain.offer.PriceOfferTemplate;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
 import no.ding.pk.web.handlers.PriceOfferTemplateNotFound;
 import org.springframework.beans.factory.annotation.Autowired;

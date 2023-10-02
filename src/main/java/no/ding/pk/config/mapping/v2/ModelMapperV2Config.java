@@ -3,6 +3,7 @@ package no.ding.pk.config.mapping.v2;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
@@ -10,6 +11,7 @@ import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
+import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -22,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Configuration
 public class ModelMapperV2Config {
@@ -90,7 +93,18 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(MaterialStdPriceDTO.class, MaterialPrice.class)
                 .addMapping(MaterialStdPriceDTO::getMaterial, MaterialPrice::setMaterialNumber);
 
+        priceOfferTemplateToDto(modelMapper);
+
         return modelMapper;
+    }
+
+    private static void priceOfferTemplateToDto(ModelMapper modelMapper) {
+        Converter<User, String> userToEmailConverter = context -> context.getSource().getEmail();
+
+        Converter<List<User>, List<String>> userListToEmailList = context -> context.getSource().stream().map(User::getEmail).collect(Collectors.toList());
+        modelMapper.createTypeMap(PriceOfferTemplate.class, PriceOfferTemplateDTO.class)
+                .addMappings(mapping -> mapping.using(userToEmailConverter).map(PriceOfferTemplate::getAuthor, PriceOfferTemplateDTO::setAuthor))
+                .addMappings(mapping -> mapping.using(userListToEmailList).map(PriceOfferTemplate::getSharedWith, PriceOfferTemplateDTO::setSharedWith));
     }
 
     private static void priceOfferToPriceOfferListDto(ModelMapper modelMapper) {
