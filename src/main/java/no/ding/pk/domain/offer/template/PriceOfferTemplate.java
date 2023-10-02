@@ -40,12 +40,12 @@ public class PriceOfferTemplate implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<User> sharedWith;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "pot_materials_id", foreignKey = @ForeignKey(name = "Fk_price_offer_template_materials"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<TemplateMaterial> materials;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "pot_zoneBasedMaterials_id", foreignKey = @ForeignKey(name = "Fk_price_offer_template_zoneBasedMaterials"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<TemplateMaterial> zoneBasedMaterials;

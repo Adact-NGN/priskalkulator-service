@@ -94,7 +94,6 @@ public class PriceOfferTemplateController {
             newTemplate.zoneBasedMaterials(zoneBasedMaterials);
         }
 
-
         return modelMapper.map(service.save(newTemplate.build()), PriceOfferTemplateDTO.class);
     }
 
