@@ -165,11 +165,6 @@ public class PriceOfferRepositoryTest {
 
         sharedWithUser = userRepository.save(sharedWithUser);
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber("50101")
-                .standardPrice(1131.0)
-                .build();
-
         TemplateMaterial material = TemplateMaterial.builder()
                 .material("50101")
                 .build();
@@ -180,6 +175,7 @@ public class PriceOfferRepositoryTest {
 
 
         return PriceOfferTemplate.builder()
+                .name("Test template")
                 .author(salesEmployee)
                 .materials(List.of(material, waste))
                 .isShareable(true)

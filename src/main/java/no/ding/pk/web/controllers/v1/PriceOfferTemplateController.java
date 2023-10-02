@@ -5,7 +5,9 @@ import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.PriceOfferTemplateService;
 import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
+import no.ding.pk.web.handlers.MissingRequiredPropertyException;
 import no.ding.pk.web.handlers.PriceOfferTemplateNotFound;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -65,19 +68,34 @@ public class PriceOfferTemplateController {
 
         log.debug("Create new Price offer template: {}", newTemplateDto);
 
-        List<TemplateMaterial> materials = List.of(modelMapper.map(newTemplateDto.getMaterials(), TemplateMaterial[].class));
-        List<TemplateMaterial> zoneBasedMaterials = List.of(modelMapper.map(newTemplateDto.getZoneBasedMaterials(), TemplateMaterial[].class));
+        if(StringUtils.isBlank(newTemplateDto.getName())) {
+            throw new MissingRequiredPropertyException("PriceOfferTemplate.name property is missing.");
+        }
 
-        PriceOfferTemplate newTemplate = PriceOfferTemplate.builder()
+        PriceOfferTemplate.PriceOfferTemplateBuilder newTemplate = PriceOfferTemplate.builder()
                 .name(newTemplateDto.getName())
-                .isShareable(newTemplateDto.getIsShareable())
-                .author(userService.findByEmail(newTemplateDto.getAuthor()))
-                .sharedWith(userService.findByEmailInList(newTemplateDto.getSharedWith()))
-                .materials(materials)
-                .zoneBasedMaterials(zoneBasedMaterials)
-                .build();
+                .isShareable(newTemplateDto.getIsShareable());
 
-        return modelMapper.map(service.save(newTemplate), PriceOfferTemplateDTO.class);
+        if(StringUtils.isNotBlank(newTemplateDto.getAuthor())) {
+            newTemplate.author(userService.findByEmail(newTemplateDto.getAuthor()));
+        }
+
+        if(newTemplateDto.getSharedWith() != null && !newTemplateDto.getSharedWith().isEmpty()){
+            newTemplate.sharedWith(userService.findByEmailInList(newTemplateDto.getSharedWith()));
+        }
+
+        if(newTemplateDto.getMaterials() != null) {
+            List<TemplateMaterial> materials = List.of(modelMapper.map(newTemplateDto.getMaterials(), TemplateMaterial[].class));
+            newTemplate.materials(materials);
+        }
+
+        if(newTemplateDto.getZoneBasedMaterials() != null) {
+            List<TemplateMaterial> zoneBasedMaterials = List.of(modelMapper.map(newTemplateDto.getZoneBasedMaterials(), TemplateMaterial[].class));
+            newTemplate.zoneBasedMaterials(zoneBasedMaterials);
+        }
+
+
+        return modelMapper.map(service.save(newTemplate.build()), PriceOfferTemplateDTO.class);
     }
 
     /**
@@ -87,23 +105,44 @@ public class PriceOfferTemplateController {
      */
     @PutMapping(path="save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO save(@RequestBody PriceOfferTemplateDTO priceOfferTemplateDto) {
-        PriceOfferTemplate entity = service.findById(priceOfferTemplateDto.getId());
 
-        List<TemplateMaterial> materials = List.of(modelMapper.map(priceOfferTemplateDto.getMaterials(), TemplateMaterial[].class));
-        List<TemplateMaterial> zoneBasedMaterials = List.of(modelMapper.map(priceOfferTemplateDto.getZoneBasedMaterials(), TemplateMaterial[].class));
+        if(StringUtils.isBlank(priceOfferTemplateDto.getName())) {
+            throw new MissingRequiredPropertyException("PriceOfferTemplate.name property is missing.");
+        }
+
+        PriceOfferTemplate entity = service.findById(priceOfferTemplateDto.getId());
 
         entity.setName(priceOfferTemplateDto.getName());
         entity.setIsShareable(priceOfferTemplateDto.getIsShareable());
-        entity.setAuthor(userService.findByEmail(priceOfferTemplateDto.getAuthor()));
-        entity.setSharedWith(userService.findByEmailInList(priceOfferTemplateDto.getSharedWith()));
-        entity.setMaterials(materials);
-        entity.setZoneBasedMaterials(zoneBasedMaterials);
+
+        if(StringUtils.isNotBlank(priceOfferTemplateDto.getAuthor())) {
+            entity.setAuthor(userService.findByEmail(priceOfferTemplateDto.getAuthor()));
+        }
+
+        if(priceOfferTemplateDto.getSharedWith() != null && !priceOfferTemplateDto.getSharedWith().isEmpty()) {
+            entity.setSharedWith(userService.findByEmailInList(priceOfferTemplateDto.getSharedWith()));
+        }
+
+        if(priceOfferTemplateDto.getMaterials() != null && !priceOfferTemplateDto.getMaterials().isEmpty()) {
+            List<TemplateMaterial> materials = List.of(modelMapper.map(priceOfferTemplateDto.getMaterials(), TemplateMaterial[].class));
+            entity.setMaterials(materials);
+        }
+
+        if(priceOfferTemplateDto.getZoneBasedMaterials() != null && !priceOfferTemplateDto.getZoneBasedMaterials().isEmpty()) {
+            List<TemplateMaterial> zoneBasedMaterials = List.of(modelMapper.map(priceOfferTemplateDto.getZoneBasedMaterials(), TemplateMaterial[].class));
+            entity.setZoneBasedMaterials(zoneBasedMaterials);
+        }
 
         return modelMapper.map(service.save(entity), PriceOfferTemplateDTO.class);
     }
 
     @ExceptionHandler({PriceOfferTemplateNotFound.class})
-    public ResponseEntity<Object> handleNotFoundException() {
+    public ResponseEntity<Object> handleNotFoundException(RuntimeException ex) {
         return new ResponseEntity<>("Price Offer Template was not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({MissingRequiredPropertyException.class})
+    public ResponseEntity<Object> handleMissingPropertyException(RuntimeException ex, WebRequest request) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
