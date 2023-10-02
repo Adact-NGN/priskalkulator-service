@@ -25,7 +25,7 @@ public class PriceOfferTemplate implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
