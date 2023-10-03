@@ -12,4 +12,8 @@ public interface PriceOfferTemplateService {
     List<PriceOfferTemplate> findAll();
 
     PriceOfferTemplate findById(Long id);
+
+    List<PriceOfferTemplate> findAllByAuthor(String userEmail);
+
+    List<PriceOfferTemplate> findAllSharedWithUser(String userEmail);
 }

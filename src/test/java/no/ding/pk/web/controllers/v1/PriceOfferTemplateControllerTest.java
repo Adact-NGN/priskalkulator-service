@@ -1,7 +1,6 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.google.gson.Gson;
-import no.ding.pk.config.ObjectMapperTestConfig;
 import no.ding.pk.config.SecurityTestConfig;
 import no.ding.pk.config.mapping.v1.ModelMapperConfig;
 import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
@@ -19,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Disabled
-@Import({SecurityTestConfig.class, ModelMapperConfig.class, ObjectMapperTestConfig.class})
+@Import({SecurityTestConfig.class, ModelMapperConfig.class})
 @WebMvcTest(controllers = PriceOfferTemplateController.class)
 public class PriceOfferTemplateControllerTest {
 

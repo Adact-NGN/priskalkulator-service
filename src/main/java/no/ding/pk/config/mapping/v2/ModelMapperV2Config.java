@@ -101,7 +101,13 @@ public class ModelMapperV2Config {
     private static void priceOfferTemplateToDto(ModelMapper modelMapper) {
         Converter<User, String> userToEmailConverter = context -> context.getSource().getEmail();
 
-        Converter<List<User>, List<String>> userListToEmailList = context -> context.getSource().stream().map(User::getEmail).collect(Collectors.toList());
+        Converter<List<User>, List<String>> userListToEmailList = context -> {
+            if(context.getSource() != null) {
+                return context.getSource().stream().map(User::getEmail).collect(Collectors.toList());
+            }
+
+            return null;
+        };
         modelMapper.createTypeMap(PriceOfferTemplate.class, PriceOfferTemplateDTO.class)
                 .addMappings(mapping -> mapping.using(userToEmailConverter).map(PriceOfferTemplate::getAuthor, PriceOfferTemplateDTO::setAuthor))
                 .addMappings(mapping -> mapping.using(userListToEmailList).map(PriceOfferTemplate::getSharedWith, PriceOfferTemplateDTO::setSharedWith));
