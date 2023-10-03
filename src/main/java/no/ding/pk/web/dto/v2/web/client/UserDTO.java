@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client;
+package no.ding.pk.web.dto.v2.web.client;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;

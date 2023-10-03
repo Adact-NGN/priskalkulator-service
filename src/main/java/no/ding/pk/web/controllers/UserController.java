@@ -3,7 +3,7 @@ package no.ding.pk.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 import no.ding.pk.web.handlers.UserNotFoundException;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;

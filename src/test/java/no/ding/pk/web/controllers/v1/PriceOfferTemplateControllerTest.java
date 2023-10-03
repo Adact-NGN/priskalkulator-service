@@ -3,7 +3,7 @@ package no.ding.pk.web.controllers.v1;
 import com.google.gson.Gson;
 import no.ding.pk.config.SecurityTestConfig;
 import no.ding.pk.config.mapping.v1.ModelMapperConfig;
-import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.template.PriceOfferTemplateDTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

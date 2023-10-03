@@ -6,7 +6,7 @@ import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
-import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.template.PriceOfferTemplateDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;

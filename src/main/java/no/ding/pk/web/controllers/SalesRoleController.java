@@ -2,7 +2,7 @@ package no.ding.pk.web.controllers;
 
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.web.dto.web.client.SalesRoleDTO;
+import no.ding.pk.web.dto.v2.web.client.SalesRoleDTO;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

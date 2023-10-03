@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client.offer;
+package no.ding.pk.web.dto.v2.web.client.offer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

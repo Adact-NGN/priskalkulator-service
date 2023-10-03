@@ -8,7 +8,7 @@ import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.service.UserService;
 import no.ding.pk.service.offer.PriceOfferTemplateService;
-import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.template.PriceOfferTemplateDTO;
 import no.ding.pk.web.handlers.MissingRequiredPropertyException;
 import no.ding.pk.web.handlers.PriceOfferTemplateNotFound;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +66,7 @@ public class PriceOfferTemplateController {
      * @return A list of PriceOfferTemplates
      */
     @Operation(summary = "List all PriceOfferTemplates shared with user by email",
+            description = "List all PriceOfferTemplates shared with user by email",
             parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")})
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns a list of PriceOfferTemplates")

@@ -6,11 +6,14 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
-import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
-import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
+import no.ding.pk.utils.JsonNullableUtils;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferListDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceRowDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.patch.ContactPersonUpdateDto;
+import no.ding.pk.web.dto.v2.web.client.offer.patch.PriceOfferUpdateDto;
+import no.ding.pk.web.dto.v2.web.client.requests.ActivatePriceOfferRequest;
+import no.ding.pk.web.dto.v2.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
@@ -27,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -380,5 +384,81 @@ public class PriceOfferController {
 
         log.debug("Amount of offers for BO-report: {}", priceOffersForBoReport.size());
         return priceOffersForBoReport.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).toList();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updatePriceOffer(@PathVariable("id") Long id,
+                                                 @Valid @RequestBody PriceOfferUpdateDto priceOfferUpdateDto) {
+        Optional<PriceOffer> priceOfferOptional = service.findById(id);
+
+        if(priceOfferOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        PriceOffer priceOffer = priceOfferOptional.get();
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getCustomerNumber(), priceOffer::setCustomerNumber);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getCustomerName(), priceOffer::setCustomerName);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getCustomerType(), priceOffer::setCustomerType);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getStreetAddress(), priceOffer::setStreetAddress);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPostalNumber(), priceOffer::setPostalNumber);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getCity(), priceOffer::setCity);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getOrganizationNumber(), priceOffer::setOrganizationNumber);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getNeedsApproval(), priceOffer::setNeedsApproval);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getAdditionalInformation(), priceOffer::setAdditionalInformation);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getGeneralComment(), priceOffer::setGeneralComment);
+
+        if(priceOfferUpdateDto.getContactPersonList().isPresent()) {
+            for (ContactPersonUpdateDto contactPersonUpdateDto : priceOfferUpdateDto.getContactPersonList().get()) {
+                if(contactPersonUpdateDto.getId().isPresent()) {
+                    Optional<ContactPerson> contactPersonOptional = priceOffer.getContactPersonList().stream().filter(contactPerson -> contactPerson.getId().equals(contactPersonUpdateDto.getId().get())).findAny();
+
+                    if(contactPersonOptional.isEmpty()) {
+                        ContactPerson contactPerson = new ContactPerson();
+
+                        updateContactPerson(contactPersonUpdateDto, contactPerson);
+
+                        priceOffer.getContactPersonList().add(contactPerson);
+                    } else {
+                        ContactPerson contactPerson = contactPersonOptional.get();
+
+                        updateContactPerson(contactPersonUpdateDto, contactPerson);
+                    }
+                }
+            }
+        }
+
+        if(priceOfferUpdateDto.getSalesOfficeList().isPresent()) {
+            for()
+        }
+
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+        JsonNullableUtils.changeIfPresent(priceOfferUpdateDto.getPriceOfferStatus(), priceOffer::setPriceOfferStatus);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private static void updateContactPerson(ContactPersonUpdateDto contactPersonUpdateDto, ContactPerson contactPerson) {
+        JsonNullableUtils.changeIfPresent(contactPersonUpdateDto.getId(), contactPerson::setId);
+        JsonNullableUtils.changeIfPresent(contactPersonUpdateDto.getFirstName(), contactPerson::setFirstName);
+        JsonNullableUtils.changeIfPresent(contactPersonUpdateDto.getLastName(), contactPerson::setLastName);
+        JsonNullableUtils.changeIfPresent(contactPersonUpdateDto.getMobileNumber(), contactPerson::setMobileNumber);
+        JsonNullableUtils.changeIfPresent(contactPersonUpdateDto.getEmailAddress(), contactPerson::setEmailAddress);
     }
 }

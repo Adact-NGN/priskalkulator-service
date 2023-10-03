@@ -1,4 +1,4 @@
-package no.ding.pk.web.dto.web.client.offer;
+package no.ding.pk.web.dto.v2.web.client.offer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 
 import java.util.Date;
 import java.util.List;

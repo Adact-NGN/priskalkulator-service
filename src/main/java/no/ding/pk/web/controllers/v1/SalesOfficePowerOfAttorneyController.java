@@ -2,7 +2,7 @@ package no.ding.pk.web.controllers.v1;
 
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
-import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
+import no.ding.pk.web.dto.v2.web.client.SalesOfficePowerOfAttorneyDTO;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

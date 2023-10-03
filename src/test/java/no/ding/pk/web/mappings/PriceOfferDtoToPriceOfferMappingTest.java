@@ -3,7 +3,7 @@ package no.ding.pk.web.mappings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

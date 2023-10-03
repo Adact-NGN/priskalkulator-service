@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
-import no.ding.pk.web.dto.web.client.SalesRoleDTO;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.SalesRoleDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

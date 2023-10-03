@@ -9,7 +9,7 @@ import no.ding.pk.repository.UserRepository;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.utils.JsonTestUtils;
-import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
+import no.ding.pk.web.dto.v2.web.client.SalesOfficePowerOfAttorneyDTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -19,14 +19,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;

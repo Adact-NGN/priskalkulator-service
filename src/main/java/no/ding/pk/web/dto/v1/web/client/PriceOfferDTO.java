@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import no.ding.pk.domain.offer.Terms;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 
 import java.util.Date;
 import java.util.List;

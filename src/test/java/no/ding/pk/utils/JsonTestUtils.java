@@ -3,7 +3,7 @@ package no.ding.pk.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.platform.commons.util.StringUtils;
 import org.springframework.test.web.servlet.MvcResult;

@@ -9,7 +9,7 @@ import no.ding.pk.domain.User;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.service.SalesRoleService;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Disabled;

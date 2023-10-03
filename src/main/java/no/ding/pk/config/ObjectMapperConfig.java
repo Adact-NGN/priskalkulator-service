@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +24,7 @@ public class ObjectMapperConfig {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         objectMapper.registerModule(new SimpleModule().addDeserializer(String.class, new WhitespaceDeserializer()));
+        objectMapper.registerModule(new JsonNullableModule());
 
         return objectMapper;
     }

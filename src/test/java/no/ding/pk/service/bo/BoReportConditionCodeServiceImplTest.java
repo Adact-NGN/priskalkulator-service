@@ -20,7 +20,7 @@ import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.mappers.MapperService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

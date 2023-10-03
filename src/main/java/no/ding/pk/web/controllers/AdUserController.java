@@ -2,7 +2,7 @@ package no.ding.pk.web.controllers;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserAzureAdService;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

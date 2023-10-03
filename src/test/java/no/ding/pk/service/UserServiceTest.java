@@ -14,7 +14,7 @@ import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.service.offer.MaterialPriceServiceImpl;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.service.offer.MaterialServiceImpl;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.v2.web.client.UserDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;

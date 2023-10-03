@@ -4,15 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.offer.PriceOffer;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferDTO;
+import no.ding.pk.web.dto.v2.web.client.offer.PriceOfferListDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.io.File;
