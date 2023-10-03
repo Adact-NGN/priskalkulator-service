@@ -1,5 +1,9 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.service.UserService;
@@ -12,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +37,9 @@ public class PriceOfferTemplateController {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PriceOfferTemplateController(PriceOfferTemplateService service, UserService userService, ModelMapper modelMapper) {
+    public PriceOfferTemplateController(PriceOfferTemplateService service,
+                                        UserService userService,
+                                        @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         this.service = service;
         this.userService = userService;
         this.modelMapper = modelMapper;
@@ -42,10 +49,32 @@ public class PriceOfferTemplateController {
      * List all Price offer templates.
      * @return A list of PriceOfferTemplates
      */
-    @GetMapping(path = "list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferTemplateDTO> getAllTemplates() {
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PriceOfferTemplateDTO> getAllTemplates(@RequestParam(value = "user", required = false) String userEmail) {
+
+        if(StringUtils.isNotBlank(userEmail)) {
+            List<PriceOfferTemplate> all = service.findAllByAuthor(userEmail);
+            return Arrays.stream(modelMapper.map(all, PriceOfferTemplateDTO[].class)).toList();
+        }
         List<PriceOfferTemplate> all = service.findAll();
         return Arrays.stream(modelMapper.map(all, PriceOfferTemplateDTO[].class)).toList();
+    }
+
+    /**
+     * List all PriceOfferTemplates shared with user by email
+     * @param sharedWithEmail User email
+     * @return A list of PriceOfferTemplates
+     */
+    @Operation(summary = "List all PriceOfferTemplates shared with user by email",
+            parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns a list of PriceOfferTemplates")
+    })
+    @GetMapping(path = "/list/shared/{sharedWithEmail}")
+    public List<PriceOfferTemplateDTO> getAllTemplatesSharedWith(@PathVariable("sharedWithEmail") String sharedWithEmail) {
+        List<PriceOfferTemplate> sharedWithUser = service.findAllSharedWithUser(sharedWithEmail);
+
+        return Arrays.stream(modelMapper.map(sharedWithUser, PriceOfferTemplateDTO[].class)).toList();
     }
 
     /**
@@ -53,6 +82,7 @@ public class PriceOfferTemplateController {
      * @param id the id for the template
      * @return PriceOfferTemplate
      */
+    @Operation(summary = "Get a specific PriceOfferTemplate")
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO getTemplateById(@PathVariable("id") Long id) {
         return modelMapper.map(service.findById(id), PriceOfferTemplateDTO.class);

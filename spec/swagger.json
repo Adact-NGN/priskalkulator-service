@@ -2231,9 +2231,51 @@
         "summary" : "getAllTemplates",
         "operationId" : "getAllTemplatesUsingGET",
         "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "user",
+          "in" : "query",
+          "description" : "user",
+          "required" : false,
+          "type" : "string"
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/PriceOfferTemplateDTO"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/list/shared/{sharedWithEmail}" : {
+      "get" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "List all PriceOfferTemplates shared with user by email",
+        "operationId" : "getAllTemplatesSharedWithUsingGET",
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "sharedWithEmail",
+          "in" : "path",
+          "description" : "sharedWithEmail",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns a list of PriceOfferTemplates",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -2294,7 +2336,7 @@
     "/api/v1/price-offer-template/{id}" : {
       "get" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "getTemplateById",
+        "summary" : "Get a specific PriceOfferTemplate",
         "operationId" : "getTemplateByIdUsingGET",
         "produces" : [ "application/json" ],
         "parameters" : [ {
