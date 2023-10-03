@@ -127,6 +127,17 @@ The application is mainly communicating with SAP. It gets all the information it
 
 For more information about the usage of Sap APIs: [Integrasjon SAP til Hubspot](https://ping24.atlassian.net/wiki/spaces/DOI/pages/2276229128/Integrasjon+SAP+til+Hubspot)
 
+# Azure AD Roles
+
+The application makes use of authorization by roles assigned to the user.
+
+Roles can be defined in Azure Entra ID (prev. Azure AD) in the application you have registered under "App registrations".
+
+To assign the roles to users you have to do this in "Azure Entra admin center[https://entra.microsoft.com/]":
+- Go to Applications->Enterprise applications
+- Search for you application and click it.
+- Go to "Users and groups"
+- Add the users you want with the roles you want the user to have.
 
 # Build, Test and Debug
 ## Building
