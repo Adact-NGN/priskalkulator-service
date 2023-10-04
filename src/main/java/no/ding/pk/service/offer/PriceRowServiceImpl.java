@@ -207,6 +207,14 @@ public class PriceRowServiceImpl implements PriceRowService {
         if(entity.getManualPrice() != null) {
             entity.setDiscountedPrice(entity.getManualPrice());
 
+            if(entity.getStandardPrice() != null) {
+                double discountLevelPrice = entity.getStandardPrice() - entity.getManualPrice();
+                entity.setDiscountLevelPrice(discountLevelPrice);
+                entity.setDiscountLevelPct(discountLevelPrice * 100 / entity.getStandardPrice());
+            } else {
+                log.error("Standard price for material {} was not found.", entity.getMaterial().getMaterialNumber());
+            }
+
             Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice, discountMap);
             if(discountLevel != null) {
                 entity.setDiscountLevel(discountLevel);
