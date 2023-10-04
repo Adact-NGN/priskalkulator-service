@@ -147,7 +147,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             List<MaterialPrice> materialPrices = List.of(modelMapper.map(materialStdPriceDTO, MaterialPrice[].class));
 
-            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getMaterialNumber, Function.identity()));
+            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
         }
         
         return new HashMap<>();

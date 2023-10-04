@@ -22,7 +22,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-@Profile("dev")
+@Profile({"dev", "test"})
 @Component
 public class StartUpDev {
 

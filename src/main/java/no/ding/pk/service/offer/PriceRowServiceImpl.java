@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Transactional
@@ -92,7 +93,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
                     .filter(smpe -> {
                         if(zone != null) {
-                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && smpe.getValue().getZone().equals(zone);
+                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && Objects.equals(smpe.getValue().getZone(), zone);
                         }
                         return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType());
                     })

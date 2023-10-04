@@ -29,16 +29,16 @@ public class PriceOffer extends Offer implements Serializable {
     private String materialsForApproval;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "po_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_salesOfficeList"))
+    @JoinColumn(name = "po_salesOfficeList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_salesOfficeList"), nullable = true)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<SalesOffice> salesOfficeList;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "po_salesEmployee_id", foreignKey = @ForeignKey(name = "Fk_price_offer_sales_employee"))
+    @JoinColumn(name = "po_salesEmployee_id", foreignKey = @ForeignKey(name = "Fk_price_offer_sales_employee"), nullable = true)
     private User salesEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "po_approverUser_id", foreignKey = @ForeignKey(name = "Fk_price_offer_approver"))
+    @JoinColumn(name = "po_approverUser_id", foreignKey = @ForeignKey(name = "Fk_price_offer_approver"), nullable = true)
     private User approver;
 
     @Column
@@ -57,7 +57,7 @@ public class PriceOffer extends Offer implements Serializable {
     private Date activationDate;
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"))
+    @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"), nullable = true)
     private PriceOfferTerms customerTerms;
 
     @Builder(builderMethodName = "priceOfferBuilder")
