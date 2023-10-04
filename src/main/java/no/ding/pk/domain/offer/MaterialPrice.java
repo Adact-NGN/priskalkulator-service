@@ -42,6 +42,9 @@ public class MaterialPrice extends Auditable {
     @Column
     private String quantumUnit;
 
+    @Column
+    private String zone;
+
     public void copy(MaterialPrice materialStandardPrice) {
         this.standardPrice = materialStandardPrice.getStandardPrice();
     }

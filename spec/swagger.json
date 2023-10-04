@@ -4731,6 +4731,9 @@
         "validTo" : {
           "type" : "string",
           "format" : "date-time"
+        },
+        "zone" : {
+          "type" : "string"
         }
       },
       "title" : "MaterialPrice"
