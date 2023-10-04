@@ -332,7 +332,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                     Optional<DiscountLevel> optionalDl = discount.getDiscountLevels().stream().filter(dlevel -> dlevel.getLevel() == entity.getDiscountLevel()).findFirst();
 
                     if(optionalDl.isEmpty()) {
-                        log.debug("Discount was found, but no discount level with value {} was found.", entity.getDiscountLevel());
+                        log.debug("Discount level was set, but no discount level with value {} was found.", entity.getDiscountLevel());
 
                         return;
                     }
