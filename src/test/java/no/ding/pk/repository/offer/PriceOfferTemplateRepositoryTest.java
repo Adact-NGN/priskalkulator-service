@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -132,20 +131,10 @@ class PriceOfferTemplateRepositoryTest {
 
         repository.save(yetAnotherTemplate);
 
-        List<PriceOfferTemplate> actual = repository.findAll();
 
-        List<PriceOfferTemplate> filteredList = new ArrayList<>();
-        for(PriceOfferTemplate pot : actual) {
-            if(pot.getIsShareable() != null) {
-                for (User user : pot.getSharedWith()) {
-                    if (user.getEmail().equals(sharedUser.getEmail())) {
-                        filteredList.add(pot);
-                    }
-                }
-            }
-        }
+        List<PriceOfferTemplate> allBySharedWith = repository.findAllBySharedWith(sharedUser);
 
-        assertThat(filteredList, hasSize(2));
+        assertThat(allBySharedWith, hasSize(2));
     }
 
 }

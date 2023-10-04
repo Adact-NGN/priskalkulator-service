@@ -2,24 +2,12 @@ package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -112,6 +100,9 @@ public class User extends Auditable implements Serializable {
     
     @Column
     private String department;
+
+    @ManyToMany(mappedBy = "sharedWith")
+    private List<PriceOfferTemplate> priceOfferTemplates;
     
     @Override
     public String toString() {

@@ -5059,6 +5059,43 @@
       },
       "title" : "PriceOfferListDTO"
     },
+    "PriceOfferTemplate" : {
+      "type" : "object",
+      "properties" : {
+        "author" : {
+          "$ref" : "#/definitions/User"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "isShareable" : {
+          "type" : "boolean"
+        },
+        "materials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterial"
+          }
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "sharedWith" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/User"
+          }
+        },
+        "zoneBasedMaterials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterial"
+          }
+        }
+      },
+      "title" : "PriceOfferTemplate"
+    },
     "PriceOfferTemplateDTO" : {
       "type" : "object",
       "properties" : {
@@ -5623,6 +5660,22 @@
       },
       "title" : "SimpleSalesEmployeeDTO"
     },
+    "TemplateMaterial" : {
+      "type" : "object",
+      "properties" : {
+        "deviceType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "material" : {
+          "type" : "string"
+        }
+      },
+      "title" : "TemplateMaterial"
+    },
     "TemplateMaterialDTO" : {
       "type" : "object",
       "properties" : {
@@ -5892,6 +5945,12 @@
         "powerOfAttorneyOA" : {
           "type" : "integer",
           "format" : "int32"
+        },
+        "priceOfferTemplates" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/PriceOfferTemplate"
+          }
         },
         "regionName" : {
           "type" : "string"

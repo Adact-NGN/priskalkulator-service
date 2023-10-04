@@ -3,7 +3,10 @@ package no.ding.pk.service.offer;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
+import no.ding.pk.service.UserService;
 import no.ding.pk.web.handlers.PriceOfferTemplateNotFound;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +19,15 @@ import java.util.Optional;
 @Service
 public class PriceOfferTemplateServiceImpl implements PriceOfferTemplateService {
 
+    private static final Logger log = LoggerFactory.getLogger(PriceOfferTemplateServiceImpl.class);
+
     private final PriceOfferTemplateRepository repository;
-    
+    private final UserService userService;
+
     @Autowired
-    public PriceOfferTemplateServiceImpl(PriceOfferTemplateRepository repository) {
+    public PriceOfferTemplateServiceImpl(PriceOfferTemplateRepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
     @Override
@@ -51,18 +58,14 @@ public class PriceOfferTemplateServiceImpl implements PriceOfferTemplateService 
 
     @Override
     public List<PriceOfferTemplate> findAllSharedWithUser(String userEmail) {
-        List<PriceOfferTemplate> actual = repository.findAll();
 
-        List<PriceOfferTemplate> filteredList = new ArrayList<>();
-        for(PriceOfferTemplate pot : actual) {
-            if(pot.getIsShareable() != null) {
-                for (User user : pot.getSharedWith()) {
-                    if (user.getEmail().equals(userEmail)) {
-                        filteredList.add(pot);
-                    }
-                }
-            }
+        User user = userService.findByEmail(userEmail);
+
+        if(user == null) {
+            log.debug("Could not find user with mail {} when looking for shared price offer templates.", userEmail);
+            return new ArrayList<>();
         }
-        return filteredList;
+
+        return repository.findAllBySharedWith(user);
     }
 }
