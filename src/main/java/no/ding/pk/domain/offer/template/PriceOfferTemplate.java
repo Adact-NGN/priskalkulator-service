@@ -35,8 +35,12 @@ public class PriceOfferTemplate implements Serializable {
     @JoinColumn(name = "pot_author_id", foreignKey = @ForeignKey(name = "Fk_offer_template_author"))
     private User author;
 
-    @OneToMany()
-    @JoinColumn(name = "pot_sharedWithList_id", foreignKey = @ForeignKey(name = "Fk_price_offer_template_sharedWithList"))
+    @ManyToMany
+    @JoinTable(
+            name = "price_offer_template_users",
+            joinColumns = @JoinColumn(name = "pot_sharedWithList_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_sharedWith_pot_id")
+    )
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<User> sharedWith;
 
