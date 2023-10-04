@@ -1,7 +1,9 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -44,6 +46,21 @@ public class MaterialPrice extends Auditable {
 
     @Column
     private String zone;
+
+    @JsonIgnore
+    public String getUniqueMaterialNumber() {
+        StringBuilder sb = new StringBuilder(materialNumber);
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            sb.append("_").append(deviceType);
+        }
+
+        if(StringUtils.isNotBlank(zone)) {
+            sb.append("_").append(zone);
+        }
+
+        return sb.toString();
+    }
 
     public void copy(MaterialPrice materialStandardPrice) {
         this.standardPrice = materialStandardPrice.getStandardPrice();

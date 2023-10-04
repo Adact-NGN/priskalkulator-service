@@ -4724,6 +4724,9 @@
           "type" : "number",
           "format" : "double"
         },
+        "uniqueMaterialNumber" : {
+          "type" : "string"
+        },
         "validFrom" : {
           "type" : "string",
           "format" : "date-time"
