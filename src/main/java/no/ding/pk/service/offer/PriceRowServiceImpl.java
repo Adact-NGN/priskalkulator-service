@@ -23,7 +23,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Transactional
@@ -89,18 +88,35 @@ public class PriceRowServiceImpl implements PriceRowService {
         if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
+
+        StringBuilder lookUpKey = new StringBuilder(material.getMaterialNumber());
+
         if(StringUtils.isNotBlank(material.getDeviceType())) {
-            Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
-                    .filter(smpe -> {
-                        if(zone != null) {
-                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && Objects.equals(smpe.getValue().getZone(), zone);
-                        }
-                        return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType());
-                    })
-                    .findFirst();
-            return priceEntry.map(Map.Entry::getValue).orElse(null);
+            lookUpKey.append("_").append(material.getDeviceType());
         }
-        return materialStdPriceMap.getOrDefault(material.getMaterialNumber(), null);
+
+        if(StringUtils.isNotBlank(material.getSalesZone())) {
+            lookUpKey.append("_").append(material.getSalesZone());
+        }
+
+        log.debug("Material price lookup key: {}", lookUpKey.toString());
+
+//        if(StringUtils.isNotBlank(material.getDeviceType())) {
+//            Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
+//                    .filter(smpe -> {
+//                        if(zone != null) {
+//                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && Objects.equals(smpe.getValue().getZone(), zone);
+//                        }
+//                        return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType());
+//                    })
+//                    .findFirst();
+//            return priceEntry.map(Map.Entry::getValue).orElse(null);
+//        }
+        MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
+
+        log.debug("Got material price: {}", materialPrice);
+
+        return materialPrice;
     }
 
     private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone,
