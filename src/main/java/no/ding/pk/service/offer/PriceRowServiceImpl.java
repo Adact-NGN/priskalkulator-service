@@ -73,7 +73,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                                   Map<String, Map<String, Map<String, Discount>>> discountMap) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPriceMap);
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), zone, materialStdPriceMap);
             log.debug("Found standard price for material: {}: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice, discountMap);
 
@@ -84,13 +84,18 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private MaterialPrice getMaterialPriceForMaterial(Material material, Map<String, MaterialPrice> materialStdPriceMap) {
+    private MaterialPrice getMaterialPriceForMaterial(Material material, String zone, Map<String, MaterialPrice> materialStdPriceMap) {
         if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
         if(StringUtils.isNotBlank(material.getDeviceType())) {
             Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
-                    .filter(smpe -> smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()))
+                    .filter(smpe -> {
+                        if(zone != null) {
+                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && smpe.getValue().getZone().equals(zone);
+                        }
+                        return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType());
+                    })
                     .findFirst();
             return priceEntry.map(Map.Entry::getValue).orElse(null);
         }
