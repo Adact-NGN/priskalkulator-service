@@ -144,8 +144,6 @@ public class PriceOfferRepositoryTest {
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
 
-
-
         repository.save(priceOffer);
     }
 
@@ -285,8 +283,16 @@ public class PriceOfferRepositoryTest {
         List<SalesOffice> salesOfficeList = new ArrayList<>();
         salesOfficeList.add(salesOffice);
 
+        ContactPerson contactPerson = ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("123456789")
+                .build();
+
         return PriceOffer.priceOfferBuilder()
                 .customerNumber("5162")
+                .contactPersonList(List.of(contactPerson))
                 .salesOfficeList(salesOfficeList)
                 .salesEmployee(salesEmployee)
                 .approver(approver)
