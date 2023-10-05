@@ -15,6 +15,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import static no.ding.pk.repository.specifications.ApprovalSpecifications.withApproverId;
@@ -23,7 +24,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @DataJpaTest
-@TestPropertySource("/h2-db.properties")
+@TestPropertySource("classpath:h2-db.properties")
 public class PriceOfferRepositoryTest {
 
     @Autowired
@@ -67,9 +68,12 @@ public class PriceOfferRepositoryTest {
 
         priceOffer = repository.save(priceOffer);
 
-        priceOffer.setDeleted(true);
+//        priceOffer.setDeleted(true);
+        PriceOffer updatedPriceOffer = repository.findById(priceOffer.getId()).orElse(null);
 
-        priceOffer = repository.save(priceOffer);
+        assertThat(updatedPriceOffer, notNullValue());
+
+        updatedPriceOffer = repository.save(updatedPriceOffer);
 
         repository.existsByIdAndDeleted(priceOffer.getId());
     }
@@ -290,9 +294,17 @@ public class PriceOfferRepositoryTest {
                 .mobileNumber("123456789")
                 .build();
 
+        List<ContactPerson> contactPersonList = new LinkedList<>();
+        contactPersonList.add(contactPerson);
+        contactPersonList.add(ContactPerson.builder()
+                .firstName("Testa")
+                .lastName("Testesen")
+                .emailAddress("testa.testesen@testing.com")
+                .mobileNumber("987654321")
+                .build());
         return PriceOffer.priceOfferBuilder()
                 .customerNumber("5162")
-                .contactPersonList(List.of(contactPerson))
+                .contactPersonList(contactPersonList)
                 .salesOfficeList(salesOfficeList)
                 .salesEmployee(salesEmployee)
                 .approver(approver)
