@@ -3886,6 +3886,12 @@
           "required" : true,
           "type" : "integer",
           "format" : "int64"
+        }, {
+          "name" : "statuses",
+          "in" : "query",
+          "description" : "statuses",
+          "required" : false,
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
@@ -4723,9 +4729,6 @@
         "standardPrice" : {
           "type" : "number",
           "format" : "double"
-        },
-        "uniqueMaterialNumber" : {
-          "type" : "string"
         },
         "validFrom" : {
           "type" : "string",

@@ -84,8 +84,16 @@ public class PriceOfferController {
      * @return list of price offers connected to sales employee, else empty list.
      */
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
-        List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
+    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId,
+                                                       @RequestParam(value = "statuses", required = false) String statuses) {
+        List<PriceOffer> priceOffers;
+
+        if(StringUtils.isNotBlank(statuses)) {
+            List<String> statusList = Arrays.stream(statuses.split(",")).toList();
+            priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId, statusList);
+        } else {
+            priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId, null);
+        }
         
         if(!priceOffers.isEmpty()) {
             return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());

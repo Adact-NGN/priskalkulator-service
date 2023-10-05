@@ -99,19 +99,6 @@ public class PriceRowServiceImpl implements PriceRowService {
             lookUpKey.append("_").append(material.getSalesZone());
         }
 
-        log.debug("Material price lookup key: {}", lookUpKey.toString());
-
-//        if(StringUtils.isNotBlank(material.getDeviceType())) {
-//            Optional<Map.Entry<String, MaterialPrice>> priceEntry = materialStdPriceMap.entrySet().stream()
-//                    .filter(smpe -> {
-//                        if(zone != null) {
-//                            return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType()) && Objects.equals(smpe.getValue().getZone(), zone);
-//                        }
-//                        return smpe.getKey().equals(material.getMaterialNumber()) && material.getDeviceType().equals(smpe.getValue().getDeviceType());
-//                    })
-//                    .findFirst();
-//            return priceEntry.map(Map.Entry::getValue).orElse(null);
-//        }
         MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
 
         log.debug("Got material price: {}", materialPrice);
