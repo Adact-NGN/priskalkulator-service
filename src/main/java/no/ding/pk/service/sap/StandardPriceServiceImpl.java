@@ -148,7 +148,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             if(materialStdPriceDTO.isEmpty()) {
                 log.debug("Material standard price is empty.");
-                return null;
+                return new HashMap<>();
             }
 
             List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
