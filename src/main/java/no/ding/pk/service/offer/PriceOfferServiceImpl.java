@@ -1,5 +1,6 @@
 package no.ding.pk.service.offer;
 
+import lombok.Data;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
@@ -9,10 +10,7 @@ import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.EmployeeNotProvidedException;
-import no.ding.pk.web.handlers.MissingApprovalStatusException;
-import no.ding.pk.web.handlers.PriceOfferNotFoundException;
-import no.ding.pk.web.handlers.WrongStatusException;
+import no.ding.pk.web.handlers.*;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -27,8 +25,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.withApproverId;
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.withPriceOfferStatus;
+import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
 @Transactional
 @Service
@@ -148,6 +145,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 approver = getApproverForOffer(materialsForApproval, entity.getSalesEmployee());
                 entity.setApprover(approver);
             }
+
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         } else {
             log.debug("No materials needs to be approved, set price offer as APPROVED.");
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
@@ -258,53 +257,64 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return entity;
     }
 
+    @Data
+    private static class HighestDiscountLevelAndType {
+        boolean faMaterial = false;
+        boolean oaMaterial = false;
+
+        int highestDiscountLevel = 0;
+    }
+
+    private HighestDiscountLevelAndType getHighestSetDiscountLevel(List<PriceRow> listEntry) {
+        HighestDiscountLevelAndType levelAndType = new HighestDiscountLevelAndType();
+
+        for (PriceRow priceRow : listEntry) {
+            Material material = priceRow.getMaterial();
+            if (material.isFaMaterial()) {
+                levelAndType.setFaMaterial(true);
+            } else {
+                levelAndType.setOaMaterial(true);
+            }
+
+            if (priceRow.getDiscountLevel() != null && priceRow.getDiscountLevel() > levelAndType.getHighestDiscountLevel()) {
+                levelAndType.setHighestDiscountLevel(priceRow.getDiscountLevel());
+            }
+        }
+
+        return levelAndType;
+    }
+
     private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval, User salesEmployee) {
         Set<User> approvalUsers = new HashSet<>();
 
-        for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
-            boolean hasFaMaterialForApproval = false;
-            boolean hasRegularMaterialForApproval = false;
+        for (Map.Entry<String, List<PriceRow>> salesOfficePriceRowMap : materialsForApproval.entrySet()) {
+            HighestDiscountLevelAndType levelAndType = getHighestSetDiscountLevel(salesOfficePriceRowMap.getValue());
 
-            int highestDiscountLevel = 0;
+            log.debug("Highest discount level registered: {}", levelAndType.getHighestDiscountLevel());
 
-            for(PriceRow priceRow : listEntry.getValue()) {
-                Material material = priceRow.getMaterial();
-                if(material.isFaMaterial()) {
-                    hasFaMaterialForApproval = true;
-                } else {
-                    hasRegularMaterialForApproval = true;
-                }
-
-                if(priceRow.getDiscountLevel() != null && priceRow.getDiscountLevel() > highestDiscountLevel) {
-                    highestDiscountLevel = priceRow.getDiscountLevel();
-                }
-            }
-
-            log.debug("Highest discount level registered: {}", highestDiscountLevel);
-
-            Integer salesOfficeNumber = Integer.valueOf(listEntry.getKey());
+            Integer salesOfficeNumber = Integer.valueOf(salesOfficePriceRowMap.getKey());
             PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(salesOfficeNumber);
 
             if(poa == null) {
                 log.debug("No power of attorney found for sales office {}", salesOfficeNumber);
                 log.debug("Unable to set any approver for given price offer");
             } else {
-                if(hasFaMaterialForApproval && salesOfficesWhichRequiresOwnFaApprover.contains(salesOfficeNumber)) {
+                if(levelAndType.isFaMaterial() && salesOfficesWhichRequiresOwnFaApprover.contains(salesOfficeNumber)) {
                     if(poa.getDangerousWasteHolder() == null) {
                         log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
                     } else {
                         approvalUsers.add(poa.getDangerousWasteHolder());
                     }
-                } else if (highestDiscountLevel > 5) {
+                } else if (levelAndType.getHighestDiscountLevel() > 5) {
                     if (poa.getOrdinaryWasteLvlTwoHolder() == null) {
                         log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
                     } else {
                         approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
                     }
-                } else if (salesEmployee.getPowerOfAttorneyOA() >= highestDiscountLevel) {
+                } else if (salesEmployee.getPowerOfAttorneyOA() >= levelAndType.getHighestDiscountLevel()) {
                     log.debug("Sales employee has the correct level to approve this.");
                     approvalUsers.add(salesEmployee);
-                } else if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                } else if (levelAndType.isFaMaterial() && !levelAndType.isOaMaterial()) {
                     if (poa.getDangerousWasteHolder() == null) {
                         log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
                     } else {
@@ -415,8 +425,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public List<PriceOffer> findAllBySalesEmployeeId(Long userId) {
-        return repository.findAllBySalesEmployeeId(userId);
+    public List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList) {
+        return repository.findAll(Specification.where(withSalesEmployeeId(userId)).and(withPriceOfferStatusInList(statusList)));
     }
 
     @Override
@@ -426,6 +436,15 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String additionalInformation) {
+        Optional<User> approverOptional = userService.findById(approverId);
+
+        if(approverOptional.isEmpty()) {
+            log.debug("User with id {} trying to approve the offer was not found.", approverId);
+            throw new UserNotFoundException(String.format("Approver User with id %d was not found.", approverId));
+        }
+
+        User approver = approverOptional.get();
+
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
@@ -451,10 +470,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
                 if(priceOfferToApprove.getApprover() == null) {
                     Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
-                    User approver = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
+                    User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
-                    priceOfferToApprove.setApprover(approver);
+                    priceOfferToApprove.setApprover(neededApprover);
                 }
+            } else {
+                priceOfferToApprove.setNeedsApproval(false);
+                priceOfferToApprove.setApprovalDate(new Date());
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);

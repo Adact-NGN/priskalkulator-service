@@ -18,7 +18,7 @@ public interface PriceOfferService {
 
     boolean delete(Long id);
 
-    List<PriceOffer> findAllBySalesEmployeeId(Long userId);
+    List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList);
 
     List<PriceOffer> findAllByApproverIdAndPriceOfferStatus(Long approverId, String priceOfferStatus);
 

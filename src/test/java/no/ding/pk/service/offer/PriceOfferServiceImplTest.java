@@ -6,6 +6,7 @@ import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.*;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.*;
 import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
@@ -33,6 +34,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +65,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     private DiscountService discountService;
 
+    private PriceOfferRepository priceOfferRepository;
+
     private ModelMapper modelMapper = new ModelMapper();
     private SapHttpClient sapHttpClient;
     private SapMaterialService sapMaterialService;
@@ -70,6 +74,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     @BeforeEach
     public void setup() {
+
+        priceOfferRepository = getPriceOfferRepository();
 
         MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
 
@@ -431,7 +437,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .needsApproval(true)
                 .build();
 
-        Material dangerousMaterial = createDangerousMaterial();
+        Material dangerousMaterial = materialService.findByMaterialNumber("70120015");
+        if(dangerousMaterial == null) {
+            dangerousMaterial = createDangerousMaterial();
+        }
+
         PriceRow faPriceRow = PriceRow.builder()
                 .material(dangerousMaterial)
                 .standardPrice(16566.00)
@@ -448,6 +458,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .salesEmployee(dangerousWasteHolder)
                 .salesOfficeList(List.of(salesOffice))
                 .needsApproval(true)
@@ -456,7 +467,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceOffer actual = service.save(priceOffer);
 
         assertThat(actual.getApprover(), notNullValue());
-        assertThat(actual.getApprover(), equalTo(ordinaryWasteHolderLvl2));
+        assertThat(actual.getApprover().getEmail(), equalTo(ordinaryWasteHolderLvl2.getEmail()));
     }
 
     private static HttpResponse<String> createResponse() {
@@ -828,6 +839,95 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     @Test
+    public void shouldListAllPriceOfferForSalesEmployee() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        User user = userService.findByEmail("alexander.brox@ngn.no");
+        List<SalesOffice> salesOfficeList = List.of(SalesOffice
+                .builder()
+                .salesOffice("100")
+                .materialList(List.of())
+                .build());
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesOfficeList(salesOfficeList)
+                .salesEmployee(user)
+                .salesEmployee(user)
+                .approver(user)
+                .build();
+
+        service.save(priceOffer);
+
+        List<PriceOffer> actual = service.findAllBySalesEmployeeId(user.getId(), null);
+
+        assertThat(actual, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldListAllPriceOfferForSalesEmployeeWithStatuses() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        User user = userService.findByEmail("alexander.brox@ngn.no");
+        List<SalesOffice> salesOfficeList = List.of(SalesOffice
+                .builder()
+                .salesOffice("100")
+                .materialList(List.of())
+                .build());
+        PriceOffer approvedPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus(PriceOfferStatus.APPROVED.getStatus())
+                .salesOfficeList(salesOfficeList)
+                .salesEmployee(user)
+                .salesEmployee(user)
+                .approver(user)
+                .build();
+
+        service.save(approvedPriceOffer);
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus(PriceOfferStatus.APPROVED.getStatus())
+                .salesOfficeList(salesOfficeList)
+                .salesEmployee(user)
+                .salesEmployee(user)
+                .approver(user)
+                .build();
+
+        service.save(priceOffer);
+
+        List<PriceOffer> actualApproved = service.findAllBySalesEmployeeId(user.getId(), List.of(PriceOfferStatus.APPROVED.getStatus()));
+
+        assertThat(actualApproved, hasSize(2));
+
+        PriceOffer pendingPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .salesOfficeList(salesOfficeList)
+                .salesEmployee(user)
+                .salesEmployee(user)
+                .approver(user)
+                .build();
+
+        priceOfferRepository.save(pendingPriceOffer);
+
+        List<PriceOffer> actualPending = service.findAllBySalesEmployeeId(user.getId(), List.of(PriceOfferStatus.PENDING.getStatus()));
+
+        assertThat(actualPending, hasSize(1));
+
+        List<PriceOffer> actualMixed = service.findAllBySalesEmployeeId(user.getId(), List.of(PriceOfferStatus.PENDING.getStatus(), PriceOfferStatus.APPROVED.getStatus()));
+
+        assertThat(actualMixed, hasSize(3));
+    }
+
+    @Test
     public void shouldListAllPriceOfferForApproverWithStatusPending() {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
@@ -838,10 +938,16 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber("119901")
-                .standardPrice(1199.0)
-                .build();
+
+        MaterialPrice materialPrice = getMaterialPriceRepository().findByMaterialNumber("119901");
+
+        if(materialPrice == null) {
+            materialPrice = MaterialPrice.builder()
+                    .materialNumber("119901")
+                    .standardPrice(1199.0)
+                    .build();
+        }
+
         Material material = Material.builder()
                 .materialNumber("119901")
                 .materialStandardPrice(materialPrice)
@@ -852,18 +958,22 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(7)
                 .needsApproval(true)
                 .build();
+        List<PriceRow> materials = new LinkedList<PriceRow>();
+        materials.add(priceRow);
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
-                .materialList(List.of(priceRow))
+                .materialList(materials)
                 .build();
+        List<SalesOffice> salesOffices = new LinkedList<>();
+        salesOffices.add(salesOffice);
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .salesEmployee(user)
-                .salesOfficeList(List.of(salesOffice))
+                .salesOfficeList(salesOffices)
                 .approver(user)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
 
-        service.save(priceOffer);
+        priceOfferRepository.save(priceOffer);
 
         List<PriceOffer> actual = service.findAllByApproverIdAndPriceOfferStatus(user.getId(), PriceOfferStatus.PENDING.getStatus());
 
