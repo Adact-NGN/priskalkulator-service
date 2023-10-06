@@ -128,6 +128,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
+        log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, zone);
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -229,11 +230,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
-        String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
-        MaterialField.SalesOffice.getValue(), salesOffice, 
-        MaterialField.SalesOrganization.getValue(), salesOrg, 
-        MaterialField.MaterialExpired.getValue()
-        ));
+                String.format("%s eq '%s' and %s eq '%s' and %s eq ''",
+                        MaterialField.SalesOffice.getValue(), salesOffice,
+                        MaterialField.SalesOrganization.getValue(), salesOrg,
+                        MaterialField.MaterialExpired.getValue()
+                ));
 
         addMaterialNumber(materialNumber, filterQuery);
 
