@@ -261,12 +261,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
     }
 
-    private static void addZone(String zone, StringBuilder filterQuery) {
-        if(StringUtils.isNotBlank(zone)) {
-            if(zone.length() < 2) {
-                zone = "0" + zone;
-            }
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), zone));
+    private static void addZone(String zoneString, StringBuilder filterQuery) {
+        if(StringUtils.isNotBlank(zoneString)) {
+            Integer zoneNumber = Integer.valueOf(zoneString);
+
+            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
         } else {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }

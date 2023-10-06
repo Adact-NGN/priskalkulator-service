@@ -1,6 +1,5 @@
 package no.ding.pk.service.offer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
@@ -12,34 +11,39 @@ import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.sap.StandardPriceService;
-import no.ding.pk.service.sap.StandardPriceServiceImpl;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDateTime;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -71,6 +75,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private SapHttpClient sapHttpClient;
     private SapMaterialService sapMaterialService;
 
+    StandardPriceService standardPriceService;
+
 
     @BeforeEach
     public void setup() {
@@ -94,7 +100,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
         ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
         sapHttpClient = mock(SapHttpClient.class);
-        StandardPriceService standardPriceService = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", getObjectMapper(), standardPriceInMemoryCache, sapMaterialService, sapHttpClient, modelMapper);
+
+        standardPriceService = mock(StandardPriceService.class);
+
         ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, discountService, standardPriceService);
 
         salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
@@ -113,14 +121,18 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         createDiscountMatrix();
     }
 
+
     @Test
-    public void shouldPersistPriceOffer() throws JsonProcessingException {
+    public void shouldPersistPriceOffer() throws IOException {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
         HttpResponse<String> response = createResponse();
         when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        mockMaterialServiceResponse(classLoader);
 
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
                 .contractTerm(TermsTypes.GeneralTerms.getValue())
@@ -1279,5 +1291,85 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         saSalesRole.addUser(consultant);
 
         salesRoleService.save(saSalesRole);
+    }
+
+    private void mockMaterialServiceResponse(ClassLoader classLoader) throws IOException {
+        File file = new File(classLoader.getResource("materials100.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        JSONObject jsonObjectResult = new JSONObject(json);
+
+        JSONArray result = jsonObjectResult.getJSONArray("value");
+
+        ObjectMapper om = new ObjectMapper();
+
+        List<MaterialDTO> materialDTOS = new ArrayList<>();
+
+        for(int i = 0; i < result.length(); i++) {
+            JSONObject jsonObject = result.getJSONObject(i);
+
+            MaterialDTO materialDTO = om.readValue(jsonObject.toString(), MaterialDTO.class);
+
+            materialDTOS.add(materialDTO);
+        }
+
+        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt());
+    }
+
+    private void mockCallForStandardPrice(ClassLoader classLoader) throws IOException {
+        File file = new File(classLoader.getResource("standardPrices100104.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        doReturn(HttpRequest.newBuilder().uri(URI.create("https://test")).build()).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> stdPriceResponse = new HttpResponse<>() {
+            @Override
+            public int statusCode() {
+                return HttpStatus.OK.value();
+            }
+
+            @Override
+            public HttpRequest request() {
+                return null;
+            }
+
+            @Override
+            public Optional<HttpResponse<String>> previousResponse() {
+                return Optional.empty();
+            }
+
+            @Override
+            public HttpHeaders headers() {
+                return null;
+            }
+
+            @Override
+            public String body() {
+                return json;
+            }
+
+            @Override
+            public Optional<SSLSession> sslSession() {
+                return Optional.empty();
+            }
+
+            @Override
+            public URI uri() {
+                return null;
+            }
+
+            @Override
+            public HttpClient.Version version() {
+                return null;
+            }
+        };
+
+        doReturn(stdPriceResponse).when(sapHttpClient).getResponse(any());
     }
 }
