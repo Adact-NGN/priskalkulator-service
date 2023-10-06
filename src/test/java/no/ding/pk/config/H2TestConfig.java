@@ -1,16 +1,12 @@
 package no.ding.pk.config;
 
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.TestPropertySource;
 
 import javax.sql.DataSource;
 
 @TestConfiguration
-//@DataJpaTest
 public class H2TestConfig {
     @Bean
     public DataSource getDataSource() {

@@ -61,7 +61,7 @@ public class ZoneServiceImpl implements ZoneService {
 
             Map<String, MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOrg, salesOffice, zone.getZoneId());
 
-            log.debug("Created key set for map: ", materialStdPrices.keySet());
+            log.debug("Created key set for map: {}", materialStdPrices.isEmpty() ? "No map created" : materialStdPrices.keySet());
 
             if(zone.getPriceRows() != null && zone.getPriceRows().size() > 0) {
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, zone.getZoneId(), materialStdPrices, discountMap);

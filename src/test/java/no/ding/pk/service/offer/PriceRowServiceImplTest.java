@@ -8,7 +8,6 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.service.sap.SapMaterialService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +26,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 
-//@SpringBootTest
-//@Transactional
-//@TestPropertySource("/h2-db.properties")
-@Disabled
 @Import(ModelMapperV2Config.class)
 public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 

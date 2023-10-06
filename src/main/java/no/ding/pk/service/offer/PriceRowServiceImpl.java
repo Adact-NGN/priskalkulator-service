@@ -290,7 +290,7 @@ public class PriceRowServiceImpl implements PriceRowService {
     }
 
     private Discount getDiscountLevel(String salesOrg, String salesOffice, String materialNumber, Map<String, Map<String, Map<String, Discount>>> discountMap) {
-        if(discountMap.containsKey(salesOrg)) {
+        if(discountMap != null && discountMap.containsKey(salesOrg)) {
             Map<String, Map<String, Discount>> salesOrgDiscountMap = discountMap.get(salesOrg);
             if(salesOrgDiscountMap != null && salesOrgDiscountMap.containsKey(salesOffice)) {
                 Map<String, Discount> salesOfficeDiscountMap = salesOrgDiscountMap.get(salesOffice);
