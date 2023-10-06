@@ -215,4 +215,29 @@ class BoReportConditionCodeServiceRuleImplTest extends AbstractIntegrationConfig
         assertThat(suggestion.getKeyCombination(), equalTo("Kundehiearki per material"));
         assertThat(suggestion.getKeyCombinationTableName(), equalTo("A767"));
     }
+
+    @Test
+    public void shouldSuggest() {
+        BoReportCondition condition = BoReportCondition.builder()
+                .terms("Generelle vilkår")
+                .isWasteDisposalMaterial(false)
+                .isService(true)
+                .isRental(false)
+                .isProduct(false)
+                .hasSalesOrg(true)
+                .isPricedOnSalesOffice(true)
+                .isCustomer(true)
+                .isNode(false)
+                .isZoneMaterial(true)
+                .isWaste(false)
+                .hasDevicePlacement(false)
+                .isDeviceType(false)
+                .hasSalesDocument(false)
+                .build();
+
+        SuggestedConditionCodeKeyCombination suggestion = boReportService.suggestConditionCodeAndKeyCombination(condition);
+
+        assertThat(suggestion.getConditionCode(), equalTo("ZPTR"));
+        assertThat(suggestion.getKeyCombinationTableName(), equalTo("A615"));
+    }
 }
