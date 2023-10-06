@@ -17,7 +17,7 @@ when
     isDeviceType == false,
     hasSalesDocument == false,
     isWasteDisposalMaterial == false,
-    isService == false,
+    isService == true,
     isRental == false,
     isProduct == false)
 then
@@ -39,7 +39,7 @@ when
     isDeviceType == false,
     hasSalesDocument == false,
     isWasteDisposalMaterial == false,
-    isService == false,
+    isService == true,
     isRental == false,
     isProduct == false)
 then
@@ -62,7 +62,7 @@ when
     isDeviceType == false,
     hasSalesDocument == false,
     isWasteDisposalMaterial == false,
-    isService == false,
+    isService == true,
     isRental == false,
     isProduct == false)
 then
@@ -84,7 +84,7 @@ when
     isDeviceType == false,
     hasSalesDocument == false,
     isWasteDisposalMaterial == false,
-    isService == false,
+    isService == true,
     isRental == false,
     isProduct == false)
 then
