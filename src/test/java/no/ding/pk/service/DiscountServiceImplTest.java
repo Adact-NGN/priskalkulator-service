@@ -163,7 +163,7 @@ public class DiscountServiceImplTest extends AbstractIntegrationConfig {
         addMissingDiscounts();
 
         List<String> materialNumbers = List.of("113103");
-        List<Discount> actual = service.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", materialNumbers);
+        List<Discount> actual = service.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", materialNumbers);
 
         assertThat(actual, hasSize(1));
 

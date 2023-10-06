@@ -30,5 +30,5 @@ public interface DiscountService {
                                                                                                   String salesOffice,
                                                                                                   String materialNumbers, String zone);
 
-    List<Discount> findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
+    List<Discount> findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
 }
