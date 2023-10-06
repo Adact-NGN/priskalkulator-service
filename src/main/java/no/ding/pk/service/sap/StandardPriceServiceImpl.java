@@ -135,6 +135,17 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> materialStdPriceDTO = jsonToMaterialStdPriceDTO(response);
 
+            if(StringUtils.isNotBlank(zone)) {
+                List<MaterialStdPriceDTO> filteredMaterialStdPrice = new ArrayList<>();
+                for (MaterialStdPriceDTO materialStdPrice : materialStdPriceDTO) {
+                    if (StringUtils.isNotBlank(materialStdPrice.getZone()) && materialStdPrice.getZone().equals(zone)) {
+                        filteredMaterialStdPrice.add(materialStdPrice);
+                    }
+                }
+
+                materialStdPriceDTO = filteredMaterialStdPrice;
+            }
+
             if(materialStdPriceDTO.isEmpty()) {
                 log.debug("Material standard price is empty.");
                 return null;
