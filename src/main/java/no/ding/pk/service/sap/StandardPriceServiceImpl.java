@@ -128,11 +128,23 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
+        log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, zone);
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> materialStdPriceDTO = jsonToMaterialStdPriceDTO(response);
+
+            if(StringUtils.isNotBlank(zone)) {
+                List<MaterialStdPriceDTO> filteredMaterialStdPrice = new ArrayList<>();
+                for (MaterialStdPriceDTO materialStdPrice : materialStdPriceDTO) {
+                    if (StringUtils.isNotBlank(materialStdPrice.getZone()) && materialStdPrice.getZone().equals(zone)) {
+                        filteredMaterialStdPrice.add(materialStdPrice);
+                    }
+                }
+
+                materialStdPriceDTO = filteredMaterialStdPrice;
+            }
 
             if(materialStdPriceDTO.isEmpty()) {
                 log.debug("Material standard price is empty.");
@@ -229,11 +241,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
-        String.format("%s eq '%s' and %s eq '%s' and %s eq ''", 
-        MaterialField.SalesOffice.getValue(), salesOffice, 
-        MaterialField.SalesOrganization.getValue(), salesOrg, 
-        MaterialField.MaterialExpired.getValue()
-        ));
+                String.format("%s eq '%s' and %s eq '%s' and %s eq ''",
+                        MaterialField.SalesOffice.getValue(), salesOffice,
+                        MaterialField.SalesOrganization.getValue(), salesOrg,
+                        MaterialField.MaterialExpired.getValue()
+                ));
 
         addMaterialNumber(materialNumber, filterQuery);
 

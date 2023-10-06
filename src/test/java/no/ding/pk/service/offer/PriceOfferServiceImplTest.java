@@ -177,7 +177,35 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .standardPrice(1131.0)
                 .material(zoneMaterial)
                 .build();
-        List<PriceRow> zoneMaterialList = List.of(zonePriceRow);
+
+        MaterialPrice zoneMaterialPriceWithDeviceType = MaterialPrice.builder()
+                .materialNumber("50301")
+                .deviceType("B-0-S")
+                .standardPrice(16.0)
+                .build();
+        Material zoneDiveceTypeMaterial = Material.builder()
+                .materialNumber("50301")
+                .deviceType("B-0-S")
+                .designation("Flatvogn - Utsett")
+                .materialGroupDesignation("Tj.  Flatvogn")
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .materialStandardPrice(zoneMaterialPriceWithDeviceType)
+                .build();
+        PriceRow zoneDeviceTypeRow = PriceRow.builder()
+                .customerPrice(15.0)
+                .discountLevelPct(0.07)
+                .showPriceInOffer(true)
+                .manualPrice(15.0)
+                .discountLevel(1)
+                .discountLevelPrice(1.0)
+                .amount(1)
+                .priceIncMva(18.75)
+                .standardPrice(16.0)
+                .material(zoneDiveceTypeMaterial)
+                .build();
+
+        List<PriceRow> zoneMaterialList = List.of(zonePriceRow, zoneDeviceTypeRow);
         Zone zone = Zone.builder()
                 .zoneId("0000000001")
                 .postalCode("1601")

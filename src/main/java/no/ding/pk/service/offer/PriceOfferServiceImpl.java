@@ -218,7 +218,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
                 List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
 
-                List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
 
                 if(discounts != null && !discounts.isEmpty()) {
                     discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));

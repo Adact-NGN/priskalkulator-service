@@ -1,11 +1,19 @@
 package no.ding.pk.service.sap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.service.cache.PingInMemory3DCache;
+import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.utils.SapHttpClient;
+import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import org.apache.commons.io.IOUtils;
 import org.hamcrest.core.Is;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
@@ -13,56 +21,169 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
+import javax.net.ssl.SSLSession;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 @Disabled("SAP is down")
 @Tag("integrationtest")
 @Profile("itest")
 @ActiveProfiles("itest")
-@SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@DataJpaTest
+@TestPropertySource("classpath:h2-db.properties")
+//@SpringBootTest
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class StandardPriceServiceImplTest {
     
     private StandardPriceService service;
     private Path workingDir;
     
-    @Autowired
     private SapHttpClient sapHttpClient;
     
-    @Autowired
     private SapMaterialService sapMaterialService;
 
-    @Autowired
     private ModelMapper modelMapper;
-    
-    @Value("${cache.max.amount.items:5000}") 
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
+    @Value("${cache.max.amount.items:5000}")
     private Integer capacity;
     
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
+
+        sapHttpClient = mock(SapHttpClient.class);
+        sapMaterialService = mock(SapMaterialService.class);
+
+        MaterialService materialService = mock(MaterialService.class);
+
+        modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, salesRoleRepository);
+
         this.workingDir = Path.of("", "src/test/resources");
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
+        mockCallForStandardPrice(classLoader);
+
+        mockMaterialServiceResponse(classLoader);
+
         InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache = new PingInMemory3DCache<>(capacity);
         service = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", new ObjectMapper(),
         inMemoryCache,
         sapMaterialService,
         sapHttpClient, modelMapper);
     }
-    
+
+    private void mockMaterialServiceResponse(ClassLoader classLoader) throws IOException {
+        File file = new File(classLoader.getResource("materials100.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        JSONObject jsonObjectResult = new JSONObject(json);
+
+        JSONArray result = jsonObjectResult.getJSONArray("value");
+
+        ObjectMapper om = new ObjectMapper();
+
+        List<MaterialDTO> materialDTOS = new ArrayList<>();
+
+        for(int i = 0; i < result.length(); i++) {
+            JSONObject jsonObject = result.getJSONObject(i);
+
+            MaterialDTO materialDTO = om.readValue(jsonObject.toString(), MaterialDTO.class);
+
+            materialDTOS.add(materialDTO);
+        }
+
+        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt());
+    }
+
+    private void mockCallForStandardPrice(ClassLoader classLoader) throws IOException {
+        File file = new File(classLoader.getResource("standardPrices100104.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        doReturn(HttpRequest.newBuilder().uri(URI.create("https://test")).build()).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> stdPriceResponse = new HttpResponse<>() {
+            @Override
+            public int statusCode() {
+                return HttpStatus.OK.value();
+            }
+
+            @Override
+            public HttpRequest request() {
+                return null;
+            }
+
+            @Override
+            public Optional<HttpResponse<String>> previousResponse() {
+                return Optional.empty();
+            }
+
+            @Override
+            public HttpHeaders headers() {
+                return null;
+            }
+
+            @Override
+            public String body() {
+                return json;
+            }
+
+            @Override
+            public Optional<SSLSession> sslSession() {
+                return Optional.empty();
+            }
+
+            @Override
+            public URI uri() {
+                return null;
+            }
+
+            @Override
+            public HttpClient.Version version() {
+                return null;
+            }
+        };
+
+        doReturn(stdPriceResponse).when(sapHttpClient).getResponse(any());
+    }
+
     @Test
     void shouldGetStandardPricesBySalesOfficeSalesOrg() {
         String salesOffice = "104";
@@ -72,6 +193,17 @@ public class StandardPriceServiceImplTest {
         
         assertNotNull(result);
         assertThat(result, hasSize(greaterThan(0)));
+    }
+
+    @Test
+    void shouldGetStandardPricesBySalesOfficeSalesOrgAndZone() {
+        String salesOffice = "104";
+        String salesOrg = "100";
+
+        Map<String, MaterialPrice> result = service.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice, salesOrg, "02");
+
+        assertNotNull(result);
+        assertThat(result.keySet(), hasSize(greaterThan(0)));
     }
     
     @Test
