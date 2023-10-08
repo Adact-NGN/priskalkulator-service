@@ -40,7 +40,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     private static final Logger log = LoggerFactory.getLogger(StandardPriceServiceImpl.class);
     
-    private String standardPriceSapUrl;
+    private final String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
     

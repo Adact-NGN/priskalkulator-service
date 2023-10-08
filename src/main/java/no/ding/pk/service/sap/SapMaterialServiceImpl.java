@@ -49,10 +49,12 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Override
     public MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String material, String salesOrg) {
         if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired()) {
+            log.debug("Initiating cache build for Sap Materials.");
             initiateCacheBuild(salesOrg, material);
         }
 
         if(!inMemoryCache.contains(salesOrg, material)) {
+            log.debug("Cache does not contain material {} for sales org {}. Updating", material, salesOrg);
             updateMaterialCache(salesOrg, null, material, null, null);
         }
 
@@ -235,7 +237,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
-            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
 
             addMaterialsToCache(salesOrg, materialDTOList);
         } else {
