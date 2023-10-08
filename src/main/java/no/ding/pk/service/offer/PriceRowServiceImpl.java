@@ -96,7 +96,8 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         if(StringUtils.isNotBlank(material.getSalesZone())) {
-            lookUpKey.append("_").append(material.getSalesZone());
+            String salesZone = String.format("0%d", Integer.valueOf(material.getSalesZone())) ;
+            lookUpKey.append("_").append(salesZone);
         }
 
         MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
@@ -247,12 +248,6 @@ public class PriceRowServiceImpl implements PriceRowService {
             material.setPricingUnit(materialPrice.getPricingUnit());
 
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
-//            if(material.getMaterialStandardPrice() == null) {
-//                material.setMaterialStandardPrice(materialPrice);
-//            } else {
-//                modelMapper.map(materialPrice, material.getMaterialStandardPrice());
-//            }
-
         } else {
             log.debug("No material prices found.");
         }
@@ -350,9 +345,9 @@ public class PriceRowServiceImpl implements PriceRowService {
                         discountLevelPrice = 0.0;
                     } else if(discountLevelPct == null && discountLevelPrice != null) {
                         if(discountLevelPrice < 0.0) {
-                            discountLevelPct = ((discountLevelPrice * -1.0) * 100) / entity.getStandardPrice();
+                            discountLevelPct = ((discountLevelPrice * -1.0)) / entity.getStandardPrice();
                         } else {
-                            discountLevelPct = (discountLevelPrice * 100) / entity.getStandardPrice();
+                            discountLevelPct = (discountLevelPrice) / entity.getStandardPrice();
                         }
                     }
                     entity.setDiscountLevelPct(discountLevelPct);

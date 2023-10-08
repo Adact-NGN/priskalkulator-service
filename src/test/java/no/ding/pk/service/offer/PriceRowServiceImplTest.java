@@ -2,11 +2,14 @@ package no.ding.pk.service.offer;
 
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.domain.Discount;
+import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -17,14 +20,14 @@ import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import static no.ding.pk.utils.JsonTestUtils.mockSapMaterialServiceResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
 
 @Import(ModelMapperV2Config.class)
 public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
@@ -59,6 +62,82 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 emFactory,
                 sapMaterialService,
                 modelMapper);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        List<MaterialDTO> sapMaterialDTOS = mockSapMaterialServiceResponse(classLoader);
+
+        doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), any());
+    }
+
+    @Test
+    public void shouldSaveZonedPrice() {
+        String zoneMaterialNumber = "50101";
+
+        Material listPlacement = Material.builder()
+                .materialNumber(zoneMaterialNumber)
+                .designation("Lift - Utsett")
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .salesZone("0000000001")
+                .build();
+
+        PriceRow wastePriceRow = PriceRow.builder()
+//                .customerPrice(1500.0)
+//                .discountLevelPct(0.02)
+                .standardPrice(1599.0)
+                .material(listPlacement)
+                .showPriceInOffer(true)
+//                .manualPrice(2400.0)
+                .discountLevel(2)
+                .discountLevelPrice(56.0)
+                .amount(1)
+//                .priceIncMva(2448.0)
+                .build();
+
+        List<PriceRow> wastePriceRowList = new ArrayList<>();
+        wastePriceRowList.add(wastePriceRow);
+
+        DiscountLevel levelOne = DiscountLevel.builder()
+                .level(1)
+                .discount(0.0)
+                .pctDiscount(0.0)
+                .build();
+
+        DiscountLevel levelTwo = DiscountLevel.builder()
+                .level(2)
+                .discount(189.0)
+                .build();
+
+        List<DiscountLevel> discountLevels = new LinkedList<>();
+        discountLevels.add(levelOne);
+        discountLevels.add(levelTwo);
+
+        Discount discount = Discount.builder()
+                .materialNumber(zoneMaterialNumber)
+                .standardPrice(1599.0)
+                .salesOffice("104")
+                .salesOrg("100")
+                .materialDesignation("Lift - Utsett")
+                .discountLevels(discountLevels)
+                .build();
+
+        Map<String, Map<String, Map<String, Discount>>> discountMap = new HashMap<>();
+        discountMap.put("100", Map.of("104", Map.of("50101", discount)));
+
+        MaterialPrice materialPrice = MaterialPrice.builder()
+                .materialNumber("50101")
+                .pricingUnit(1)
+                .standardPrice(1599.0)
+                .quantumUnit("ST")
+                .build();
+        Map<String, MaterialPrice> materialStdPrice = new HashMap<>();
+        materialStdPrice.put("50101_01", materialPrice);
+
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", "0000000001", materialStdPrice, discountMap);
+
+        assertThat(priceRows, notNullValue());
+        assertThat(priceRows, not(empty()));
+        assertThat(priceRows.get(0).getDiscountedPrice(), is(materialPrice.getStandardPrice() - levelTwo.getDiscount()));
     }
 
     @Test
