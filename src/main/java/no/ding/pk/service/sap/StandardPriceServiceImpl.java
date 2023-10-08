@@ -128,7 +128,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
-        String formattedZone = String.format("0%d", Integer.valueOf(zone));
+        String formattedZone = getFormattedZone(zone);
         log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, formattedZone);
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, formattedZone, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
@@ -164,6 +164,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         
         return new HashMap<>();
+    }
+
+    private static String getFormattedZone(String zone) {
+        return StringUtils.isNotBlank(zone) ? String.format("0%d", Integer.valueOf(zone)) : null;
     }
 
     @Override
