@@ -51,15 +51,7 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                     continue;
                 }
 
-                SalesOffice entity = new SalesOffice();
-
-                if (salesOffice.getId() != null) {
-                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
-
-                    if (optSalesOffice.isPresent()) {
-                        entity = optSalesOffice.get();
-                    }
-                }
+                SalesOffice entity = getSalesOffice(salesOffice);
 
                 entity.setCustomerNumber(salesOffice.getCustomerNumber());
                 entity.setSalesOrg(salesOffice.getSalesOrg());
@@ -111,5 +103,16 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
             }
         }
         return returnList;
+    }
+
+    private SalesOffice getSalesOffice(SalesOffice salesOffice) {
+        if (salesOffice.getId() != null) {
+            Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
+
+            if (optSalesOffice.isPresent()) {
+                return optSalesOffice.get();
+            }
+        }
+        return new SalesOffice();
     }
 }

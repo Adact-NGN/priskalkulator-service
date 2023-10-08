@@ -53,15 +53,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-@Disabled("SAP is down")
-@Tag("integrationtest")
-@Profile("itest")
-@ActiveProfiles("itest")
 @DataJpaTest
 @TestPropertySource("classpath:h2-db.properties")
-//@SpringBootTest
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class StandardPriceServiceImplTest {
     
     private StandardPriceService service;
@@ -193,6 +186,7 @@ public class StandardPriceServiceImplTest {
         
         assertNotNull(result);
         assertThat(result, hasSize(greaterThan(0)));
+
     }
 
     @Test
@@ -200,7 +194,7 @@ public class StandardPriceServiceImplTest {
         String salesOffice = "104";
         String salesOrg = "100";
 
-        Map<String, MaterialPrice> result = service.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice, salesOrg, "02");
+        Map<String, MaterialPrice> result = service.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice, salesOrg, "0000000002");
 
         assertNotNull(result);
         assertThat(result.keySet(), hasSize(greaterThan(0)));

@@ -44,15 +44,7 @@ public class ZoneServiceImpl implements ZoneService {
         for (Zone zone : zoneList) {
             log.debug("Zone {}", zone);
 
-            Zone entity = new Zone();
-
-            if (zone.getId() != null) {
-                Optional<Zone> optZone = repository.findById(zone.getId());
-
-                if (optZone.isPresent()) {
-                    entity = optZone.get();
-                }
-            }
+            Zone entity = getZone(zone.getId());
 
             entity.setZoneId(zone.getZoneId());
             entity.setPostalCode(zone.getPostalCode());
@@ -74,6 +66,17 @@ public class ZoneServiceImpl implements ZoneService {
 
         log.debug("Persisted {} amount of Zones", returnZoneList.size());
         return returnZoneList;
+    }
+
+    private Zone getZone(Long zoneId) {
+        if (zoneId != null) {
+            Optional<Zone> optZone = repository.findById(zoneId);
+
+            if (optZone.isPresent()) {
+                return optZone.get();
+            }
+        }
+        return new Zone();
     }
 
     private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForZones(List<Zone> zoneList, String salesOrg, String salesOffice) {

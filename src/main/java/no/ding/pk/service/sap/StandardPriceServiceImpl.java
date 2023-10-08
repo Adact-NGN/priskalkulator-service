@@ -40,7 +40,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     
     private static final Logger log = LoggerFactory.getLogger(StandardPriceServiceImpl.class);
     
-    private String standardPriceSapUrl;
+    private final String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
     
@@ -128,17 +128,18 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
-        log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, zone);
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
+        String formattedZone = String.format("0%d", Integer.valueOf(zone));
+        log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, formattedZone);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, formattedZone, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
             List<MaterialStdPriceDTO> materialStdPriceDTO = jsonToMaterialStdPriceDTO(response);
 
-            if(StringUtils.isNotBlank(zone)) {
+            if(StringUtils.isNotBlank(formattedZone)) {
                 List<MaterialStdPriceDTO> filteredMaterialStdPrice = new ArrayList<>();
                 for (MaterialStdPriceDTO materialStdPrice : materialStdPriceDTO) {
-                    if (StringUtils.isNotBlank(materialStdPrice.getZone()) && materialStdPrice.getZone().equals(zone)) {
+                    if (StringUtils.isNotBlank(materialStdPrice.getZone()) && materialStdPrice.getZone().equals(formattedZone)) {
                         filteredMaterialStdPrice.add(materialStdPrice);
                     }
                 }
@@ -249,7 +250,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         addMaterialNumber(materialNumber, filterQuery);
 
-        addZone(zone, filterQuery);
+        addOrExcludeZone(zone, filterQuery);
 
         addDeviceType(deviceType, filterQuery, "and %s eq '%s'", MaterialField.DeviceCategory);
         return filterQuery.toString();
@@ -261,7 +262,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
     }
 
-    private static void addZone(String zoneString, StringBuilder filterQuery) {
+    private static void addOrExcludeZone(String zoneString, StringBuilder filterQuery) {
         if(StringUtils.isNotBlank(zoneString)) {
             Integer zoneNumber = Integer.valueOf(zoneString);
 
