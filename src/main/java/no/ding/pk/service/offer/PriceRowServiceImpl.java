@@ -96,7 +96,8 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         if(StringUtils.isNotBlank(material.getSalesZone())) {
-            lookUpKey.append("_").append(material.getSalesZone());
+            String salesZone = String.format("0%d", Integer.valueOf(material.getSalesZone())) ;
+            lookUpKey.append("_").append(salesZone);
         }
 
         MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
