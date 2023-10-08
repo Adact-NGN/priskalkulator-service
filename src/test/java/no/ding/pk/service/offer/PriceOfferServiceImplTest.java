@@ -239,9 +239,21 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
 
         List<SalesOffice> salesOfficeList = List.of(salesOffice);
+
+        ContactPerson contactPerson = ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build();
+
+        List<ContactPerson> contactPeople = new ArrayList<>();
+        contactPeople.add(contactPerson);
+
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
                 .customerNumber("5162")
                 .customerName("Europris Telem Notodden")
+                .contactPersonList(contactPeople)
                 .needsApproval(true)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .salesEmployee(salesEmployee)

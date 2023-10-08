@@ -74,7 +74,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
             MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), zone, materialStdPriceMap);
-            log.debug("Found standard price for material: {}: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice);
+            log.debug("Found standard price for material: {}: {}, zone: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice, zone);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice, discountMap);
 
             returnList.add(entity);
