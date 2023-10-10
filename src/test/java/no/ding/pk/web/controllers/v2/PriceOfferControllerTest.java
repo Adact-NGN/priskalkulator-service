@@ -1,16 +1,20 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.config.ObjectMapperConfig;
+import no.ding.pk.config.SecurityConfig;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
+import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.offer.PriceOfferRepository;
+import no.ding.pk.service.DiscountService;
+import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
-import no.ding.pk.service.offer.MaterialPriceService;
-import no.ding.pk.service.offer.PriceOfferService;
+import no.ding.pk.service.offer.*;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
@@ -19,7 +23,6 @@ import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -50,20 +53,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@AutoConfigureMockMvc(addFilters = false)
-//@Import({SecurityTestConfig.class, ModelMapperV2Config.class, ObjectMapperConfig.class})
 @Disabled("ObjectMapper is null")
-@ExtendWith(SpringExtension.class)
-@Import(ObjectMapperConfig.class)
-@WebMvcTest(controllers = {PriceOfferController.class}, excludeAutoConfiguration = {ObjectMapper.class})
+@ContextConfiguration(classes = {ObjectMapperConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
+@WebMvcTest(PriceOfferController.class)
 class PriceOfferControllerTest {
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private UserService userService;
 
     @MockBean
@@ -72,20 +75,29 @@ class PriceOfferControllerTest {
     @Autowired
     private PriceOfferService priceOfferService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+//    @Autowired
+//    private ObjectMapper objectMapper;
 
-//    @MockBean
-//    private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
+    @MockBean
+    private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
 
-//    @MockBean
-//    private MaterialService materialService;
+    @MockBean
+    private MaterialService materialService;
 
-//    @MockBean
-//    private SalesRoleRepository salesRoleRepository;
+    @MockBean
+    private SalesRoleRepository salesRoleRepository;
 
-//    private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-//
+    @MockBean
+    private SalesOfficeService salesOfficeService;
+
+    @MockBean
+    private DiscountService discountService;
+
+    @MockBean
+    private CustomerTermsService customerTermsService;
+
+    private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+
 //    private final ObjectReader objectReader = new ObjectMapper().reader();
 
     @MockBean
@@ -101,6 +113,11 @@ class PriceOfferControllerTest {
     private String salesEmployeeEmail;
     private User salesEmployee;
     private User approver;
+
+//    @Override
+//    public void setup() throws IOException {
+//
+//    }
 
 //    @BeforeEach
 //    public void setup() {
@@ -156,6 +173,23 @@ class PriceOfferControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(priceOffer))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldPersistPriceOfferWithMultipleZonesWithSimilarMaterials() throws Exception {
+        String filename = "priceOfferDtoV2_multipleZonePrices.json";
+//        PriceOfferDTO priceOfferDTO = createCompleteOfferDto(filename);
+
+        String json = getCompleteofferDtoString(filename);
+
+        String createUrl = "/api/v2/price-offer/create";
+
+        MvcResult result = mockMvc.perform(post(createUrl).contentType(MediaType.APPLICATION_JSON_VALUE).content(json))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+
     }
 
     @Disabled("Move to service test")

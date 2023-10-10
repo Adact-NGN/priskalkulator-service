@@ -26,7 +26,7 @@ import java.io.Serializable;
 })
 @JsonIgnoreProperties({"faMaterial"})
 @Entity
-@Table(name = "materials", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType"}))
+@Table(name = "materials", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType", "salesZone"}))
 public class Material implements Serializable {
 
 	@Id
