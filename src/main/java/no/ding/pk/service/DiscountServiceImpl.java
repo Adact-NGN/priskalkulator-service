@@ -190,4 +190,9 @@ public class DiscountServiceImpl implements DiscountService {
     public List<Discount> findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials) {
         return repository.findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materials);
     }
+
+    @Override
+    public List<Discount> findAllDiscountBySalesOrgAndSalesOfficeAndZoneAndMaterialNumberIn(String salesOrg, String salesOffice, Integer zones, List<String> materials) {
+        return repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, List.of(zones), materials);
+    }
 }

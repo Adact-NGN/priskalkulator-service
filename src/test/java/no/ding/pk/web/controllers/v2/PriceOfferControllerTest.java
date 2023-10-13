@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers.v2;
 
+import com.azure.spring.cloud.autoconfigure.aad.properties.AadResourceServerProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import no.ding.pk.config.ObjectMapperConfig;
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -56,8 +58,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled("ObjectMapper is null")
-@ContextConfiguration(classes = {ObjectMapperConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
+@Disabled("403 Forbidden error")
+@ContextConfiguration(classes = {PriceOfferController.class, ObjectMapperConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
 @WebMvcTest(PriceOfferController.class)
 class PriceOfferControllerTest {
 
@@ -74,9 +76,6 @@ class PriceOfferControllerTest {
 
     @Autowired
     private PriceOfferService priceOfferService;
-
-//    @Autowired
-//    private ObjectMapper objectMapper;
 
     @MockBean
     private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
@@ -95,6 +94,12 @@ class PriceOfferControllerTest {
 
     @MockBean
     private CustomerTermsService customerTermsService;
+
+    @MockBean
+    private AadResourceServerProperties aadResourceServerProperties;
+
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
@@ -178,6 +183,17 @@ class PriceOfferControllerTest {
     @Test
     public void shouldPersistPriceOfferWithMultipleZonesWithSimilarMaterials() throws Exception {
         String filename = "priceOfferDtoV2_multipleZonePrices.json";
+
+        when(userService.findByEmail("kjetil.torvund.minde@ngn.no"))
+                .thenReturn(User.builder()
+                        .id(123L)
+                        .orgNr("100")
+                        .orgName("NG")
+                        .name("Kjetil")
+                        .jobTitle("Systemutvikler")
+                        .powerOfAttorneyOA(4)
+                        .powerOfAttorneyFA(2)
+                        .build());
 //        PriceOfferDTO priceOfferDTO = createCompleteOfferDto(filename);
 
         String json = getCompleteofferDtoString(filename);
@@ -188,8 +204,6 @@ class PriceOfferControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
-
-
     }
 
     @Disabled("Move to service test")

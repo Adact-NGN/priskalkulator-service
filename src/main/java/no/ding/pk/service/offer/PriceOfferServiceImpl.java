@@ -189,7 +189,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                     }
 
                     for (PriceRow priceRow : zone.getPriceRows()) {
-                        mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
+                        String zoneNumber = getFormattedZoneNumber(zone.getZoneId());
+                        String zoneMaterialNumber = String.format("%s_%s", priceRow.getMaterial().getMaterialNumber(),
+                                zoneNumber);
+                        mateiralNumberSet.add(zoneMaterialNumber);
                     }
                 }
             }
@@ -218,7 +221,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
                 List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
 
-                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
+                List<String> regularMaterialNumbers = materialNumbers.stream().filter(s -> !s.contains("_")).toList();
+                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, regularMaterialNumbers);
+
+                List<String> zonedMaterialNumbers = new ArrayList<>(materialNumbers);
+                zonedMaterialNumbers.removeAll(regularMaterialNumbers);
+
+                List<Discount> zoneDiscounts = getDiscountForZoneMaterials(salesOrg, salesOffice, zonedMaterialNumbers);
 
                 if(discounts != null && !discounts.isEmpty()) {
                     discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
@@ -231,6 +240,45 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return orgOfficeMaterialDiscount;
+    }
+
+    private List<Discount> getDiscountForZoneMaterials(String salesOrg, String salesOffice, List<String> zonedMaterialNumbers) {
+        Map<String, List<String>> zoneMaterialMap = createZoneMaterialMap(zonedMaterialNumbers);
+
+        List<Discount> zoneDiscounts = new ArrayList<>();
+        for(String zoneNumber : zoneMaterialMap.keySet()) {
+            List<Discount> tempZoneDiscounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndZoneAndMaterialNumberIn(
+                    salesOrg,
+                    salesOffice,
+                    Integer.valueOf(zoneNumber),
+                    zoneMaterialMap.get(zoneNumber)
+            );
+
+            zoneDiscounts.addAll(tempZoneDiscounts);
+        }
+        return zoneDiscounts;
+    }
+
+    private static Map<String, List<String>> createZoneMaterialMap(List<String> zonedMaterialNumbers) {
+        Map<String, List<String>> zoneMaterialMap = new HashMap<>();
+        for (String zoneMaterialNumber : zonedMaterialNumbers) {
+            String[] zoneMaterialSplitArray = zoneMaterialNumber.split("_");
+
+            if(zoneMaterialMap.containsKey(zoneMaterialSplitArray[1])) {
+                zoneMaterialMap.get(zoneMaterialSplitArray[1]).add(zoneMaterialSplitArray[0]);
+            } else {
+                List<String> temp = new ArrayList<>();
+                temp.add(zoneMaterialSplitArray[0]);
+                zoneMaterialMap.put(zoneMaterialSplitArray[1], temp);
+            }
+        }
+        return zoneMaterialMap;
+    }
+
+    private static String getFormattedZoneNumber(String zoneId) {
+        Integer zoneNumber = Integer.valueOf(zoneId);
+
+        return zoneNumber > 9 ? String.valueOf(zoneNumber) : String.format("0%d", zoneNumber);
     }
 
     private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
