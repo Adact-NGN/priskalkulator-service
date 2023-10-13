@@ -4,6 +4,7 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.repository.offer.PriceOfferTemplateRepository;
 import no.ding.pk.service.UserService;
+import no.ding.pk.web.handlers.MissingRequiredPropertyException;
 import no.ding.pk.web.handlers.PriceOfferTemplateNotFound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class PriceOfferTemplateServiceImpl implements PriceOfferTemplateService 
 
     @Override
     public PriceOfferTemplate findById(Long id) {
+        if(id == null) {
+            throw new MissingRequiredPropertyException("No id provided for PriceOfferTemplate.");
+        }
         Optional<PriceOfferTemplate> byId = repository.findById(id);
 
         if(byId.isEmpty()) {

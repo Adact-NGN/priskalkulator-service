@@ -2190,7 +2190,8 @@
     "/api/v1/price-offer-template/create" : {
       "post" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "createTemplate",
+        "summary" : "Create a new price offer template",
+        "description" : "Creates a new price offer template with the given request body.",
         "operationId" : "createTemplateUsingPOST",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
@@ -2205,13 +2206,16 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns newly created price offer template",
             "schema" : {
               "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
           },
           "201" : {
             "description" : "Created"
+          },
+          "400" : {
+            "description" : "Bad request, missing name for template."
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2263,7 +2267,7 @@
     "/api/v1/price-offer-template/list/shared/{sharedWithEmail}" : {
       "get" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "List all PriceOfferTemplates shared with user by email",
+        "summary" : "List all price offer templates shared with user by email",
         "operationId" : "getAllTemplatesSharedWithUsingGET",
         "produces" : [ "*/*" ],
         "parameters" : [ {
@@ -2275,7 +2279,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "Returns a list of PriceOfferTemplates",
+            "description" : "Returns a list of shared price offer templates",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -2295,14 +2299,22 @@
         }
       }
     },
-    "/api/v1/price-offer-template/save" : {
+    "/api/v1/price-offer-template/save/{id}" : {
       "put" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "save",
+        "summary" : "Update price offer template",
+        "description" : "Update existing price offer template with new values.",
         "operationId" : "saveUsingPUT_3",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
           "in" : "body",
           "name" : "priceOfferTemplateDto",
           "description" : "priceOfferTemplateDto",
@@ -2313,7 +2325,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Updated price offer template",
             "schema" : {
               "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
@@ -2336,7 +2348,7 @@
     "/api/v1/price-offer-template/{id}" : {
       "get" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "Get a specific PriceOfferTemplate",
+        "summary" : "Get a specific price offer template",
         "operationId" : "getTemplateByIdUsingGET",
         "produces" : [ "application/json" ],
         "parameters" : [ {
