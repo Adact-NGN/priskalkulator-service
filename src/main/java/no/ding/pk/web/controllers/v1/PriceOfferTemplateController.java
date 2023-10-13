@@ -65,10 +65,10 @@ public class PriceOfferTemplateController {
      * @param sharedWithEmail User email
      * @return A list of PriceOfferTemplates
      */
-    @Operation(summary = "List all PriceOfferTemplates shared with user by email",
+    @Operation(summary = "List all price offer templates shared with user by email",
             parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")})
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Returns a list of PriceOfferTemplates")
+            @ApiResponse(responseCode = "200", description = "Returns a list of shared price offer templates")
     })
     @GetMapping(path = "/list/shared/{sharedWithEmail}")
     public List<PriceOfferTemplateDTO> getAllTemplatesSharedWith(@PathVariable("sharedWithEmail") String sharedWithEmail) {
@@ -82,7 +82,7 @@ public class PriceOfferTemplateController {
      * @param id the id for the template
      * @return PriceOfferTemplate
      */
-    @Operation(summary = "Get a specific PriceOfferTemplate")
+    @Operation(summary = "Get a specific price offer template")
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO getTemplateById(@PathVariable("id") Long id) {
         return modelMapper.map(service.findById(id), PriceOfferTemplateDTO.class);
@@ -93,6 +93,12 @@ public class PriceOfferTemplateController {
      * @param newTemplateDto the object
      * @return Newly created PriceOfferTemplate object.
      */
+    @Operation(summary = "Create a new price offer template",
+            description = "Creates a new price offer template with the given request body.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns newly created price offer template"),
+            @ApiResponse(responseCode = "400", description = "Bad request, missing name for template.")
+    })
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO createTemplate(@RequestBody PriceOfferTemplateDTO newTemplateDto) {
 
@@ -132,14 +138,25 @@ public class PriceOfferTemplateController {
      * @param priceOfferTemplateDto object with updated values.
      * @return Updated PriceOfferTemplate object.
      */
-    @PutMapping(path="save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOfferTemplateDTO save(@RequestBody PriceOfferTemplateDTO priceOfferTemplateDto) {
+    @Operation(description = "Update existing price offer template with new values.",
+    summary = "Update price offer template",
+            parameters = @Parameter(name = "id", description = "Price offer templates id", required = true)
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Updated price offer template")
+    })
+    @PutMapping(path="/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PriceOfferTemplateDTO save(@PathVariable("id") Long id,
+                                      @RequestBody PriceOfferTemplateDTO priceOfferTemplateDto) {
 
         if(StringUtils.isBlank(priceOfferTemplateDto.getName())) {
             throw new MissingRequiredPropertyException("PriceOfferTemplate.name property is missing.");
         }
 
-        PriceOfferTemplate entity = service.findById(priceOfferTemplateDto.getId());
+        if(id == null) {
+            throw new MissingRequiredPropertyException("PriceOfferTemplate.id property is missing.");
+        }
+        PriceOfferTemplate entity = service.findById(id);
 
         entity.setName(priceOfferTemplateDto.getName());
         entity.setIsShareable(priceOfferTemplateDto.getIsShareable());
