@@ -1203,6 +1203,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
     }
 
+    @Test
+    public void shouldSetPriceOfferToNotApprovedWhenNewMaterialsIsAdded() throws Exception {
+
+    }
+
     private void prepareUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 

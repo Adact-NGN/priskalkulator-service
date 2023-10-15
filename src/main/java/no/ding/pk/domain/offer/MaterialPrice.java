@@ -17,13 +17,13 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "material_price")
+@Table(name = "material_price", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType", "zone"}))
 public class MaterialPrice extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String materialNumber;
 
     @Column

@@ -36,7 +36,14 @@ public class MaterialServiceImpl implements MaterialService {
             throw new RuntimeException("Received material without a material number.");
         }
 
-        Material entity = getMaterial(material);
+        Material entity;
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), material.getDeviceType());
+            entity = repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
+        } else {
+            log.debug("Searching for material with number: {}", material.getMaterialNumber());
+            entity = repository.findByMaterialNumber(material.getMaterialNumber());
+        }
         log.debug("Found material: {}", entity);
         
         if(entity == null) {
@@ -116,16 +123,6 @@ public class MaterialServiceImpl implements MaterialService {
         }
         
         return repository.save(entity);
-    }
-
-    private Material getMaterial(Material material) {
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), material.getDeviceType());
-            return repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
-        } else {
-            log.debug("Searching for material with number: {}", material.getMaterialNumber());
-            return repository.findByMaterialNumber(material.getMaterialNumber());
-        }
     }
 
     @Override

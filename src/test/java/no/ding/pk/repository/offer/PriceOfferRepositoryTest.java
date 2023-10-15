@@ -49,6 +49,11 @@ public class PriceOfferRepositoryTest {
         priceOffer = repository.save(priceOffer);
 
         assertThat(priceOffer.getId(), notNullValue());
+        List<Zone> zoneList = priceOffer.getSalesOfficeList().get(0).getZoneList();
+        assertThat(zoneList, hasSize(3));
+        assertThat(zoneList.get(0).getPriceRows(), hasSize(3));
+        assertThat(zoneList.get(1).getPriceRows(), hasSize(3));
+        assertThat(zoneList.get(2).getPriceRows(), hasSize(3));
     }
 
     @Test
@@ -207,44 +212,14 @@ public class PriceOfferRepositoryTest {
                 .additionForAdminFee(false)
                 .build();
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber("50101")
-                .standardPrice(1131.0)
-                .build();
-
-        Material material = Material.builder()
-                .materialNumber("50101")
-                .designation("Lift - Utsett")
-                .pricingUnit(1)
-                .quantumUnit("ST")
-                .materialStandardPrice(materialPrice)
-                .build();
-
-        PriceRow priceRow = PriceRow.builder()
-                .customerPrice(1000.0)
-                .discountLevelPct(0.02)
-                .material(material)
-                .showPriceInOffer(true)
-                .manualPrice(900.0)
-                .discountLevel(1)
-                .discountLevelPrice(100.0)
-                .amount(1)
-                .priceIncMva(1125.0)
-                .build();
-
-        List<PriceRow> priceRowList = new ArrayList<>();
-        priceRowList.add(priceRow);
-
-        Zone zone = Zone.builder()
-                .postalCode("1601")
-                .postalName(null)
-                .zoneId("0000000001")
-                .isStandardZone(true)
-                .priceRows(priceRowList)
-                .build();
+        Zone zoneOne = createZone("0000000001", true);
+        Zone zoneTwo = createZone("0000000002", false);
+        Zone zoneThree = createZone("0000000003", false);
 
         List<Zone> zoneList = new ArrayList<>();
-        zoneList.add(zone);
+        zoneList.add(zoneOne);
+        zoneList.add(zoneTwo);
+        zoneList.add(zoneThree);
 
         MaterialPrice wastePrice = MaterialPrice.builder()
                 .materialNumber("119901")
@@ -309,6 +284,101 @@ public class PriceOfferRepositoryTest {
                 .salesEmployee(salesEmployee)
                 .approver(approver)
                 .priceOfferTerms(customerTerms)
+                .build();
+    }
+
+    private static Zone createZone(String zoneId, boolean isStandardZone) {
+        String formattedZoneId = String.format("0%d", Integer.valueOf(zoneId));
+        MaterialPrice materialPrice = MaterialPrice.builder()
+                .materialNumber("50101")
+                .zone(formattedZoneId)
+                .standardPrice(1131.0)
+                .build();
+
+        Material liftPlacementMaterial = Material.builder()
+                .materialNumber("50101")
+                .designation("Lift - Utsett")
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .salesZone(formattedZoneId)
+                .materialStandardPrice(materialPrice)
+                .build();
+
+        PriceRow priceRow = PriceRow.builder()
+                .customerPrice(1000.0)
+                .discountLevelPct(0.02)
+                .material(liftPlacementMaterial)
+                .showPriceInOffer(true)
+                .manualPrice(900.0)
+                .discountLevel(1)
+                .discountLevelPrice(100.0)
+                .amount(1)
+                .priceIncMva(1125.0)
+                .build();
+
+        MaterialPrice liftExchangePrice = MaterialPrice.builder()
+                .materialNumber("50102")
+                .zone(formattedZoneId)
+                .standardPrice(1468.0)
+                .build();
+        Material liftExchange = Material.builder()
+                .materialNumber("50102")
+                .designation("Lift - Utbytte")
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .salesZone(formattedZoneId)
+                .materialStandardPrice(liftExchangePrice)
+                .build();
+
+        PriceRow liftExchangePriceRow = PriceRow.builder()
+                .customerPrice(1000.0)
+                .discountLevelPct(0.02)
+                .material(liftExchange)
+                .showPriceInOffer(true)
+                .manualPrice(900.0)
+                .discountLevel(1)
+                .discountLevelPrice(100.0)
+                .amount(1)
+                .priceIncMva(1125.0)
+                .build();
+
+        MaterialPrice liftEmptyingPrice = MaterialPrice.builder()
+                .materialNumber("50103")
+                .zone(formattedZoneId)
+                .standardPrice(1131.0)
+                .build();
+        Material liftEmptying = Material.builder()
+                .materialNumber("50103")
+                .designation("Lift - Tømming")
+                .pricingUnit(1)
+                .quantumUnit("ST")
+                .salesZone(formattedZoneId)
+                .materialStandardPrice(liftEmptyingPrice)
+                .build();
+
+        PriceRow liftEmptyingPriceRow = PriceRow.builder()
+                .customerPrice(1000.0)
+                .discountLevelPct(0.02)
+                .material(liftExchange)
+                .showPriceInOffer(true)
+                .manualPrice(900.0)
+                .discountLevel(1)
+                .discountLevelPrice(100.0)
+                .amount(1)
+                .priceIncMva(1125.0)
+                .build();
+
+        List<PriceRow> priceRowList = new ArrayList<>();
+        priceRowList.add(priceRow);
+        priceRowList.add(liftEmptyingPriceRow);
+        priceRowList.add(liftExchangePriceRow);
+
+        return Zone.builder()
+                .postalCode("1601")
+                .postalName(null)
+                .zoneId(zoneId)
+                .isStandardZone(isStandardZone)
+                .priceRows(priceRowList)
                 .build();
     }
 

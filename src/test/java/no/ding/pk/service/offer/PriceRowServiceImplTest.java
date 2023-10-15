@@ -101,11 +101,13 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .level(1)
                 .discount(0.0)
                 .pctDiscount(0.0)
+                .zone(1)
                 .build();
 
         DiscountLevel levelTwo = DiscountLevel.builder()
                 .level(2)
                 .discount(189.0)
+                .zone(1)
                 .build();
 
         List<DiscountLevel> discountLevels = new LinkedList<>();

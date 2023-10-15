@@ -23,10 +23,10 @@ public class DiscountLevel {
     @Column
     private Double discount;
 
-    @Column
+    @Column(name = "calculated_discount")
     private Double calculatedDiscount;
 
-    @Column
+    @Column(name = "pct_discount")
     private Double pctDiscount;
 
     @Column
