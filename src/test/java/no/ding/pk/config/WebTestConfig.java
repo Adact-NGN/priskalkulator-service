@@ -7,6 +7,10 @@ import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.offer.MaterialPriceRepository;
+import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.repository.offer.SalesOfficeRepository;
+import no.ding.pk.repository.offer.ZoneRepository;
 import no.ding.pk.service.*;
 import no.ding.pk.service.bo.BoReportConditionCodeService;
 import no.ding.pk.service.converters.PdfService;
@@ -21,6 +25,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.persistence.EntityManagerFactory;
 
 @Configuration
 @Import({ModelMapperConfig.class, ModelMapperV2Config.class})
@@ -93,5 +99,20 @@ public class WebTestConfig implements WebMvcConfigurer {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private SalesOfficeRepository salesOfficeRepository;
+
+    @MockBean
+    private PriceRowRepository priceRowRepository;
+
+    @MockBean
+    private MaterialPriceRepository materialPriceRepository;
+
+    @MockBean
+    private EntityManagerFactory entityManagerFactory;
+
+    @MockBean
+    private ZoneRepository zoneRepository;
 
 }

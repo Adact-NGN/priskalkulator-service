@@ -2,6 +2,7 @@ package no.ding.pk.service.offer;
 
 import lombok.Data;
 import no.ding.pk.domain.Discount;
+import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
@@ -181,21 +182,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
             mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
-
-            if(salesOffice.getZoneList() != null && !salesOffice.getZoneList().isEmpty()) {
-                for (Zone zone : salesOffice.getZoneList()) {
-                    if(zone.getPriceRows() == null) {
-                        continue;
-                    }
-
-                    for (PriceRow priceRow : zone.getPriceRows()) {
-                        String zoneNumber = getFormattedZoneNumber(zone.getZoneId());
-                        String zoneMaterialNumber = String.format("%s_%s", priceRow.getMaterial().getMaterialNumber(),
-                                zoneNumber);
-                        mateiralNumberSet.add(zoneMaterialNumber);
-                    }
-                }
-            }
+            mateiralNumberSet.addAll(getZonedMaterialNumberSet(salesOffice.getZoneList()));
 
             // Create sales office to material number map.
             Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
@@ -221,17 +208,21 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
                 List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
 
-                List<String> regularMaterialNumbers = materialNumbers.stream().filter(s -> !s.contains("_")).toList();
-                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, regularMaterialNumbers);
-
-                List<String> zonedMaterialNumbers = new ArrayList<>(materialNumbers);
-                zonedMaterialNumbers.removeAll(regularMaterialNumbers);
-
-                List<Discount> zoneDiscounts = getDiscountForZoneMaterials(salesOrg, salesOffice, zonedMaterialNumbers);
+//                List<String> regularMaterialNumbers = materialNumbers.stream().filter(s -> !s.contains("_")).toList();
+                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
 
                 if(discounts != null && !discounts.isEmpty()) {
                     discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
                 }
+
+//                List<String> zonedMaterialNumbers = new ArrayList<>(materialNumbers);
+//                zonedMaterialNumbers.removeAll(regularMaterialNumbers);
+
+//                List<Discount> zoneDiscounts = getDiscountForZoneMaterials(salesOrg, salesOffice, zonedMaterialNumbers);
+
+//                if(!zoneDiscounts.isEmpty()) {
+//                    zoneDiscounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
+//                }
 
                 salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
             }
@@ -242,21 +233,36 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return orgOfficeMaterialDiscount;
     }
 
-    private List<Discount> getDiscountForZoneMaterials(String salesOrg, String salesOffice, List<String> zonedMaterialNumbers) {
-        Map<String, List<String>> zoneMaterialMap = createZoneMaterialMap(zonedMaterialNumbers);
+    private Collection<String> getZonedMaterialNumberSet(List<Zone> zoneList) {
 
-        List<Discount> zoneDiscounts = new ArrayList<>();
-        for(String zoneNumber : zoneMaterialMap.keySet()) {
-            List<Discount> tempZoneDiscounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndZoneAndMaterialNumberIn(
+        Set<String> mateiralNumberSet = new HashSet<>();
+
+        if(zoneList != null && !zoneList.isEmpty()) {
+            for (Zone zone : zoneList) {
+                if(zone.getPriceRows() == null) {
+                    continue;
+                }
+
+                for (PriceRow priceRow : zone.getPriceRows()) {
+//                    String zoneNumber = getFormattedZoneNumber(zone.getZoneId());
+//                    String zoneMaterialNumber = String.format("%s_%s", priceRow.getMaterial().getMaterialNumber(),
+//                            zoneNumber);
+                    mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
+                }
+            }
+        }
+        return mateiralNumberSet;
+    }
+
+    private List<Discount> getDiscountForZoneMaterials(String salesOrg, String salesOffice, List<String> zonedMaterialNumbers) {
+
+            List<Discount> tempZoneDiscounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(
                     salesOrg,
                     salesOffice,
-                    Integer.valueOf(zoneNumber),
-                    zoneMaterialMap.get(zoneNumber)
+                    zonedMaterialNumbers.stream().map(key -> key.split("_")[0]).collect(Collectors.toSet()).stream().toList()
             );
 
-            zoneDiscounts.addAll(tempZoneDiscounts);
-        }
-        return zoneDiscounts;
+        return new ArrayList<>(tempZoneDiscounts);
     }
 
     private static Map<String, List<String>> createZoneMaterialMap(List<String> zonedMaterialNumbers) {

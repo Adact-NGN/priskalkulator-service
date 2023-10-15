@@ -29,22 +29,22 @@ public class Discount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @Column(nullable = false)
+    @Column(nullable = false, name = "sales_org")
     private String salesOrg;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "sales_office")
     private String salesOffice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "material_number")
     private String materialNumber;
     
-    @Column
+    @Column(nullable = true, name = "DEVICE_TYPE")
     private String deviceType;
     
-    @Column
+    @Column(name = "material_designation")
     private String materialDesignation;
     
-    @Column
+    @Column(name = "standard_price")
     private Double standardPrice;
 
     @Column

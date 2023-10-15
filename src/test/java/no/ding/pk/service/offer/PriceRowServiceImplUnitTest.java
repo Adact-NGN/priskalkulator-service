@@ -22,8 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class PriceRowServiceImplUnitTest {
 
@@ -62,7 +61,7 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(oldMaterialPrice);
+        doReturn(oldMaterialPrice).when(materialPriceService).findByMaterialNumber(anyString());
 
         Material oldMaterial = Material.builder()
                 .id(1L)
@@ -163,7 +162,7 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        doReturn(materialPrice).when(materialPriceService).findByMaterialNumber(anyString());
 
         Material material = Material.builder()
                 .materialNumber(materialNumber)
@@ -173,7 +172,7 @@ public class PriceRowServiceImplUnitTest {
                 .materialStandardPrice(materialPrice)
                 .build();
 
-        when(materialService.save(any())).thenReturn(material);
+        doReturn(material).when(materialService).save(any());
 
         EntityManager entityManager = mock(EntityManager.class);
         when(entityManager.getTransaction()).thenReturn(mock(EntityTransaction.class));
@@ -197,22 +196,27 @@ public class PriceRowServiceImplUnitTest {
                 DiscountLevel.builder()
                         .level(1)
                         .discount(0.0)
+                        .zone(1)
                         .build(),
                 DiscountLevel.builder()
                         .level(2)
                         .discount(90.0)
+                        .zone(1)
                         .build(),
                 DiscountLevel.builder()
                         .level(3)
                         .discount(180.0)
+                        .zone(1)
                         .build(),
                 DiscountLevel.builder()
                         .level(4)
                         .discount(315.0)
+                        .zone(1)
                         .build(),
                 DiscountLevel.builder()
                         .level(5)
                         .discount(468.0)
+                        .zone(1)
                         .build()
         );
         Discount discount = Discount.builder()

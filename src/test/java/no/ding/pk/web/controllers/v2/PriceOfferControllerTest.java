@@ -3,41 +3,42 @@ package no.ding.pk.web.controllers.v2;
 import com.azure.spring.cloud.autoconfigure.aad.properties.AadResourceServerProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import no.ding.pk.config.ObjectMapperConfig;
+import no.ding.pk.config.H2IntegrationTestConfig;
 import no.ding.pk.config.SecurityConfig;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
-import no.ding.pk.repository.SalesRoleRepository;
-import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
-import no.ding.pk.service.offer.*;
-import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.service.offer.PriceOfferService;
+import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.offer.SalesOfficeDTO;
 import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlMergeMode;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,51 +50,30 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Disabled("403 Forbidden error")
-@ContextConfiguration(classes = {PriceOfferController.class, ObjectMapperConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
-@WebMvcTest(PriceOfferController.class)
+@SqlConfig(commentPrefix = "#")
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
+@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@SpringJUnitWebConfig(classes = {H2IntegrationTestConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
 class PriceOfferControllerTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private UserService userService;
 
     @MockBean
-    private PriceOfferRepository priceOfferRepository;
-
-    @Autowired
-    private PriceOfferService priceOfferService;
+    private SapMaterialService sapMaterialService;
 
     @MockBean
-    private SalesOfficePowerOfAttorneyService salesOfficePowerOfAttorneyService;
-
-    @MockBean
-    private MaterialService materialService;
-
-    @MockBean
-    private SalesRoleRepository salesRoleRepository;
-
-    @MockBean
-    private SalesOfficeService salesOfficeService;
-
-    @MockBean
-    private DiscountService discountService;
-
-    @MockBean
-    private CustomerTermsService customerTermsService;
+    private StandardPriceService standardPriceService;
 
     @MockBean
     private AadResourceServerProperties aadResourceServerProperties;
@@ -103,76 +83,37 @@ class PriceOfferControllerTest {
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
-//    private final ObjectReader objectReader = new ObjectMapper().reader();
-
-    @MockBean
-    private MaterialPriceService materialPriceService;
-
     @Autowired
     @Qualifier("modelMapperV2")
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PriceOfferService priceOfferService;
+
+    @Autowired
+    @Qualifier("sopoaTestService")
+    private SalesOfficePowerOfAttorneyService sopoaService;
+
+    @BeforeEach
+    public void setup() {
+        PriceOfferController priceOfferController1 = new PriceOfferController(priceOfferService, sopoaService, modelMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(priceOfferController1).build();
+    }
+
     private static final String baseUrl = "/api/v2/price-offer";
-
-    private String approverEmail;
-    private String salesEmployeeEmail;
-    private User salesEmployee;
-    private User approver;
-
-//    @Override
-//    public void setup() throws IOException {
-//
-//    }
-
-//    @BeforeEach
-//    public void setup() {
-//
-//        MaterialPrice stdMaterialPrice = MaterialPrice.builder()
-//                .standardPrice(1000.0)
-//                .pricingUnit(1)
-//                .deviceType("Test_device_type")
-//                .build();
-//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(stdMaterialPrice);
-//
-////        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-//
-//        salesEmployeeEmail = "Wolfgang@farris-bad.no";
-//
-//        salesEmployee = User.builder()
-//                .adId("ad-id-wegarijo-arha-rh-arha")
-//                .jobTitle("Salgskonsulent")
-//                .fullName("Wolfgang Amadeus Mozart")
-//                .email(salesEmployeeEmail)
-//                .associatedPlace("Larvik")
-//                .department("Hvitsnippene")
-//                .build();
-//
-//        when(userService.findByEmail(salesEmployeeEmail)).thenReturn(salesEmployee);
-//
-//        approverEmail = "alexander.brox@ngn.no";
-//
-//        approver = User.builder()
-//                .adId("ad-ww-wegarijo-arha-rh-arha")
-//                .associatedPlace("Oslo")
-//                .email(approverEmail)
-//                .department("Salg")
-//                .fullName("Alexander Brox")
-//                .name("Alexander")
-//                .sureName("Brox")
-//                .jobTitle("Markedskonsulent")
-//                .build();
-//
-//        when(userService.findByEmail(approverEmail)).thenReturn(approver);
-//    }
 
     @Test
     public void shouldPersistPriceOffer() throws Exception {
         String priceOffer = getCompleteofferDtoString(null);
 
-        when(priceOfferService.save(any())).thenAnswer(invocationOnMock -> {
-            Object[] arguments = invocationOnMock.getArguments();
-            return arguments[0];
-        });
+        String mail = "alexander.brox@ngn.no";
+
+        userService.save(User.builder()
+                .id(2L)
+                .name("Alexander Brox")
+                .phoneNumber("95838638")
+                .email(mail)
+                .build(), null);
 
         mockMvc.perform(post(baseUrl + "/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -184,17 +125,16 @@ class PriceOfferControllerTest {
     public void shouldPersistPriceOfferWithMultipleZonesWithSimilarMaterials() throws Exception {
         String filename = "priceOfferDtoV2_multipleZonePrices.json";
 
-        when(userService.findByEmail("kjetil.torvund.minde@ngn.no"))
-                .thenReturn(User.builder()
-                        .id(123L)
-                        .orgNr("100")
-                        .orgName("NG")
-                        .name("Kjetil")
-                        .jobTitle("Systemutvikler")
-                        .powerOfAttorneyOA(4)
-                        .powerOfAttorneyFA(2)
-                        .build());
-//        PriceOfferDTO priceOfferDTO = createCompleteOfferDto(filename);
+        userService.save(User.builder()
+                .id(123L)
+                .orgNr("100")
+                .orgName("NG")
+                .name("Kjetil")
+                .jobTitle("Systemutvikler")
+                        .email("kjetil.torvund.minde@ngn.no")
+                .powerOfAttorneyOA(4)
+                .powerOfAttorneyFA(2)
+                .build(), null);
 
         String json = getCompleteofferDtoString(filename);
 
@@ -204,6 +144,20 @@ class PriceOfferControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
+
+        String resultAsString = result.getResponse().getContentAsString();
+
+        PriceOfferDTO priceOfferDTOResult = new ObjectMapper().reader().readValue(resultAsString, PriceOfferDTO.class);
+
+        assertThat(priceOfferDTOResult.getSalesOfficeList(), hasSize(1));
+        SalesOfficeDTO salesOfficeDTO = priceOfferDTOResult.getSalesOfficeList().get(0);
+
+        assertThat(salesOfficeDTO.getZoneList(), hasSize(3));
+        List<ZoneDTO> zoneDTOList = salesOfficeDTO.getZoneList();
+        assertThat(zoneDTOList.get(0).getMaterialList(), hasSize(6));
+        assertThat(zoneDTOList.get(1).getMaterialList(), hasSize(6));
+        assertThat(zoneDTOList.get(2).getMaterialList(), hasSize(6));
+
     }
 
     @Disabled("Move to service test")
@@ -270,9 +224,9 @@ class PriceOfferControllerTest {
     @Test
     public void shouldListAllPriceOfferForApprover() throws Exception {
 
-        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
-        UserDTO approverDto = modelMapper.map(approver, UserDTO.class);
-        priceOffer.setApprover(approverDto);
+//        PriceOfferDTO priceOffer = createCompleteOfferDto(null);
+//        UserDTO approverDto = modelMapper.map(approver, UserDTO.class);
+//        priceOffer.setApprover(approverDto);
 
 //        MvcResult result = mockMvc.perform(
 //                        post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
@@ -300,15 +254,15 @@ class PriceOfferControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldSetPriceOfferToNotApprovedWhenNewMaterialsIsAdded() throws Exception {
-        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
-        User approver = userService.findByEmail(approverEmail);
+//        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+//        User approver = userService.findByEmail(approverEmail);
 
-        List<PriceRow> materials = createPriceRows();
-        SalesOffice salesOfficeDTO = createSalesOffice(materials);
-        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
-        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
-
-        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+//        List<PriceRow> materials = createPriceRows();
+//        SalesOffice salesOfficeDTO = createSalesOffice(materials);
+//        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
+//        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
+//
+//        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
         // Create
 //        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create").contentType(MediaType.APPLICATION_JSON)
@@ -368,15 +322,15 @@ class PriceOfferControllerTest {
     @Test
     public void shouldSetPriceOfferToApproved() throws Exception {
 
-        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
-        User approver = userService.findByEmail(approverEmail);
-
-        List<PriceRow> materials = createPriceRows();
-        SalesOffice salesOfficeDTO = createSalesOffice(materials);
-        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
-        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
-
-        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+//        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+//        User approver = userService.findByEmail(approverEmail);
+//
+//        List<PriceRow> materials = createPriceRows();
+//        SalesOffice salesOfficeDTO = createSalesOffice(materials);
+//        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
+//        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
+//
+//        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
 //        MvcResult result = mockMvc.perform(post("/api/v2/price-offer/create")
 //                        .contentType(MediaType.APPLICATION_JSON)
@@ -410,15 +364,15 @@ class PriceOfferControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldListAllPriceOffersWithListDTO() throws Exception {
-        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
-        User approver = userService.findByEmail(approverEmail);
-
-        List<PriceRow> materials = createPriceRows();
-        SalesOffice salesOfficeDTO = createSalesOffice(materials);
-        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
-        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
-
-        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+//        User salesEmployee = userService.findByEmail(salesEmployeeEmail);
+//        User approver = userService.findByEmail(approverEmail);
+//
+//        List<PriceRow> materials = createPriceRows();
+//        SalesOffice salesOfficeDTO = createSalesOffice(materials);
+//        List<SalesOffice> salesOfficeDTOs = List.of(salesOfficeDTO);
+//        PriceOffer priceOffer = createPriceOffer(salesEmployee, approver, salesOfficeDTOs);
+//
+//        PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
 
         // Create
         String createUrl = "/api/v2/price-offer/create";

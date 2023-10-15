@@ -24,7 +24,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.withEnvironmentVariable;
 
 @Tag("integrationtest")
 @ContextConfiguration
-@Import(H2TestConfig.class)
+@Import(H2UnitTestConfig.class)
 @DataJpaTest
 @ExtendWith(SystemStubsExtension.class)
 @Getter

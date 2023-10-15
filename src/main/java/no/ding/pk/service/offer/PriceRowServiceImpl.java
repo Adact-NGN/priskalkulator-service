@@ -20,10 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -141,7 +138,6 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
-//        entity.setApproved(materialPriceRow.isApproved());
 
         entity = repository.save(entity);
 
@@ -224,7 +220,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                 log.info("Could not get discount level equivalent for manual price.");
             }
         } else {
-            calculateDiscountPrice(entity, salesOrg, salesOffice, discountMap);
+            calculateDiscountPrice(entity, salesOrg, salesOffice, zone, discountMap);
         }
 
         if(materialPriceRow.hasCombinedMaterials()) {
@@ -315,7 +311,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return materials;
     }
 
-    private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+    private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, String zone, Map<String, Map<String, Map<String, Discount>>> discountMap) {
         if(discountMap == null || discountMap.isEmpty()) {
             log.debug("No discount map provided for material: {}", entity.getMaterial().getMaterialNumber());
             return;
@@ -325,7 +321,14 @@ public class PriceRowServiceImpl implements PriceRowService {
                 Discount discount = discountMap.get(salesOrg).get(salesOffice).get(entity.getMaterial().getMaterialNumber());
 
                 if(discount != null && !discount.getDiscountLevels().isEmpty()) {
-                    Optional<DiscountLevel> optionalDl = discount.getDiscountLevels().stream().filter(dlevel -> dlevel.getLevel() == entity.getDiscountLevel()).findFirst();
+                    Integer zoneAsInt = StringUtils.isNotBlank(zone) ? Integer.valueOf(zone) : null;
+                    Optional<DiscountLevel> optionalDl = discount.getDiscountLevels().stream().filter(discountLevel -> {
+                        if(zoneAsInt == null) {
+                            return discountLevel.getLevel() == entity.getDiscountLevel();
+                        }
+
+                        return discountLevel.getLevel() == entity.getDiscountLevel() && Objects.equals(discountLevel.getZone(), zoneAsInt);
+                    }).findFirst();
 
                     if(optionalDl.isEmpty()) {
                         log.debug("Discount was found, but no discount level with value {} was found.", entity.getDiscountLevel());
