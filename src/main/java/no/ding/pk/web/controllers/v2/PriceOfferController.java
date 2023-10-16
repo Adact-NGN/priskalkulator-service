@@ -1,6 +1,10 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
@@ -15,6 +19,7 @@ import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.EmployeeNotProvidedException;
 import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
+import no.ding.pk.web.handlers.PriceOfferStatusCodeNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
@@ -213,6 +218,42 @@ public class PriceOfferController {
         
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
+
+    /**
+     * Update PriceOffer with new status
+     * @param id price offer id
+     * @param status the new status to set
+     * @return Message if the update was successfull.
+     */
+    @Operation(summary = "Set new status for the price offer by id.",
+            parameters = {
+                    @Parameter(name = "id", required = true, description = "ID for price offer to update"),
+                    @Parameter(name = "status", required = true, description = "The status to update the price offer with.")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns status OK when status has successfully been updated."),
+            @ApiResponse(responseCode = "400", description = "Price offer not found"),
+            @ApiResponse(responseCode = "404", description = "Given status not found")
+    })
+    @PutMapping("/status/{id}")
+    public ResponseEntity<String> updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status) {
+        if(!PriceOfferStatus.getAllPriceOfferStatuses().contains(status)) {
+            String message = String.format("Given status is not a valid: %s", status);
+            throw new PriceOfferStatusCodeNotFoundException(message);
+        }
+
+        service.updateStatus(id, status);
+
+        String returnMessage = String.format("Price offer with id: %d was updated with status: %s", id, status);
+        return new ResponseEntity<>(returnMessage, HttpStatus.OK);
+    }
+
+    @ExceptionHandler({PriceOfferStatusCodeNotFoundException.class})
+    public ResponseEntity<Object> handlePriceOfferStatusCodeNotFoundException(RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 
     /**
      * Adds missing fields for the {@code Material} object. The ModelMapper is unable to map all fields when converting from a string to an object.

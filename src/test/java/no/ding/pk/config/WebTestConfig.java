@@ -31,7 +31,6 @@ import javax.persistence.EntityManagerFactory;
 @Configuration
 @Import({ModelMapperConfig.class, ModelMapperV2Config.class})
 @ComponentScan("no.ding.pk.web")
-//@EnableWebMvc
 public class WebTestConfig implements WebMvcConfigurer {
 
     @MockBean

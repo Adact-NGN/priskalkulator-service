@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "AD_USER_INFO_SELECT_LIST=AD_USER_INFO_LIST"
 }, classes = {
         AzureConfig.class,
-        ObjectMapperConfig.class,
+//        ObjectMapperConfig.class,
         SpringFoxConfig.class
 })
 public class GenerateSwaggerTest {

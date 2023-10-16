@@ -29,4 +29,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
 
     List<PriceOffer> findAllPriceOffersRadyForBoReport();
+
+    void updateStatus(Long id, String status);
 }
