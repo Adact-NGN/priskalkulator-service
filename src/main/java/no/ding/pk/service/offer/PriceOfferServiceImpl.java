@@ -2,7 +2,6 @@ package no.ding.pk.service.offer;
 
 import lombok.Data;
 import no.ding.pk.domain.Discount;
-import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
@@ -676,6 +675,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public List<PriceOffer> findAllPriceOffersRadyForBoReport() {
         
         return repository.findAllByPriceOfferStatusIn(List.of(PriceOfferStatus.ACTIVATED.getStatus()));
+    }
+
+    @Override
+    public void updateStatus(Long id, String status) {
+        PriceOffer priceOffer = repository.findById(id).orElse(null);
+
+        if(priceOffer == null) {
+            String message = String.format("Price offer with id %d not found", id);
+            throw new PriceOfferNotFoundException(message);
+        }
+
+        priceOffer.setPriceOfferStatus(status);
+
+        repository.save(priceOffer);
     }
 
 }

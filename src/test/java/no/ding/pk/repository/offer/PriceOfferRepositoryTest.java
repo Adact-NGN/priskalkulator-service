@@ -115,6 +115,29 @@ public class PriceOfferRepositoryTest {
         assertThat(build, notNullValue());
     }
 
+    @Test
+    public void shouldUpdatePriceOfferStatus() {
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(User.builder()
+                        .name("Test person")
+                        .build())
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .build();
+
+        priceOffer = repository.save(priceOffer);
+
+        assertThat(priceOffer.getId(), notNullValue());
+
+        priceOffer.setPriceOfferStatus(PriceOfferStatus.DRAFT.getStatus());
+
+        priceOffer = repository.save(priceOffer);
+
+        PriceOffer actualPriceOffer = repository.findById(priceOffer.getId()).orElse(null);
+
+        assertThat(actualPriceOffer.getPriceOfferStatus(), notNullValue());
+        assertThat(actualPriceOffer.getPriceOfferStatus(), equalTo(PriceOfferStatus.DRAFT.getStatus()));
+    }
+
     private void createCompleteOfferDtoList(User salesAndApproval) {
         Material material = Material.builder()
                 .materialNumber("70120015")
