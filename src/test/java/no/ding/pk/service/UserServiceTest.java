@@ -6,10 +6,13 @@ import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
+import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
 import no.ding.pk.repository.offer.MaterialPriceRepository;
 import no.ding.pk.repository.offer.MaterialRepository;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.service.offer.MaterialPriceService;
 import no.ding.pk.service.offer.MaterialPriceServiceImpl;
 import no.ding.pk.service.offer.MaterialService;
@@ -80,7 +83,9 @@ public class UserServiceTest extends AbstractIntegrationConfig {
 
         salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
 
-        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository);
+        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
+
+        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
 
         objectMapper = new ObjectMapper();
 

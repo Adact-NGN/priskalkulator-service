@@ -53,15 +53,23 @@ public class DiscountRepositoryTest {
     }
 
     @Test
-    public void shouldGetSpecificDiscountLevel() {
+    public void shouldGetSpecificDiscountLevelWithZone() {
         List<DiscountLevel> dls = discountLevelRepository.findAll();
 
         assertThat(dls, hasSize(greaterThan(0)));
 
-        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, 2);
+        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(salesOrg, materialNumber, 2,1);
 
         assertThat(actualList, hasSize(greaterThan(0)));
         assertThat(actualList.get(0).getLevel(), is(2));
+    }
+
+    @Test
+    public void shouldGetSpecificDiscountLevelWithNoZone() {
+        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(salesOrg, "161201", 3, null);
+
+        assertThat(actualList, hasSize(greaterThan(0)));
+        assertThat(actualList.get(0).getLevel(), is(3));
     }
 
     @Test

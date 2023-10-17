@@ -83,27 +83,32 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         priceOfferRepository = getPriceOfferRepository();
 
-        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
+        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
+        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), materialPriceCache);
 
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
 
         sapMaterialService = mock(SapMaterialService.class);
 
-        PriceRowService priceRowService = new PriceRowServiceImpl(getPriceRowRepository(),
+        discountService = mock(DiscountService.class);
+
+        PriceRowService priceRowService = new PriceRowServiceImpl(
+                discountService,
+                getPriceRowRepository(),
                 materialService,
                 materialPriceService,
                 getEmFactory(),
                 sapMaterialService,
                 modelMapper);
 
-        discountService = mock(DiscountService.class);
+
         InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
         ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
         sapHttpClient = mock(SapHttpClient.class);
 
         standardPriceService = mock(StandardPriceService.class);
 
-        ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, discountService, standardPriceService);
+        ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, standardPriceService);
 
         salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
         userService = new UserServiceImpl(getUserRepository(), getSalesRoleRepository());

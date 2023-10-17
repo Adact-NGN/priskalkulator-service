@@ -1,6 +1,8 @@
 package no.ding.pk.service.sap;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.SalesRoleRepository;
@@ -11,20 +13,18 @@ import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.core.Is;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import javax.net.ssl.SSLSession;
@@ -66,12 +66,16 @@ public class StandardPriceServiceImplTest {
 
     private ModelMapper modelMapper;
 
+    @MockBean
+    private SalesOrgService salesOrgService;
+
     @Autowired
     private SalesRoleRepository salesRoleRepository;
 
     @Value("${cache.max.amount.items:5000}")
     private Integer capacity;
-    
+    private InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache;
+
     @BeforeEach
     public void setup() throws IOException {
 
@@ -90,11 +94,11 @@ public class StandardPriceServiceImplTest {
 
         mockMaterialServiceResponse(classLoader);
 
-        InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache = new PingInMemory3DCache<>(capacity);
+        inMemoryCache = new PingInMemory3DCache<>(capacity);
         service = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", new ObjectMapper(),
         inMemoryCache,
         sapMaterialService,
-        sapHttpClient, modelMapper);
+        sapHttpClient, modelMapper, salesOrgService);
     }
 
     private void mockMaterialServiceResponse(ClassLoader classLoader) throws IOException {
@@ -208,5 +212,69 @@ public class StandardPriceServiceImplTest {
         MaterialStdPriceDTO stdPriceDTO = objectMapper.readValue(jsonFile, MaterialStdPriceDTO.class);
         
         assertThat(stdPriceDTO.getMaterial(), Is.is("50101"));
+    }
+
+    @Test
+    void shouldGetMaterialStandardPriceFromCache() {
+        String salesOrg = "100";
+        String salesOffice = "104";
+
+        List<MaterialStdPriceDTO> stdPriceDTOS = service.getStandardPriceForSalesOrgSalesOfficeAndMaterial(salesOrg, salesOffice, "50101", "01");
+
+        assertThat(stdPriceDTOS, hasSize(1));
+
+        stdPriceDTOS = service.getStandardPriceForSalesOrgSalesOfficeAndMaterial(salesOrg, salesOffice, "50101", "01");
+
+        assertThat(stdPriceDTOS, hasSize(1));
+        assertThat(inMemoryCache.size("100"), is(1));
+    }
+
+    @Test
+    void shouldBeAbleToSearchForMaterialsInCache() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("standardPrices100104.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectReader objectReader = objectMapper.reader();
+
+        JsonNode jsonNode = objectReader.readTree(json);
+
+        jsonNode.get("d").get("results").forEach(node -> {
+            MaterialStdPriceDTO materialStdPriceDTO = null;
+            try {
+                materialStdPriceDTO = objectReader.readValue(node, MaterialStdPriceDTO.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            String combination = createSalesOfficeMaterialNumberCombination(materialStdPriceDTO.getSalesOffice(), materialStdPriceDTO.getMaterial(), materialStdPriceDTO.getZone(), materialStdPriceDTO.getDeviceType());
+
+            inMemoryCache.put("100", combination, materialStdPriceDTO);
+        });
+
+        assertThat(inMemoryCache.size("100"), greaterThan(0));
+
+        List<MaterialStdPriceDTO> materialStdPriceDTOS = inMemoryCache.searchFor("100", "50101");
+
+        assertThat(materialStdPriceDTOS, hasSize(greaterThan(0)));
+    }
+
+    private String createSalesOfficeMaterialNumberCombination(String salesOffice, String material, String zone, CharSequence deviceType) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(salesOffice).append("_").append(material);
+
+        if(StringUtils.isNotBlank(zone)) {
+            sb.append("_").append(zone);
+        }
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            sb.append("_").append(deviceType);
+        }
+
+        return sb.toString();
     }
 }

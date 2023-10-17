@@ -507,6 +507,13 @@
           "description" : "salesOrg",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "zone",
+          "in" : "query",
+          "description" : "zone",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
         } ],
         "responses" : {
           "200" : {
@@ -1671,6 +1678,13 @@
           "description" : "salesOrg",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "zone",
+          "in" : "query",
+          "description" : "zone",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
         } ],
         "responses" : {
           "200" : {
