@@ -52,7 +52,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         this.inMemoryCache = inMemoryCache;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
     @Async
     @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
     public void updateMaterialCache() {

@@ -76,7 +76,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         this.salesOrgService = salesOrgService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
     @Async
     @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
     public void updateStandardPriceCache() {
