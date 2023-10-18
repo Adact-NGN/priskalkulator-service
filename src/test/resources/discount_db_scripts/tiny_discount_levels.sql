@@ -73,6 +73,11 @@ INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_disco
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (138, null, 225, 3, null, 23, null);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (139, null, 394, 4, null, 23, null);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (140, null, 585, 5, null, 23, null);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4453, null, 0, 1, null, 879, null);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4454, null, 3, 2, null, 879, null);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4455, null, 6, 3, null, 879, null);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4456, null, 11, 4, null, 879, null);
+INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4457, null, 15, 5, null, 879, null);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4518, null, 0, 1, null, 892, null);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4519, null, 36, 2, null, 892, null);
 INSERT INTO discount_levels (id, calculated_discount, discount, level, pct_discount, discount_id, zone) VALUES (4520, null, 73, 3, null, 892, null);

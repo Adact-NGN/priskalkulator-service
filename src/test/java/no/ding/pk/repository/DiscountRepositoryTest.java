@@ -119,7 +119,7 @@ public class DiscountRepositoryTest {
         Specification<Discount> specification = withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withMaterialNumber("C-02L")).and(hasDiscountLevelInZone(null));
         List<Discount> discountList = repository.findAll(specification);
 
-        assertThat(discountList, hasSize(greaterThan(0)));
+        assertThat(discountList, hasSize(1));
     }
 
     @Test

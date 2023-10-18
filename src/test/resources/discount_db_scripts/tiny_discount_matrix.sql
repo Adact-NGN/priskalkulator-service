@@ -8,6 +8,7 @@ INSERT INTO discount_matrix (id, device_type, material_designation, material_num
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (21, null, 'Lift - Flytting', '50107', '100', '100', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (22, null, 'Lift - Ventetid', '50108', '100', '100', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (23, null, 'Lift - Steaming/vask', '50109', '100', '100', null, null);
+INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (879, null, 'Container - 2 m3 (lift) Åpen', 'C-02L', '100', '101', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (892, null, 'Ren Betong med armering', '161201', '100', '101', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (10889, null, 'Lift - Utsett', '50101', '100', '127', null, null);
 INSERT INTO discount_matrix (id, device_type, material_designation, material_number, sales_org, sales_office, standard_price, fa) VALUES (10919, 'B-0060-FO', 'Flatvogn - Utsett', '50301', '100', '127', null, null);

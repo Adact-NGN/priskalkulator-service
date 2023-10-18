@@ -987,7 +987,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(7)
                 .needsApproval(true)
                 .build();
-        List<PriceRow> materials = new LinkedList<PriceRow>();
+        List<PriceRow> materials = new LinkedList<>();
         materials.add(priceRow);
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
@@ -1086,8 +1086,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse();
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        List<String> materialNumbers = List.of("159904", "70120015");
-
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
@@ -1104,14 +1102,14 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                     .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
                     .dangerousWasteHolder(dangerousWasteHolder)
                     .build();
-            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
         } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
                 powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
             powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
             powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
             powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
 
-            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
         }
 
         String salesOrg = "100";
@@ -1208,11 +1206,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
     }
 
-    @Test
-    public void shouldSetPriceOfferToNotApprovedWhenNewMaterialsIsAdded() throws Exception {
-
-    }
-
     private void prepareUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
@@ -1248,7 +1241,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         knSalesRole.addUser(alex);
 
-        knSalesRole = salesRoleService.save(knSalesRole);
+        salesRoleService.save(knSalesRole);
 
         SalesRole saSalesRole = SalesRole.builder()
                 .roleName("SA")
