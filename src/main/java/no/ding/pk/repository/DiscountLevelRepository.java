@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface DiscountLevelRepository extends JpaRepository<DiscountLevel, Long> {
 
+    List<DiscountLevel> findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberAndLevelAndZone(String salesOrg, String salesOffice, String materialNumber, Integer level, Integer zone);
+
     List<DiscountLevel> findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(String salesOrg, String materialNumber, Integer level, Integer zone);
 
     List<DiscountLevel> findByParentSalesOrgAndParentSalesOfficeAndZoneAndParent_MaterialNumberIn(String salesOrg, String salesOffice, Integer integer, List<String> materialNumberList);

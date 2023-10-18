@@ -50,8 +50,8 @@ import static org.mockito.Mockito.*;
 
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
-@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
 

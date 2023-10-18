@@ -3,6 +3,7 @@ package no.ding.pk.web.controllers.v2;
 import com.azure.spring.cloud.autoconfigure.aad.properties.AadResourceServerProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import no.ding.pk.categories.IntegrationTest;
 import no.ding.pk.config.H2IntegrationTestConfig;
 import no.ding.pk.config.SecurityConfig;
 import no.ding.pk.domain.User;
@@ -20,6 +21,7 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.offer.SalesOfficeDTO;
 import no.ding.pk.web.dto.web.client.offer.ZoneDTO;
 import org.apache.commons.io.IOUtils;
+import org.junit.experimental.categories.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlMergeMode;
@@ -56,10 +59,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled("403 Forbidden error")
+@Category({IntegrationTest.class})
+@ActiveProfiles("integrationtest")
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 @SpringJUnitWebConfig(classes = {H2IntegrationTestConfig.class, PriceOfferServiceConfig.class, SecurityConfig.class})
 class PriceOfferControllerIntegrationTest {
 

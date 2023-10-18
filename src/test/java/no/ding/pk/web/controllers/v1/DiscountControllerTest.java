@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -22,11 +23,12 @@ import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 
 @Disabled("Move all test scenarios to service")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("/h2-db.properties")
+//@TestPropertySource("/h2-db.properties")
+@ActiveProfiles("unittest")
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
-@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 public class DiscountControllerTest {
 
     @LocalServerPort
