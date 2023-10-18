@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -74,8 +72,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         this.salesOrgService = salesOrgService;
     }
 
-    @Async
-    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Async
+//    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
     public void updateStandardPriceCache() {
         log.debug("Starting to populate Standard price cache.");
         List<SalesOrgDTO> salesOrgs = salesOrgService.getAll();
