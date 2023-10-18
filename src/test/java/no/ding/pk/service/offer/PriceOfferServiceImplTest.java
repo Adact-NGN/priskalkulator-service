@@ -50,8 +50,8 @@ import static org.mockito.Mockito.*;
 
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
-@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private PriceOfferService service;
 
@@ -83,27 +83,32 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         priceOfferRepository = getPriceOfferRepository();
 
-        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
+        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
+        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), materialPriceCache);
 
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
 
         sapMaterialService = mock(SapMaterialService.class);
 
-        PriceRowService priceRowService = new PriceRowServiceImpl(getPriceRowRepository(),
+        discountService = mock(DiscountService.class);
+
+        PriceRowService priceRowService = new PriceRowServiceImpl(
+                discountService,
+                getPriceRowRepository(),
                 materialService,
                 materialPriceService,
                 getEmFactory(),
                 sapMaterialService,
                 modelMapper);
 
-        discountService = mock(DiscountService.class);
+
         InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
         ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
         sapHttpClient = mock(SapHttpClient.class);
 
         standardPriceService = mock(StandardPriceService.class);
 
-        ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, discountService, standardPriceService);
+        ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, standardPriceService);
 
         salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
         userService = new UserServiceImpl(getUserRepository(), getSalesRoleRepository());
@@ -423,7 +428,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse();
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        when(sapMaterialService.getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
+        when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
                         .material("159904")
                         .categoryDescription("Degaussing harddisker")
                         .salesOrganization("100")
@@ -627,7 +632,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse();
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        when(sapMaterialService.getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt())).thenReturn(
+        when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(
                 List.of(
                         MaterialDTO.builder()
                                 .material("159904")
@@ -982,7 +987,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevel(7)
                 .needsApproval(true)
                 .build();
-        List<PriceRow> materials = new LinkedList<PriceRow>();
+        List<PriceRow> materials = new LinkedList<>();
         materials.add(priceRow);
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
@@ -1081,8 +1086,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse();
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        List<String> materialNumbers = List.of("159904", "70120015");
-
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
         User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
         User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
@@ -1099,14 +1102,14 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                     .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
                     .dangerousWasteHolder(dangerousWasteHolder)
                     .build();
-            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
         } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
                 powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
             powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
             powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
             powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
 
-            powerOfAttorney = salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
         }
 
         String salesOrg = "100";
@@ -1203,11 +1206,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
     }
 
-    @Test
-    public void shouldSetPriceOfferToNotApprovedWhenNewMaterialsIsAdded() throws Exception {
-
-    }
-
     private void prepareUsersAndSalesRoles() {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
@@ -1243,7 +1241,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         knSalesRole.addUser(alex);
 
-        knSalesRole = salesRoleService.save(knSalesRole);
+        salesRoleService.save(knSalesRole);
 
         SalesRole saSalesRole = SalesRole.builder()
                 .roleName("SA")
@@ -1333,7 +1331,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
             materialDTOS.add(materialDTO);
         }
 
-        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt());
+        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt());
     }
 
     private void mockCallForStandardPrice(ClassLoader classLoader) throws IOException {

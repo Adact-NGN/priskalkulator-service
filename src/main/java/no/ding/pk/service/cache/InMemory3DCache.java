@@ -11,5 +11,7 @@ public interface InMemory3DCache<K, T, V> {
     boolean isExpired();
     boolean contains(K groupKey, T objectKey);
 
+    List<V> searchFor(K groupKey, T partialObjectKey);
+
     List<V> getAllInList(K groupKey, List<T> objectKeys);
 }

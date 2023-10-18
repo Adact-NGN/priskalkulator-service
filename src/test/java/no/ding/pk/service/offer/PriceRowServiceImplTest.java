@@ -8,6 +8,7 @@ import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,12 @@ import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static no.ding.pk.utils.JsonTestUtils.mockSapMaterialServiceResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,6 +34,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 @Import(ModelMapperV2Config.class)
 public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
@@ -36,6 +43,9 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
     @Autowired
     private PriceRowRepository priceRowRepository;
+
+    @MockBean
+    private DiscountService discountService;
 
     @MockBean
     private MaterialService materialService;
@@ -56,7 +66,9 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
     @BeforeEach
     @Override
     public void setup() throws IOException {
-        service = new PriceRowServiceImpl(priceRowRepository,
+        service = new PriceRowServiceImpl(
+                discountService,
+                priceRowRepository,
                 materialService,
                 materialPriceService,
                 emFactory,
@@ -66,7 +78,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         ClassLoader classLoader = getClass().getClassLoader();
         List<MaterialDTO> sapMaterialDTOS = mockSapMaterialServiceResponse(classLoader);
 
-        doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), any());
+        doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), any());
     }
 
     @Test
@@ -82,16 +94,12 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         PriceRow wastePriceRow = PriceRow.builder()
-//                .customerPrice(1500.0)
-//                .discountLevelPct(0.02)
                 .standardPrice(1599.0)
                 .material(listPlacement)
                 .showPriceInOffer(true)
-//                .manualPrice(2400.0)
                 .discountLevel(2)
                 .discountLevelPrice(56.0)
                 .amount(1)
-//                .priceIncMva(2448.0)
                 .build();
 
         List<PriceRow> wastePriceRowList = new ArrayList<>();
@@ -104,11 +112,15 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .zone(1)
                 .build();
 
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "104", zoneMaterialNumber, 1, 1)).thenReturn(Collections.singletonList(levelOne));
+
         DiscountLevel levelTwo = DiscountLevel.builder()
                 .level(2)
                 .discount(189.0)
                 .zone(1)
                 .build();
+
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "104", zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
 
         List<DiscountLevel> discountLevels = new LinkedList<>();
         discountLevels.add(levelOne);
@@ -135,7 +147,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         Map<String, MaterialPrice> materialStdPrice = new HashMap<>();
         materialStdPrice.put("50101_01", materialPrice);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", "0000000001", materialStdPrice, discountMap);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", "0000000001", materialStdPrice);
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
@@ -175,7 +187,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", new HashMap<>(), null);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", new HashMap<>());
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));

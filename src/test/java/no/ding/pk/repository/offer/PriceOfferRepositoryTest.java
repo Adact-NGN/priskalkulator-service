@@ -139,6 +139,7 @@ public class PriceOfferRepositoryTest {
     }
 
     private void createCompleteOfferDtoList(User salesAndApproval) {
+
         Material material = Material.builder()
                 .materialNumber("70120015")
                 .designation("Ikke refunderbar spillolje,Småemb")

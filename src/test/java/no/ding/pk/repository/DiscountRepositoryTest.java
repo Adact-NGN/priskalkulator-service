@@ -24,8 +24,8 @@ import static org.hamcrest.Matchers.*;
 @TestPropertySource("/h2-db.properties")
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discount_db_scripts/drop_schema.sql", "/discount_db_scripts/create_schema.sql"})
-@Sql(value = {"/discount_db_scripts/discount_matrix.sql", "/discount_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 public class DiscountRepositoryTest {
 
     @Autowired
@@ -53,15 +53,23 @@ public class DiscountRepositoryTest {
     }
 
     @Test
-    public void shouldGetSpecificDiscountLevel() {
+    public void shouldGetSpecificDiscountLevelWithZone() {
         List<DiscountLevel> dls = discountLevelRepository.findAll();
 
         assertThat(dls, hasSize(greaterThan(0)));
 
-        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, 2);
+        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(salesOrg, materialNumber, 2,1);
 
         assertThat(actualList, hasSize(greaterThan(0)));
         assertThat(actualList.get(0).getLevel(), is(2));
+    }
+
+    @Test
+    public void shouldGetSpecificDiscountLevelWithNoZone() {
+        List<DiscountLevel> actualList = discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(salesOrg, "161201", 3, null);
+
+        assertThat(actualList, hasSize(greaterThan(0)));
+        assertThat(actualList.get(0).getLevel(), is(3));
     }
 
     @Test
@@ -108,15 +116,15 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldGetDiscountForMaterialWithoutZones() {
-        Specification<Discount> specification = withSalesOrg("100").and(withSalesOffice("100")).and(withMaterialNumber("C-02L")).and(hasDiscountLevelInZone(null));
+        Specification<Discount> specification = withSalesOrg(salesOrg).and(withSalesOffice(salesOffice)).and(withMaterialNumber("C-02L")).and(hasDiscountLevelInZone(null));
         List<Discount> discountList = repository.findAll(specification);
 
-        assertThat(discountList, hasSize(greaterThan(0)));
+        assertThat(discountList, hasSize(1));
     }
 
     @Test
     public void shouldFilterOutMaterialsByZone() {
-        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn("100", "100", List.of(1), List.of("50101"));
+        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, List.of(1), List.of("50101"));
 
         assertThat(actual, hasSize(1));
 
@@ -127,7 +135,7 @@ public class DiscountRepositoryTest {
 
     @Test
     public void shouldFilterOutMultipleMaterialsByZone() {
-        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn("100", "100", List.of(1), List.of("50101","50102"));
+        List<Discount> actual = repository.findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(salesOrg, salesOffice, List.of(1), List.of("50101","50102"));
 
         assertThat(actual, hasSize(2));
 

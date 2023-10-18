@@ -6,6 +6,7 @@ import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.sap.SapMaterialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +25,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PriceRowServiceImplUnitTest {
 
@@ -40,6 +45,8 @@ public class PriceRowServiceImplUnitTest {
 
     private EntityManagerFactory emFactory;
 
+    private DiscountService discountService;
+
     @BeforeEach
     public void setup() {
         repository = mock(PriceRowRepository.class);
@@ -48,8 +55,9 @@ public class PriceRowServiceImplUnitTest {
         sapMaterialService = mock(SapMaterialService.class);
         emFactory = mock(EntityManagerFactory.class);
         modelMapper = new ModelMapper();
+        discountService = mock(DiscountService.class);
 
-        service = new PriceRowServiceImpl(repository, materialService, materialPriceService, emFactory, sapMaterialService, modelMapper);
+        service = new PriceRowServiceImpl(discountService, repository, materialService, materialPriceService, emFactory, sapMaterialService, modelMapper);
     }
 
     @Test
@@ -72,10 +80,7 @@ public class PriceRowServiceImplUnitTest {
                 .materialStandardPrice(oldMaterialPrice)
                 .build();
 
-        when(materialService.save(any())).thenAnswer(invocationOnMock -> {
-            Material updatedMaterial = (Material) invocationOnMock.getArguments()[0];
-            return updatedMaterial;
-        });
+        when(materialService.save(any())).thenAnswer(invocationOnMock -> (Material) invocationOnMock.getArguments()[0]);
 
         EntityManager entityManager = mock(EntityManager.class);
         when(entityManager.getTransaction()).thenReturn(mock(EntityTransaction.class));
@@ -144,8 +149,8 @@ public class PriceRowServiceImplUnitTest {
                 .discountLevel(3)
                 .build();
 
-        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1", Map.of(updatedMaterialPrice.getMaterialNumber(), updatedMaterialPrice),
-                discountMap);
+        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1",
+                Map.of(updatedMaterialPrice.getMaterialNumber(), updatedMaterialPrice));
 
         PriceRow actualPriceRow = actual.get(0);
 
@@ -219,14 +224,18 @@ public class PriceRowServiceImplUnitTest {
                         .zone(1)
                         .build()
         );
+
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "129", materialNumber, 3, 1)).thenReturn(Collections.singletonList(discountLevels.get(2)));
+
         Discount discount = Discount.builder()
                 .materialNumber(materialNumber)
                 .discountLevels(discountLevels)
                 .build();
-        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
-                discountMap);
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+                Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         PriceRow actualPriceRow = actual.get(0);
 
@@ -309,10 +318,11 @@ public class PriceRowServiceImplUnitTest {
                 .materialNumber(materialNumber)
                 .discountLevels(discountLevels)
                 .build();
-        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
-                discountMap);
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+                Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(1));
     }
@@ -383,10 +393,11 @@ public class PriceRowServiceImplUnitTest {
                 .materialNumber(materialNumber)
                 .discountLevels(discountLevels)
                 .build();
-        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
-                discountMap);
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+                Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(2));
     }
@@ -457,10 +468,13 @@ public class PriceRowServiceImplUnitTest {
                 .materialNumber(materialNumber)
                 .discountLevels(discountLevels)
                 .build();
-        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1", Map.of(materialPrice.getMaterialNumber(), materialPrice),
-                discountMap);
+        List<String> materials = new ArrayList<>();
+        materials.add(materialNumber);
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", materials)).thenReturn(Collections.singletonList(discount));
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+                Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(6));
     }

@@ -15,15 +15,11 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 
-import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -67,7 +63,7 @@ class ZoneServiceImplTest extends AbstractIntegrationConfig {
 
     @BeforeEach
     public void setup() throws IOException {
-        service = new ZoneServiceImpl(zoneRepository, priceRowService, discountService, standardPriceService);
+        service = new ZoneServiceImpl(zoneRepository, priceRowService, standardPriceService);
 
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.

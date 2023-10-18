@@ -1,9 +1,12 @@
 package no.ding.pk.web.controllers.v2;
 
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.*;
 import no.ding.pk.repository.offer.*;
 import no.ding.pk.service.*;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.service.offer.*;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.service.sap.StandardPriceService;
@@ -49,27 +52,34 @@ public class PriceOfferServiceConfig {
     }
 
     @Bean
-    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository) {
-        return new MaterialPriceServiceImpl(materialPriceRepository);
+    public InMemory3DCache<String, String, MaterialPrice> materialPriceCache() {
+        return new PingInMemory3DCache<>(5000);
     }
 
     @Bean
-    public PriceRowService priceRowService(PriceRowRepository priceRowRepository,
+    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository,
+                                                     InMemory3DCache<String, String, MaterialPrice> materialPriceCache) {
+        return new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
+    }
+
+    @Bean
+    public PriceRowService priceRowService(
+            DiscountService discountService,
+            PriceRowRepository priceRowRepository,
                                            MaterialService materialService,
                                            MaterialPriceService materialPriceService,
                                            EntityManagerFactory emFactory,
                                            SapMaterialService sapMaterialService,
                                            @Qualifier("modelMapperV2") ModelMapper modelMapper) {
-        return new PriceRowServiceImpl(priceRowRepository, materialService, materialPriceService, emFactory,
+        return new PriceRowServiceImpl(discountService, priceRowRepository, materialService, materialPriceService, emFactory,
                 sapMaterialService, modelMapper);
     }
 
     @Bean
     public ZoneService zoneService(ZoneRepository zoneRepository,
                                    PriceRowService priceRowService,
-                                   DiscountService discountService,
                                    StandardPriceService standardPriceService) {
-        return new ZoneServiceImpl(zoneRepository, priceRowService, discountService, standardPriceService);
+        return new ZoneServiceImpl(zoneRepository, priceRowService, standardPriceService);
     }
 
     @Bean
