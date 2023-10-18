@@ -57,7 +57,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
     public void updateMaterialCache() {
         log.debug("Starting to populate Material cache.");
-        List<MaterialDTO> materials = getAllMaterialsForSalesOrg("100", 0, 5000);
+        List<MaterialDTO> materials = getAllMaterialsForSalesOrgByZone("100", 0, 5000);
         log.debug("Got {} amount of materials.", materials.size());
         materials.forEach(materialDTO -> inMemoryCache.put("100", materialDTO.getMaterial(), materialDTO));
         log.debug("Added materials to cache. Cache size is: {}", inMemoryCache.size("100"));
@@ -73,7 +73,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         if(!inMemoryCache.contains(salesOrg, material)) {
             log.debug("Cache does not contain material {} for sales org {}. Updating", material, salesOrg);
-            updateMaterialCache(salesOrg, null, material, null, null);
+            updateMaterialCache(salesOrg, material, null, null);
         }
 
         return inMemoryCache.get(salesOrg, material);
@@ -82,7 +82,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Override
     public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String salesOrg,
                                                                             String salesOffice, String zone) {
-
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
 
@@ -91,22 +90,15 @@ public class SapMaterialServiceImpl implements SapMaterialService {
                         salesOrgExpression, LogicOperator.And));
         String filterQuery = createFilterQuery(queryMap);
 
-        log.debug("Got material {} sales org {} sales office {}", material, salesOrg, salesOffice);
-        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired()) {
-            log.debug("Memory cache is empty or expired, refreshing cache!");
-            initiateCacheBuild(salesOrg, material);
-
-            log.debug("Update Material with standard price: material {} sales org {} sales office {}", material, salesOffice, salesOrg);
-
-            updateMaterialCache(salesOrg, salesOffice, filterQuery);
-        }
-
         if(!inMemoryCache.contains(salesOrg, material)) {
             log.debug("Cache is missing the material.");
 
-            updateMaterialCache(salesOrg, salesOffice, filterQuery);
+            updateMaterialCache(salesOrg, filterQuery);
+
+            return inMemoryCache.get(salesOrg, material);
         }
 
+        log.debug("Got material {} sales org {}", material, salesOrg);
         return inMemoryCache.get(salesOrg, material);
     }
 
@@ -126,7 +118,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrg(String salesOrg, Integer page, Integer pageSize) {
+    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
         // Get material size count from SAP
         Integer materialCount = getCountFromSap(salesOrg, null);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
@@ -188,27 +180,30 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String zone, Integer page, Integer pageSize) {
+    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, String zone, Integer page, Integer pageSize) {
         Integer materialCount = getCountFromSap(salesOrg, zone);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
-//        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired() || inMemoryCache.size(salesOrg) < materialCount) {
 
-//            buildMaterialCache(salesOrg, salesOffice, filterQuery, page, pageSize);
-//            log.debug("Returning from new cache");
-//        }
-        HashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build(), LogicOperator.And));
+        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
+        HashMap<LogicExpression, LogicOperator> queryMap =
+                Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
 
         includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 
         log.debug("Filter query: {}", filterQuery);
-        return getAllMaterialsDirectly(salesOrg, salesOffice, filterQuery, page, pageSize);
-
-//        return inMemoryCache.getAllInList(salesOrg);
+        return requestSapMaterialService(filterQuery, page, pageSize);
     }
 
-    private List<MaterialDTO> getAllMaterialsDirectly(String salesOrg, String salesOffice, String filterQuery, Integer page, Integer pageSize) {
+    /**
+     * Execute request to SAP Material service with filter query
+     * @param filterQuery filter query
+     * @param page page to start from
+     * @param pageSize amount of elements per page
+     * @return List of MaterialDTO
+     */
+    private List<MaterialDTO> requestSapMaterialService(String filterQuery, Integer page, Integer pageSize) {
         MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
 
         HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
@@ -230,23 +225,17 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     private void buildMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
         log.debug("Building cache");
 
-        updateMaterialCache(salesOrg, null, filterQuery, page, pageSize);
+        updateMaterialCache(salesOrg, filterQuery, page, pageSize);
     }
 
-    private void buildMaterialCache(String salesOrg, String salesOffice, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Building cache");
+    private void updateMaterialCache(String salesOrg, String filterQuery) {
+        log.debug("Got sales org {}, query {}", salesOrg, filterQuery);
 
-        updateMaterialCache(salesOrg, salesOffice, filterQuery, page, pageSize);
+        updateMaterialCache(salesOrg, filterQuery, null, null);
     }
 
-    private void updateMaterialCache(String salesOrg, String salesOffice, String filterQuery) {
-        log.debug("Got sales org {} sales office {}, query {}", salesOrg, salesOffice, filterQuery);
-
-        updateMaterialCache(salesOrg, salesOffice, filterQuery, null, null);
-    }
-
-    private void updateMaterialCache(String salesOrg, String salesOffice, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Update material cache with sales org {} sales office {}", salesOrg, salesOffice);
+    private void updateMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
+        log.debug("Update material cache with sales org {}", salesOrg);
 
         MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
 

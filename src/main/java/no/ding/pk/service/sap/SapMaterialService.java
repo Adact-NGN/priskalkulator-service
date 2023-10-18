@@ -8,6 +8,6 @@ public interface SapMaterialService {
     MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String material, String salesOrg);
     MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String salesOrg,
             String salesOffice, String zone);
-    List<MaterialDTO> getAllMaterialsForSalesOrg(String salesOrg, Integer page, Integer pageSize);
-    List<MaterialDTO> getAllMaterialsForSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String zone, Integer page, Integer pageSize);
+    List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize);
+    List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, String zone, Integer page, Integer pageSize);
 }

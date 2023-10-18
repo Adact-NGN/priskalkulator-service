@@ -172,7 +172,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Override
     public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String salesOffice,
                                                                                              String materialNumber, Integer level, Integer zone) {
-        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevelAndZone(salesOrg, materialNumber, level, zone);
+        return discountLevelRepository.findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberAndLevelAndZone(salesOrg, salesOffice, materialNumber, level, zone);
     }
 
     @Override

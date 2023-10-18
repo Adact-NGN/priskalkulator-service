@@ -28,7 +28,7 @@ public class SapMaterialServiceITest {
 
     @Test
     public void shouldGetAListOfMaterialsFromSapMaterialService() {
-        List<MaterialDTO> materialDTOs = sapMaterialService.getAllMaterialsForSalesOrg("100", 0, 100);
+        List<MaterialDTO> materialDTOs = sapMaterialService.getAllMaterialsForSalesOrgByZone("100", 0, 100);
 
         assertThat(materialDTOs, hasSize(greaterThan(0)));
     }

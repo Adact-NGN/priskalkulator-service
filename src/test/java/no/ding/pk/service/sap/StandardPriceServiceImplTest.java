@@ -124,7 +124,7 @@ public class StandardPriceServiceImplTest {
             materialDTOS.add(materialDTO);
         }
 
-        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrg(anyString(), anyInt(), anyInt());
+        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt());
     }
 
     private void mockCallForStandardPrice(ClassLoader classLoader) throws IOException {

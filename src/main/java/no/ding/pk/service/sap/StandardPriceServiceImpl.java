@@ -108,7 +108,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             standardPriceDTOList = filterStdPricesByZone(zone, standardPriceDTOList);
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
 
             if(StringUtils.isBlank(zone)) {
                 List<MaterialDTO> nonZonedMaterialsDTO = allMaterialsForSalesOrg.stream().filter(p -> !"Sone differensiert".equals(p.getSubCategoryDescription())).toList();
@@ -182,7 +182,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 return new HashMap<>();
             }
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrg(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
 
             Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
