@@ -29,7 +29,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
-@EnableAsync
+//@EnableAsync
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
     private static final Logger log = LoggerFactory.getLogger(SapMaterialServiceImpl.class);
@@ -52,9 +52,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         this.inMemoryCache = inMemoryCache;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Async
-    @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Async
+//    @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
     public void updateMaterialCache() {
         log.debug("Starting to populate Material cache.");
         List<MaterialDTO> materials = getAllMaterialsForSalesOrgByZone("100", 0, 5000);

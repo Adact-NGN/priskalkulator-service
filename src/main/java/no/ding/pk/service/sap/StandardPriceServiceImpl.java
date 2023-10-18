@@ -76,9 +76,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         this.salesOrgService = salesOrgService;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Async
-    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Async
+//    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
     public void updateStandardPriceCache() {
         log.debug("Starting to populate Standard price cache.");
         List<SalesOrgDTO> salesOrgs = salesOrgService.getAll();
