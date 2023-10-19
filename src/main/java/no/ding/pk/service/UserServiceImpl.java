@@ -142,18 +142,19 @@ public class UserServiceImpl implements UserService {
 			return repository.save(user);
 		}
 
-		if(Objects.equals(user.getSalesRole(), salesRole)) {
+		if(userHasRole(user.getSalesRole(), salesRole)) {
 			return user;
-		}
-
-		if(!Objects.equals(user.getSalesRole(), salesRole)) {
+		} else {
 			user = removeSalesRoleFromUser(user);
 
 			salesRole.addUser(user);
 
 			return repository.save(user);
 		}
-		return user;
+	}
+
+	private boolean userHasRole(SalesRole userRole, SalesRole salesRole) {
+		return Objects.equals(userRole, salesRole);
 	}
 
 	@Override
@@ -163,8 +164,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> findByEmailInList(List<String> superAdmins) {
-		return repository.findAllByEmailIn(superAdmins);
+	public List<User> findByEmailInList(List<String> emails) {
+		return repository.findAllByEmailIn(emails);
 	}
 
 }
