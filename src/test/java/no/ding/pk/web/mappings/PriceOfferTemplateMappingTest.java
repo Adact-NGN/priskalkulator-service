@@ -46,7 +46,7 @@ public class PriceOfferTemplateMappingTest {
     private PriceOfferTemplate createCompleteOfferTemplate() {
         User salesEmployee = createEmployee();
 
-        User sharedWithUser = User.builder()
+        User sharedWithUser = User.builder("Alexander", "Brox", "Alexander Brox", "alexander.brox@ngn.no", "alexander.brox@ngn.no")
                 .adId("ad-ww-wegarijo-arha-rh-arha")
                 .associatedPlace("Oslo")
                 .email("alexander.brox@ngn.no")
@@ -75,15 +75,12 @@ public class PriceOfferTemplateMappingTest {
     }
 
     private User createEmployee() {
-        User salesEmployee = User.builder()
+
+        return User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart", "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
                 .adId("ad-id-wegarijo-arha-rh-arha")
                 .associatedPlace("Larvik")
-                .email("Wolfgang@farris-bad.no")
                 .department("Hvitsnippene")
-                .fullName("Wolfgang Amadeus Mozart")
                 .jobTitle("Komponist")
                 .build();
-
-        return salesEmployee;
     }
 }

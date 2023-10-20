@@ -31,16 +31,9 @@ import java.io.IOException;
 import java.util.List;
 
 @Disabled("ObjectMapper is null")
-//@AutoConfigureMockMvc(addFilters = false)
-//@ContextConfiguration(value = {SecurityTestConfig.class, ModelMapperV2Config.class, ObjectMapperConfig.class})
-@ActiveProfiles({"test"})
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
-
-//    @Autowired
-//    @Qualifier("modelMapperV2")
-//    private ModelMapper modelMapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -57,30 +50,30 @@ public class UserControllerTest {
     private List<UserDTO> testData;
     private String requestPayload;
 
-    @Configuration
-    public static class UserControllerTestConfig {
-        @Bean
-        public ObjectMapper objectMapper() {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new Hibernate5Module());
-            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-            objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-            objectMapper.registerModule(new SimpleModule().addDeserializer(String.class, new WhitespaceDeserializer()));
-
-            return objectMapper;
-        }
-
-        private static class WhitespaceDeserializer extends JsonDeserializer<String> {
-            @Override
-            public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-                return p.getText().trim();
-            }
-        }
-    }
+//    @Configuration
+//    protected static class UserControllerTestConfig {
+//        @Bean
+//        public ObjectMapper objectMapper() {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            objectMapper.registerModule(new Hibernate5Module());
+//            objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+//            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//            objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+//            objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+//            objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+//
+//            objectMapper.registerModule(new SimpleModule().addDeserializer(String.class, new WhitespaceDeserializer()));
+//
+//            return objectMapper;
+//        }
+//
+//        private static class WhitespaceDeserializer extends JsonDeserializer<String> {
+//            @Override
+//            public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+//                return p.getText().trim();
+//            }
+//        }
+//    }
 
 //    @BeforeEach
 //    public void setup() throws IOException {
@@ -244,10 +237,7 @@ public class UserControllerTest {
     public void shouldFindUserByEmail() {
         String email = "test.testesen@ngn.no";
 
-        User expected = User.builder()
-                .name("Test Testesen")
-                .email(email)
-                .build();
+        User expected = User.builder("Test", "testesen", "Test testesen", email, email).build();
 
 //        userRepository.save(expected);
 //

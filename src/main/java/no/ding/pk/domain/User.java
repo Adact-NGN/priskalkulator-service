@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
@@ -175,5 +175,9 @@ public class User extends Auditable implements Serializable {
         } else if (!email.equals(other.email))
             return false;
         return true;
+    }
+
+    public static UserBuilder builder(String name, String sureName, String fullName, String username, String email) {
+        return hiddenBuilder().name(name).sureName(sureName).fullName(fullName).username(username).email(email);
     }
 }

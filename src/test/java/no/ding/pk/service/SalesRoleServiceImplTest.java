@@ -112,11 +112,8 @@ class SalesRoleServiceImplTest extends AbstractIntegrationConfig {
         if(sa != null) {
             return sa;
         }
-        return SalesRole.builder()
-        .roleName("SA")
+        return SalesRole.builder("SA", 2, 2)
         .description("Salgskonsulent (rolle a)")
-        .defaultPowerOfAttorneyOa(2)
-        .defaultPowerOfAttorneyFa(2)
         .build();
     }
     
@@ -127,36 +124,27 @@ class SalesRoleServiceImplTest extends AbstractIntegrationConfig {
             return kn;
         }
 
-        return SalesRole.builder()
-        .roleName("KN")
+        return SalesRole.builder("KN", 5, 5)
         .description("KAM nasjonalt")
-        .defaultPowerOfAttorneyOa(5)
-        .defaultPowerOfAttorneyFa(5)
         .build();
     }
     
     private User createSaUser() {
-        return User.builder()
+        return User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart", "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
         .adId("ad-id-wegarijo-arha-rh-arha")
         .jobTitle("Komponist")
-        .fullName("Wolfgang Amadeus Mozart")
-        .email("Wolfgang@farris-bad.no")
         .associatedPlace("Larvik")
         .department("Hvitsnippene")
         .build();
     }
     
     private User createKnUser() {
-        return User.builder()
+        return User.builder("Alexander", "Brox", "Alexander Brox", "alexander.brox@ngn.no", "alexander.brox@ngn.no")
         .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-        .name("Alexander")
-        .sureName("Brox")
-        .fullName("Alexander Brox")
         .orgNr("100")
         .resourceNr("63874")
         .associatedPlace("Oslo")
         .phoneNumber("95838638")
-        .email("alexander.brox@ngn.no")
         .jobTitle("Markedskonsulent")
         .powerOfAttorneyOA(5)
         .powerOfAttorneyFA(3)

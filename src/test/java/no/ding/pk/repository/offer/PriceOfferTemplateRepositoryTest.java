@@ -27,13 +27,12 @@ class PriceOfferTemplateRepositoryTest {
 
     @Test
     public void shouldPersistPriceOfferTemplate() {
-        User author = User.builder()
-                .email("test.testesen@testing.no").build();
+        User author = User.builder("Test", "Testesen", "Test Testesen", "test.testesen@testing.no", "test.testesen@testing.no")
+                .build();
 
         author = userRepository.save(author);
 
-        User sharedUser = User.builder()
-                .email("delt.med@testing.no")
+        User sharedUser = User.builder("Delt", "Med", "Delt Med", "delt.med@testing.no", "delt.med@testing.no")
                 .build();
 
         sharedUser = userRepository.save(sharedUser);
@@ -54,13 +53,12 @@ class PriceOfferTemplateRepositoryTest {
 
     @Test
     public void shouldFindPriceOfferTemplateByAuthor() {
-        User author = User.builder()
-                .email("test.testesen@testing.no").build();
+        User author = User.builder("Test", "Testesen", "Test Testesen", "test.testesen@testing.no", "test.testesen@testing.no")
+                .build();
 
         author = userRepository.save(author);
 
-        User sharedUser = User.builder()
-                .email("delt.med@testing.no")
+        User sharedUser = User.builder("Delt", "Med", "Delt Med", "delt.med@testing.no", "delt.med@testing.no")
                 .build();
 
         sharedUser = userRepository.save(sharedUser);
@@ -83,19 +81,17 @@ class PriceOfferTemplateRepositoryTest {
 
     @Test
     public void shouldFindPriceOfferTemplatesSharedWithUser() {
-        User author = User.builder()
-                .email("test.testesen@testing.no").build();
+        User author = User.builder("Test", "Testesen", "Test Testesen", "test.testesen@testing.no", "test.testesen@testing.no")
+                .build();
 
         author = userRepository.save(author);
 
-        User sharedUser = User.builder()
-                .email("delt.med@testing.no")
+        User sharedUser = User.builder("Delt", "Med", "Delt Med", "delt.med@testing.no", "delt.med@testing.no")
                 .build();
 
         sharedUser = userRepository.save(sharedUser);
 
-        User anotherUser = User.builder()
-                .email("another.user@testing.no")
+        User anotherUser = User.builder("Another", "User", "Another User", "another.user@testing.no", "another.user@testing.no")
                 .build();
 
         anotherUser = userRepository.save(anotherUser);

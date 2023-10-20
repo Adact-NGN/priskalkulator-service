@@ -85,13 +85,11 @@ public class PriceOfferRepositoryTest {
 
     @Test
     public void shouldFindAllByApproverIdAndNeedsApprovalIsTrue() {
-        User salesAndApprover = User.builder()
+        User salesAndApprover = User.builder("Thomas", "Nilsen", "Thomas Nilsen",
+                        "thomas.nilsen@ngn.no", "thomas.nilsen@ngn.no")
                 .adId("183a1b82-d795-47d1-94a1-96f6aa5a268a")
                 .orgNr("100")
                 .orgName("Norsk Gjenvinning")
-                .sureName("Nilsen")
-                .name("Thomas")
-                .username("thomas.nilsen@ngn.no")
                 .usernameAlias("vh3180")
                 .jobTitle("Utvikler")
                 .fullName("Thomas Nilsen")
@@ -118,8 +116,7 @@ public class PriceOfferRepositoryTest {
     @Test
     public void shouldUpdatePriceOfferStatus() {
         PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
-                .salesEmployee(User.builder()
-                        .name("Test person")
+                .salesEmployee(User.builder("Test", "Testesen", "Test Testesen", "test.testesen@testing.no", "test.testesen@testing.no")
                         .build())
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
                 .build();
@@ -183,14 +180,11 @@ public class PriceOfferRepositoryTest {
     private PriceOfferTemplate createCompleteOfferTemplate() {
         User salesEmployee = createEmployee();
 
-        User sharedWithUser = User.builder()
+        User sharedWithUser = User.builder("Alexander", "Brox", "Alexander Brox",
+                        "alexander.brox@ngn.no", "alexander.brox@ngn.no")
                 .adId("ad-ww-wegarijo-arha-rh-arha")
                 .associatedPlace("Oslo")
-                .email("alexander.brox@ngn.no")
                 .department("Salg")
-                .fullName("Alexander Brox")
-                .name("Alexander")
-                .sureName("Brox")
                 .jobTitle("Markedskonsulent")
                 .build();
 
@@ -217,14 +211,11 @@ public class PriceOfferRepositoryTest {
     private Offer createCompleteOffer() {
         User salesEmployee = createEmployee();
 
-        User approver = User.builder()
+        User approver = User.builder("Alexander", "Brox", "Alexander Brox",
+                        "alexander.brox@ngn.no", "alexander.brox@ngn.no")
                 .adId("ad-ww-wegarijo-arha-rh-arha")
                 .associatedPlace("Oslo")
-                .email("alexander.brox@ngn.no")
                 .department("Salg")
-                .fullName("Alexander Brox")
-                .name("Alexander")
-                .sureName("Brox")
                 .jobTitle("Markedskonsulent")
                 .build();
 
@@ -407,12 +398,11 @@ public class PriceOfferRepositoryTest {
     }
 
     private User createEmployee() {
-        User salesEmployee = User.builder()
+        User salesEmployee = User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart",
+                        "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
                 .adId("ad-id-wegarijo-arha-rh-arha")
                 .associatedPlace("Larvik")
-                .email("Wolfgang@farris-bad.no")
                 .department("Hvitsnippene")
-                .fullName("Wolfgang Amadeus Mozart")
                 .jobTitle("Komponist")
                 .build();
 

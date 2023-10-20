@@ -84,12 +84,10 @@ public class StartUpDev {
                 User salesEmployee = userService.findByEmail("Wolfgang@farris-bad.no");
 
                 if(salesEmployee == null) {
-                        salesEmployee = User.builder()
+                        salesEmployee = User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart", "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
                                 .adId("ad-id-wegarijo-arha-rh-arha")
                                 .orgNr("100")
                                 .jobTitle("Komponist")
-                                .fullName("Wolfgang Amadeus Mozart")
-                                .email("Wolfgang@farris-bad.no")
                                 .associatedPlace("Larvik")
                                 .department("Hvitsnippene")
                                 .build();
@@ -111,16 +109,12 @@ public class StartUpDev {
                                       String associatedPlace, String phoneNumber, String email,
                                       String jobTitle, int powerOfAttorneyOA, String resourceNr) {
                 return userService.save(
-                        User.builder()
+                        User.builder(name, sureName, fullName, email, email)
                                 .adId(adId)
-                                .name(name)
-                                .sureName(sureName)
-                                .fullName(fullName)
                                 .orgNr("100")
                                 .orgName("Norsk Gjenvinning")
                                 .associatedPlace(associatedPlace)
                                 .phoneNumber(phoneNumber)
-                                .email(email)
                                 .jobTitle(jobTitle)
                                 .powerOfAttorneyFA(5)
                                 .powerOfAttorneyOA(powerOfAttorneyOA)

@@ -122,12 +122,9 @@ class SalesOfficePowerOfAttorneyControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldCreatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
@@ -161,26 +158,20 @@ class SalesOfficePowerOfAttorneyControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldUpdatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
                 .phoneNumber("+4790135757")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
 
         user = userRepository.save(user);
 
-        User otherUser = User.builder()
+        User otherUser = User.builder("Kristin Jørgensen", "Nærum", "Kristin Jørgensen Nærum", "kristin.nerum@ngn.no", "kristin.nerum@ngn.no")
                 .adId("7c6c0b5c-53de-4224-ac98-aa92c1aaa2ef")
                 .associatedPlace("Larvik")
-                .email("kristin.nerum@ngn.no")
                 .phoneNumber("+4798232574")
-                .fullName("Kristin Jørgensen Nærum")
-                .name("Kristin")
                 .powerOfAttorneyOA(2)
                 .powerOfAttorneyFA(3)
                 .build();

@@ -1,9 +1,7 @@
 package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.LazyCollection;
@@ -25,7 +23,9 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Getter
+@Setter
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @NamedEntityGraph(name = "SalesRole.userList", attributeNodes = @NamedAttributeNode("userList"))
 @Table(name = "sales_roles")
@@ -51,27 +51,15 @@ public class SalesRole implements Serializable {
     @OneToMany(mappedBy = "salesRole", cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @Builder.Default private List<User> userList = new ArrayList<>();
-    
-    public Long getId() {
-        return id;
-    }
-    
+
     public void setId(Long id) {
         this.id = id;
     }
-    
-    public String getRoleName() {
-        return roleName;
-    }
-    
+
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
-    
-    public String getDescription() {
-        return description;
-    }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -97,17 +85,9 @@ public class SalesRole implements Serializable {
             user.setSalesRole(null);
         }
     }
-    
-    public Integer getDefaultPowerOfAttorneyOa() {
-        return defaultPowerOfAttorneyOa;
-    }
 
     public void setDefaultPowerOfAttorneyOa(Integer defaultPowerOfAttorneyOa) {
         this.defaultPowerOfAttorneyOa = defaultPowerOfAttorneyOa;
-    }
-
-    public Integer getDefaultPowerOfAttorneyFa() {
-        return defaultPowerOfAttorneyFa;
     }
 
     public void setDefaultPowerOfAttorneyFa(Integer defaultPowerOfAttorneyFa) {
@@ -150,5 +130,9 @@ public class SalesRole implements Serializable {
                 "defaultPowerOfAttorneyOa = " + defaultPowerOfAttorneyOa + ", " +
                 "defaultPowerOfAttorneyFa = " + defaultPowerOfAttorneyFa + ", " +
                 "userList.size() = " + userList.size() + ")";
+    }
+
+    public static SalesRoleBuilder builder(String roleName, Integer defaultPowerOfAttorneyOa, Integer defaultPowerOfAttorneyFa) {
+        return SalesRole.hiddenBuilder().roleName(roleName).defaultPowerOfAttorneyOa(defaultPowerOfAttorneyOa).defaultPowerOfAttorneyFa(defaultPowerOfAttorneyFa);
     }
 }

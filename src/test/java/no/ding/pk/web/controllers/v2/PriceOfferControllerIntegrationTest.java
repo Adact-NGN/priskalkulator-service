@@ -112,11 +112,9 @@ class PriceOfferControllerIntegrationTest {
 
         String mail = "alexander.brox@ngn.no";
 
-        userService.save(User.builder()
+        userService.save(User.builder("Alexander", "Brox", "Alexander Brox", mail, mail)
                 .id(2L)
-                .name("Alexander Brox")
                 .phoneNumber("95838638")
-                .email(mail)
                 .build(), null);
 
         mockMvc.perform(post(baseUrl + "/create")
@@ -129,13 +127,12 @@ class PriceOfferControllerIntegrationTest {
     public void shouldPersistPriceOfferWithMultipleZonesWithSimilarMaterials() throws Exception {
         String filename = "priceOfferDtoV2_multipleZonePrices.json";
 
-        userService.save(User.builder()
+        String mail = "kjetil.torvund.minde@ngn.no";
+        userService.save(User.builder("Kjetil", "Minde", "Kjetil Torvund Minde", mail, mail)
                 .id(123L)
                 .orgNr("100")
                 .orgName("NG")
-                .name("Kjetil")
                 .jobTitle("Systemutvikler")
-                        .email("kjetil.torvund.minde@ngn.no")
                 .powerOfAttorneyOA(4)
                 .powerOfAttorneyFA(2)
                 .build(), null);

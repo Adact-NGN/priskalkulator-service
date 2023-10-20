@@ -21,11 +21,11 @@ import java.util.List;
 @RequestMapping("/api/ad/users")
 public class AdUserController {
 
-    private static Logger log = LoggerFactory.getLogger(AdUserController.class);
+    private static final Logger log = LoggerFactory.getLogger(AdUserController.class);
 
-    private UserAzureAdService adService;
+    private final UserAzureAdService adService;
     private final UserService userService;
-    private MapperService mapperService;
+    private final MapperService mapperService;
 
     @Autowired
     public AdUserController(UserAzureAdService adService, UserService userService, MapperService mapperService) {
