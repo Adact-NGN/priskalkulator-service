@@ -1,15 +1,17 @@
 package no.ding.pk.web.controllers.v1;
 
+import com.azure.spring.cloud.autoconfigure.aad.properties.AadResourceServerProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
-import no.ding.pk.config.ObjectMapperConfig;
+import no.ding.pk.config.ObjectMapperTestConfig;
 import no.ding.pk.config.SecurityTestConfig;
 import no.ding.pk.config.mapping.v1.ModelMapperConfig;
 import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -23,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Disabled
-@Import({SecurityTestConfig.class, ModelMapperConfig.class, ObjectMapperConfig.class})
+@Import({SecurityTestConfig.class, JacksonAutoConfiguration.class})
 @WebMvcTest(PriceOfferTemplateController.class)
 public class PriceOfferTemplateControllerTest {
 
@@ -34,7 +36,10 @@ public class PriceOfferTemplateControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper om;
+    private ObjectMapper om;
+
+    @MockBean
+    private AadResourceServerProperties aadResourceServerProperties;
 
     @Test
     public void shouldPersistNewPriceOfferTemplate() throws Exception {

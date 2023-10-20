@@ -1210,27 +1210,20 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         SalesRole knSalesRole = salesRoleService.findSalesRoleByRoleName("KN");
 
         if(knSalesRole == null) {
-            knSalesRole = SalesRole.builder()
-                    .roleName("KN")
+            knSalesRole = SalesRole.builder("KN", 5, 5)
                     .description("KAM nasjonalt")
-                    .defaultPowerOfAttorneyOa(5)
-                    .defaultPowerOfAttorneyFa(5)
                     .build();
 
             knSalesRole = salesRoleService.save(knSalesRole);
         }
 
-        User alex = User.builder()
+        User alex = User.builder("Alexander", "Brox", "Alexander Brox", "alexander.brox@ngn.no", "alexander.brox@ngn.no")
                 .id(39L)
                 .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-                .name("Alexander")
-                .sureName("Brox")
-                .fullName("Alexander Brox")
                 .orgNr("100")
                 .resourceNr("63874")
                 .associatedPlace("Oslo")
                 .phoneNumber("95838638")
-                .email("alexander.brox@ngn.no")
                 .jobTitle("Markedskonsulent")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(3)
@@ -1243,19 +1236,13 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         salesRoleService.save(knSalesRole);
 
-        SalesRole saSalesRole = SalesRole.builder()
-                .roleName("SA")
+        SalesRole saSalesRole = SalesRole.builder("SA", 2, 2)
                 .description("Salgskonsulent (rolle a)")
-                .defaultPowerOfAttorneyOa(2)
-                .defaultPowerOfAttorneyFa(2)
                 .build();
 
-        User eirik  = User.builder()
-                .name("Eirik")
-                .sureName("Flaa")
+        User eirik  = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no")
                 .orgNr("100")
                 .associatedPlace("Larvik")
-                .email("Eirik.Flaa@ngn.no")
                 .jobTitle("Prosjektleder")
                 .powerOfAttorneyFA(5)
                 .powerOfAttorneyOA(5)
@@ -1263,12 +1250,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         userService.save(eirik, null);
 
-        User kjetil = User.builder()
-                .name("Kjetil")
-                .sureName("Minde")
+        User kjetil = User.builder("Kjetil", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .orgNr("100")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
                 .jobTitle("Fullstack utvikler")
                 .powerOfAttorneyFA(5)
                 .powerOfAttorneyOA(5)
@@ -1276,18 +1260,16 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         userService.save(kjetil, null);
 
-        User salesEmployee = User.builder()
+        User salesEmployee = User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart", "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
                 .adId("ad-id-wegarijo-arha-rh-arha")
                 .jobTitle("Komponist")
-                .fullName("Wolfgang Amadeus Mozart")
-                .email("Wolfgang@farris-bad.no")
                 .associatedPlace("Larvik")
                 .department("Hvitsnippene")
                 .build();
 
         salesEmployee = userService.save(salesEmployee, null);
 
-        User consultant = User.builder()
+        User consultant = User.builder("Birte", "Sundmo", "Birte Sundmo", "birte.sundmo@ngn.no", "birte.sundmo@ngn.no")
                 .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
                 .name("Birte")
                 .sureName("Sundmo")

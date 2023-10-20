@@ -130,11 +130,8 @@ public class UserServiceTest extends AbstractIntegrationConfig {
         SalesRole kv = salesRoleService.findSalesRoleByRoleName("KV");
 
         if(kv == null) {
-            kv = SalesRole.builder()
-                    .roleName("KV")
+            kv = SalesRole.builder("KV", 1, 1)
                     .description("Kundeveileder")
-                    .defaultPowerOfAttorneyOa(1)
-                    .defaultPowerOfAttorneyFa(1)
                     .build();
 
             salesRoleService.save(kv);
@@ -143,11 +140,8 @@ public class UserServiceTest extends AbstractIntegrationConfig {
         SalesRole kv2 = salesRoleService.findSalesRoleByRoleName("SA");
 
         if(kv2 == null) {
-            kv2 = SalesRole.builder()
-                    .defaultPowerOfAttorneyFa(2)
-                    .defaultPowerOfAttorneyOa(2)
+            kv2 = SalesRole.builder("SA", 2, 2)
                     .description("Salgskonsulent (rolle a)")
-                    .roleName("SA")
                     .build();
 
             salesRoleService.save(kv2);
@@ -206,11 +200,8 @@ public class UserServiceTest extends AbstractIntegrationConfig {
         SalesRole salesRole = salesRoleService.findSalesRoleByRoleName("KV");
         
         if(salesRole == null) {
-            salesRole = SalesRole.builder()
-            .roleName("KV")
+            salesRole = SalesRole.builder("KV", 1, 1)
             .description("Kundeveileder")
-            .defaultPowerOfAttorneyFa(1)
-            .defaultPowerOfAttorneyOa(1)
             .build();
             
             salesRole = salesRoleService.save(salesRole);
@@ -254,11 +245,8 @@ public class UserServiceTest extends AbstractIntegrationConfig {
         SalesRole firstSalesRole = salesRoleService.findSalesRoleByRoleName("KV");
         
         if(firstSalesRole == null) {
-            firstSalesRole = SalesRole.builder()
-            .roleName("KV")
+            firstSalesRole = SalesRole.builder("KV", 1, 1)
             .description("Kundeveileder")
-            .defaultPowerOfAttorneyFa(1)
-            .defaultPowerOfAttorneyOa(1)
             .build();
             
             firstSalesRole = salesRoleService.save(firstSalesRole);
@@ -267,11 +255,8 @@ public class UserServiceTest extends AbstractIntegrationConfig {
         SalesRole otherSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
         
         if(otherSalesRole == null) {
-            otherSalesRole = SalesRole.builder()
-            .roleName("SA")
+            otherSalesRole = SalesRole.builder("SA", 2, 2)
             .description("Salgskonsulent (rolle a)")
-            .defaultPowerOfAttorneyFa(2)
-            .defaultPowerOfAttorneyOa(2)
             .build();
             
             otherSalesRole = salesRoleService.save(otherSalesRole);

@@ -59,12 +59,9 @@ class SalesOfficePowerOfAttorneyServiceImplTest extends AbstractIntegrationConfi
 
     @Test
     public void shouldUpdatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
