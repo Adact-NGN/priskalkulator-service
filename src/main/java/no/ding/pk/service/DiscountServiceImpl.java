@@ -107,15 +107,12 @@ public class DiscountServiceImpl implements DiscountService {
             List<Discount> returnList = new ArrayList<>();
 
             for(Discount discount : discounts) {
-                Discount d = Discount.builder()
-                        .salesOrg(discount.getSalesOrg())
-                        .salesOffice(discount.getSalesOffice())
-                        .materialNumber(discount.getMaterialNumber())
+                Discount d = Discount.builder(discount.getSalesOrg(), discount.getSalesOffice(),
+                                discount.getMaterialNumber(), discount.getStandardPrice(), new ArrayList<>())
                         .deviceType(discount.getDeviceType())
                         .materialDesignation(discount.getMaterialDesignation())
                         .standardPrice(discount.getStandardPrice())
                         .fa(discount.getFa())
-                        .discountLevels(new ArrayList<>())
                         .build();
 
                 for (DiscountLevel discountLevel : discount.getDiscountLevels()) {

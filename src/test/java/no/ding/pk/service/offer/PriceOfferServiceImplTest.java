@@ -1,5 +1,6 @@
 package no.ding.pk.service.offer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
@@ -33,6 +34,7 @@ import javax.net.ssl.SSLSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
@@ -41,6 +43,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static no.ding.pk.utils.JsonTestUtils.jsonToObject;
+import static no.ding.pk.utils.JsonTestUtils.objectToJson;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -523,87 +527,87 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             @Override
             public String body() {
-                return "{\n" +
-                        "    \"d\": {\n" +
-                        "        \"results\": [\n" +
-                        "            {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"159904\",\n" +
-                        "                \"MaterialDescription\": \"Degaussing harddisker\",\n" +
-                        "                \"DeviceCategory\": \"\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0\",\n" +
-                        "                \"StandardPrice\": \"170.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1\",\n" +
-                        "                \"QuantumUnit\": \"ST\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"1599\",\n" +
-                        "                \"MaterialGroupDescription\": \"Blandet EE-avfall\",\n" +
-                        "                \"MaterialType\": \"ZWAF\",\n" +
-                        "                \"MaterialTypeDescription\": \"Avfallsmateriale\"\n" +
-                        "            },\n" +
-                        "           {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"70120015\",\n" +
-                        "                \"MaterialDescription\": \"Ikke refunderbar spillolje,Småemb\",\n" +
-                        "                \"DeviceCategory\": \"\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0.000\",\n" +
-                        "                \"StandardPrice\": \"16566.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1000\",\n" +
-                        "                \"QuantumUnit\": \"KG\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"7012\",\n" +
-                        "                \"MaterialGroupDescription\": \"Spillolje, ikke ref.\",\n" +
-                        "                \"MaterialType\": \"ZAFA\",\n" +
-                        "                \"MaterialTypeDescription\": \"Farlig Avfallsmateriale\"\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695945600000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"50301\",\n" +
-                        "                \"MaterialDescription\": \"Flatvogn - Utsett\",\n" +
-                        "                \"DeviceCategory\": \"B-0-S\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0\",\n" +
-                        "                \"StandardPrice\": \"13.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1\",\n" +
-                        "                \"QuantumUnit\": \"ST\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"0503\",\n" +
-                        "                \"MaterialGroupDescription\": \"Tj.  Flatvogn\",\n" +
-                        "                \"MaterialType\": \"DIEN\",\n" +
-                        "                \"MaterialTypeDescription\": \"Tjeneste\"\n" +
-                        "            }"+
-                        "        ]\n" +
-                        "    }\n" +
-                        "}";
+                return """
+                        {
+                            "d": {
+                                "results": [
+                                    {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695859200000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "159904",
+                                        "MaterialDescription": "Degaussing harddisker",
+                                        "DeviceCategory": "",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0",
+                                        "StandardPrice": "170.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1",
+                                        "QuantumUnit": "ST",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "1599",
+                                        "MaterialGroupDescription": "Blandet EE-avfall",
+                                        "MaterialType": "ZWAF",
+                                        "MaterialTypeDescription": "Avfallsmateriale"
+                                    },
+                                   {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695859200000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "70120015",
+                                        "MaterialDescription": "Ikke refunderbar spillolje,Småemb",
+                                        "DeviceCategory": "",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0.000",
+                                        "StandardPrice": "16566.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1000",
+                                        "QuantumUnit": "KG",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "7012",
+                                        "MaterialGroupDescription": "Spillolje, ikke ref.",
+                                        "MaterialType": "ZAFA",
+                                        "MaterialTypeDescription": "Farlig Avfallsmateriale"
+                                    },
+                                    {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695945600000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "50301",
+                                        "MaterialDescription": "Flatvogn - Utsett",
+                                        "DeviceCategory": "B-0-S",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0",
+                                        "StandardPrice": "13.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1",
+                                        "QuantumUnit": "ST",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "0503",
+                                        "MaterialGroupDescription": "Tj.  Flatvogn",
+                                        "MaterialType": "DIEN",
+                                        "MaterialTypeDescription": "Tjeneste"
+                                    }        ]
+                            }
+                        }""";
             }
 
             @Override
@@ -722,35 +726,22 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         String materialNumber = "119901";
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(0)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 0)
                         .build(),
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(223.0)
+                DiscountLevel.builder(223.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(446.0)
+                DiscountLevel.builder(446.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(669.0)
+                DiscountLevel.builder(669.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(895.0)
+                DiscountLevel.builder(895.0, 4)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .salesOrg("100")
-                .salesOffice("127")
+        Discount discount = Discount.builder("100", "127", materialNumber, 2764.0, discountLevels)
                 .materialDesignation("Restavfall")
                 .build();
 
-        discountLevels.forEach(discount::addDiscountLevel);
+//        discountLevels.forEach(discount::addDiscountLevel);
 
         discountService.save(discount);
     }
@@ -1094,23 +1085,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
 
-        if(powerOfAttorney == null) {
-            powerOfAttorney = PowerOfAttorney.builder()
-                    .salesOffice(104)
-                    .salesOfficeName("Skien")
-                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
-                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
-                    .dangerousWasteHolder(dangerousWasteHolder)
-                    .build();
-            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
-        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
-                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
-            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
-            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
-            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
-
-            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
-        }
+        createPowerOfAttorney(powerOfAttorney, ordinaryWasteHolder, ordinaryWasteHolderLvl2, dangerousWasteHolder);
 
         String salesOrg = "100";
         String salesOffice = "104";
@@ -1204,6 +1179,157 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceOffer actual = service.save(priceOffer);
 
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+    }
+
+    @Test
+    public void shouldSetPriceOfferStatusBackToPendingWhenDiscountLevelIsSetToHighestPossibleLevel() throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        List<DiscountLevel> discountLevels = Arrays.asList(
+                DiscountLevel.builder(0.0, 1).build(),
+                DiscountLevel.builder(5.0, 2).build(),
+                DiscountLevel.builder(10.0, 3).build(),
+                DiscountLevel.builder(15.0, 4).build(),
+                DiscountLevel.builder(20.0, 5).build()
+        );
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "104", Collections.singletonList("159904"))).thenReturn(Collections.singletonList(Discount.builder("100", "104", "159904", 170.0, discountLevels).build()));
+
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse();
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        User salesConsultant = userService.findByEmail("birte.sundmo@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
+
+        createPowerOfAttorney(powerOfAttorney, ordinaryWasteHolder, ordinaryWasteHolderLvl2, dangerousWasteHolder);
+
+        String salesOrg = "100";
+        String salesOffice = "104";
+        Material normalWaste = Material.builder()
+                .materialNumber("159904")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(170.0)
+                                .pricingUnit(1)
+                                .materialNumber("159904")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Degaussing harddisker")
+                .build();
+
+        PriceRow normalWasteRow = PriceRow.builder()
+                .material(normalWaste)
+                .standardPrice(170.0)
+                .discountLevel(2)
+                .needsApproval(false)
+                .build();
+        Material dangerousWaste = Material.builder()
+                .materialNumber("70120015")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(16566.0)
+                                .pricingUnit(1000)
+                                .materialNumber("70120015")
+                                .quantumUnit("KG")
+                                .build())
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .build();
+        PriceRow dangerousWasteRow = PriceRow.builder()
+                .material(dangerousWaste)
+                .standardPrice(16566.0)
+                .needsApproval(false)
+                .build();
+
+        Material deviceType = Material.builder()
+                .materialNumber("50301")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .deviceType("B-0-S")
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder()
+                                .standardPrice(13.00)
+                                .pricingUnit(1)
+                                .materialNumber("50301")
+                                .deviceType("B-0-S")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Flatvogn - Utsett")
+                .build();
+
+        PriceRow deviceTypeRow = PriceRow.builder()
+                .material(deviceType)
+                .standardPrice(13.00)
+                .needsApproval(false)
+                .build();
+
+        SalesOffice salesOffice1 = SalesOffice.builder()
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .salesOfficeName("Skien")
+                .materialList(List.of(
+                        normalWasteRow,
+                        dangerousWasteRow,
+                        deviceTypeRow
+                ))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesConsultant)
+                .salesOfficeList(List.of(salesOffice1))
+                .needsApproval(false)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        String json = objectToJson(priceOffer);
+
+        PriceOffer updatedPriceOffer = jsonToObject(json, PriceOffer.class);
+
+        PriceRow priceRow = updatedPriceOffer.getSalesOfficeList().get(0).getMaterialList().get(0);
+        priceRow.setNeedsApproval(true);
+        priceRow.setDiscountLevel(null);
+        priceRow.setManualPrice(1.0);
+
+        PriceOffer actual = service.save(updatedPriceOffer);
+
+        assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+        assertThat(actual.getApprover(), is(ordinaryWasteHolderLvl2));
+    }
+
+    private void createPowerOfAttorney(PowerOfAttorney powerOfAttorney, User ordinaryWasteHolder, User ordinaryWasteHolderLvl2, User dangerousWasteHolder) {
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
+                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
+            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
+
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
     }
 
     private void prepareUsersAndSalesRoles() {

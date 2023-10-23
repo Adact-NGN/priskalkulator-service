@@ -21,7 +21,6 @@ import java.util.Random;
 @Profile("test")
 @TestConfiguration
 @TestPropertySource("/h2-db.properties")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class DiscountServiceConfig {
     @Bean
@@ -36,13 +35,10 @@ public class DiscountServiceConfig {
             Discount input = (Discount) invocationOnMock.getArguments()[0];
             Random random = new Random();
             long id = random.nextLong();
-            return Discount.builder()
+            return Discount.builder(input.getSalesOrg(), input.getSalesOffice(), input.getMaterialNumber(),
+                            input.getStandardPrice(), input.getDiscountLevels())
                     .id(id)
-                    .salesOrg(input.getSalesOrg())
-                    .materialNumber(input.getMaterialNumber())
                     .materialDesignation(input.getMaterialDesignation())
-                    .standardPrice(input.getStandardPrice())
-                    .discountLevels(input.getDiscountLevels())
                     .build();
         });
         return mock;
