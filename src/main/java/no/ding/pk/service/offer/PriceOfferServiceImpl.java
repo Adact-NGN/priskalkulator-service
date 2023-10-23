@@ -111,7 +111,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(entity);
 
         if(!materialsForApproval.isEmpty()) {
             log.debug("Materials needs approving by responsible person.");
@@ -161,87 +161,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
             String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
 
-            if(materialNumbersForApproval.length() > 0) {
+            if(!materialNumbersForApproval.isEmpty()) {
                 materialNumbersForApproval.append(",").append(materials);
             } else {
                 materialNumbersForApproval = new StringBuilder(materials);
             }
         }
         return materialNumbersForApproval.toString();
-    }
-
-    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
-        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
-        for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
-
-            // Collect all Material numbers in each price row lists.
-            Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
-            mateiralNumberSet.addAll(getZonedMaterialNumberSet(salesOffice.getZoneList()));
-
-            // Create sales office to material number map.
-            Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
-            salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
-
-            // Add map to sales org map, sales office, material number map.
-            if(discountMap.containsKey(salesOffice.getSalesOrg())) {
-                discountMap.get(salesOffice.getSalesOrg()).putAll(salesOfficeMaterialMap);
-            } else {
-                discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
-            }
-        }
-
-        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
-
-        for (String salesOrg : discountMap.keySet()) {
-            if(!orgOfficeMaterialDiscount.containsKey(salesOrg)) {
-                orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
-            }
-
-            Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
-            for(String salesOffice : discountMap.get(salesOrg).keySet()) {
-                Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
-                List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
-
-                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
-
-                if(discounts != null && !discounts.isEmpty()) {
-                    discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
-                }
-
-                salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
-            }
-
-            orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
-        }
-
-        return orgOfficeMaterialDiscount;
-    }
-
-    private static Set<String> getZonedMaterialNumberSet(List<Zone> zoneList) {
-
-        Set<String> mateiralNumberSet = new HashSet<>();
-
-        if(zoneList != null && !zoneList.isEmpty()) {
-            for (Zone zone : zoneList) {
-                if(zone.getPriceRows() == null) {
-                    continue;
-                }
-
-                for (PriceRow priceRow : zone.getPriceRows()) {
-                    mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
-                }
-            }
-        }
-        return mateiralNumberSet;
-    }
-
-    private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
-        if(materialList == null) {
-            return new HashSet<>();
-        }
-        return materialList.stream().map(material -> material.getMaterial().getMaterialNumber()).collect(Collectors.toSet());
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
@@ -446,8 +372,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             log.debug("User with id {} trying to approve the offer was not found.", approverId);
             throw new UserNotFoundException(String.format("Approver User with id %d was not found.", approverId));
         }
-
-        User approver = approverOptional.get();
 
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 

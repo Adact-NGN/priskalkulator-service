@@ -105,38 +105,26 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        DiscountLevel levelOne = DiscountLevel.builder()
-                .level(1)
-                .discount(0.0)
+        DiscountLevel levelOne = DiscountLevel.builder(0.0, 1)
                 .pctDiscount(0.0)
                 .zone(1)
                 .build();
 
-        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "104", zoneMaterialNumber, 1, 1)).thenReturn(Collections.singletonList(levelOne));
+        String salesOrg = "100";
+        String salesOffice = "104";
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
+                zoneMaterialNumber, 1, 1)).thenReturn(Collections.singletonList(levelOne));
 
-        DiscountLevel levelTwo = DiscountLevel.builder()
-                .level(2)
-                .discount(189.0)
+        DiscountLevel levelTwo = DiscountLevel.builder(189.0, 2)
                 .zone(1)
                 .build();
 
-        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "104", zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
+                zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
 
         List<DiscountLevel> discountLevels = new LinkedList<>();
         discountLevels.add(levelOne);
         discountLevels.add(levelTwo);
-
-        Discount discount = Discount.builder()
-                .materialNumber(zoneMaterialNumber)
-                .standardPrice(1599.0)
-                .salesOffice("104")
-                .salesOrg("100")
-                .materialDesignation("Lift - Utsett")
-                .discountLevels(discountLevels)
-                .build();
-
-        Map<String, Map<String, Map<String, Discount>>> discountMap = new HashMap<>();
-        discountMap.put("100", Map.of("104", Map.of("50101", discount)));
 
         MaterialPrice materialPrice = MaterialPrice.builder()
                 .materialNumber("50101")
@@ -147,7 +135,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         Map<String, MaterialPrice> materialStdPrice = new HashMap<>();
         materialStdPrice.put("50101_01", materialPrice);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", "0000000001", materialStdPrice);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, "0000000001", materialStdPrice);
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));

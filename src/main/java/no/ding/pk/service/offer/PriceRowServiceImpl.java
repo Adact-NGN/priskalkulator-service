@@ -74,7 +74,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                                   Map<String, MaterialPrice> materialStdPriceMap) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), zone, materialStdPriceMap);
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPriceMap);
             log.debug("Found standard price for material: {}: {}, zone: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice, zone);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice);
 
@@ -85,7 +85,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private MaterialPrice getMaterialPriceForMaterial(Material material, String zone, Map<String, MaterialPrice> materialStdPriceMap) {
+    private MaterialPrice getMaterialPriceForMaterial(Material material, Map<String, MaterialPrice> materialStdPriceMap) {
         if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
@@ -127,9 +127,9 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
         entity.setDiscountLevelPct(materialPriceRow.getDiscountLevelPct());
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
-        entity.setManualPrice(materialPriceRow.getManualPrice());
+//        entity.setManualPrice(materialPriceRow.getManualPrice());
 
-        entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
+//        entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
         entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
         entity.setStandardPrice(materialPriceRow.getStandardPrice());
         entity.setAmount(materialPriceRow.getAmount());
@@ -152,7 +152,7 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                 List materials = getMaterials(material);
 
-                if(materials != null && materials.size() > 0) {
+                if(materials != null && !materials.isEmpty()) {
                     Material persistedMaterial = (Material) materials.get(0);
                     log.debug("Got Material: {}", persistedMaterial);
                     updateMaterial(persistedMaterial, material);
@@ -213,7 +213,8 @@ public class PriceRowServiceImpl implements PriceRowService {
             }
         }
 
-        if(entity.getManualPrice() != null) {
+        if(materialPriceRow.getManualPrice() != null && !materialPriceRow.getManualPrice().equals(entity.getManualPrice())) {
+            entity.setManualPrice(materialPriceRow.getManualPrice());
             entity.setDiscountedPrice(entity.getManualPrice());
 
             Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
@@ -222,8 +223,12 @@ public class PriceRowServiceImpl implements PriceRowService {
             } else {
                 log.info("Could not get discount level equivalent for manual price.");
             }
-        } else {
-            calculateDiscountPrice(entity, salesOrg, salesOffice, zone);
+        } else if(materialPriceRow.getDiscountLevel() != null && !materialPriceRow.getDiscountLevel().equals(entity.getDiscountLevel())) {
+            entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
+            entity.setDiscountLevelPct(materialPriceRow.getDiscountLevelPct());
+            entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
+            Double currentDiscountedPrice = materialPriceRow.getDiscountedPrice();
+            calculateDiscountPrice(entity, currentDiscountedPrice, salesOrg, salesOffice, zone);
         }
 
         if(materialPriceRow.hasCombinedMaterials()) {
@@ -309,8 +314,8 @@ public class PriceRowServiceImpl implements PriceRowService {
         return materials;
     }
 
-    private void calculateDiscountPrice(PriceRow entity, String salesOrg, String salesOffice, String zone) {
-        if(entity.getDiscountedPrice() == null) {
+    private void calculateDiscountPrice(PriceRow entity, Double currentDiscountedPrice, String salesOrg, String salesOffice, String zone) {
+        if(isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(entity, currentDiscountedPrice)) {
             if(entity.getDiscountLevel() != null) {
                 Integer zoneAsInt = StringUtils.isNotBlank(zone) ? Integer.valueOf(zone) : null;
                 List<DiscountLevel> discountLevels = discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber(), entity.getDiscountLevel(), zoneAsInt);
@@ -346,16 +351,16 @@ public class PriceRowServiceImpl implements PriceRowService {
                 } else {
                     entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
                 }
-//                } else {
-//                    log.debug("No discount found for material {} for sales office {} in sales org {}",
-//                            entity.getMaterial().getMaterialNumber(), salesOffice, salesOrg);
-//                }
             } else {
                 log.debug("No discount level set for price row.");
             }
         } else {
             log.debug("Discounted price already set.");
         }
+    }
+
+    private static boolean isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(PriceRow entity, Double currentDiscountedPrice) {
+        return entity.getDiscountedPrice() == null || (currentDiscountedPrice != null && !entity.getDiscountedPrice().equals(currentDiscountedPrice));
     }
 
     private Material getMaterial(Material material) {

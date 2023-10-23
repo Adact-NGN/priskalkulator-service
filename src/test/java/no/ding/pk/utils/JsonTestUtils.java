@@ -1,6 +1,9 @@
 package no.ding.pk.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import no.ding.pk.web.dto.sap.MaterialDTO;
@@ -16,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +27,6 @@ import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
 public class JsonTestUtils {
 
@@ -82,5 +83,18 @@ public class JsonTestUtils {
         }
 
         return materialDTOS;
+    }
+
+    public static <T> String objectToJson(T object) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        ObjectWriter objectWriter = om.writer().withDefaultPrettyPrinter();
+
+        return objectWriter.writeValueAsString(object);
+    }
+
+    public static <T> T jsonToObject(String json, Class<T> clazz) throws JsonProcessingException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        ObjectReader om = new ObjectMapper().readerForUpdating(clazz.getDeclaredConstructor().newInstance());
+
+        return om.readValue(json);
     }
 }

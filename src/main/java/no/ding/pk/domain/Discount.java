@@ -18,7 +18,7 @@ import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -38,7 +38,7 @@ public class Discount {
     @Column(nullable = false, name = "material_number")
     private String materialNumber;
     
-    @Column(nullable = true, name = "DEVICE_TYPE")
+    @Column(name = "DEVICE_TYPE")
     private String deviceType;
     
     @Column(name = "material_designation")
@@ -76,27 +76,18 @@ public class Discount {
         this.id = id;
     }
     
-    public String getSalesOrg() {
-        return salesOrg;
-    }
     public void setSalesOrg(String salesOrg) {
         this.salesOrg = salesOrg;
     }
-    public String getMaterialNumber() {
-        return materialNumber;
-    }
+
     public void setMaterialNumber(String materialNumber) {
         this.materialNumber = materialNumber;
     }
-    public String getMaterialDesignation() {
-        return materialDesignation;
-    }
+
     public void setMaterialDesignation(String materialDesignation) {
         this.materialDesignation = materialDesignation;
     }
-    public Double getStandardPrice() {
-        return standardPrice;
-    }
+
     public void setStandardPrice(Double standardPrice) {
         this.standardPrice = standardPrice;
     }
@@ -107,11 +98,7 @@ public class Discount {
     public void setId(long id) {
         this.id = id;
     }
-    
-    public String getDeviceType() {
-        return deviceType;
-    }
-    
+
     public void setDeviceType(String deviceType) {
         this.deviceType = deviceType;
     }
@@ -188,5 +175,9 @@ public class Discount {
         return true;
     }
     
-    
+    public static DiscountBuilder builder(String salesOrg, String salesOffice, String materialNumber,
+                                                  Double standardPrice, List<DiscountLevel> discountLevels) {
+        return Discount.hiddenBuilder().salesOrg(salesOrg).salesOffice(salesOffice).materialNumber(materialNumber)
+                .standardPrice(standardPrice).discountLevels(discountLevels);
+    }
 }
