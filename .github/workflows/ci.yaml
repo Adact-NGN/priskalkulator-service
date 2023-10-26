@@ -65,9 +65,12 @@ jobs:
           kustomize edit set image dingipacr.azurecr.io/ding-ip-app-pk-service=:${{ steps.increment_version.outputs.new_version }}
           less kustomization.yaml
       - name: Commit and Push Changes
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
         if: steps.bump_version.outcome == 'success'
         id: commit_n_push
-        run: |
+      - run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
           echo "Previous Version: [$previous_version]"
           new_version=${{ steps.increment_version.outputs.new_version }}
