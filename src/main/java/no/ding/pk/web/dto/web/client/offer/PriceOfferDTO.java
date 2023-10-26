@@ -42,4 +42,5 @@ public class PriceOfferDTO {
     private Date dateIssued;
     private String createdBy;
     private String lastModifiedBy;
+    private UserDTO priceTeamUser;
 }

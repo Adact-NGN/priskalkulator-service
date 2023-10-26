@@ -60,6 +60,12 @@ public class PriceOffer extends Offer implements Serializable {
     @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"))
     private PriceOfferTerms customerTerms;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "priceTeamUserId", foreignKey = @ForeignKey(name = "Fk_price_offer_price_team_user"))
+    private User priceTeamUser;
+
+    @OnUpdate
+
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType,
                       String streetAddress,
@@ -99,11 +105,16 @@ public class PriceOffer extends Offer implements Serializable {
 
         PriceOffer that = (PriceOffer) o;
 
-        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList).append(salesEmployee, that.salesEmployee).append(approver, that.approver).append(approvalDate, that.approvalDate).append(activationDate, that.activationDate).append(customerTerms, that.customerTerms).isEquals();
+        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList)
+                .append(salesEmployee, that.salesEmployee).append(approver, that.approver)
+                .append(approvalDate, that.approvalDate).append(activationDate, that.activationDate)
+                .append(customerTerms, that.customerTerms).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
+        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList)
+                .append(salesEmployee).append(approver).append(approvalDate).append(activationDate)
+                .append(customerTerms).toHashCode();
     }
 }

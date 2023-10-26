@@ -5008,6 +5008,9 @@
         "priceOfferStatus" : {
           "type" : "string"
         },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/User"
+        },
         "salesEmployee" : {
           "$ref" : "#/definitions/User"
         },
