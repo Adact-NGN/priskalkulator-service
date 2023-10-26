@@ -47,7 +47,7 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
       - name: Bump Version
-        id: checkout_code
+        id: bump_version
         if: steps.increment_version.outcome == 'success'
         working-directory: manifests/dev/
         run: |
