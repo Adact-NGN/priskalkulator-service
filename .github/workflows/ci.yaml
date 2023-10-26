@@ -83,7 +83,7 @@ jobs:
           git push origin ${{ steps.increment_version.outputs.new_version }}
 
       - name: Create and push Release
-        if: steps.create_tag.create_tag == 'success'
+        if: steps.create_tag.outcome == 'success'
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
