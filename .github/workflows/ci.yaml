@@ -45,15 +45,12 @@ jobs:
           new_version="v$major.$((minor + 1)).$patch"
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
-
-      - uses: actions/checkout@v3
+      - name: Bump Version
         if: steps.increment_version.outcome == 'success'
         id: checkout_code
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.TOKEN_GITHUB_ACTION }}
-      - name: Bump Version
-        if: steps.checkout_code.outcome == 'success'
-        id: bump_version
         working-directory: manifests/dev/
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
