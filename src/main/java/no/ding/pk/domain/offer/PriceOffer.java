@@ -64,8 +64,6 @@ public class PriceOffer extends Offer implements Serializable {
     @JoinColumn(name = "priceTeamUserId", foreignKey = @ForeignKey(name = "Fk_price_offer_price_team_user"))
     private User priceTeamUser;
 
-    @OnUpdate
-
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType,
                       String streetAddress,
