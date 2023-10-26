@@ -31,7 +31,17 @@ public enum PriceOfferStatus {
     }
 
     public static List<String> getAllPriceOfferStatuses() {
-        return List.of(PENDING.status, REJECTED.status, APPROVED.status, SENT_TO_COSTUMER.status, ACTIVATED.status);
+        return List.of(
+                ARCHIVED.status,
+                DRAFT.status,
+                PENDING.status,
+                REJECTED.status, APPROVED.status,
+                APPROVED.status,
+                SENT_TO_COSTUMER.status,
+                ACTIVATED.status,
+                SENT_TO_SAP.status,
+                COMPLETED.status
+        );
     }
 
     public static boolean isApprovalState(String status) {
@@ -40,10 +50,6 @@ public enum PriceOfferStatus {
 
     public static boolean isApproved(String priceOfferStatus) {
         return APPROVED.status.equals(priceOfferStatus);
-    }
-
-    public String getStatus() {
-        return status;
     }
 
     @Override
