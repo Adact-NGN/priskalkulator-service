@@ -67,8 +67,8 @@ jobs:
           echo "Previous Version: [$previous_version]"
           new_version=${{ steps.increment_version.outputs.new_version }}
           pwd
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name "kjetilatngn"
+          git config user.email "kjetil.torvund.minde@ngn.no"
           git commit -am "$previous_version -> $new_version"
           git push
 
