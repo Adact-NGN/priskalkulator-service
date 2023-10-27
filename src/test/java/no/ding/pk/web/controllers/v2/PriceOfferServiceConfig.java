@@ -29,13 +29,12 @@ public class PriceOfferServiceConfig {
                                                SalesOfficeService salesOfficeService,
                                                UserService userService,
                                                SalesOfficePowerOfAttorneyService poaService,
-                                               DiscountService discountService,
                                                CustomerTermsService customerTermsService,
                                                @Qualifier("modelMapperV2") ModelMapper modelMapper) {
         List<Integer> salesOfficeRequiringOwnFaApproverList = new ArrayList<>();
         salesOfficeRequiringOwnFaApproverList.add(100);
         return new PriceOfferServiceImpl(priceOfferRepository, salesOfficeService, userService, poaService,
-                discountService, customerTermsService, modelMapper, salesOfficeRequiringOwnFaApproverList);
+                customerTermsService, modelMapper, salesOfficeRequiringOwnFaApproverList);
     }
 
     @Bean

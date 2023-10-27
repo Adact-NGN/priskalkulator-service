@@ -122,7 +122,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
 
         service = new PriceOfferServiceImpl(getPriceOfferRepository(), salesOfficeService, userService,
-                salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper,
+                salesOfficePowerOfAttorneyService, customerTermsService, modelMapper,
                 List.of(100));
 
         prepareUsersAndSalesRoles();

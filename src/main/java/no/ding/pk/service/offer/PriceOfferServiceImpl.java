@@ -41,8 +41,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
-    private final DiscountService discountService;
-
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
     private final List<Integer> salesOfficesWhichRequiresOwnFaApprover;
@@ -52,14 +50,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 DiscountService discountService, CustomerTermsService customerTermsService,
+                                 CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper,
                                  @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
-        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
         this.salesOfficesWhichRequiresOwnFaApprover = salesOfficesWhichRequiresOwnFaApprover;
