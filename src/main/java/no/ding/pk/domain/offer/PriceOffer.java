@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.User;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -25,7 +26,7 @@ public class PriceOffer extends Offer implements Serializable {
     @Column
     private String priceOfferStatus;
 
-    @Column(length = 21844)
+    @Column
     private String materialsForApproval;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -91,6 +92,18 @@ public class PriceOffer extends Offer implements Serializable {
         return needsApproval != null && needsApproval;
     }
 
+    @JsonIgnore
+    public Integer getHighestSelectedDiscountLevel() {
+        Integer highestSelectedDiscountLevel = null;
+        if(salesOfficeList  != null) {
+            for(SalesOffice salesOffice : salesOfficeList) {
+                highestSelectedDiscountLevel = salesOffice.getHighestSelectedDiscountLevel();
+            }
+        }
+
+        return highestSelectedDiscountLevel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,3 +120,4 @@ public class PriceOffer extends Offer implements Serializable {
         return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
     }
 }
+

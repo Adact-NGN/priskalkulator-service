@@ -137,7 +137,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -314,7 +314,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -368,7 +368,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -429,7 +429,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
@@ -503,11 +503,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getApprover().getEmail(), equalTo(ordinaryWasteHolderLvl2.getEmail()));
     }
 
-    private static HttpResponse<String> createResponse() {
+    private static HttpResponse<String> createResponse(final int responseStatusCode) {
         return new HttpResponse<>() {
             @Override
             public int statusCode() {
-                return 200;
+                return responseStatusCode;
             }
 
             @Override
@@ -628,12 +628,101 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     @Test
+    public void shouldSetEquivalentDiscountLevelForMaterialsWithManualPriceSet() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse(200);
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        List<DiscountLevel> discountLevels = Arrays.asList(
+                DiscountLevel.builder(0.0, 1).build(),
+                DiscountLevel.builder(199.0, 2).build(),
+                DiscountLevel.builder(397.0, 3).build(),
+                DiscountLevel.builder(695.0, 4).build(),
+                DiscountLevel.builder(1033.0, 5).build()
+        );
+        Discount discount = Discount.builder("100", "100", "119901", 2604.0, discountLevels).build();
+
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Arrays.asList("119901"))).thenReturn(Arrays.asList(discount));
+
+        List<Zone> zones = Arrays.asList(Zone.builder()
+                .zoneId("0000000001")
+                .postalCode("1001")
+                .postalName("Oslo")
+                .isStandardZone(true)
+                .build()
+        );
+        MaterialPrice standardPrice = MaterialPrice.builder()
+                .standardPrice(2604.0)
+                .quantumUnit("KG")
+                .materialNumber("119901")
+                .build();
+
+        when(standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap("100", "100", null)).thenReturn(Map.of("119901", standardPrice));
+
+        Material material = Material.builder()
+                .materialNumber("119901")
+                .designation("Restavfall")
+                .materialGroupDesignation("Bl. næringsavfall")
+                .materialTypeDescription("Avfallsmateriale")
+                .deviceType("")
+                .materialStandardPrice(standardPrice)
+                .build();
+        List<PriceRow> materials = Arrays.asList(
+                PriceRow.builder()
+                        .showPriceInOffer(true)
+                        .manualPrice(1.0)
+                        .standardPrice(2604.0)
+                        .needsApproval(true)
+                        .approved(false)
+                        .categoryId("00300")
+                        .categoryDescription("Avfall")
+                        .subCategoryId("0030000100")
+                        .subCategoryDescription("Blandet avfall")
+                        .classId("")
+                        .classDescription("")
+                        .material(material)
+                .build());
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOffice("100")
+                .salesOrg("100")
+                .salesOfficeName("Stor-Oslo")
+                .city("OSLO")
+                .zoneList(zones)
+                .materialList(materials)
+                .build();
+        List<SalesOffice> salesOffices = Arrays.asList(salesOffice);
+
+        User salesEmployee = userService.findByEmail("Eirik.Flaa@ngn.no");
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .customerNumber("125277")
+                .customerName("TESTKUNDE")
+                .streetAddress("Tårnfjellvegen")
+                .postalNumber("3910")
+                .city("Porsgrunn")
+                .organizationNumber("000000000")
+                .salesOfficeList(salesOffices)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getNeedsApproval(), is(true));
+
+        assertThat(priceOffer.getMaterialsForApproval(), notNullValue());
+        assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).getDiscountLevel(), is(6));
+    }
+
+    @Test
     public void shouldEndExistingCustomerTermsAndAddNewWhenNewPriceOfferIsActivated() {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(
@@ -836,7 +925,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(HttpStatus.OK.value());
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -865,7 +954,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -895,7 +984,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -954,7 +1043,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -1007,7 +1096,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         String materialNumber = "50301";
@@ -1074,7 +1163,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -1197,7 +1286,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
