@@ -251,9 +251,8 @@ public class PriceRowServiceImpl implements PriceRowService {
             material.setQuantumUnit(materialPrice.getQuantumUnit());
             material.setPricingUnit(materialPrice.getPricingUnit());
 
-            material.setMaterialStandardPrice(materialPrice);
-
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+//            material.setMaterialStandardPrice(materialPrice);
         } else {
             log.debug("No material prices found.");
         }
@@ -294,13 +293,14 @@ public class PriceRowServiceImpl implements PriceRowService {
     }
 
     private static Double getStandardPrice(PriceRow entity) {
+        if(entity.getStandardPrice() != null) {
+            return entity.getStandardPrice();
+        }
+
         if (entity.getMaterial() != null && entity.getMaterial().getMaterialStandardPrice() != null && entity.getMaterial().getMaterialStandardPrice().getStandardPrice() != null) {
             return entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
         }
 
-        if(entity.getStandardPrice() != null) {
-            return entity.getStandardPrice();
-        }
 
         return null;
     }

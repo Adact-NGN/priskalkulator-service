@@ -77,13 +77,13 @@ public class MaterialPrice extends Auditable {
         return new EqualsBuilder().append(id, that.id).append(materialNumber, that.materialNumber)
                 .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
                 .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
-                .append(quantumUnit, that.quantumUnit).isEquals();
+                .append(quantumUnit, that.quantumUnit).append(zone, that.zone).isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(id).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
-                .append(quantumUnit).toHashCode();
+                .append(quantumUnit).append(zone).toHashCode();
     }
 }
