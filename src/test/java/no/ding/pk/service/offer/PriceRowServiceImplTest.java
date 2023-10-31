@@ -1,8 +1,6 @@
 package no.ding.pk.service.offer;
 
 import no.ding.pk.config.AbstractIntegrationConfig;
-import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
-import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
@@ -17,26 +15,20 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static no.ding.pk.utils.JsonTestUtils.mockSapMaterialServiceResponse;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-@Import(ModelMapperV2Config.class)
 public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
     private PriceRowService service;
@@ -47,10 +39,10 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
     @MockBean
     private DiscountService discountService;
 
-    @MockBean
+    @Autowired
     private MaterialService materialService;
 
-    @MockBean
+    @Autowired
     private MaterialPriceService materialPriceService;
 
     @Autowired
@@ -62,6 +54,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
     @Autowired
     @Qualifier("modelMapperV2")
     private ModelMapper modelMapper;
+    private List<MaterialDTO> sapMaterialDTOS;
 
     @BeforeEach
     @Override
@@ -76,7 +69,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 modelMapper);
 
         ClassLoader classLoader = getClass().getClassLoader();
-        List<MaterialDTO> sapMaterialDTOS = mockSapMaterialServiceResponse(classLoader);
+        sapMaterialDTOS = mockSapMaterialServiceResponse(classLoader);
 
         doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), any());
     }
@@ -121,10 +114,6 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
                 zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
-
-        List<DiscountLevel> discountLevels = new LinkedList<>();
-        discountLevels.add(levelOne);
-        discountLevels.add(levelTwo);
 
         MaterialPrice materialPrice = MaterialPrice.builder()
                 .materialNumber("50101")
@@ -179,5 +168,57 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
+    }
+
+    @Test
+    void testSaveAllWithExistingMaterialPrice() {
+
+        String materialNumber = "119901";
+
+        Optional<MaterialDTO> dtoOptional = sapMaterialDTOS.stream().filter(materialDTO -> materialDTO.getMaterial().equals(materialNumber)).findAny();
+
+        assertThat(dtoOptional.isPresent(), is(true));
+
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice("119901", "100", "104", null)).thenReturn(dtoOptional.get());
+
+        MaterialPrice wastePrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(2456.00)
+                .build();
+
+        wastePrice = materialPriceService.save(wastePrice);
+
+        MaterialPrice standardPrice = MaterialPrice.builder()
+                .materialNumber(materialNumber)
+                .standardPrice(2456.00)
+                .build();
+        Material waste = Material.builder()
+                .materialNumber(materialNumber)
+                .designation("Restavfall")
+                .pricingUnit(1000)
+                .quantumUnit("KG")
+                .materialStandardPrice(standardPrice)
+                .build();
+
+        PriceRow wastePriceRow = PriceRow.builder()
+                .customerPrice(2456.0)
+                .discountLevelPct(0.02)
+                .material(waste)
+                .showPriceInOffer(true)
+                .manualPrice(2400.0)
+                .discountLevel(1)
+                .discountLevelPrice(56.0)
+                .amount(1)
+                .priceIncMva(2448.0)
+                .build();
+
+        List<PriceRow> wastePriceRowList = new ArrayList<>();
+        wastePriceRowList.add(wastePriceRow);
+
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", Map.of("119901", standardPrice));
+
+        assertThat(priceRows, notNullValue());
+        assertThat(priceRows, not(empty()));
+        assertThat(priceRows.get(0).getMaterial().getMaterialStandardPrice(), equalTo(wastePrice));
     }
 }

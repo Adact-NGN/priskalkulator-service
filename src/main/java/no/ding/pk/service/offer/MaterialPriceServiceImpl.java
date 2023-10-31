@@ -57,5 +57,10 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
     public List<MaterialPrice> findAll() {
         return repository.findAll();
     }
-    
+
+    @Override
+    public Optional<MaterialPrice> findByMaterialNumberDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone) {
+        return repository.findMaterialPriceByMaterialNumberAndDeviceTypeAndZone(materialNumber, deviceType, salesZone);
+    }
+
 }

@@ -93,7 +93,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
         }
 
-        entity.setContactPersonList(newPriceOffer.getContactPersonList());
+        if(entity.getContactPersonList() == null || entity.getContactPersonList().isEmpty() || entity.getContactPersonList().containsAll(newPriceOffer.getContactPersonList())) {
+            entity.setContactPersonList(newPriceOffer.getContactPersonList());
+            entity = repository.save(entity);
+        }
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(!newPriceOffer.getSalesOfficeList().isEmpty()) {

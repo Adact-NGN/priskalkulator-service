@@ -295,6 +295,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
@@ -303,9 +304,74 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer2, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldUpdateContactPersonList() {
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
+
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("127")
+                .salesOfficeName("Sarpsborg/Fredrikstad")
+                .postalNumber("1601")
+                .city("FREDRIKSTAD")
+                //.materialList(materialList)
+                //.zoneList(zoneList)
+                .build();
+
+        ContactPerson contactPerson = ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build();
+
+        List<ContactPerson> contactPeople = new ArrayList<>();
+        contactPeople.add(contactPerson);
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
+        assertThat(priceOffer.getContactPersonList().get(0).getId(), notNullValue());
+
+        PriceOffer updatedPriceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        updatedPriceOffer.setContactPersonList(Collections.singletonList(ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build()));
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
+        updatedPriceOffer = service.save(updatedPriceOffer);
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
     }
 
     @Test

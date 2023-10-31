@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
 @DataJpaTest
-@TestPropertySource("/h2-db.properties")
+@TestPropertySource("classpath:h2-db.properties")
 class PriceOfferTemplateRepositoryTest {
 
     @Autowired

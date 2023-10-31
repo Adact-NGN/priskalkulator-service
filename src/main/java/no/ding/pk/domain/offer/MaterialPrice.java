@@ -17,7 +17,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "material_price", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType", "zone"}))
+@Table(name = "material_price", uniqueConstraints = @UniqueConstraint(
+        name = "material_price_identifier",
+        columnNames = {"materialNumber", "deviceType", "zone"}))
 public class MaterialPrice extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

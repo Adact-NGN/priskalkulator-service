@@ -32,7 +32,7 @@ public class ModelMapperV2Config {
     private static final Logger log = LoggerFactory.getLogger(ModelMapperV2Config.class);
 
     @Bean(name = "modelMapperV2")
-    public ModelMapper modelMapperV2(MaterialService materialRepository, SalesRoleRepository salesRoleRepository) {
+    public ModelMapper modelMapperV2(MaterialService materialService, SalesRoleRepository salesRoleRepository) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 
@@ -84,7 +84,7 @@ public class ModelMapperV2Config {
 
         priceOfferToPriceOfferListDto(modelMapper);
 
-        priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
+        priceRowDtoToPriceRowTypeMapping(materialService, modelMapper);
 
         priceRowToPriceRowDtoTypeMapping(modelMapper);
 

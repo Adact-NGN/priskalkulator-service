@@ -57,18 +57,14 @@ public class Offer extends Auditable {
     @Column
     private Date dateIssued;
 
-    public List<ContactPerson> getContactPersonList() {
-        return contactPersonList;
-    }
-
-    public void setContactPersonList(List<ContactPerson> contactPersonList) {
+    public void setContactPersonList(List<ContactPerson> tempContactPersonList) {
         if(this.contactPersonList == null) {
             this.contactPersonList = new ArrayList<>();
         }
 
         this.contactPersonList.clear();
-        if(contactPersonList != null && !contactPersonList.isEmpty()) {
-            this.contactPersonList.addAll(contactPersonList);
+        if(tempContactPersonList != null && !tempContactPersonList.isEmpty()) {
+            this.contactPersonList.addAll(tempContactPersonList);
         }
     }
 
