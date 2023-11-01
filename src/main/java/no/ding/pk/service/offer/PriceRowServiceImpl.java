@@ -256,7 +256,14 @@ public class PriceRowServiceImpl implements PriceRowService {
             Optional<MaterialPrice> existingMaterialPrice = materialPriceService.findByMaterialNumberDeviceTypeAndSalesZone(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone());
 
             if(existingMaterialPrice.isPresent()) {
-                material.setMaterialStandardPrice(existingMaterialPrice.get());
+                MaterialPrice materialStandardPrice = existingMaterialPrice.get();
+
+                // TODO: Should we update the price with the newest every time?
+//                if(!materialStandardPrice.getStandardPrice().equals(materialPrice.getStandardPrice())) {
+//                    materialStandardPrice.setStandardPrice(materialPrice.getStandardPrice());
+//                }
+
+                material.setMaterialStandardPrice(materialStandardPrice);
             } else {
                 material.setMaterialStandardPrice(materialPrice);
             }

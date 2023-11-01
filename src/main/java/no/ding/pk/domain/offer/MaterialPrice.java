@@ -76,7 +76,7 @@ public class MaterialPrice extends Auditable {
 
         MaterialPrice that = (MaterialPrice) o;
 
-        return new EqualsBuilder().append(id, that.id).append(materialNumber, that.materialNumber)
+        return new EqualsBuilder().append(materialNumber, that.materialNumber)
                 .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
                 .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
                 .append(quantumUnit, that.quantumUnit).append(zone, that.zone).isEquals();
@@ -84,7 +84,7 @@ public class MaterialPrice extends Auditable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(id).append(materialNumber)
+        return new HashCodeBuilder(17, 37).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
                 .append(quantumUnit).append(zone).toHashCode();
     }
