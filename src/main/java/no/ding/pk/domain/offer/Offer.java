@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,6 +48,7 @@ public class Offer extends Auditable {
     @Column
     private String organizationNumber;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ContactPerson> contactPersonList;
@@ -57,18 +59,15 @@ public class Offer extends Auditable {
     @Column
     private Date dateIssued;
 
-    public List<ContactPerson> getContactPersonList() {
-        return contactPersonList;
-    }
-
-    public void setContactPersonList(List<ContactPerson> contactPersonList) {
+    public void setContactPersonList(List<ContactPerson> tempContactPersonList) {
         if(this.contactPersonList == null) {
             this.contactPersonList = new ArrayList<>();
         }
 
-        this.contactPersonList.clear();
-        if(contactPersonList != null && !contactPersonList.isEmpty()) {
-            this.contactPersonList.addAll(contactPersonList);
+        for(ContactPerson contactPerson : tempContactPersonList) {
+            if(!this.contactPersonList.contains(contactPerson)) {
+                this.contactPersonList.add(contactPerson);
+            }
         }
     }
 

@@ -57,7 +57,7 @@ public class User extends Auditable implements Serializable {
     private String resourceNr;
     
     @JsonAlias("phone")
-    @Column()
+    @Column
     private String phoneNumber;
     
     @Column(unique = true)

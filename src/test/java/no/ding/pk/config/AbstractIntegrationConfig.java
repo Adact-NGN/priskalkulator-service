@@ -2,6 +2,7 @@ package no.ding.pk.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
@@ -24,7 +25,7 @@ import static uk.org.webcompere.systemstubs.SystemStubs.withEnvironmentVariable;
 
 @Tag("integrationtest")
 @ContextConfiguration
-@Import(H2UnitTestConfig.class)
+@Import({H2UnitTestConfig.class, ModelMapperV2Config.class, MaterialServicesConfig.class})
 @DataJpaTest
 @ExtendWith(SystemStubsExtension.class)
 @Getter
@@ -114,4 +115,5 @@ public abstract class AbstractIntegrationConfig {
         environmentVariables.set("sap.api.salesorg.url", "");
         environmentVariables.set("sales.offices.requires.fa.approvment", "100");
     }
+
 }

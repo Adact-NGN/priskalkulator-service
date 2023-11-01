@@ -1,16 +1,15 @@
 package no.ding.pk.service.offer;
 
 import lombok.Data;
-import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
@@ -41,8 +39,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
-    private final DiscountService discountService;
-
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
     private final List<Integer> salesOfficesWhichRequiresOwnFaApprover;
@@ -52,14 +48,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 DiscountService discountService, CustomerTermsService customerTermsService,
+                                 CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper,
                                  @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
-        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
         this.salesOfficesWhichRequiresOwnFaApprover = salesOfficesWhichRequiresOwnFaApprover;
@@ -99,7 +94,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
         }
 
-        entity.setContactPersonList(newPriceOffer.getContactPersonList());
+        if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
+            if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
+                entity.setContactPersonList(newPriceOffer.getContactPersonList());
+                entity = repository.save(entity);
+            }
+        }
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(!newPriceOffer.getSalesOfficeList().isEmpty()) {
@@ -116,6 +116,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(!materialsForApproval.isEmpty()) {
             log.debug("Materials needs approving by responsible person.");
             entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+            entity.setNeedsApproval(true);
             String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
             entity.setMaterialsForApproval(materialNumbersForApproval);
@@ -130,6 +131,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             if(approver != null && approver.equals(entity.getSalesEmployee())) {
                 log.debug("Sales employee has the rights to approve the price offer. Set it to approved.");
+                entity.setNeedsApproval(false);
                 entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
             }
         } else if(newPriceOffer.getApprover() != null) {
@@ -143,9 +145,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 entity.setApprover(approver);
             }
 
+            entity.setNeedsApproval(false);
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         } else {
             log.debug("No materials needs to be approved, set price offer as APPROVED.");
+            entity.setNeedsApproval(false);
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 

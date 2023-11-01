@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.LazyCollection;
@@ -40,7 +41,6 @@ public class SalesOffice {
     private String city;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "material_list_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_materialList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> materialList;
@@ -51,13 +51,11 @@ public class SalesOffice {
     private List<Zone> zoneList;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "transport_list_id", foreignKey = @ForeignKey(name ="Fk_salesOffice_transportServiceList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> transportServiceList;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-//    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE, org.hibernate.annotations.CascadeType.PERSIST})
     @JoinColumn(name = "rental_list_id", foreignKey = @ForeignKey(name = "Fk_salesOffice_rentalList"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> rentalList;
@@ -76,5 +74,32 @@ public class SalesOffice {
                 "salesOfficeName = " + salesOfficeName + ", " +
                 "postalNumber = " + postalNumber + ", " +
                 "city = " + city + ")";
+    }
+
+    @JsonIgnore
+    public Integer getHighestSelectedDiscountLevel() {
+        int highestSelectedDiscountLevel = 0;
+        getHighestDiscountLevel(highestSelectedDiscountLevel, materialList);
+        getHighestDiscountLevel(highestSelectedDiscountLevel, transportServiceList);
+        getHighestDiscountLevel(highestSelectedDiscountLevel, rentalList);
+
+        getHighestDiscountLevelForZones(highestSelectedDiscountLevel, zoneList);
+        return null;
+    }
+
+    private void getHighestDiscountLevelForZones(int highestSelectedDiscountLevel, List<Zone> zoneList) {
+        for (Zone zone : zoneList) {
+            highestSelectedDiscountLevel = getHighestDiscountLevel(highestSelectedDiscountLevel, zone.getPriceRows());
+        }
+    }
+
+    private int getHighestDiscountLevel(int highestSelectedDiscountLevel, List<PriceRow> priceRows) {
+        for(PriceRow material : priceRows) {
+            if(material.getDiscountLevel() != null && material.getDiscountLevel() > highestSelectedDiscountLevel) {
+                highestSelectedDiscountLevel = material.getDiscountLevel();
+            }
+        }
+
+        return highestSelectedDiscountLevel;
     }
 }

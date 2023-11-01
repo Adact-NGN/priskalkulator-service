@@ -17,7 +17,9 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "material_price", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType", "zone"}))
+@Table(name = "material_price", uniqueConstraints = @UniqueConstraint(
+        name = "material_price_identifier",
+        columnNames = {"materialNumber", "deviceType", "zone"}))
 public class MaterialPrice extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,16 +76,16 @@ public class MaterialPrice extends Auditable {
 
         MaterialPrice that = (MaterialPrice) o;
 
-        return new EqualsBuilder().append(id, that.id).append(materialNumber, that.materialNumber)
+        return new EqualsBuilder().append(materialNumber, that.materialNumber)
                 .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
                 .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
-                .append(quantumUnit, that.quantumUnit).isEquals();
+                .append(quantumUnit, that.quantumUnit).append(zone, that.zone).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(id).append(materialNumber)
+        return new HashCodeBuilder(17, 37).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
-                .append(quantumUnit).toHashCode();
+                .append(quantumUnit).append(zone).toHashCode();
     }
 }

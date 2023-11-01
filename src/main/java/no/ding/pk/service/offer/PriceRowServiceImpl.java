@@ -252,6 +252,22 @@ public class PriceRowServiceImpl implements PriceRowService {
             material.setPricingUnit(materialPrice.getPricingUnit());
 
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+
+            Optional<MaterialPrice> existingMaterialPrice = materialPriceService.findByMaterialNumberDeviceTypeAndSalesZone(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone());
+
+            if(existingMaterialPrice.isPresent()) {
+                MaterialPrice materialStandardPrice = existingMaterialPrice.get();
+
+                // TODO: Should we update the price with the newest every time?
+//                if(!materialStandardPrice.getStandardPrice().equals(materialPrice.getStandardPrice())) {
+//                    materialStandardPrice.setStandardPrice(materialPrice.getStandardPrice());
+//                }
+
+                material.setMaterialStandardPrice(materialStandardPrice);
+            } else {
+                material.setMaterialStandardPrice(materialPrice);
+            }
+
         } else {
             log.debug("No material prices found.");
         }
@@ -265,15 +281,19 @@ public class PriceRowServiceImpl implements PriceRowService {
             return null;
         }
 
-        if(entity.getMaterial() == null || entity.getMaterial().getMaterialStandardPrice() == null || entity.getMaterial().getMaterialStandardPrice().getStandardPrice() == null) {
+        Double standardPrice = getStandardPrice(entity);
+
+        if(standardPrice == null) {
             log.debug("Could not get material information for calculating discount level: {}", entity);
             return null;
         }
 
-        Double standardPrice = entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
-
         Double manualPrice = entity.getManualPrice();
 
+        return getCurrentLevel(discount, standardPrice, manualPrice);
+    }
+
+    private static Integer getCurrentLevel(Discount discount, Double standardPrice, Double manualPrice) {
         Integer currentLevel = 1;
         for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
             Double tempDiscount = standardPrice - discountLevel.getDiscount();
@@ -284,8 +304,20 @@ public class PriceRowServiceImpl implements PriceRowService {
                 break;
             }
         }
-
         return currentLevel;
+    }
+
+    private static Double getStandardPrice(PriceRow entity) {
+        if(entity.getStandardPrice() != null) {
+            return entity.getStandardPrice();
+        }
+
+        if (entity.getMaterial() != null && entity.getMaterial().getMaterialStandardPrice() != null && entity.getMaterial().getMaterialStandardPrice().getStandardPrice() != null) {
+            return entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
+        }
+
+
+        return null;
     }
 
     private Discount getDiscountLevel(String salesOrg, String salesOffice, String materialNumber) {
