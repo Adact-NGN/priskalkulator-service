@@ -3,6 +3,7 @@ package no.ding.pk.service.offer;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.offer.MaterialPriceRepository;
 import no.ding.pk.service.cache.InMemory3DCache;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,15 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
 
     @Override
     public Optional<MaterialPrice> findByMaterialNumberDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone) {
-        return repository.findMaterialPriceByMaterialNumberAndDeviceTypeAndZone(materialNumber, deviceType, salesZone);
+        String zone = "";
+        if(StringUtils.isNotBlank(salesZone))
+            zone = salesZone;
+
+        String deviceTypeToUse = "";
+        if(StringUtils.isNotBlank(deviceType))
+            deviceTypeToUse = deviceType;
+
+        return repository.findMaterialPriceByMaterialNumberAndDeviceTypeAndZone(materialNumber, deviceTypeToUse, zone);
     }
 
 }
