@@ -9,6 +9,7 @@ import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -93,9 +94,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
         }
 
-        if(entity.getContactPersonList() == null || entity.getContactPersonList().isEmpty() || entity.getContactPersonList().containsAll(newPriceOffer.getContactPersonList())) {
-            entity.setContactPersonList(newPriceOffer.getContactPersonList());
-            entity = repository.save(entity);
+        if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
+            if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
+                entity.setContactPersonList(newPriceOffer.getContactPersonList());
+                entity = repository.save(entity);
+            }
         }
 
         if(newPriceOffer.getSalesOfficeList() != null) {

@@ -12,10 +12,7 @@ import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
 import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.TypeMap;
+import org.modelmapper.*;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +32,7 @@ public class ModelMapperV2Config {
     public ModelMapper modelMapperV2(MaterialService materialService, SalesRoleRepository salesRoleRepository) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
         priceOfferDtoToPriceOfferMapping(modelMapper);
 

@@ -49,6 +49,6 @@ public class ContactPerson {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, mobileNumber, emailAddress);
+        return Objects.hash(firstName, lastName, mobileNumber, emailAddress);
     }
 }

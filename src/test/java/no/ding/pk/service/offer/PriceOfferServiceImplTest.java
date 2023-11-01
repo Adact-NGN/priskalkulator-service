@@ -350,11 +350,12 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(priceOffer.getContactPersonList().get(0).getId(), notNullValue());
 
         PriceOffer updatedPriceOffer = PriceOffer.priceOfferBuilder()
+                .id(priceOffer.getId())
                 .customerNumber("327342")
                 .customerName("Follo Ren IKS")
                 .needsApproval(false)
                 .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
-                .contactPersonList(contactPeople)
+                //.contactPersonList(contactPeople)
                 .salesEmployee(salesEmployee)
                 //.salesOfficeList(List.of(salesOffice2))
                 .build();
@@ -711,9 +712,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         );
         Discount discount = Discount.builder("100", "100", "119901", 2604.0, discountLevels).build();
 
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Arrays.asList("119901"))).thenReturn(Arrays.asList(discount));
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Collections.singletonList("119901"))).thenReturn(Collections.singletonList(discount));
 
-        List<Zone> zones = Arrays.asList(Zone.builder()
+        List<Zone> zones = Collections.singletonList(Zone.builder()
                 .zoneId("0000000001")
                 .postalCode("1001")
                 .postalName("Oslo")
@@ -736,7 +737,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .deviceType("")
                 .materialStandardPrice(standardPrice)
                 .build();
-        List<PriceRow> materials = Arrays.asList(
+        List<PriceRow> materials = Collections.singletonList(
                 PriceRow.builder()
                         .showPriceInOffer(true)
                         .manualPrice(1.0)
@@ -750,7 +751,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         .classId("")
                         .classDescription("")
                         .material(material)
-                .build());
+                        .build());
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
                 .salesOrg("100")
@@ -759,7 +760,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .zoneList(zones)
                 .materialList(materials)
                 .build();
-        List<SalesOffice> salesOffices = Arrays.asList(salesOffice);
+        List<SalesOffice> salesOffices = Collections.singletonList(salesOffice);
 
         User salesEmployee = userService.findByEmail("Eirik.Flaa@ngn.no");
 
