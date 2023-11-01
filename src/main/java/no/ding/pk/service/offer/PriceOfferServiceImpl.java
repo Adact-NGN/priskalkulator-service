@@ -272,9 +272,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private Map<String, List<PriceRow>> getAllMaterialsForApproval(PriceOffer priceOffer) {
+        log.debug("Getting all materials which needs approval.");
         Map<String, List<PriceRow>> salesOfficeMaterialsMap = new HashMap<>();
 
-        if(priceOffer.getSalesOfficeList() == null) {
+        if(CollectionUtils.isEmpty(priceOffer.getSalesOfficeList())) {
+            log.debug("No sales offices registered on the Price offer, returning.");
             return salesOfficeMaterialsMap;
         }
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
@@ -292,6 +294,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 salesOfficeMaterialsMap.put(salesOffice.getSalesOffice(), materialsInPriceOffer);
             }
         }
+        log.debug("Filtering done, found {} materials which needs to be approved.", salesOfficeMaterialsMap.size());
         return salesOfficeMaterialsMap;
     }
 
@@ -397,13 +400,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 
             if(needsReApproval) {
+                log.debug("Price offer still needs approval. Setting status to PENDING and needsApproval to true.");
                 priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
                 priceOfferToApprove.setNeedsApproval(true);
 
+                log.debug("Checking if Price offer has an approver registered on it.");
                 if(priceOfferToApprove.getApprover() == null) {
+                    log.debug("No approver set.");
                     Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
                     User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
+                    log.debug("Found approver? {}", neededApprover != null);
                     priceOfferToApprove.setApprover(neededApprover);
                 }
             } else {
@@ -422,12 +429,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Boolean activatePriceOffer(Long activatedById, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
-        PriceOffer priceOfferToActivate = repository.findById(priceOfferId).orElse(null);
+        Optional<PriceOffer> priceOfferToActivateOptional = repository.findById(priceOfferId);
 
-        if(priceOfferToActivate == null) {
+        if(priceOfferToActivateOptional.isEmpty()) {
             String message = String.format("No PriceOffer with given id %d was found.", priceOfferId);
             throw new PriceOfferNotFoundException(message);
         }
+
+        PriceOffer priceOfferToActivate = priceOfferToActivateOptional.get();
 
         if(StringUtils.isBlank(priceOfferToActivate.getPriceOfferStatus())) {
             String message = "Given Price offer has no status assigned.";
@@ -540,7 +549,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
+        log.debug("Checking if price offer needs approval.");
         List<String> currentMaterialInPriceOffer = new ArrayList<>();
+
         for (Map.Entry<String, List<PriceRow>> listEntry : getAllMaterialsForApproval(priceOfferToApprove).entrySet()) {
             currentMaterialInPriceOffer.addAll(listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
         }
