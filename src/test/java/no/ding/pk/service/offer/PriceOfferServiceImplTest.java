@@ -295,6 +295,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
@@ -303,9 +304,75 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer2, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldUpdateContactPersonList() {
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
+
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("127")
+                .salesOfficeName("Sarpsborg/Fredrikstad")
+                .postalNumber("1601")
+                .city("FREDRIKSTAD")
+                //.materialList(materialList)
+                //.zoneList(zoneList)
+                .build();
+
+        ContactPerson contactPerson = ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build();
+
+        List<ContactPerson> contactPeople = new ArrayList<>();
+        contactPeople.add(contactPerson);
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
+        assertThat(priceOffer.getContactPersonList().get(0).getId(), notNullValue());
+
+        PriceOffer updatedPriceOffer = PriceOffer.priceOfferBuilder()
+                .id(priceOffer.getId())
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                //.contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        updatedPriceOffer.setContactPersonList(Collections.singletonList(ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build()));
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
+        updatedPriceOffer = service.save(updatedPriceOffer);
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
     }
 
     @Test
@@ -645,9 +712,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         );
         Discount discount = Discount.builder("100", "100", "119901", 2604.0, discountLevels).build();
 
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Arrays.asList("119901"))).thenReturn(Arrays.asList(discount));
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Collections.singletonList("119901"))).thenReturn(Collections.singletonList(discount));
 
-        List<Zone> zones = Arrays.asList(Zone.builder()
+        List<Zone> zones = Collections.singletonList(Zone.builder()
                 .zoneId("0000000001")
                 .postalCode("1001")
                 .postalName("Oslo")
@@ -670,7 +737,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .deviceType("")
                 .materialStandardPrice(standardPrice)
                 .build();
-        List<PriceRow> materials = Arrays.asList(
+        List<PriceRow> materials = Collections.singletonList(
                 PriceRow.builder()
                         .showPriceInOffer(true)
                         .manualPrice(1.0)
@@ -684,7 +751,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                         .classId("")
                         .classDescription("")
                         .material(material)
-                .build());
+                        .build());
         SalesOffice salesOffice = SalesOffice.builder()
                 .salesOffice("100")
                 .salesOrg("100")
@@ -693,7 +760,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .zoneList(zones)
                 .materialList(materials)
                 .build();
-        List<SalesOffice> salesOffices = Arrays.asList(salesOffice);
+        List<SalesOffice> salesOffices = Collections.singletonList(salesOffice);
 
         User salesEmployee = userService.findByEmail("Eirik.Flaa@ngn.no");
 

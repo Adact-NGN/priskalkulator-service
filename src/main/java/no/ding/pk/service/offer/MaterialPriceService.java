@@ -11,4 +11,6 @@ public interface MaterialPriceService {
     Optional<MaterialPrice> findById(Long id);
     MaterialPrice findByMaterialNumber(String materialNumber);
     List<MaterialPrice> findAll();
+
+    Optional<MaterialPrice> findByMaterialNumberDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone);
 }

@@ -252,7 +252,15 @@ public class PriceRowServiceImpl implements PriceRowService {
             material.setPricingUnit(materialPrice.getPricingUnit());
 
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
-//            material.setMaterialStandardPrice(materialPrice);
+
+            Optional<MaterialPrice> existingMaterialPrice = materialPriceService.findByMaterialNumberDeviceTypeAndSalesZone(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone());
+
+            if(existingMaterialPrice.isPresent()) {
+                material.setMaterialStandardPrice(existingMaterialPrice.get());
+            } else {
+                material.setMaterialStandardPrice(materialPrice);
+            }
+
         } else {
             log.debug("No material prices found.");
         }

@@ -1,6 +1,7 @@
 package no.ding.pk.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -93,7 +94,11 @@ public class JsonTestUtils {
     }
 
     public static <T> T jsonToObject(String json, Class<T> clazz) throws JsonProcessingException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        ObjectReader om = new ObjectMapper().readerForUpdating(clazz.getDeclaredConstructor().newInstance());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
+        //objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectReader om = objectMapper.readerForUpdating(clazz.getDeclaredConstructor().newInstance());
 
         return om.readValue(json);
     }
