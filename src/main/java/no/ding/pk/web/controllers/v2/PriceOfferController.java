@@ -239,7 +239,7 @@ public class PriceOfferController {
     @PutMapping("/status/{id}")
     public ResponseEntity<String> updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status) {
         if(!PriceOfferStatus.getAllPriceOfferStatuses().contains(status)) {
-            String message = String.format("Given status is not a valid: %s", status);
+            String message = String.format("Given status is not valid: %s", status);
             throw new PriceOfferStatusCodeNotFoundException(message);
         }
 
