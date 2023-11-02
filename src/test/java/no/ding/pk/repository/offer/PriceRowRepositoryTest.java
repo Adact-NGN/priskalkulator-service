@@ -17,14 +17,14 @@ class PriceRowRepositoryTest {
 
     @Test
     public void shouldPersistPriceRow() {
-        MaterialPrice standardPrice = MaterialPrice.builder()
+        String materialNumber = "119901";
+        MaterialPrice standardPrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                 .standardPrice(2604.0)
-                .materialNumber("119901")
                 .pricingUnit(1000)
                 .quantumUnit("KG")
                 .build();
         Material material = Material.builder()
-                .materialNumber("119901")
+                .materialNumber(materialNumber)
                 .materialStandardPrice(standardPrice)
                 .pricingUnit(1000)
                 .quantumUnit("KG")

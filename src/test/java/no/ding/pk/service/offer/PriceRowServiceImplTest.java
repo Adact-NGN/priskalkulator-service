@@ -115,8 +115,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
                 zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber("50101")
+        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", "50101", null, "01")
                 .pricingUnit(1)
                 .standardPrice(1599.0)
                 .quantumUnit("ST")
@@ -136,8 +135,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         String materialNumber = "119901";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice wastePrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                 .standardPrice(2456.00)
                 .build();
 
@@ -179,17 +177,18 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(dtoOptional.isPresent(), is(true));
 
-        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice("119901", "100", "104", null)).thenReturn(dtoOptional.get());
+        String salesOrg = "100";
+        String salesOffice = "104";
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice("119901", salesOrg, salesOffice, null)).thenReturn(dtoOptional.get());
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .materialNumber(materialNumber)
                 .standardPrice(2456.00)
                 .build();
 
         wastePrice = materialPriceService.save(wastePrice);
 
-        MaterialPrice standardPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice standardPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(2456.00)
                 .build();
         Material waste = Material.builder()
@@ -215,7 +214,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, "100", "104", Map.of("119901", standardPrice));
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, Map.of("119901", standardPrice));
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));

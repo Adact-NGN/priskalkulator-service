@@ -64,9 +64,10 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldUpdateMaterialWithNewValues() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice oldMaterialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice oldMaterialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -114,11 +115,9 @@ public class PriceRowServiceImplUnitTest {
                         .build()
         );
 
-        String salesOrg = "100";
-        String salesOffice = "129";
 
-        MaterialPrice updatedMaterialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+
+        MaterialPrice updatedMaterialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .pricingUnit(1)
                 .standardPrice(1917.0)
                 .build();
@@ -151,8 +150,7 @@ public class PriceRowServiceImplUnitTest {
     public void shouldSetDiscountPctByStandardPriceAndDiscountLevelPrice() {
         String materialNumber = "50103";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -238,9 +236,10 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldSetDiscountLevelToOneWhenManualPriceIsSet() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -288,8 +287,7 @@ public class PriceRowServiceImplUnitTest {
                         .build()
         );
 
-        String salesOrg = "100";
-        String salesOffice = "129";
+
         Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
 
@@ -306,9 +304,10 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldSetDiscountLevelToTwoWhenManualPriceIsSet() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -356,11 +355,8 @@ public class PriceRowServiceImplUnitTest {
                         .build()
         );
 
-        String salesOrg = "100";
-        String salesOffice = "129";
         Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
-
 
         when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
 
@@ -374,10 +370,11 @@ public class PriceRowServiceImplUnitTest {
 
     @Test
     public void shouldSetDiscountLevelAboveFiveWhenManualPriceIsSet() {
+        String salesOrg = "100";
+        String salesOffice = "129";
         String materialNumber = "50103";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -424,8 +421,7 @@ public class PriceRowServiceImplUnitTest {
                 DiscountLevel.builder(468.0, 5)
                         .build()
         );
-        String salesOrg = "100";
-        String salesOffice = "129";
+
         Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
 

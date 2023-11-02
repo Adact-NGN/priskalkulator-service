@@ -15,7 +15,7 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @Table(name = "material_price", uniqueConstraints = @UniqueConstraint(
         name = "material_price_identifier",
@@ -95,5 +95,13 @@ public class MaterialPrice extends Auditable {
         return new HashCodeBuilder(17, 37).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
                 .append(quantumUnit).append(salesOrg).append(salesOffice).append(zone).toHashCode();
+    }
+
+    public static MaterialPriceBuilder builder(String salesOrg, String salesOffice, String materialNumber, String deviceType, String zone) {
+        return MaterialPrice.hiddenBuilder().salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .materialNumber(materialNumber)
+                .deviceType(deviceType)
+                .zone(zone);
     }
 }

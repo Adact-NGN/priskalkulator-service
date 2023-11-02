@@ -304,14 +304,11 @@ public class PriceOfferController {
         to.setMaterialGroupDesignation(from.getProductGroupDesignation());
         to.setMaterialTypeDescription(from.getMaterialDesignation());
         to.setDeviceType(from.getDeviceType());
-        MaterialPrice materialStdPrice = MaterialPrice.builder()
-                .materialNumber(from.getMaterial())
-                .deviceType(from.getDeviceType())
+        MaterialPrice materialStdPrice = MaterialPrice
+                .builder(salesOrg, salesOffice, from.getMaterial(), from.getDeviceType(), to.getSalesZone())
                 .standardPrice(from.getStandardPrice())
                 .pricingUnit(from.getPricingUnit())
                 .quantumUnit(from.getQuantumUnit())
-                .salesOrg(salesOrg)
-                .salesOffice(salesOffice)
                 .build();
         to.setMaterialStandardPrice(materialStdPrice);
 

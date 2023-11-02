@@ -151,7 +151,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .agreementStartDate(new Date())
                 .build();
 
-        MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder()
+        MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder("100", "100", "119901", null, "01")
                 .materialNumber("119901")
                 .standardPrice(2456.0)
                 .build();
@@ -177,8 +177,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         List<PriceRow> materialList = List.of(priceRow);
 
-        MaterialPrice zoneMaterialStandardPrice = MaterialPrice.builder()
-                .materialNumber("50101")
+        MaterialPrice zoneMaterialStandardPrice = MaterialPrice.builder("100", "100", "50101", null, null)
                 .standardPrice(1131.0)
                 .build();
         Material zoneMaterial = Material.builder()
@@ -202,9 +201,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .material(zoneMaterial)
                 .build();
 
-        MaterialPrice zoneMaterialPriceWithDeviceType = MaterialPrice.builder()
-                .materialNumber("50301")
-                .deviceType("B-0-S")
+        MaterialPrice zoneMaterialPriceWithDeviceType = MaterialPrice.builder("100", "100", "50301", "B-0-S", null)
                 .standardPrice(16.0)
                 .build();
         Material zoneDiveceTypeMaterial = Material.builder()
@@ -724,7 +721,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .isStandardZone(true)
                 .build()
         );
-        MaterialPrice standardPrice = MaterialPrice.builder()
+        MaterialPrice standardPrice = MaterialPrice.builder("100", "100", "119901", null, "01")
                 .standardPrice(2604.0)
                 .quantumUnit("KG")
                 .materialNumber("119901")
@@ -908,14 +905,16 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private Material createOrdinaryMaterial() {
         String materialNumber = "159904";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
+        String salesOffice = "104";
+        String salesOrg = "100";
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .materialNumber(materialNumber)
                 .standardPrice(170.00)
                 .build();
 
         return Material.builder()
-                .salesOffice("104")
-                .salesOrg("100")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
                 .designation("Degaussing harddisker")
                 .materialNumber(materialNumber)
                 .scaleQuantum(0.0)
@@ -930,15 +929,17 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     private static Material createDangerousMaterial() {
+        String salesOrg = "100";
+        String salesOffice = "100";
         String materialNumber = "70120015";
-        MaterialPrice wastePrice = MaterialPrice.builder()
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, null)
                 .materialNumber(materialNumber)
                 .standardPrice(16566.00)
                 .build();
         return Material.builder()
                 .materialNumber(materialNumber)
-                .salesOrg("100")
-                .salesOffice("100")
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
                 .quantumUnit("KG")
                 .designation("Ikke refunderbar spillolje,Småemb")
                 .materialGroup("7012")
@@ -960,7 +961,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         MaterialPrice wastePrice = getMaterialPriceRepository().findByMaterialNumber(materialNumber);
 
         if(wastePrice == null) {
-            wastePrice = MaterialPrice.builder()
+            wastePrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                     .materialNumber(materialNumber)
                     .standardPrice(2456.00)
                     .build();
@@ -1118,17 +1119,19 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
 
-        MaterialPrice materialPrice = getMaterialPriceRepository().findByMaterialNumber("119901");
+        String materialNumber = "119901";
+        MaterialPrice materialPrice = getMaterialPriceRepository().findByMaterialNumber(materialNumber);
+
+        String salesOfficeNumber = "100";
 
         if(materialPrice == null) {
-            materialPrice = MaterialPrice.builder()
-                    .materialNumber("119901")
+            materialPrice = MaterialPrice.builder("100", salesOfficeNumber, materialNumber, null, "01")
                     .standardPrice(1199.0)
                     .build();
         }
 
         Material material = Material.builder()
-                .materialNumber("119901")
+                .materialNumber(materialNumber)
                 .materialStandardPrice(materialPrice)
                 .build();
 
@@ -1139,8 +1142,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         List<PriceRow> materials = new LinkedList<>();
         materials.add(priceRow);
+
         SalesOffice salesOffice = SalesOffice.builder()
-                .salesOffice("100")
+                .salesOffice(salesOfficeNumber)
                 .materialList(materials)
                 .build();
         List<SalesOffice> salesOffices = new LinkedList<>();
@@ -1172,8 +1176,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         String materialNumber = "50301";
         String deviceType = "B-0040-FO";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", materialNumber, deviceType, null)
                 .standardPrice(175.0)
                 .pricingUnit(1)
                 .quantumUnit("ST")
@@ -1248,16 +1251,16 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         String salesOrg = "100";
         String salesOffice = "104";
+        String materialNumber = "159904";
         Material normalWaste = Material.builder()
-                .materialNumber("159904")
+                .materialNumber(materialNumber)
                 .salesOffice(salesOffice)
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, null)
                                 .standardPrice(170.0)
                                 .pricingUnit(1)
-                                .materialNumber("159904")
                                 .quantumUnit("ST")
                                 .build())
                 .designation("Degaussing harddisker")
@@ -1275,10 +1278,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder("100", "100", "70120015", null, null)
                                 .standardPrice(16566.0)
                                 .pricingUnit(1000)
-                                .materialNumber("70120015")
                                 .quantumUnit("KG")
                                 .build())
                 .designation("Ikke refunderbar spillolje,Småemb")
@@ -1296,11 +1298,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .deviceType("B-0-S")
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder("100", "100", "50301", "B-0-S", null)
                                 .standardPrice(13.00)
                                 .pricingUnit(1)
-                                .materialNumber("50301")
-                                .deviceType("B-0-S")
                                 .quantumUnit("ST")
                                 .build())
                 .designation("Flatvogn - Utsett")
@@ -1377,10 +1377,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder(salesOrg, salesOffice, "159904", null, null)
                                 .standardPrice(170.0)
                                 .pricingUnit(1)
-                                .materialNumber("159904")
                                 .quantumUnit("ST")
                                 .build())
                 .designation("Degaussing harddisker")
@@ -1398,10 +1397,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder(salesOrg, salesOffice, "70120015", null, null)
                                 .standardPrice(16566.0)
                                 .pricingUnit(1000)
-                                .materialNumber("70120015")
                                 .quantumUnit("KG")
                                 .build())
                 .designation("Ikke refunderbar spillolje,Småemb")
@@ -1419,7 +1417,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .deviceType("B-0-S")
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder(salesOrg, salesOffice, "50301", "B-0-S", null)
                                 .standardPrice(13.00)
                                 .pricingUnit(1)
                                 .materialNumber("50301")

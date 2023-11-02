@@ -32,8 +32,7 @@ public class MaterialServiceImplTest extends AbstractIntegrationConfig {
     private void createMaterial() {
         String materialNumber = "119901";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-        .materialNumber(materialNumber)
+        MaterialPrice wastePrice = MaterialPrice.builder("100", "100", materialNumber, null, null)
         .standardPrice(2456.00)
         .build();
         

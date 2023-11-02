@@ -227,17 +227,21 @@ public class PriceOfferRepositoryTest {
                 .additionForAdminFee(false)
                 .build();
 
-        Zone zoneOne = createZone("0000000001", true);
-        Zone zoneTwo = createZone("0000000002", false);
-        Zone zoneThree = createZone("0000000003", false);
+        String salesOfficeNumber = "127";
+        String salesOrg = "100";
+
+        Zone zoneOne = createZone("0000000001", true, salesOrg, salesOfficeNumber);
+        Zone zoneTwo = createZone("0000000002", false, salesOrg, salesOfficeNumber);
+        Zone zoneThree = createZone("0000000003", false, salesOrg, salesOfficeNumber);
 
         List<Zone> zoneList = new ArrayList<>();
         zoneList.add(zoneOne);
         zoneList.add(zoneTwo);
         zoneList.add(zoneThree);
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-                .materialNumber("119901")
+
+
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOfficeNumber, "119901", null, "01")
                 .standardPrice(2456.00)
                 .build();
 
@@ -267,8 +271,8 @@ public class PriceOfferRepositoryTest {
         SalesOffice salesOffice = SalesOffice.builder()
                 .city("FREDRIKSTAD")
                 .salesOfficeName("Sarpsborg/Fredrikstad")
-                .salesOffice("127")
-                .salesOrg("100")
+                .salesOffice(salesOfficeNumber)
+                .salesOrg(salesOrg)
                 .postalNumber("1601")
                 .zoneList(zoneList)
                 .materialList(wastePriceRowList)
@@ -302,11 +306,9 @@ public class PriceOfferRepositoryTest {
                 .build();
     }
 
-    private static Zone createZone(String zoneId, boolean isStandardZone) {
+    private static Zone createZone(String zoneId, boolean isStandardZone, String salesOrg, String salesOffice) {
         String formattedZoneId = String.format("0%d", Integer.valueOf(zoneId));
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber("50101")
-                .zone(formattedZoneId)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, "50101", null, formattedZoneId)
                 .standardPrice(1131.0)
                 .build();
 
@@ -331,9 +333,7 @@ public class PriceOfferRepositoryTest {
                 .priceIncMva(1125.0)
                 .build();
 
-        MaterialPrice liftExchangePrice = MaterialPrice.builder()
-                .materialNumber("50102")
-                .zone(formattedZoneId)
+        MaterialPrice liftExchangePrice = MaterialPrice.builder("100", "100", "50102", null, formattedZoneId)
                 .standardPrice(1468.0)
                 .build();
         Material liftExchange = Material.builder()
@@ -357,9 +357,7 @@ public class PriceOfferRepositoryTest {
                 .priceIncMva(1125.0)
                 .build();
 
-        MaterialPrice liftEmptyingPrice = MaterialPrice.builder()
-                .materialNumber("50103")
-                .zone(formattedZoneId)
+        MaterialPrice liftEmptyingPrice = MaterialPrice.builder("100", "100", "50103", null, formattedZoneId)
                 .standardPrice(1131.0)
                 .build();
         Material liftEmptying = Material.builder()
