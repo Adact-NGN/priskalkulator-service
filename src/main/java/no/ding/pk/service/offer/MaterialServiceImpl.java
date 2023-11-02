@@ -86,15 +86,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setDeviceType(material.getDeviceType());
         }
 
-        log.debug("Getting std price for material: {}", material.getMaterialNumber());
-        MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
-        
-        if(materialPriceEntity == null) {
-            log.debug("Std price for material not found.");
-            materialPriceEntity = material.getMaterialStandardPrice();
-        } else if(material.getMaterialStandardPrice() != null){
-            materialPriceEntity.copy(material.getMaterialStandardPrice());
-        }
+        MaterialPrice materialPriceEntity = getMaterialPrice(material);
 
         entity.setMaterialStandardPrice(materialPriceEntity);
 
@@ -123,6 +115,25 @@ public class MaterialServiceImpl implements MaterialService {
         }
         
         return repository.save(entity);
+    }
+
+    private MaterialPrice getMaterialPrice(Material material) {
+        log.debug("Getting std price for material: {}", material.getMaterialNumber());
+        Optional<MaterialPrice> materialPriceEntityOptional = materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        material.getSalesOrg(),
+                        material.getSalesOffice(),
+                        material.getMaterialNumber(),
+                        material.getDeviceType(),
+                        material.getSalesZone());
+
+        if(materialPriceEntityOptional.isEmpty()) {
+            log.debug("Std price for material not found.");
+            return material.getMaterialStandardPrice();
+        } else if(material.getMaterialStandardPrice() != null){
+            return material.getMaterialStandardPrice();
+        }
+        return null;
     }
 
     @Override

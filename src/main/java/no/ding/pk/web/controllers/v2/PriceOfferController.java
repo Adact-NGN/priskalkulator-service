@@ -293,12 +293,12 @@ public class PriceOfferController {
             Material material = priceRow.getMaterial();
 
             if (material != null) {
-                createMaterialFromPriceRowDTO(material, priceRowDTO);
+                createMaterialFromPriceRowDTO(material, priceRowDTO, salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
             }
         };
     }
 
-    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from) {
+    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from, String salesOrg, String salesOffice) {
         log.debug("To: {}, from: {}", to, from);
         to.setDesignation(from.getDesignation());
         to.setMaterialGroupDesignation(from.getProductGroupDesignation());
@@ -310,6 +310,8 @@ public class PriceOfferController {
                 .standardPrice(from.getStandardPrice())
                 .pricingUnit(from.getPricingUnit())
                 .quantumUnit(from.getQuantumUnit())
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
                 .build();
         to.setMaterialStandardPrice(materialStdPrice);
 

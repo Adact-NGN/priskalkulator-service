@@ -143,7 +143,7 @@ public class StartUpDev {
                 if(materialDTO == null) {
                         return null;
                 }
-                MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, materialDTO.getStandardPrice());
+                MaterialPrice residualWasteMaterialStdPrice = createMaterialStdPrice(materialNumber, materialDTO.getStandardPrice(), materialDTO.getSalesOrg(), materialDTO.getSalesOffice(), materialDTO.getZone());
                 Material material = createMaterial(materialNumber, materialDTO, residualWasteMaterialStdPrice);
 
                 material = materialService.save(material);
@@ -193,10 +193,13 @@ public class StartUpDev {
                         .build();
         }
 
-        private MaterialPrice createMaterialStdPrice(String materialNumber, Double standardPrice) {
+        private MaterialPrice createMaterialStdPrice(String materialNumber, Double standardPrice, String salesOrg, String salesOffice, String zone) {
                 return MaterialPrice.builder()
                         .materialNumber(materialNumber)
                         .standardPrice(standardPrice)
+                        .salesOrg(salesOrg)
+                        .salesOffice(salesOffice)
+                        .zone(zone)
                         .build();
         }
 }

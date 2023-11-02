@@ -253,7 +253,12 @@ public class PriceRowServiceImpl implements PriceRowService {
 
             materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
 
-            Optional<MaterialPrice> existingMaterialPrice = materialPriceService.findByMaterialNumberDeviceTypeAndSalesZone(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone());
+            Optional<MaterialPrice> existingMaterialPrice = materialPriceService
+                    .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(material.getSalesOrg(),
+                            material.getSalesOffice(),
+                            material.getMaterialNumber(),
+                            material.getDeviceType(),
+                            material.getSalesZone());
 
             if(existingMaterialPrice.isPresent()) {
                 MaterialPrice materialStandardPrice = existingMaterialPrice.get();
@@ -330,6 +335,7 @@ public class PriceRowServiceImpl implements PriceRowService {
     }
 
     private List getMaterials(Material material) {
+        log.debug("Getting material from DB: {}", material);
         EntityManager em = emFactory.createEntityManager();
         log.debug("Is material attached: {}", em.contains(material));
 

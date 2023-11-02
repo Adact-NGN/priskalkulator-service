@@ -19,7 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "material_price", uniqueConstraints = @UniqueConstraint(
         name = "material_price_identifier",
-        columnNames = {"materialNumber", "deviceType", "zone"}))
+        columnNames = {"salesOrg", "salesOffice", "materialNumber", "deviceType", "zone"}))
 public class MaterialPrice extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,12 @@ public class MaterialPrice extends Auditable {
 
     @Column
     private String quantumUnit;
+
+    @Column
+    private String salesOrg;
+
+    @Column
+    private String salesOffice;
 
     @Column
     private String zone;
@@ -79,13 +85,15 @@ public class MaterialPrice extends Auditable {
         return new EqualsBuilder().append(materialNumber, that.materialNumber)
                 .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
                 .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
-                .append(quantumUnit, that.quantumUnit).append(zone, that.zone).isEquals();
+                .append(quantumUnit, that.quantumUnit).append(salesOrg, that.salesOrg)
+                .append(salesOffice, that.salesOffice)
+                .append(zone, that.zone).isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
-                .append(quantumUnit).append(zone).toHashCode();
+                .append(quantumUnit).append(salesOrg).append(salesOffice).append(zone).toHashCode();
     }
 }
