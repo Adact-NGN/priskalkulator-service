@@ -3,7 +3,7 @@ name: Release Container Image
 on:
   release:
     types:
-      - released
+      - created
 
 env:
   IMAGE_NAME: ding-ip-app-pk-service
