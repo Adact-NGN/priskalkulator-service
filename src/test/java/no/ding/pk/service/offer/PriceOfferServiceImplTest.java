@@ -15,6 +15,7 @@ import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.apache.commons.io.IOUtils;
@@ -48,6 +49,8 @@ import static no.ding.pk.utils.JsonTestUtils.objectToJson;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -1466,6 +1469,47 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
         assertThat(actual.getApprover(), is(ordinaryWasteHolderLvl2));
+    }
+
+    @Test
+    public void shouldApprovePriceOffer() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(Objects.requireNonNull(classLoader.getResource("price_offers/218.json")).getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        assertThat("JSON is empty", json, not(emptyOrNullString()));
+
+        JSONObject results = new JSONObject(json);
+
+        ObjectMapper om = getObjectMapper();
+
+        PriceOfferDTO priceOfferDTO = om.readValue(results.toString(), PriceOfferDTO.class);
+
+        PriceOffer priceOffer = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository()).map(priceOfferDTO, PriceOffer.class);
+
+        User approver = userService.findByEmail(priceOffer.getApprover().getEmail());
+
+        if(approver == null) {
+            approver = getUserRepository().save(approver);
+        }
+        priceOffer.setApprover(approver);
+
+        User salesEmployee = userService.findByEmail(priceOffer.getSalesEmployee().getEmail());
+
+        if(salesEmployee == null) {
+            salesEmployee = getUserRepository().save(salesEmployee);
+        }
+        priceOffer.setSalesEmployee(salesEmployee);
+        priceOffer.setNeedsApproval(true);
+
+        priceOffer = priceOfferRepository.save(priceOffer);
+
+        Boolean approveResult = service.approvePriceOffer(priceOffer.getId(), approver.getId(), PriceOfferStatus.APPROVED.getStatus(), null);
+
+        assertThat(approveResult, is(true));
     }
 
     private void createPowerOfAttorney(PowerOfAttorney powerOfAttorney, User ordinaryWasteHolder, User ordinaryWasteHolderLvl2, User dangerousWasteHolder) {

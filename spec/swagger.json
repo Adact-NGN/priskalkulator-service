@@ -5098,6 +5098,9 @@
         "priceOfferStatus" : {
           "type" : "string"
         },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/UserDTO"
+        },
         "salesEmployee" : {
           "$ref" : "#/definitions/UserDTO"
         },
