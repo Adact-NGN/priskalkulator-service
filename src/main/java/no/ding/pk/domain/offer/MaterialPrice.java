@@ -57,14 +57,35 @@ public class MaterialPrice extends Auditable {
 
     @JsonIgnore
     public String getUniqueMaterialNumber() {
-        StringBuilder sb = new StringBuilder(materialNumber);
+        StringBuilder sb = new StringBuilder();
+
+        if(StringUtils.isNotBlank(salesOrg)) {
+            sb.append(salesOrg);
+        }
+
+        if(StringUtils.isNotBlank(salesOffice)) {
+            if(!sb.isEmpty()) {
+                sb.append("_");
+            }
+
+            sb.append(salesOffice);
+        }
+
+        if(StringUtils.isNotBlank(materialNumber)) {
+            if(!sb.isEmpty()) {
+                sb.append("_");
+            }
+
+            sb.append(materialNumber);
+        }
 
         if(StringUtils.isNotBlank(deviceType)) {
             sb.append("_").append(deviceType);
         }
 
         if(StringUtils.isNotBlank(zone)) {
-            sb.append("_").append(zone);
+            String salesZone = String.format("0%d", Integer.valueOf(zone)) ;
+            sb.append("_").append(salesZone);
         }
 
         return sb.toString();

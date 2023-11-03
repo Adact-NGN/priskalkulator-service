@@ -10,8 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.is;
 
 @Disabled
 public class MaterialServiceImplTest extends AbstractIntegrationConfig {
@@ -58,10 +61,11 @@ public class MaterialServiceImplTest extends AbstractIntegrationConfig {
         
         String materialNumber = "119901";
         
-        Material actual = service.findByMaterialNumber(materialNumber);
+        Optional<Material> actual = service.findByMaterialNumber(materialNumber);
 
-        assertThat(actual.getId(), notNullValue());
-        assertThat(actual.getMaterialStandardPrice(), notNullValue());
-        assertThat(actual.getMaterialStandardPrice().getId(), notNullValue());
+        assertThat(actual.isPresent(), is(true));
+        assertThat(actual.get().getId(), notNullValue());
+        assertThat(actual.get().getMaterialStandardPrice(), notNullValue());
+        assertThat(actual.get().getMaterialStandardPrice().getId(), notNullValue());
     }
 }

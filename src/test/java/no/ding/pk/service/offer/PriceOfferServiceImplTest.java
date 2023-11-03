@@ -34,6 +34,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.net.ssl.SSLSession;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -43,6 +44,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static no.ding.pk.utils.JsonTestUtils.jsonToObject;
 import static no.ding.pk.utils.JsonTestUtils.objectToJson;
@@ -78,7 +81,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     private PriceOfferRepository priceOfferRepository;
 
-    private ModelMapper modelMapper = new ModelMapper();
+    private ModelMapper modelMapper;
     private SapHttpClient sapHttpClient;
     private SapMaterialService sapMaterialService;
 
@@ -99,6 +102,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         discountService = mock(DiscountService.class);
 
+        modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
+
         PriceRowService priceRowService = new PriceRowServiceImpl(
                 discountService,
                 getPriceRowRepository(),
@@ -108,12 +113,13 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 sapMaterialService,
                 modelMapper);
 
-
         InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
         ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
         sapHttpClient = mock(SapHttpClient.class);
 
         standardPriceService = mock(StandardPriceService.class);
+        Map<String, MaterialPrice> materialPrices = getMaterialPrices();
+        doReturn(materialPrices).when(standardPriceService).getStandardPriceForSalesOrgAndSalesOfficeMap(anyString(), anyString(), any());
 
         ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, standardPriceService);
 
@@ -131,6 +137,37 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         prepareUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
+    }
+
+    private Map<String, MaterialPrice> getMaterialPrices() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("standardPrices100104.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        try {
+            String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+            JSONObject result = new JSONObject(json);
+
+            JSONArray jsonArray = result.getJSONObject("d").getJSONArray("results");
+
+            ObjectMapper om = getObjectMapper();
+
+            List<MaterialPrice> materialPrices = new ArrayList<>();
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+
+                MaterialStdPriceDTO materialStdPriceDTO = om.readValue(object.toString(), MaterialStdPriceDTO.class);
+
+                MaterialPrice materialPrice = modelMapper.map(materialStdPriceDTO, MaterialPrice.class);
+                materialPrices.add(materialPrice);
+            }
+
+            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -537,9 +574,12 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .needsApproval(true)
                 .build();
 
-        Material dangerousMaterial = materialService.findByMaterialNumber("70120015");
-        if(dangerousMaterial == null) {
+        Optional<Material> optionalDangerousMaterial = materialService.findByMaterialNumber("70120015");
+        Material dangerousMaterial;
+        if(optionalDangerousMaterial.isEmpty()) {
             dangerousMaterial = createDangerousMaterial();
+        } else {
+            dangerousMaterial = optionalDangerousMaterial.get();
         }
 
         PriceRow faPriceRow = PriceRow.builder()
@@ -969,10 +1009,10 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
             wastePrice = getMaterialPriceRepository().save(wastePrice);
         }
 
-        Material waste = materialService.findByMaterialNumber(materialNumber);
+        Optional<Material> optionalWaste = materialService.findByMaterialNumber(materialNumber);
 
-        if(waste == null) {
-            waste = Material.builder()
+        if(optionalWaste.isEmpty()) {
+            Material waste = Material.builder()
                     .designation("Restavfall")
                     .materialNumber(materialNumber)
                     .pricingUnit(1000)
@@ -986,7 +1026,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             materialService.save(waste);
         }
-
     }
 
     @Test

@@ -76,14 +76,48 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldSaveZonedPrice() {
+        String salesOrg = "100";
+        String salesOffice = "104";
         String zoneMaterialNumber = "50101";
+
+        Optional<MaterialDTO> dtoOptional = sapMaterialDTOS.stream().filter(materialDTO -> materialDTO.getMaterial().equals(zoneMaterialNumber)).findAny();
+        assertThat(dtoOptional.isPresent(), is(true));
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(zoneMaterialNumber, salesOrg, salesOffice, "01")).thenReturn(dtoOptional.get());
+
+        DiscountLevel levelOne = DiscountLevel.builder(0.0, 1)
+                .pctDiscount(0.0)
+                .zone(1)
+                .build();
+
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
+                zoneMaterialNumber, 1, 1)).thenReturn(Collections.singletonList(levelOne));
+
+        DiscountLevel levelTwo = DiscountLevel.builder(189.0, 2)
+                .zone(1)
+                .build();
+
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
+                zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
+
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, zoneMaterialNumber, null, "01")
+                .pricingUnit(1)
+                .standardPrice(1599.0)
+                .quantumUnit("ST")
+                .build();
+
+        materialPrice = materialPriceService.save(materialPrice);
+
+        Map<String, MaterialPrice> materialStdPrice = new HashMap<>();
+        materialStdPrice.put(String.format("%s_%s_%s_%s", salesOrg, salesOffice, zoneMaterialNumber, "01"), materialPrice);
 
         Material listPlacement = Material.builder()
                 .materialNumber(zoneMaterialNumber)
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
                 .designation("Lift - Utsett")
                 .pricingUnit(1)
                 .quantumUnit("ST")
-                .salesZone("0000000001")
+                .salesZone("01")
                 .build();
 
         PriceRow wastePriceRow = PriceRow.builder()
@@ -98,32 +132,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        DiscountLevel levelOne = DiscountLevel.builder(0.0, 1)
-                .pctDiscount(0.0)
-                .zone(1)
-                .build();
-
-        String salesOrg = "100";
-        String salesOffice = "104";
-        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
-                zoneMaterialNumber, 1, 1)).thenReturn(Collections.singletonList(levelOne));
-
-        DiscountLevel levelTwo = DiscountLevel.builder(189.0, 2)
-                .zone(1)
-                .build();
-
-        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
-                zoneMaterialNumber, 2, 1)).thenReturn(Collections.singletonList(levelTwo));
-
-        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", "50101", null, "01")
-                .pricingUnit(1)
-                .standardPrice(1599.0)
-                .quantumUnit("ST")
-                .build();
-        Map<String, MaterialPrice> materialStdPrice = new HashMap<>();
-        materialStdPrice.put("50101_01", materialPrice);
-
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, "0000000001", materialStdPrice);
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, "01", materialStdPrice);
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
@@ -179,7 +188,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         String salesOrg = "100";
         String salesOffice = "104";
-        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice("119901", salesOrg, salesOffice, null)).thenReturn(dtoOptional.get());
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(materialNumber, salesOrg, salesOffice, null)).thenReturn(dtoOptional.get());
 
         MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .materialNumber(materialNumber)
@@ -192,6 +201,9 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .standardPrice(2456.00)
                 .build();
         Material waste = Material.builder()
+                .salesOrg("100")
+                .salesOffice("104")
+                .salesZone("01")
                 .materialNumber(materialNumber)
                 .designation("Restavfall")
                 .pricingUnit(1000)
@@ -214,7 +226,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         List<PriceRow> wastePriceRowList = new ArrayList<>();
         wastePriceRowList.add(wastePriceRow);
 
-        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, Map.of("119901", standardPrice));
+        List<PriceRow> priceRows = service.saveAll(wastePriceRowList, salesOrg, salesOffice, Map.of(String.format("100_104_%s_01", materialNumber), standardPrice));
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
