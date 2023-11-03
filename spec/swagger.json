@@ -4798,6 +4798,12 @@
         "quantumUnit" : {
           "type" : "string"
         },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
         "standardPrice" : {
           "type" : "number",
           "format" : "double"

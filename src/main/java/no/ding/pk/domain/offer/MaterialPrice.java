@@ -15,11 +15,11 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @Table(name = "material_price", uniqueConstraints = @UniqueConstraint(
         name = "material_price_identifier",
-        columnNames = {"materialNumber", "deviceType", "zone"}))
+        columnNames = {"salesOrg", "salesOffice", "materialNumber", "deviceType", "zone"}))
 public class MaterialPrice extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,18 +47,45 @@ public class MaterialPrice extends Auditable {
     private String quantumUnit;
 
     @Column
+    private String salesOrg;
+
+    @Column
+    private String salesOffice;
+
+    @Column
     private String zone;
 
     @JsonIgnore
     public String getUniqueMaterialNumber() {
-        StringBuilder sb = new StringBuilder(materialNumber);
+        StringBuilder sb = new StringBuilder();
+
+        if(StringUtils.isNotBlank(salesOrg)) {
+            sb.append(salesOrg);
+        }
+
+        if(StringUtils.isNotBlank(salesOffice)) {
+            if(!sb.isEmpty()) {
+                sb.append("_");
+            }
+
+            sb.append(salesOffice);
+        }
+
+        if(StringUtils.isNotBlank(materialNumber)) {
+            if(!sb.isEmpty()) {
+                sb.append("_");
+            }
+
+            sb.append(materialNumber);
+        }
 
         if(StringUtils.isNotBlank(deviceType)) {
             sb.append("_").append(deviceType);
         }
 
         if(StringUtils.isNotBlank(zone)) {
-            sb.append("_").append(zone);
+            String salesZone = String.format("0%d", Integer.valueOf(zone)) ;
+            sb.append("_").append(salesZone);
         }
 
         return sb.toString();
@@ -79,13 +106,23 @@ public class MaterialPrice extends Auditable {
         return new EqualsBuilder().append(materialNumber, that.materialNumber)
                 .append(standardPrice, that.standardPrice).append(validFrom, that.validFrom)
                 .append(validTo, that.validTo).append(pricingUnit, that.pricingUnit)
-                .append(quantumUnit, that.quantumUnit).append(zone, that.zone).isEquals();
+                .append(quantumUnit, that.quantumUnit).append(salesOrg, that.salesOrg)
+                .append(salesOffice, that.salesOffice)
+                .append(zone, that.zone).isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37).append(materialNumber)
                 .append(standardPrice).append(validFrom).append(validTo).append(pricingUnit)
-                .append(quantumUnit).append(zone).toHashCode();
+                .append(quantumUnit).append(salesOrg).append(salesOffice).append(zone).toHashCode();
+    }
+
+    public static MaterialPriceBuilder builder(String salesOrg, String salesOffice, String materialNumber, String deviceType, String zone) {
+        return MaterialPrice.hiddenBuilder().salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .materialNumber(materialNumber)
+                .deviceType(deviceType)
+                .zone(zone);
     }
 }

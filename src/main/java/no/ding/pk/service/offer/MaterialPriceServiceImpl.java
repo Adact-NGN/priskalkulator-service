@@ -40,6 +40,9 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
 
         entity.setMaterialNumber(materialPrice.getMaterialNumber());
         entity.setStandardPrice(materialPrice.getStandardPrice());
+        entity.setSalesOrg(materialPrice.getSalesOrg());
+        entity.setSalesOffice(materialPrice.getSalesOffice());
+        entity.setZone(materialPrice.getZone());
 
         return repository.save(entity);
     }
@@ -60,16 +63,14 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
     }
 
     @Override
-    public Optional<MaterialPrice> findByMaterialNumberDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone) {
-        String zone = "";
-        if(StringUtils.isNotBlank(salesZone))
-            zone = salesZone;
+    public Optional<MaterialPrice> findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(String salesOrg, String salesOffice, String materialNumber, String deviceType, String salesZone) {
+        String salesOrgToUse = StringUtils.isNotBlank(salesOrg) ? salesOrg : "";
+        String salesOfficeToUse = StringUtils.isNotBlank(salesOffice) ? salesOffice : "";
+        String zone = StringUtils.isNotBlank(salesZone) ? salesZone : "";
+        String deviceTypeToUse = StringUtils.isNotBlank(deviceType) ? deviceType : "";
 
-        String deviceTypeToUse = "";
-        if(StringUtils.isNotBlank(deviceType))
-            deviceTypeToUse = deviceType;
-
-        return repository.findMaterialPriceByMaterialNumberAndDeviceTypeAndZone(materialNumber, deviceTypeToUse, zone);
+        return repository.findMaterialPriceBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndZone(
+                salesOrgToUse, salesOfficeToUse, materialNumber, deviceTypeToUse, zone);
     }
 
 }
