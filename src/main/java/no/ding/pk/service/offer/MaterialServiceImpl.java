@@ -33,6 +33,11 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
+    public List<Material> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public Material save(Material material) {
         
         if(material.getMaterialNumber() == null) {

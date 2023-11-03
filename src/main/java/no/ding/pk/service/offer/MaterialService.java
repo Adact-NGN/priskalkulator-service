@@ -7,6 +7,8 @@ import no.ding.pk.domain.offer.Material;
 
 public interface MaterialService {
 
+    List<Material> findAll();
+
     Material save(Material material);
     List<Material> saveAll(List<Material> materialList);
     Optional<Material> findById(Long id);

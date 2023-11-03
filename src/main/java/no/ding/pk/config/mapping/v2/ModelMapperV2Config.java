@@ -174,18 +174,18 @@ public class ModelMapperV2Config {
             if(c.getSource() != null) {
                 String[] materialDeviceTypeId = c.getSource().split("_");
 
-                Optional<Material> optionalMaterial;
-                if(materialDeviceTypeId.length > 1) {
-                    optionalMaterial = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
-                } else {
-                    optionalMaterial = materialRepository.findByMaterialNumber(c.getSource());
-                }
-
-                if(optionalMaterial.isPresent()) {
-                    return optionalMaterial.get();
-                }
-
-                log.debug("No material number was found. Material object must be created.");
+//                Optional<Material> optionalMaterial;
+//                if(materialDeviceTypeId.length > 1) {
+//                    optionalMaterial = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
+//                } else {
+//                    optionalMaterial = materialRepository.findByMaterialNumber(c.getSource());
+//                }
+//
+//                if(optionalMaterial.isPresent()) {
+//                    return optionalMaterial.get();
+//                }
+//
+//                log.debug("No material number was found. Material object must be created.");
 
                 if(materialDeviceTypeId.length > 1) {
                     material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();
