@@ -157,9 +157,16 @@ public class PriceRowServiceImpl implements PriceRowService {
                     log.debug("Got Material: {}", persistedMaterial);
                     updateMaterial(persistedMaterial, material);
 
-                    MaterialPrice persistedMaterialPrice = materialPriceService.findByMaterialNumber(persistedMaterial.getMaterialNumber());
+                    Optional<MaterialPrice> persistedMaterialPriceOptional = materialPriceService
+                            .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                                    persistedMaterial.getSalesOrg(),
+                                    persistedMaterial.getSalesOffice(),
+                                    persistedMaterial.getMaterialNumber(),
+                                    persistedMaterial.getDeviceType(),
+                                    persistedMaterial.getSalesZone());
 
-                    if(persistedMaterialPrice != null) {
+                    if(persistedMaterialPriceOptional.isPresent()) {
+                        MaterialPrice persistedMaterialPrice = persistedMaterialPriceOptional.get();
                         updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
                         persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
 

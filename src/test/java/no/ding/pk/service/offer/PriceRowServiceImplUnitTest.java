@@ -16,10 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -71,7 +68,8 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        doReturn(oldMaterialPrice).when(materialPriceService).findByMaterialNumber(anyString());
+        doReturn(Optional.ofNullable(oldMaterialPrice)).when(materialPriceService).findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                anyString(), anyString(), anyString(), any(), anyString());
 
         Material oldMaterial = Material.builder()
                 .id(1L)
@@ -154,8 +152,11 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        doReturn(materialPrice).when(materialPriceService).findByMaterialNumber(anyString());
-
+//        doReturn(materialPrice).when(materialPriceService).findByMaterialNumber(anyString());
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
         Material material = Material.builder()
                 .materialNumber(materialNumber)
                 .designation("Lift - Tømming")
@@ -182,7 +183,11 @@ public class PriceRowServiceImplUnitTest {
 
 //        when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
                 DiscountLevel.builder(0.0, 1)
@@ -243,7 +248,11 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         Material material = Material.builder()
                 .materialNumber(materialNumber)
@@ -272,7 +281,11 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
                 DiscountLevel.builder(0.0, 1)
@@ -340,7 +353,11 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
                 DiscountLevel.builder(0.0, 1)
@@ -378,7 +395,10 @@ public class PriceRowServiceImplUnitTest {
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         Material material = Material.builder()
                 .materialNumber(materialNumber)
@@ -407,7 +427,11 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
                 DiscountLevel.builder(0.0, 1)
