@@ -131,4 +131,9 @@ public class Material implements Serializable {
     public boolean isFaMaterial() {
         return categoryDescription != null && categoryDescription.equals("Farlig avfall");
     }
+
+//    @JsonIgnore
+//    public void setSalesZone(String salesZone) {
+//        this.salesZone = StringUtils.isNotBlank(salesZone) && StringUtils.isNumeric(salesZone) ? String.format("0%d", Integer.valueOf(salesZone)) : salesZone;
+//    }
 }

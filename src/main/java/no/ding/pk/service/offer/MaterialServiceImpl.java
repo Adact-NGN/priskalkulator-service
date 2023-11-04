@@ -193,4 +193,16 @@ public class MaterialServiceImpl implements MaterialService {
 
         return Optional.ofNullable(materials.get(0));
     }
+
+    @Override
+    public List<Material> findBy(String materialNumber, String deviceType, String salesZone) {
+        return repository.findAll(Specification.where(withMaterialNumber(materialNumber)).and(withDeviceType(deviceType)).and(withZone(salesZone)));
+    }
+
+    @Override
+    public Optional<Material> findByMaterialNumberAndDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone) {
+        return repository.findByMaterialNumberAndDeviceTypeAndSalesZone(materialNumber, deviceType, salesZone);
+    }
+
+
 }
