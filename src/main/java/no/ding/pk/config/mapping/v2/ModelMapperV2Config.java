@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -169,29 +170,26 @@ public class ModelMapperV2Config {
 
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         // https://amydegregorio.com/2018/01/17/using-custom-modelmapper-converters-and-mappings/
-        Converter<String, Material> stringToMaterial = c -> {
+        Converter<Map<String, String>, Material> stringToMaterial = c -> {
             Material material = null;
             if(c.getSource() != null) {
-                String[] materialDeviceTypeId = c.getSource().split("_");
+                Map<String, String> materialDeviceTypeId = c.getSource();
 
-//                Optional<Material> optionalMaterial;
-//                if(materialDeviceTypeId.length > 1) {
-//                    optionalMaterial = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
-//                } else {
-//                    optionalMaterial = materialRepository.findByMaterialNumber(c.getSource());
-//                }
-//
-//                if(optionalMaterial.isPresent()) {
-//                    return optionalMaterial.get();
-//                }
-//
-//                log.debug("No material number was found. Material object must be created.");
+                Optional<Material> optionalMaterial = materialRepository.findByMaterialNumberAndDeviceTypeAndSalesZone(
+                        materialDeviceTypeId.get("materialNumber"),
+                        materialDeviceTypeId.get("deviceType"),
+                        materialDeviceTypeId.get("salesZone"));
 
-                if(materialDeviceTypeId.length > 1) {
-                    material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();
-                } else {
-                    material = Material.builder().materialNumber(c.getSource()).build();
+                if(optionalMaterial.isPresent()) {
+                    return optionalMaterial.get();
                 }
+
+                log.debug("No material number was found. Material object must be created.");
+
+                material = Material.builder().materialNumber(materialDeviceTypeId.get("materialNumber"))
+                        .deviceType(materialDeviceTypeId.get("deviceType"))
+                        .salesZone(materialDeviceTypeId.get("salesZone"))
+                        .build();
             }
 
             return material;
