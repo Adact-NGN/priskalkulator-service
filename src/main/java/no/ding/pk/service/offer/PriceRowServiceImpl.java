@@ -422,7 +422,6 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     private void updateMaterial(Material to, Material from) {
         log.debug("To: {}, from: {}", to, from);
-//        modelMapper.map(from, to);
         to.setDesignation(from.getDesignation());
         to.setMaterialGroup(from.getMaterialGroup());
         to.setMaterialGroupDesignation(from.getMaterialGroupDesignation());
@@ -445,7 +444,6 @@ public class PriceRowServiceImpl implements PriceRowService {
     
     private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {
         log.debug("To: {}, from: {}", to, from);
-//        modelMapper.map(from, to);
         to.setStandardPrice(from.getStandardPrice());
         to.setValidFrom(from.getValidFrom());
         to.setValidTo(from.getValidTo());
@@ -454,5 +452,4 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setMaterialNumber(from.getMaterialNumber());
         to.setQuantumUnit(from.getQuantumUnit());
     }
-    
 }

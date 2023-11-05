@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.Auditable;
 import org.hibernate.annotations.Cascade;
@@ -82,6 +83,9 @@ public class PriceRow extends Auditable {
     private String classId; // "
     @Column
     private String classDescription; // "
+
+    @Column
+    private String salesZone;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))

@@ -5417,6 +5417,9 @@
           "type" : "number",
           "format" : "double"
         },
+        "salesZone" : {
+          "type" : "string"
+        },
         "showPriceInOffer" : {
           "type" : "boolean"
         },
