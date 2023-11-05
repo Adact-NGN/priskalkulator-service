@@ -44,14 +44,11 @@ public class MaterialServiceImpl implements MaterialService {
             throw new RuntimeException("Received material without a material number.");
         }
 
-        Optional<Material> optionalEntity;
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), material.getDeviceType());
-            optionalEntity = repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
-        } else {
-            log.debug("Searching for material with number: {}", material.getMaterialNumber());
-            optionalEntity = repository.findByMaterialNumber(material.getMaterialNumber());
-        }
+        String deviceType = StringUtils.isNotBlank(material.getDeviceType()) ? material.getDeviceType() : null;
+        String salesZone = StringUtils.isNotBlank(material.getSalesZone()) ? material.getSalesZone() : null;
+        log.debug("Searching for material with number: {} and device type: {} and saleszone: {}", material.getMaterialNumber(), deviceType, salesZone);
+        Optional<Material> optionalEntity = repository.findByMaterialNumberAndDeviceTypeAndSalesZone(material.getMaterialNumber(), deviceType, salesZone);
+
         log.debug("Found material: {}", optionalEntity.isPresent());
 
         Material entity;
@@ -92,7 +89,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setMaterialTypeDescription(material.getMaterialTypeDescription());
         }
         
-        if(!StringUtils.equals(entity.getDeviceType(), material.getDesignation())) {
+        if(StringUtils.isNotBlank(material.getDeviceType()) && !StringUtils.equals(entity.getDeviceType(), material.getDeviceType())) {
             entity.setDeviceType(material.getDeviceType());
         }
 
@@ -106,10 +103,6 @@ public class MaterialServiceImpl implements MaterialService {
 
         if(!StringUtils.equals(entity.getCurrency(), material.getCurrency())) {
             entity.setCurrency(material.getCurrency());
-        }
-        
-        if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
-            entity.setPricingUnit(material.getPricingUnit());
         }
         
         if(!StringUtils.equals(entity.getQuantumUnit(), material.getQuantumUnit())) {
