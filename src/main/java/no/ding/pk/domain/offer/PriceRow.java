@@ -1,6 +1,5 @@
 package no.ding.pk.domain.offer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.Auditable;
 import org.hibernate.annotations.Cascade;

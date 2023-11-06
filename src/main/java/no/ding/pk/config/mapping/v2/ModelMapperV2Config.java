@@ -189,7 +189,6 @@ public class ModelMapperV2Config {
 
                 material = Material.builder().materialNumber(materialDeviceTypeId.get("materialNumber"))
                         .deviceType(materialDeviceTypeId.get("deviceType"))
-                        .salesZone(materialDeviceTypeId.get("salesZone"))
                         .build();
             }
 

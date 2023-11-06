@@ -46,12 +46,6 @@ public class Material implements Serializable {
     private String materialNumber;
 
     @Column
-    private String salesOrg;
-
-    @Column
-    private String salesOffice;
-
-    @Column
     private String materialGroup;
 
     @Column
@@ -77,9 +71,6 @@ public class Material implements Serializable {
     private Double scaleQuantum;
 
     @Column
-    private String salesZone;
-
-    @Column
     private String categoryId; // "
     @Column
     private String categoryDescription; // "
@@ -102,14 +93,14 @@ public class Material implements Serializable {
 
         return new EqualsBuilder().append(id, material.id).append(currency, material.currency)
                 .append(designation, material.designation).append(deviceType, material.deviceType)
-                .append(materialNumber, material.materialNumber).append(salesOrg, material.salesOrg)
+                .append(materialNumber, material.materialNumber)
                 .append(materialGroup, material.materialGroup)
                 .append(materialGroupDesignation, material.materialGroupDesignation)
                 .append(materialType, material.materialType)
                 .append(materialTypeDescription, material.materialTypeDescription)
                 .append(materialStandardPrice, material.materialStandardPrice)
                 .append(pricingUnit, material.pricingUnit).append(quantumUnit, material.quantumUnit)
-                .append(scaleQuantum, material.scaleQuantum).append(salesZone, material.salesZone)
+                .append(scaleQuantum, material.scaleQuantum)
                 .append(categoryId, material.categoryId).append(categoryDescription, material.categoryDescription)
                 .append(subCategoryId, material.subCategoryId)
                 .append(subCategoryDescription, material.subCategoryDescription)
@@ -123,7 +114,7 @@ public class Material implements Serializable {
                 .append(designation).append(deviceType).append(materialNumber).append(materialGroup)
                 .append(materialGroupDesignation).append(materialType).append(materialTypeDescription)
                 .append(materialStandardPrice).append(pricingUnit).append(quantumUnit).append(scaleQuantum)
-                .append(salesZone).append(categoryId).append(categoryDescription).append(subCategoryId)
+                .append(categoryId).append(categoryDescription).append(subCategoryId)
                 .append(subCategoryDescription).append(classId).append(classDescription)
                 .toHashCode();
     }

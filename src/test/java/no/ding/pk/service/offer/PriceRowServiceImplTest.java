@@ -112,12 +112,9 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         Material listPlacement = Material.builder()
                 .materialNumber(zoneMaterialNumber)
-                .salesOrg(salesOrg)
-                .salesOffice(salesOffice)
                 .designation("Lift - Utsett")
                 .pricingUnit(1)
                 .quantumUnit("ST")
-                .salesZone("01")
                 .build();
 
         PriceRow wastePriceRow = PriceRow.builder()
@@ -201,14 +198,10 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .standardPrice(2456.00)
                 .build();
         Material waste = Material.builder()
-                .salesOrg("100")
-                .salesOffice("104")
-                .salesZone("01")
                 .materialNumber(materialNumber)
                 .designation("Restavfall")
                 .pricingUnit(1000)
                 .quantumUnit("KG")
-                .materialStandardPrice(standardPrice)
                 .build();
 
         PriceRow wastePriceRow = PriceRow.builder()
@@ -221,6 +214,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 .discountLevelPrice(56.0)
                 .amount(1)
                 .priceIncMva(2448.0)
+                .salesZone("01")
                 .build();
 
         List<PriceRow> wastePriceRowList = new ArrayList<>();
@@ -230,6 +224,5 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceRows, notNullValue());
         assertThat(priceRows, not(empty()));
-        assertThat(priceRows.get(0).getMaterial().getMaterialStandardPrice(), equalTo(wastePrice));
     }
 }

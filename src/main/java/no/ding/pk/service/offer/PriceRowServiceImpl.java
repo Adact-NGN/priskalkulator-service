@@ -150,11 +150,6 @@ public class PriceRowServiceImpl implements PriceRowService {
             lookUpKey.append(material.getDeviceType());
         }
 
-        if(StringUtils.isNotBlank(material.getSalesZone())) {
-            String salesZone = String.format("0%d", Integer.valueOf(material.getSalesZone())) ;
-            lookUpKey.append("_").append(salesZone);
-        }
-
         MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
 
         log.debug("Got material price: {}", materialPrice);
@@ -217,16 +212,20 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                     material = materialService.save(fromSap);
                 } else {
-                    log.debug("Could not find material {} for salesorg {}", material.getMaterialNumber(), salesOrg);
-                }
+                    log.debug("Could not find material {} for salesorg {}, persisting what we have.", material.getMaterialNumber(), salesOrg);
 
+                    material = materialService.save(material);
+                }
+                
                 entity.setMaterial(material);
             } else {
                 log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
 
                 updateMaterialWithMaterialPriceValues(entity, materialPrice, material);
-
-//                entity.setMaterial(material);
+                material = materialService.save(material);
+                if(entity.getMaterial() == null) {
+                    entity.setMaterial(material);
+                }
             }
         }
 
@@ -263,42 +262,9 @@ public class PriceRowServiceImpl implements PriceRowService {
 
     private void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
         if(materialPrice != null) {
-            material.setSalesOrg(materialPrice.getSalesOrg());
-            material.setSalesOffice(materialPrice.getSalesOffice());
-            material.setSalesZone(StringUtils.isNotBlank(materialPrice.getZone()) ? materialPrice.getZone() : null);
             material.setDeviceType(StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null);
             material.setQuantumUnit(materialPrice.getQuantumUnit());
             material.setPricingUnit(materialPrice.getPricingUnit());
-
-//            if(!materialPriceRow.getStandardPrice().equals(materialPrice.getStandardPrice())) {
-//                materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
-//            }
-
-//            Optional<MaterialPrice> existingMaterialPrice = materialPriceService
-//                    .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(material.getSalesOrg(),
-//                            material.getSalesOffice(),
-//                            material.getMaterialNumber(),
-//                            material.getDeviceType(),
-//                            material.getSalesZone());
-
-//            if(existingMaterialPrice.isPresent()) {
-//                MaterialPrice materialStandardPrice = existingMaterialPrice.get();
-
-                // TODO: Should we update the price with the newest every time?
-//                if(!materialStandardPrice.getStandardPrice().equals(materialPrice.getStandardPrice())) {
-//                    materialStandardPrice.setStandardPrice(materialPrice.getStandardPrice());
-//                }
-
-//                material.setMaterialStandardPrice(materialStandardPrice);
-//            } else {
-                material.setSalesOrg(materialPrice.getSalesOrg());
-                material.setSalesOffice(materialPrice.getSalesOffice());
-                material.setDeviceType(materialPrice.getDeviceType());
-                material.setSalesZone(materialPrice.getZone());
-
-//                material.setMaterialStandardPrice(materialPrice);
-//            }
-
         } else {
             log.debug("No material prices found.");
         }
@@ -403,15 +369,9 @@ public class PriceRowServiceImpl implements PriceRowService {
             return materialService.findById(material.getId()).orElse(material);
         }
 
-        Optional<Material> optionalByMaterialNumber;
         String deviceType = materialPrice != null ? StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null : null;
-        if(StringUtils.isNotBlank(deviceType)) {
-            log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
-            optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
-        } else {
-            log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-            optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
-        }
+        log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
+        Optional<Material> optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
 
         if(optionalByMaterialNumber.isPresent()) {
             return optionalByMaterialNumber.get();
@@ -433,7 +393,6 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setCurrency(from.getCurrency());
         to.setPricingUnit(from.getPricingUnit());
         to.setQuantumUnit(from.getQuantumUnit());
-        to.setSalesZone(from.getSalesZone());
 
         to.setCategoryId(from.getCategoryId());
         to.setCategoryDescription(from.getCategoryDescription());

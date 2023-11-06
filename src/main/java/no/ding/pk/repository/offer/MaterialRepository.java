@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface MaterialRepository extends JpaRepository<Material, Long>, JpaSpecificationExecutor<Material> {
     Optional<Material> findByMaterialNumber(String materialNumber);
     Optional<Material> findByMaterialNumberAndDeviceType(String materialNumber, String deviceType);
-
-    Optional<Material> findByMaterialNumberAndDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone);
 }

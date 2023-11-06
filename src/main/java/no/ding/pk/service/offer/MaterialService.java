@@ -1,6 +1,7 @@
 package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.offer.Material;
+import no.ding.pk.domain.offer.MaterialPrice;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,4 @@ public interface MaterialService {
     Optional<Material> findBy(String salesOrg, String salesOffice, String materialNumber, String deviceType, String zone);
 
     List<Material> findBy(String materialNumber, String deviceType, String salesZone);
-
-    Optional<Material> findByMaterialNumberAndDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone);
 }
