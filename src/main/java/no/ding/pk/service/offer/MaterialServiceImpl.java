@@ -94,8 +94,8 @@ public class MaterialServiceImpl implements MaterialService {
         }
 
         MaterialPrice materialPriceEntity = getMaterialPrice(material);
-
-        entity.setMaterialStandardPrice(materialPriceEntity);
+//
+//        entity.setMaterialStandardPrice(materialPriceEntity);
 
         if(materialPriceEntity != null && !StringUtils.equals(entity.getDeviceType(), materialPriceEntity.getDeviceType())) {
             entity.setDeviceType(materialPriceEntity.getDeviceType());
@@ -164,6 +164,7 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public Optional<Material> findByMaterialNumberAndDeviceType(String material, String deviceType) {
+        log.debug("Finding material: {}, {}", material, deviceType);
         return repository.findByMaterialNumberAndDeviceType(material, deviceType);
     }
 

@@ -226,7 +226,7 @@ public class PriceRowServiceImpl implements PriceRowService {
 
                 updateMaterialWithMaterialPriceValues(entity, materialPrice, material);
 
-                entity.setMaterial(material);
+//                entity.setMaterial(material);
             }
         }
 
@@ -265,37 +265,39 @@ public class PriceRowServiceImpl implements PriceRowService {
         if(materialPrice != null) {
             material.setSalesOrg(materialPrice.getSalesOrg());
             material.setSalesOffice(materialPrice.getSalesOffice());
-            material.setSalesZone(materialPrice.getZone());
-            material.setDeviceType(materialPrice.getDeviceType());
+            material.setSalesZone(StringUtils.isNotBlank(materialPrice.getZone()) ? materialPrice.getZone() : null);
+            material.setDeviceType(StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null);
             material.setQuantumUnit(materialPrice.getQuantumUnit());
             material.setPricingUnit(materialPrice.getPricingUnit());
 
-            materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+//            if(!materialPriceRow.getStandardPrice().equals(materialPrice.getStandardPrice())) {
+//                materialPriceRow.setStandardPrice(materialPrice.getStandardPrice());
+//            }
 
-            Optional<MaterialPrice> existingMaterialPrice = materialPriceService
-                    .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(material.getSalesOrg(),
-                            material.getSalesOffice(),
-                            material.getMaterialNumber(),
-                            material.getDeviceType(),
-                            material.getSalesZone());
+//            Optional<MaterialPrice> existingMaterialPrice = materialPriceService
+//                    .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(material.getSalesOrg(),
+//                            material.getSalesOffice(),
+//                            material.getMaterialNumber(),
+//                            material.getDeviceType(),
+//                            material.getSalesZone());
 
-            if(existingMaterialPrice.isPresent()) {
-                MaterialPrice materialStandardPrice = existingMaterialPrice.get();
+//            if(existingMaterialPrice.isPresent()) {
+//                MaterialPrice materialStandardPrice = existingMaterialPrice.get();
 
                 // TODO: Should we update the price with the newest every time?
 //                if(!materialStandardPrice.getStandardPrice().equals(materialPrice.getStandardPrice())) {
 //                    materialStandardPrice.setStandardPrice(materialPrice.getStandardPrice());
 //                }
 
-                material.setMaterialStandardPrice(materialStandardPrice);
-            } else {
+//                material.setMaterialStandardPrice(materialStandardPrice);
+//            } else {
                 material.setSalesOrg(materialPrice.getSalesOrg());
                 material.setSalesOffice(materialPrice.getSalesOffice());
                 material.setDeviceType(materialPrice.getDeviceType());
                 material.setSalesZone(materialPrice.getZone());
 
-                material.setMaterialStandardPrice(materialPrice);
-            }
+//                material.setMaterialStandardPrice(materialPrice);
+//            }
 
         } else {
             log.debug("No material prices found.");
@@ -402,14 +404,13 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         Optional<Material> optionalByMaterialNumber;
-        String deviceType = materialPrice != null ? materialPrice.getDeviceType() : null;
+        String deviceType = materialPrice != null ? StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null : null;
         if(StringUtils.isNotBlank(deviceType)) {
             log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
             optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
         } else {
             log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-            String zone = materialPrice != null ? materialPrice.getZone() : null;
-            optionalByMaterialNumber = materialService.findBy(salesOrg, salesOffice, material.getMaterialNumber(), deviceType, zone);
+            optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
         }
 
         if(optionalByMaterialNumber.isPresent()) {

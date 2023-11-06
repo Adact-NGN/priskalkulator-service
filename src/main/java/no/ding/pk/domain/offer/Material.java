@@ -26,7 +26,7 @@ import java.io.Serializable;
 })
 @JsonIgnoreProperties({"faMaterial"})
 @Entity
-@Table(name = "materials", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType", "salesZone"}))
+@Table(name = "materials", uniqueConstraints = @UniqueConstraint(columnNames = {"materialNumber", "deviceType"}))
 public class Material implements Serializable {
 
 	@Id
@@ -63,7 +63,7 @@ public class Material implements Serializable {
     @Column
     private String materialTypeDescription;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_material_materialStdPrice"))
     private MaterialPrice materialStandardPrice;
 
