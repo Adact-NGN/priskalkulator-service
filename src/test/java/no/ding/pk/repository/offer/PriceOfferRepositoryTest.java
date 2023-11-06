@@ -36,6 +36,9 @@ public class PriceOfferRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MaterialRepository materialRepository;
+
     @Test
     public void shouldCreateContext() {
 
@@ -143,6 +146,8 @@ public class PriceOfferRepositoryTest {
                 .materialTypeDescription("Farlig Avfallsmateriale")
                 .quantumUnit("KG")
                 .build();
+
+        material = materialRepository.save(material);
 
         List<PriceRow> materialList = List.of(PriceRow.builder()
                 .material(material)
@@ -317,7 +322,6 @@ public class PriceOfferRepositoryTest {
                 .designation("Lift - Utsett")
                 .pricingUnit(1)
                 .quantumUnit("ST")
-                .salesZone(formattedZoneId)
                 .materialStandardPrice(materialPrice)
                 .build();
 
@@ -341,7 +345,6 @@ public class PriceOfferRepositoryTest {
                 .designation("Lift - Utbytte")
                 .pricingUnit(1)
                 .quantumUnit("ST")
-                .salesZone(formattedZoneId)
                 .materialStandardPrice(liftExchangePrice)
                 .build();
 
@@ -365,7 +368,6 @@ public class PriceOfferRepositoryTest {
                 .designation("Lift - Tømming")
                 .pricingUnit(1)
                 .quantumUnit("ST")
-                .salesZone(formattedZoneId)
                 .materialStandardPrice(liftEmptyingPrice)
                 .build();
 

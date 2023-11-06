@@ -34,7 +34,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.net.ssl.SSLSession;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -953,8 +952,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         return Material.builder()
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .designation("Degaussing harddisker")
                 .materialNumber(materialNumber)
                 .scaleQuantum(0.0)
@@ -978,8 +975,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         return Material.builder()
                 .materialNumber(materialNumber)
-                .salesOrg(salesOrg)
-                .salesOffice(salesOffice)
                 .quantumUnit("KG")
                 .designation("Ikke refunderbar spillolje,Småemb")
                 .materialGroup("7012")
@@ -1174,6 +1169,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .materialStandardPrice(materialPrice)
                 .build();
 
+        material = materialService.save(material);
         PriceRow priceRow = PriceRow.builder()
                 .material(material)
                 .discountLevel(7)
@@ -1223,8 +1219,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
 
         Material material = Material.builder()
-                .salesOrg("100")
-                .salesOffice("100")
                 .materialNumber(materialNumber)
                 .deviceType(deviceType)
                 .materialTypeDescription("Tjeneste")
@@ -1293,8 +1287,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         String materialNumber = "159904";
         Material normalWaste = Material.builder()
                 .materialNumber(materialNumber)
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
                         MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, null)
@@ -1313,8 +1305,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         Material dangerousWaste = Material.builder()
                 .materialNumber("70120015")
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
                         MaterialPrice.builder("100", "100", "70120015", null, null)
@@ -1332,8 +1322,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         Material deviceType = Material.builder()
                 .materialNumber("50301")
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .deviceType("B-0-S")
                 .pricingUnit(1)
                 .materialStandardPrice(
@@ -1412,8 +1400,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         String salesOffice = "104";
         Material normalWaste = Material.builder()
                 .materialNumber("159904")
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
                         MaterialPrice.builder(salesOrg, salesOffice, "159904", null, null)
@@ -1432,8 +1418,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         Material dangerousWaste = Material.builder()
                 .materialNumber("70120015")
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
                         MaterialPrice.builder(salesOrg, salesOffice, "70120015", null, null)
@@ -1451,8 +1435,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         Material deviceType = Material.builder()
                 .materialNumber("50301")
-                .salesOffice(salesOffice)
-                .salesOrg(salesOrg)
                 .deviceType("B-0-S")
                 .pricingUnit(1)
                 .materialStandardPrice(

@@ -45,9 +45,8 @@ public class MaterialServiceImpl implements MaterialService {
         }
 
         String deviceType = StringUtils.isNotBlank(material.getDeviceType()) ? material.getDeviceType() : null;
-        String salesZone = StringUtils.isNotBlank(material.getSalesZone()) ? material.getSalesZone() : null;
-        log.debug("Searching for material with number: {} and device type: {} and saleszone: {}", material.getMaterialNumber(), deviceType, salesZone);
-        Optional<Material> optionalEntity = repository.findByMaterialNumberAndDeviceTypeAndSalesZone(material.getMaterialNumber(), deviceType, salesZone);
+        log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), deviceType);
+        Optional<Material> optionalEntity = repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
 
         log.debug("Found material: {}", optionalEntity.isPresent());
 
@@ -93,14 +92,6 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setDeviceType(material.getDeviceType());
         }
 
-        MaterialPrice materialPriceEntity = getMaterialPrice(material);
-
-        entity.setMaterialStandardPrice(materialPriceEntity);
-
-        if(materialPriceEntity != null && !StringUtils.equals(entity.getDeviceType(), materialPriceEntity.getDeviceType())) {
-            entity.setDeviceType(materialPriceEntity.getDeviceType());
-        }
-
         if(!StringUtils.equals(entity.getCurrency(), material.getCurrency())) {
             entity.setCurrency(material.getCurrency());
         }
@@ -113,22 +104,18 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setScaleQuantum(material.getScaleQuantum());
         }
         
-        if(!StringUtils.equals(entity.getSalesZone(), material.getSalesZone())) {
-            entity.setSalesZone(material.getSalesZone());
-        }
-        
         return repository.save(entity);
     }
 
-    private MaterialPrice getMaterialPrice(Material material) {
+    private MaterialPrice getMaterialPrice(String salesOrg, String salesOffice, Material material, String salesZone) {
         log.debug("Getting std price for material: {}", material.getMaterialNumber());
         Optional<MaterialPrice> materialPriceEntityOptional = materialPriceService
                 .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
-                        material.getSalesOrg(),
-                        material.getSalesOffice(),
+                        salesOrg,
+                        salesOffice,
                         material.getMaterialNumber(),
                         material.getDeviceType(),
-                        material.getSalesZone());
+                        salesZone);
 
         if(materialPriceEntityOptional.isEmpty()) {
             log.debug("Std price for material not found.");
@@ -164,6 +151,7 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public Optional<Material> findByMaterialNumberAndDeviceType(String material, String deviceType) {
+        log.debug("Finding material: {}, {}", material, deviceType);
         return repository.findByMaterialNumberAndDeviceType(material, deviceType);
     }
 
@@ -191,11 +179,4 @@ public class MaterialServiceImpl implements MaterialService {
     public List<Material> findBy(String materialNumber, String deviceType, String salesZone) {
         return repository.findAll(Specification.where(withMaterialNumber(materialNumber)).and(withDeviceType(deviceType)).and(withZone(salesZone)));
     }
-
-    @Override
-    public Optional<Material> findByMaterialNumberAndDeviceTypeAndSalesZone(String materialNumber, String deviceType, String salesZone) {
-        return repository.findByMaterialNumberAndDeviceTypeAndSalesZone(materialNumber, deviceType, salesZone);
-    }
-
-
 }

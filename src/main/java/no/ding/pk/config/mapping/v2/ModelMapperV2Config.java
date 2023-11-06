@@ -175,10 +175,11 @@ public class ModelMapperV2Config {
             if(c.getSource() != null) {
                 Map<String, String> materialDeviceTypeId = c.getSource();
 
-                Optional<Material> optionalMaterial = materialRepository.findByMaterialNumberAndDeviceTypeAndSalesZone(
+                log.debug("Looking up material: {}", materialDeviceTypeId.get("materialNumber"));
+
+                Optional<Material> optionalMaterial = materialRepository.findByMaterialNumberAndDeviceType(
                         materialDeviceTypeId.get("materialNumber"),
-                        materialDeviceTypeId.get("deviceType"),
-                        materialDeviceTypeId.get("salesZone"));
+                        materialDeviceTypeId.get("deviceType"));
 
                 if(optionalMaterial.isPresent()) {
                     return optionalMaterial.get();
@@ -188,7 +189,6 @@ public class ModelMapperV2Config {
 
                 material = Material.builder().materialNumber(materialDeviceTypeId.get("materialNumber"))
                         .deviceType(materialDeviceTypeId.get("deviceType"))
-                        .salesZone(materialDeviceTypeId.get("salesZone"))
                         .build();
             }
 

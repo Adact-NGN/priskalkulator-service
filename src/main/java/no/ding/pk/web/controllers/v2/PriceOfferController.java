@@ -293,19 +293,19 @@ public class PriceOfferController {
             Material material = priceRow.getMaterial();
 
             if (material != null) {
-                createMaterialFromPriceRowDTO(material, priceRowDTO, salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
+                createMaterialFromPriceRowDTO(material, priceRowDTO, salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), priceRowDTO.getSalesZone());
             }
         };
     }
 
-    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from, String salesOrg, String salesOffice) {
+    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from, String salesOrg, String salesOffice, String salesZone) {
         log.debug("To: {}, from: {}", to, from);
         to.setDesignation(from.getDesignation());
         to.setMaterialGroupDesignation(from.getProductGroupDesignation());
         to.setMaterialTypeDescription(from.getMaterialDesignation());
         to.setDeviceType(from.getDeviceType());
         MaterialPrice materialStdPrice = MaterialPrice
-                .builder(salesOrg, salesOffice, from.getMaterial(), from.getDeviceType(), to.getSalesZone())
+                .builder(salesOrg, salesOffice, from.getMaterial(), from.getDeviceType(), salesZone)
                 .standardPrice(from.getStandardPrice())
                 .pricingUnit(from.getPricingUnit())
                 .quantumUnit(from.getQuantumUnit())

@@ -4613,15 +4613,6 @@
         "quantumUnit" : {
           "type" : "string"
         },
-        "salesOffice" : {
-          "type" : "string"
-        },
-        "salesOrg" : {
-          "type" : "string"
-        },
-        "salesZone" : {
-          "type" : "string"
-        },
         "scaleQuantum" : {
           "type" : "number",
           "format" : "double"
