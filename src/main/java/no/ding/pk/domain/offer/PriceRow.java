@@ -30,7 +30,7 @@ public class PriceRow extends Auditable {
     @Column
     private Double discountLevelPct;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
     @JoinColumn(name = "material_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "Fk_priceRow_material"))
     private Material material;
