@@ -12,10 +12,7 @@ import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
 import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.TypeMap;
+import org.modelmapper.*;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,9 +30,10 @@ public class ModelMapperV2Config {
     private static final Logger log = LoggerFactory.getLogger(ModelMapperV2Config.class);
 
     @Bean(name = "modelMapperV2")
-    public ModelMapper modelMapperV2(MaterialService materialRepository, SalesRoleRepository salesRoleRepository) {
+    public ModelMapper modelMapperV2(MaterialService materialService, SalesRoleRepository salesRoleRepository) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
         priceOfferDtoToPriceOfferMapping(modelMapper);
 
@@ -84,7 +83,7 @@ public class ModelMapperV2Config {
 
         priceOfferToPriceOfferListDto(modelMapper);
 
-        priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
+        priceRowDtoToPriceRowTypeMapping(materialService, modelMapper);
 
         priceRowToPriceRowDtoTypeMapping(modelMapper);
 
@@ -171,28 +170,26 @@ public class ModelMapperV2Config {
 
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         // https://amydegregorio.com/2018/01/17/using-custom-modelmapper-converters-and-mappings/
-        Converter<String, Material> stringToMaterial = c -> {
+        Converter<Map<String, String>, Material> stringToMaterial = c -> {
             Material material = null;
             if(c.getSource() != null) {
-                String[] materialDeviceTypeId = c.getSource().split("_");
+                Map<String, String> materialDeviceTypeId = c.getSource();
 
-                if(materialDeviceTypeId.length > 1) {
-                    material = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
-                } else {
-                    material = materialRepository.findByMaterialNumber(c.getSource());
-                }
+                Optional<Material> optionalMaterial = materialRepository.findByMaterialNumberAndDeviceTypeAndSalesZone(
+                        materialDeviceTypeId.get("materialNumber"),
+                        materialDeviceTypeId.get("deviceType"),
+                        materialDeviceTypeId.get("salesZone"));
 
-                if(material != null) {
-                    return material;
+                if(optionalMaterial.isPresent()) {
+                    return optionalMaterial.get();
                 }
 
                 log.debug("No material number was found. Material object must be created.");
 
-                if(materialDeviceTypeId.length > 1) {
-                    material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();
-                } else {
-                    material = Material.builder().materialNumber(c.getSource()).build();
-                }
+                material = Material.builder().materialNumber(materialDeviceTypeId.get("materialNumber"))
+                        .deviceType(materialDeviceTypeId.get("deviceType"))
+                        .salesZone(materialDeviceTypeId.get("salesZone"))
+                        .build();
             }
 
             return material;

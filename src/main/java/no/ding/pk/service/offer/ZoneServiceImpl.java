@@ -48,11 +48,12 @@ public class ZoneServiceImpl implements ZoneService {
             entity.setPostalName(zone.getPostalName());
             entity.setIsStandardZone(zone.getIsStandardZone());
 
-            Map<String, MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOrg, salesOffice, zone.getZoneId());
-
-            log.debug("Created key set for map: {}", materialStdPrices.isEmpty() ? "No map created" : materialStdPrices.keySet());
-
             if(zone.getPriceRows() != null && !zone.getPriceRows().isEmpty()) {
+                Map<String, MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOrg, salesOffice, zone.getZoneId());
+
+                log.debug("Created key set for map: {}", materialStdPrices.isEmpty() ? "No map created" : materialStdPrices.keySet());
+
+
                 List<PriceRow> materials = priceRowService.saveAll(zone.getPriceRows(), salesOrg, salesOffice, zone.getZoneId(), materialStdPrices);
 
                 entity.setPriceRows(materials);

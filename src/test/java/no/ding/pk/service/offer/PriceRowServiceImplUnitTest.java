@@ -16,13 +16,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.json.XMLTokener.entity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -63,13 +61,15 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldUpdateMaterialWithNewValues() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice oldMaterialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice oldMaterialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
-        doReturn(oldMaterialPrice).when(materialPriceService).findByMaterialNumber(anyString());
+        doReturn(Optional.ofNullable(oldMaterialPrice)).when(materialPriceService).findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                anyString(), anyString(), anyString(), any(), anyString());
 
         Material oldMaterial = Material.builder()
                 .id(1L)
@@ -80,7 +80,7 @@ public class PriceRowServiceImplUnitTest {
                 .materialStandardPrice(oldMaterialPrice)
                 .build();
 
-        when(materialService.save(any())).thenAnswer(invocationOnMock -> (Material) invocationOnMock.getArguments()[0]);
+        when(materialService.save(any())).thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
 
         EntityManager entityManager = mock(EntityManager.class);
         when(entityManager.getTransaction()).thenReturn(mock(EntityTransaction.class));
@@ -101,35 +101,21 @@ public class PriceRowServiceImplUnitTest {
         when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(oldMaterialPrice);
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(90.0)
+                DiscountLevel.builder(90.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(180.0)
+                DiscountLevel.builder(180.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(315.0)
+                DiscountLevel.builder(315.0, 4)
                         .build(),
-                DiscountLevel.builder()
-                        .level(5)
-                        .discount(468.0)
+                DiscountLevel.builder(468.0, 5)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .discountLevels(discountLevels)
-                .build();
-        Map<String, Map<String, Map<String, Discount>>> discountMap = Map.of("100", Map.of("129", Map.of(materialNumber, discount)));
 
-        MaterialPrice updatedMaterialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+
+
+        MaterialPrice updatedMaterialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .pricingUnit(1)
                 .standardPrice(1917.0)
                 .build();
@@ -149,7 +135,7 @@ public class PriceRowServiceImplUnitTest {
                 .discountLevel(3)
                 .build();
 
-        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), "100", "129", "1",
+        List<PriceRow> actual = service.saveAll(List.of(updatedPriceRow), salesOrg, salesOffice, "1",
                 Map.of(updatedMaterialPrice.getMaterialNumber(), updatedMaterialPrice));
 
         PriceRow actualPriceRow = actual.get(0);
@@ -162,13 +148,15 @@ public class PriceRowServiceImplUnitTest {
     public void shouldSetDiscountPctByStandardPriceAndDiscountLevelPrice() {
         String materialNumber = "50103";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
-        doReturn(materialPrice).when(materialPriceService).findByMaterialNumber(anyString());
-
+//        doReturn(materialPrice).when(materialPriceService).findByMaterialNumber(anyString());
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
         Material material = Material.builder()
                 .materialNumber(materialNumber)
                 .designation("Lift - Tømming")
@@ -193,48 +181,46 @@ public class PriceRowServiceImplUnitTest {
                 .discountLevel(3)
                 .build();
 
-        when(repository.save(any())).thenReturn(priceRow);
+//        when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 1)
                         .zone(1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(90.0)
+                DiscountLevel.builder(90.0, 2)
                         .zone(1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(180.0)
+                DiscountLevel.builder(180.0, 3)
                         .zone(1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(315.0)
+                DiscountLevel.builder(315.0, 4)
                         .zone(1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(5)
-                        .discount(468.0)
+                DiscountLevel.builder(468.0, 5)
                         .zone(1)
                         .build()
         );
 
-        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel("100", "129", materialNumber, 3, 1)).thenReturn(Collections.singletonList(discountLevels.get(2)));
+        String salesOrg = "100";
+        String salesOffice = "129";
+        when(discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice,
+                materialNumber, 3, 1)).thenReturn(Collections.singletonList(discountLevels.get(2)));
 
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .discountLevels(discountLevels)
+        Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, 1817.0, discountLevels)
                 .build();
 
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice,
+                Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), salesOrg, salesOffice, "1",
                 Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         PriceRow actualPriceRow = actual.get(0);
@@ -255,13 +241,18 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldSetDiscountLevelToOneWhenManualPriceIsSet() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         Material material = Material.builder()
                 .materialNumber(materialNumber)
@@ -290,38 +281,34 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(90.0)
+                DiscountLevel.builder(90.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(180.0)
+                DiscountLevel.builder(180.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(315.0)
+                DiscountLevel.builder(315.0, 4)
                         .build(),
-                DiscountLevel.builder()
-                        .level(5)
-                        .discount(468.0)
+                DiscountLevel.builder(468.0, 5)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .discountLevels(discountLevels)
+
+
+        Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
 
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), salesOrg, salesOffice, "1",
                 Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(1));
@@ -330,9 +317,10 @@ public class PriceRowServiceImplUnitTest {
     @Test
     public void shouldSetDiscountLevelToTwoWhenManualPriceIsSet() {
         String materialNumber = "50103";
+        String salesOrg = "100";
+        String salesOffice = "129";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
@@ -365,38 +353,33 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(90.0)
+                DiscountLevel.builder(90.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(180.0)
+                DiscountLevel.builder(180.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(315.0)
+                DiscountLevel.builder(315.0, 4)
                         .build(),
-                DiscountLevel.builder()
-                        .level(5)
-                        .discount(468.0)
+                DiscountLevel.builder(468.0, 5)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .discountLevels(discountLevels)
+
+        Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
 
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, Collections.singletonList(materialNumber))).thenReturn(Collections.singletonList(discount));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), salesOrg, salesOffice, "1",
                 Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(2));
@@ -404,14 +387,18 @@ public class PriceRowServiceImplUnitTest {
 
     @Test
     public void shouldSetDiscountLevelAboveFiveWhenManualPriceIsSet() {
+        String salesOrg = "100";
+        String salesOffice = "129";
         String materialNumber = "50103";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .standardPrice(1817.0)
                 .build();
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         Material material = Material.builder()
                 .materialNumber(materialNumber)
@@ -440,40 +427,35 @@ public class PriceRowServiceImplUnitTest {
 
         when(repository.save(any())).thenReturn(priceRow);
 
-        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+//        when(materialPriceService.findByMaterialNumber(anyString())).thenReturn(materialPrice);
+        when(materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        anyString(), anyString(), anyString(), any(), anyString()
+                )).thenReturn(Optional.ofNullable(materialPrice));
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(90.0)
+                DiscountLevel.builder(90.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(180.0)
+                DiscountLevel.builder(180.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(315.0)
+                DiscountLevel.builder(315.0, 4)
                         .build(),
-                DiscountLevel.builder()
-                        .level(5)
-                        .discount(468.0)
+                DiscountLevel.builder(468.0, 5)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .discountLevels(discountLevels)
+
+        Discount discount = Discount.builder(salesOrg, salesOffice, materialNumber, standardPrice, discountLevels)
                 .build();
 
         List<String> materials = new ArrayList<>();
         materials.add(materialNumber);
-        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "129", materials)).thenReturn(Collections.singletonList(discount));
 
-        List<PriceRow> actual = service.saveAll(List.of(priceRow), "100", "129", "1",
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materials)).thenReturn(Collections.singletonList(discount));
+        when(repository.save(any())).thenAnswer(invocation -> invocation.getArguments()[0]);
+
+        List<PriceRow> actual = service.saveAll(List.of(priceRow), salesOrg, salesOffice, "1",
                 Map.of(materialPrice.getMaterialNumber(), materialPrice));
 
         assertThat(actual.get(0).getDiscountLevel(), is(6));

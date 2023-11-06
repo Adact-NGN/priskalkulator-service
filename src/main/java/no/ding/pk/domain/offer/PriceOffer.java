@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.User;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -25,7 +26,7 @@ public class PriceOffer extends Offer implements Serializable {
     @Column
     private String priceOfferStatus;
 
-    @Column(length = 21844)
+    @Column
     private String materialsForApproval;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -60,6 +61,10 @@ public class PriceOffer extends Offer implements Serializable {
     @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"))
     private PriceOfferTerms customerTerms;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "priceTeamUserId", foreignKey = @ForeignKey(name = "Fk_price_offer_price_team_user"))
+    private User priceTeamUser;
+
     @Builder(builderMethodName = "priceOfferBuilder")
     public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType,
                       String streetAddress,
@@ -91,6 +96,18 @@ public class PriceOffer extends Offer implements Serializable {
         return needsApproval != null && needsApproval;
     }
 
+    @JsonIgnore
+    public Integer getHighestSelectedDiscountLevel() {
+        Integer highestSelectedDiscountLevel = null;
+        if(salesOfficeList  != null) {
+            for(SalesOffice salesOffice : salesOfficeList) {
+                highestSelectedDiscountLevel = salesOffice.getHighestSelectedDiscountLevel();
+            }
+        }
+
+        return highestSelectedDiscountLevel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -99,11 +116,17 @@ public class PriceOffer extends Offer implements Serializable {
 
         PriceOffer that = (PriceOffer) o;
 
-        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList).append(salesEmployee, that.salesEmployee).append(approver, that.approver).append(approvalDate, that.approvalDate).append(activationDate, that.activationDate).append(customerTerms, that.customerTerms).isEquals();
+        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList)
+                .append(salesEmployee, that.salesEmployee).append(approver, that.approver)
+                .append(approvalDate, that.approvalDate).append(activationDate, that.activationDate)
+                .append(customerTerms, that.customerTerms).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
+        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList)
+                .append(salesEmployee).append(approver).append(approvalDate).append(activationDate)
+                .append(customerTerms).toHashCode();
     }
 }
+

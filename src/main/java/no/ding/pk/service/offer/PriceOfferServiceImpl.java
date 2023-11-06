@@ -1,16 +1,15 @@
 package no.ding.pk.service.offer;
 
 import lombok.Data;
-import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
 
@@ -41,8 +39,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
-    private final DiscountService discountService;
-
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
     private final List<Integer> salesOfficesWhichRequiresOwnFaApprover;
@@ -52,14 +48,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 DiscountService discountService, CustomerTermsService customerTermsService,
+                                 CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper,
                                  @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
-        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
         this.salesOfficesWhichRequiresOwnFaApprover = salesOfficesWhichRequiresOwnFaApprover;
@@ -99,7 +94,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
         }
 
-        entity.setContactPersonList(newPriceOffer.getContactPersonList());
+        if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
+            if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
+                entity.setContactPersonList(newPriceOffer.getContactPersonList());
+//                entity = repository.save(entity);
+            }
+        }
 
         if(newPriceOffer.getSalesOfficeList() != null) {
             if(!newPriceOffer.getSalesOfficeList().isEmpty()) {
@@ -111,11 +111,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(entity);
 
         if(!materialsForApproval.isEmpty()) {
             log.debug("Materials needs approving by responsible person.");
             entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+            entity.setNeedsApproval(true);
             String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
             entity.setMaterialsForApproval(materialNumbersForApproval);
@@ -130,6 +131,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             if(approver != null && approver.equals(entity.getSalesEmployee())) {
                 log.debug("Sales employee has the rights to approve the price offer. Set it to approved.");
+                entity.setNeedsApproval(false);
                 entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
             }
         } else if(newPriceOffer.getApprover() != null) {
@@ -143,9 +145,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 entity.setApprover(approver);
             }
 
+            entity.setNeedsApproval(false);
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         } else {
             log.debug("No materials needs to be approved, set price offer as APPROVED.");
+            entity.setNeedsApproval(false);
             entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
@@ -161,87 +165,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
             String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
 
-            if(materialNumbersForApproval.length() > 0) {
+            if(!materialNumbersForApproval.isEmpty()) {
                 materialNumbersForApproval.append(",").append(materials);
             } else {
                 materialNumbersForApproval = new StringBuilder(materials);
             }
         }
         return materialNumbersForApproval.toString();
-    }
-
-    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
-        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
-        for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
-
-            // Collect all Material numbers in each price row lists.
-            Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
-            mateiralNumberSet.addAll(getZonedMaterialNumberSet(salesOffice.getZoneList()));
-
-            // Create sales office to material number map.
-            Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
-            salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
-
-            // Add map to sales org map, sales office, material number map.
-            if(discountMap.containsKey(salesOffice.getSalesOrg())) {
-                discountMap.get(salesOffice.getSalesOrg()).putAll(salesOfficeMaterialMap);
-            } else {
-                discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
-            }
-        }
-
-        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
-
-        for (String salesOrg : discountMap.keySet()) {
-            if(!orgOfficeMaterialDiscount.containsKey(salesOrg)) {
-                orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
-            }
-
-            Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
-            for(String salesOffice : discountMap.get(salesOrg).keySet()) {
-                Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
-                List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
-
-                List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
-
-                if(discounts != null && !discounts.isEmpty()) {
-                    discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
-                }
-
-                salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
-            }
-
-            orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
-        }
-
-        return orgOfficeMaterialDiscount;
-    }
-
-    private static Set<String> getZonedMaterialNumberSet(List<Zone> zoneList) {
-
-        Set<String> mateiralNumberSet = new HashSet<>();
-
-        if(zoneList != null && !zoneList.isEmpty()) {
-            for (Zone zone : zoneList) {
-                if(zone.getPriceRows() == null) {
-                    continue;
-                }
-
-                for (PriceRow priceRow : zone.getPriceRows()) {
-                    mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
-                }
-            }
-        }
-        return mateiralNumberSet;
-    }
-
-    private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
-        if(materialList == null) {
-            return new HashSet<>();
-        }
-        return materialList.stream().map(material -> material.getMaterial().getMaterialNumber()).collect(Collectors.toSet());
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
@@ -342,9 +272,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private Map<String, List<PriceRow>> getAllMaterialsForApproval(PriceOffer priceOffer) {
+        log.debug("Getting all materials which needs approval.");
         Map<String, List<PriceRow>> salesOfficeMaterialsMap = new HashMap<>();
 
-        if(priceOffer.getSalesOfficeList() == null) {
+        if(CollectionUtils.isEmpty(priceOffer.getSalesOfficeList())) {
+            log.debug("No sales offices registered on the Price offer, returning.");
             return salesOfficeMaterialsMap;
         }
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
@@ -362,6 +294,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 salesOfficeMaterialsMap.put(salesOffice.getSalesOffice(), materialsInPriceOffer);
             }
         }
+        log.debug("Filtering done, found {} materials which needs to be approved.", salesOfficeMaterialsMap.size());
         return salesOfficeMaterialsMap;
     }
 
@@ -447,8 +380,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new UserNotFoundException(String.format("Approver User with id %d was not found.", approverId));
         }
 
-        User approver = approverOptional.get();
-
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
@@ -469,13 +400,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 
             if(needsReApproval) {
+                log.debug("Price offer still needs approval. Setting status to PENDING and needsApproval to true.");
                 priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
                 priceOfferToApprove.setNeedsApproval(true);
 
+                log.debug("Checking if Price offer has an approver registered on it.");
                 if(priceOfferToApprove.getApprover() == null) {
+                    log.debug("No approver set.");
                     Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
                     User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
+                    log.debug("Found approver? {}", neededApprover != null);
                     priceOfferToApprove.setApprover(neededApprover);
                 }
             } else {
@@ -494,12 +429,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Boolean activatePriceOffer(Long activatedById, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
-        PriceOffer priceOfferToActivate = repository.findById(priceOfferId).orElse(null);
+        Optional<PriceOffer> priceOfferToActivateOptional = repository.findById(priceOfferId);
 
-        if(priceOfferToActivate == null) {
+        if(priceOfferToActivateOptional.isEmpty()) {
             String message = String.format("No PriceOffer with given id %d was found.", priceOfferId);
             throw new PriceOfferNotFoundException(message);
         }
+
+        PriceOffer priceOfferToActivate = priceOfferToActivateOptional.get();
 
         if(StringUtils.isBlank(priceOfferToActivate.getPriceOfferStatus())) {
             String message = "Given Price offer has no status assigned.";
@@ -612,7 +549,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
+        log.debug("Checking if price offer needs approval.");
         List<String> currentMaterialInPriceOffer = new ArrayList<>();
+
         for (Map.Entry<String, List<PriceRow>> listEntry : getAllMaterialsForApproval(priceOfferToApprove).entrySet()) {
             currentMaterialInPriceOffer.addAll(listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
         }

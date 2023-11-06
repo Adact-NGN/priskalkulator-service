@@ -4798,6 +4798,12 @@
         "quantumUnit" : {
           "type" : "string"
         },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
         "standardPrice" : {
           "type" : "number",
           "format" : "double"
@@ -5008,6 +5014,9 @@
         "priceOfferStatus" : {
           "type" : "string"
         },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/User"
+        },
         "salesEmployee" : {
           "$ref" : "#/definitions/User"
         },
@@ -5094,6 +5103,9 @@
         },
         "priceOfferStatus" : {
           "type" : "string"
+        },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/UserDTO"
         },
         "salesEmployee" : {
           "$ref" : "#/definitions/UserDTO"
@@ -5404,6 +5416,9 @@
         "priceIncMva" : {
           "type" : "number",
           "format" : "double"
+        },
+        "salesZone" : {
+          "type" : "string"
         },
         "showPriceInOffer" : {
           "type" : "boolean"

@@ -81,12 +81,8 @@ public class DiscountServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldSaveDiscountObjectWithDiscountLevels() {
-        Discount expected = Discount.builder()
-                .salesOrg("100")
-                .salesOffice("100")
-                .materialNumber("Test")
+        Discount expected = Discount.builder("100", "100", "Test", 1234.0, new ArrayList<>())
                 .materialDesignation("Test")
-                .standardPrice(1234.0)
                 .build();
 
         Discount actual = service.save(expected);
@@ -96,12 +92,8 @@ public class DiscountServiceImplTest extends AbstractIntegrationConfig {
 
     @Test
     public void shouldBeAbleToAddDiscountLevelToDiscountWithMissingCalculatedDiscountAndPctSet() {
-        Discount expected = Discount.builder()
-                .salesOrg("100")
-                .salesOffice("100")
-                .materialNumber("Test2")
+        Discount expected = Discount.builder("100", "100", "Test2", 1234.0, new ArrayList<>())
                 .materialDesignation("Test2")
-                .standardPrice(1234.0)
                 .build();
 
         expected.setDiscountLevels(new ArrayList<>());
@@ -174,7 +166,7 @@ public class DiscountServiceImplTest extends AbstractIntegrationConfig {
 
         List<Discount> discounts = testData.stream().filter(discount -> !toPersist.contains(discount.getMaterialNumber())).collect(Collectors.toList());
 
-        if(discounts.size() > 0) {
+        if(!discounts.isEmpty()) {
             service.saveAll(discounts);
         }
     }

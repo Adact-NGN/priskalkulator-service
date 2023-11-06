@@ -6,16 +6,14 @@ import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.offer.SalesOfficeRepository;
 import no.ding.pk.service.sap.StandardPriceService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -59,7 +57,7 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
 
-                Map<String, MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
+                Map<String, MaterialPrice> materialStdPrices = getMaterialPriceMap(salesOffice);
 
                 log.debug("Material prices fetched: {}", materialStdPrices.size());
 
@@ -102,6 +100,16 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
             }
         }
         return returnList;
+    }
+
+    private Map<String, MaterialPrice> getMaterialPriceMap(SalesOffice salesOffice) {
+        if(CollectionUtils.isNotEmpty(salesOffice.getMaterialList()) ||
+                CollectionUtils.isNotEmpty(salesOffice.getTransportServiceList()) ||
+                CollectionUtils.isNotEmpty(salesOffice.getRentalList())) {
+            return standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
+        }
+        log.debug("All material lists are empty, no material prices to get.");
+        return new HashMap<>();
     }
 
     private SalesOffice getSalesOffice(SalesOffice salesOffice) {

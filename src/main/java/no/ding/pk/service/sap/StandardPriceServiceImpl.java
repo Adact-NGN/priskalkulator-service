@@ -270,8 +270,8 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
 
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
-        return MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        return MaterialPrice.builder(materialStdPriceDTO.getSalesOrg(), materialStdPriceDTO.getSalesOffice(),
+                        materialNumber, materialStdPriceDTO.getDeviceType(), materialStdPriceDTO.getZone())
                 .deviceType(materialStdPriceDTO.getDeviceType())
                 .standardPrice(materialStdPriceDTO.getStandardPrice())
                 .validFrom(materialStdPriceDTO.getValidFrom())

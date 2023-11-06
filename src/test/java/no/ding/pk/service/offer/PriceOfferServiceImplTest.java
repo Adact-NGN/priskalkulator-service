@@ -1,5 +1,6 @@
 package no.ding.pk.service.offer;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
@@ -14,6 +15,7 @@ import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.apache.commons.io.IOUtils;
@@ -32,7 +34,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.net.ssl.SSLSession;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
@@ -40,10 +44,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static no.ding.pk.utils.JsonTestUtils.jsonToObject;
+import static no.ding.pk.utils.JsonTestUtils.objectToJson;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -71,7 +81,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
     private PriceOfferRepository priceOfferRepository;
 
-    private ModelMapper modelMapper = new ModelMapper();
+    private ModelMapper modelMapper;
     private SapHttpClient sapHttpClient;
     private SapMaterialService sapMaterialService;
 
@@ -92,6 +102,8 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         discountService = mock(DiscountService.class);
 
+        modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
+
         PriceRowService priceRowService = new PriceRowServiceImpl(
                 discountService,
                 getPriceRowRepository(),
@@ -101,12 +113,13 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 sapMaterialService,
                 modelMapper);
 
-
         InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache = new PingInMemory3DCache<>(5000);
         ModelMapper modelMapper = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository());
         sapHttpClient = mock(SapHttpClient.class);
 
         standardPriceService = mock(StandardPriceService.class);
+        Map<String, MaterialPrice> materialPrices = getMaterialPrices();
+        doReturn(materialPrices).when(standardPriceService).getStandardPriceForSalesOrgAndSalesOfficeMap(anyString(), anyString(), any());
 
         ZoneService zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, standardPriceService);
 
@@ -118,12 +131,43 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
 
         service = new PriceOfferServiceImpl(getPriceOfferRepository(), salesOfficeService, userService,
-                salesOfficePowerOfAttorneyService, discountService, customerTermsService, modelMapper,
+                salesOfficePowerOfAttorneyService, customerTermsService, modelMapper,
                 List.of(100));
 
         prepareUsersAndSalesRoles();
         createMaterial();
         createDiscountMatrix();
+    }
+
+    private Map<String, MaterialPrice> getMaterialPrices() {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource("standardPrices100104.json").getFile());
+
+        assertThat(file.exists(), is(true));
+
+        try {
+            String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+            JSONObject result = new JSONObject(json);
+
+            JSONArray jsonArray = result.getJSONObject("d").getJSONArray("results");
+
+            ObjectMapper om = getObjectMapper();
+
+            List<MaterialPrice> materialPrices = new ArrayList<>();
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject object = jsonArray.getJSONObject(i);
+
+                MaterialStdPriceDTO materialStdPriceDTO = om.readValue(object.toString(), MaterialStdPriceDTO.class);
+
+                MaterialPrice materialPrice = modelMapper.map(materialStdPriceDTO, MaterialPrice.class);
+                materialPrices.add(materialPrice);
+            }
+
+            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -133,7 +177,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         ClassLoader classLoader = getClass().getClassLoader();
@@ -144,7 +188,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .agreementStartDate(new Date())
                 .build();
 
-        MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder()
+        MaterialPrice residualWasteMaterialStdPrice = MaterialPrice.builder("100", "100", "119901", null, "01")
                 .materialNumber("119901")
                 .standardPrice(2456.0)
                 .build();
@@ -170,8 +214,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         List<PriceRow> materialList = List.of(priceRow);
 
-        MaterialPrice zoneMaterialStandardPrice = MaterialPrice.builder()
-                .materialNumber("50101")
+        MaterialPrice zoneMaterialStandardPrice = MaterialPrice.builder("100", "100", "50101", null, null)
                 .standardPrice(1131.0)
                 .build();
         Material zoneMaterial = Material.builder()
@@ -195,9 +238,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .material(zoneMaterial)
                 .build();
 
-        MaterialPrice zoneMaterialPriceWithDeviceType = MaterialPrice.builder()
-                .materialNumber("50301")
-                .deviceType("B-0-S")
+        MaterialPrice zoneMaterialPriceWithDeviceType = MaterialPrice.builder("100", "100", "50301", "B-0-S", null)
                 .standardPrice(16.0)
                 .build();
         Material zoneDiveceTypeMaterial = Material.builder()
@@ -291,6 +332,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
@@ -299,9 +341,75 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer2, notNullValue());
         assertThat(priceOffer.getApprover(), equalTo(salesEmployee));
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
         assertThat(priceOffer2.getSalesOfficeList(), notNullValue());
         assertThat(priceOffer2.getSalesOfficeList(), hasSize(greaterThan(0)));
         assertThat(priceOffer2.getSalesOfficeList().get(0).getMaterialList(), hasSize(greaterThan(0)));
+    }
+
+    @Test
+    public void shouldUpdateContactPersonList() {
+        User salesEmployee = userService.findByEmail("alexander.brox@ngn.no");
+
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("127")
+                .salesOfficeName("Sarpsborg/Fredrikstad")
+                .postalNumber("1601")
+                .city("FREDRIKSTAD")
+                //.materialList(materialList)
+                //.zoneList(zoneList)
+                .build();
+
+        ContactPerson contactPerson = ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build();
+
+        List<ContactPerson> contactPeople = new ArrayList<>();
+        contactPeople.add(contactPerson);
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                .contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getContactPersonList(), hasSize(1));
+        assertThat(priceOffer.getContactPersonList().get(0).getId(), notNullValue());
+
+        PriceOffer updatedPriceOffer = PriceOffer.priceOfferBuilder()
+                .id(priceOffer.getId())
+                .customerNumber("327342")
+                .customerName("Follo Ren IKS")
+                .needsApproval(false)
+                .priceOfferStatus(PriceOfferStatus.PENDING.getStatus())
+                //.contactPersonList(contactPeople)
+                .salesEmployee(salesEmployee)
+                //.salesOfficeList(List.of(salesOffice2))
+                .build();
+
+        updatedPriceOffer.setContactPersonList(Collections.singletonList(ContactPerson.builder()
+                .firstName("Test")
+                .lastName("Testesen")
+                .emailAddress("test.testesen@testing.com")
+                .mobileNumber("98765432")
+                .build()));
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
+        updatedPriceOffer = service.save(updatedPriceOffer);
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
+
     }
 
     @Test
@@ -310,7 +418,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -364,7 +472,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -425,7 +533,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
@@ -466,9 +574,12 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .needsApproval(true)
                 .build();
 
-        Material dangerousMaterial = materialService.findByMaterialNumber("70120015");
-        if(dangerousMaterial == null) {
+        Optional<Material> optionalDangerousMaterial = materialService.findByMaterialNumber("70120015");
+        Material dangerousMaterial;
+        if(optionalDangerousMaterial.isEmpty()) {
             dangerousMaterial = createDangerousMaterial();
+        } else {
+            dangerousMaterial = optionalDangerousMaterial.get();
         }
 
         PriceRow faPriceRow = PriceRow.builder()
@@ -499,11 +610,11 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         assertThat(actual.getApprover().getEmail(), equalTo(ordinaryWasteHolderLvl2.getEmail()));
     }
 
-    private static HttpResponse<String> createResponse() {
+    private static HttpResponse<String> createResponse(final int responseStatusCode) {
         return new HttpResponse<>() {
             @Override
             public int statusCode() {
-                return 200;
+                return responseStatusCode;
             }
 
             @Override
@@ -523,87 +634,87 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             @Override
             public String body() {
-                return "{\n" +
-                        "    \"d\": {\n" +
-                        "        \"results\": [\n" +
-                        "            {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"159904\",\n" +
-                        "                \"MaterialDescription\": \"Degaussing harddisker\",\n" +
-                        "                \"DeviceCategory\": \"\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0\",\n" +
-                        "                \"StandardPrice\": \"170.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1\",\n" +
-                        "                \"QuantumUnit\": \"ST\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"1599\",\n" +
-                        "                \"MaterialGroupDescription\": \"Blandet EE-avfall\",\n" +
-                        "                \"MaterialType\": \"ZWAF\",\n" +
-                        "                \"MaterialTypeDescription\": \"Avfallsmateriale\"\n" +
-                        "            },\n" +
-                        "           {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695859200000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"70120015\",\n" +
-                        "                \"MaterialDescription\": \"Ikke refunderbar spillolje,Småemb\",\n" +
-                        "                \"DeviceCategory\": \"\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0.000\",\n" +
-                        "                \"StandardPrice\": \"16566.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1000\",\n" +
-                        "                \"QuantumUnit\": \"KG\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"7012\",\n" +
-                        "                \"MaterialGroupDescription\": \"Spillolje, ikke ref.\",\n" +
-                        "                \"MaterialType\": \"ZAFA\",\n" +
-                        "                \"MaterialTypeDescription\": \"Farlig Avfallsmateriale\"\n" +
-                        "            },\n" +
-                        "            {\n" +
-                        "                \"__metadata\": {\n" +
-                        "                    \"id\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
-                        "                    \"uri\": \"https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')\",\n" +
-                        "                    \"type\": \"ZPRICES_SRV.ZZStandPris\"\n" +
-                        "                },\n" +
-                        "                \"ValidFrom\": \"/Date(1695945600000)/\",\n" +
-                        "                \"SalesOrganization\": \"100\",\n" +
-                        "                \"SalesOffice\": \"104\",\n" +
-                        "                \"Material\": \"50301\",\n" +
-                        "                \"MaterialDescription\": \"Flatvogn - Utsett\",\n" +
-                        "                \"DeviceCategory\": \"B-0-S\",\n" +
-                        "                \"SalesZone\": \"\",\n" +
-                        "                \"ScaleQuantity\": \"0\",\n" +
-                        "                \"StandardPrice\": \"13.00\",\n" +
-                        "                \"Valuta\": \"\",\n" +
-                        "                \"PricingUnit\": \"1\",\n" +
-                        "                \"QuantumUnit\": \"ST\",\n" +
-                        "                \"MaterialExpired\": \"\",\n" +
-                        "                \"ValidTo\": \"/Date(253402214400000)/\",\n" +
-                        "                \"MaterialGroup\": \"0503\",\n" +
-                        "                \"MaterialGroupDescription\": \"Tj.  Flatvogn\",\n" +
-                        "                \"MaterialType\": \"DIEN\",\n" +
-                        "                \"MaterialTypeDescription\": \"Tjeneste\"\n" +
-                        "            }"+
-                        "        ]\n" +
-                        "    }\n" +
-                        "}";
+                return """
+                        {
+                            "d": {
+                                "results": [
+                                    {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='159904')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695859200000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "159904",
+                                        "MaterialDescription": "Degaussing harddisker",
+                                        "DeviceCategory": "",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0",
+                                        "StandardPrice": "170.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1",
+                                        "QuantumUnit": "ST",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "1599",
+                                        "MaterialGroupDescription": "Blandet EE-avfall",
+                                        "MaterialType": "ZWAF",
+                                        "MaterialTypeDescription": "Avfallsmateriale"
+                                    },
+                                   {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-28T00%3A00%3A00',SalesOrganization='100',SalesOffice='100',Material='70120015')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695859200000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "70120015",
+                                        "MaterialDescription": "Ikke refunderbar spillolje,Småemb",
+                                        "DeviceCategory": "",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0.000",
+                                        "StandardPrice": "16566.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1000",
+                                        "QuantumUnit": "KG",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "7012",
+                                        "MaterialGroupDescription": "Spillolje, ikke ref.",
+                                        "MaterialType": "ZAFA",
+                                        "MaterialTypeDescription": "Farlig Avfallsmateriale"
+                                    },
+                                    {
+                                        "__metadata": {
+                                            "id": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')",
+                                            "uri": "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/ZPRICES_SRV/ZZStandPrisSet(ValidFrom=datetime'2023-09-29T00%3A00%3A00',SalesOrganization='100',SalesOffice='104',Material='50301')",
+                                            "type": "ZPRICES_SRV.ZZStandPris"
+                                        },
+                                        "ValidFrom": "/Date(1695945600000)/",
+                                        "SalesOrganization": "100",
+                                        "SalesOffice": "104",
+                                        "Material": "50301",
+                                        "MaterialDescription": "Flatvogn - Utsett",
+                                        "DeviceCategory": "B-0-S",
+                                        "SalesZone": "",
+                                        "ScaleQuantity": "0",
+                                        "StandardPrice": "13.00",
+                                        "Valuta": "",
+                                        "PricingUnit": "1",
+                                        "QuantumUnit": "ST",
+                                        "MaterialExpired": "",
+                                        "ValidTo": "/Date(253402214400000)/",
+                                        "MaterialGroup": "0503",
+                                        "MaterialGroupDescription": "Tj.  Flatvogn",
+                                        "MaterialType": "DIEN",
+                                        "MaterialTypeDescription": "Tjeneste"
+                                    }        ]
+                            }
+                        }""";
             }
 
             @Override
@@ -624,12 +735,101 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     @Test
+    public void shouldSetEquivalentDiscountLevelForMaterialsWithManualPriceSet() {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse(200);
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        List<DiscountLevel> discountLevels = Arrays.asList(
+                DiscountLevel.builder(0.0, 1).build(),
+                DiscountLevel.builder(199.0, 2).build(),
+                DiscountLevel.builder(397.0, 3).build(),
+                DiscountLevel.builder(695.0, 4).build(),
+                DiscountLevel.builder(1033.0, 5).build()
+        );
+        Discount discount = Discount.builder("100", "100", "119901", 2604.0, discountLevels).build();
+
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "100", Collections.singletonList("119901"))).thenReturn(Collections.singletonList(discount));
+
+        List<Zone> zones = Collections.singletonList(Zone.builder()
+                .zoneId("0000000001")
+                .postalCode("1001")
+                .postalName("Oslo")
+                .isStandardZone(true)
+                .build()
+        );
+        MaterialPrice standardPrice = MaterialPrice.builder("100", "100", "119901", null, "01")
+                .standardPrice(2604.0)
+                .quantumUnit("KG")
+                .materialNumber("119901")
+                .build();
+
+        when(standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap("100", "100", null)).thenReturn(Map.of("119901", standardPrice));
+
+        Material material = Material.builder()
+                .materialNumber("119901")
+                .designation("Restavfall")
+                .materialGroupDesignation("Bl. næringsavfall")
+                .materialTypeDescription("Avfallsmateriale")
+                .deviceType("")
+                .materialStandardPrice(standardPrice)
+                .build();
+        List<PriceRow> materials = Collections.singletonList(
+                PriceRow.builder()
+                        .showPriceInOffer(true)
+                        .manualPrice(1.0)
+                        .standardPrice(2604.0)
+                        .needsApproval(true)
+                        .approved(false)
+                        .categoryId("00300")
+                        .categoryDescription("Avfall")
+                        .subCategoryId("0030000100")
+                        .subCategoryDescription("Blandet avfall")
+                        .classId("")
+                        .classDescription("")
+                        .material(material)
+                        .build());
+        SalesOffice salesOffice = SalesOffice.builder()
+                .salesOffice("100")
+                .salesOrg("100")
+                .salesOfficeName("Stor-Oslo")
+                .city("OSLO")
+                .zoneList(zones)
+                .materialList(materials)
+                .build();
+        List<SalesOffice> salesOffices = Collections.singletonList(salesOffice);
+
+        User salesEmployee = userService.findByEmail("Eirik.Flaa@ngn.no");
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .customerNumber("125277")
+                .customerName("TESTKUNDE")
+                .streetAddress("Tårnfjellvegen")
+                .postalNumber("3910")
+                .city("Porsgrunn")
+                .organizationNumber("000000000")
+                .salesOfficeList(salesOffices)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getNeedsApproval(), is(true));
+
+        assertThat(priceOffer.getMaterialsForApproval(), notNullValue());
+        assertThat(priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).getDiscountLevel(), is(6));
+    }
+
+    @Test
     public void shouldEndExistingCustomerTermsAndAddNewWhenNewPriceOfferIsActivated() {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
         HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(
@@ -722,35 +922,22 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         String materialNumber = "119901";
 
         List<DiscountLevel> discountLevels = List.of(
-                DiscountLevel.builder()
-                        .level(0)
-                        .discount(0.0)
+                DiscountLevel.builder(0.0, 0)
                         .build(),
-                DiscountLevel.builder()
-                        .level(1)
-                        .discount(223.0)
+                DiscountLevel.builder(223.0, 1)
                         .build(),
-                DiscountLevel.builder()
-                        .level(2)
-                        .discount(446.0)
+                DiscountLevel.builder(446.0, 2)
                         .build(),
-                DiscountLevel.builder()
-                        .level(3)
-                        .discount(669.0)
+                DiscountLevel.builder(669.0, 3)
                         .build(),
-                DiscountLevel.builder()
-                        .level(4)
-                        .discount(895.0)
+                DiscountLevel.builder(895.0, 4)
                         .build()
         );
-        Discount discount = Discount.builder()
-                .materialNumber(materialNumber)
-                .salesOrg("100")
-                .salesOffice("127")
+        Discount discount = Discount.builder("100", "127", materialNumber, 2764.0, discountLevels)
                 .materialDesignation("Restavfall")
                 .build();
 
-        discountLevels.forEach(discount::addDiscountLevel);
+//        discountLevels.forEach(discount::addDiscountLevel);
 
         discountService.save(discount);
     }
@@ -758,14 +945,16 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     private Material createOrdinaryMaterial() {
         String materialNumber = "159904";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
+        String salesOffice = "104";
+        String salesOrg = "100";
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .materialNumber(materialNumber)
                 .standardPrice(170.00)
                 .build();
 
         return Material.builder()
-                .salesOffice("104")
-                .salesOrg("100")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
                 .designation("Degaussing harddisker")
                 .materialNumber(materialNumber)
                 .scaleQuantum(0.0)
@@ -780,15 +969,17 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
     }
 
     private static Material createDangerousMaterial() {
+        String salesOrg = "100";
+        String salesOffice = "100";
         String materialNumber = "70120015";
-        MaterialPrice wastePrice = MaterialPrice.builder()
+        MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, null)
                 .materialNumber(materialNumber)
                 .standardPrice(16566.00)
                 .build();
         return Material.builder()
                 .materialNumber(materialNumber)
-                .salesOrg("100")
-                .salesOffice("100")
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
                 .quantumUnit("KG")
                 .designation("Ikke refunderbar spillolje,Småemb")
                 .materialGroup("7012")
@@ -810,7 +1001,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         MaterialPrice wastePrice = getMaterialPriceRepository().findByMaterialNumber(materialNumber);
 
         if(wastePrice == null) {
-            wastePrice = MaterialPrice.builder()
+            wastePrice = MaterialPrice.builder("100", "100", materialNumber, null, "01")
                     .materialNumber(materialNumber)
                     .standardPrice(2456.00)
                     .build();
@@ -818,10 +1009,10 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
             wastePrice = getMaterialPriceRepository().save(wastePrice);
         }
 
-        Material waste = materialService.findByMaterialNumber(materialNumber);
+        Optional<Material> optionalWaste = materialService.findByMaterialNumber(materialNumber);
 
-        if(waste == null) {
-            waste = Material.builder()
+        if(optionalWaste.isEmpty()) {
+            Material waste = Material.builder()
                     .designation("Restavfall")
                     .materialNumber(materialNumber)
                     .pricingUnit(1000)
@@ -835,7 +1026,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
             materialService.save(waste);
         }
-
     }
 
     @Test
@@ -845,7 +1035,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(HttpStatus.OK.value());
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -874,7 +1064,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -904,7 +1094,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
@@ -963,22 +1153,24 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User user = userService.findByEmail("alexander.brox@ngn.no");
 
-        MaterialPrice materialPrice = getMaterialPriceRepository().findByMaterialNumber("119901");
+        String materialNumber = "119901";
+        MaterialPrice materialPrice = getMaterialPriceRepository().findByMaterialNumber(materialNumber);
+
+        String salesOfficeNumber = "100";
 
         if(materialPrice == null) {
-            materialPrice = MaterialPrice.builder()
-                    .materialNumber("119901")
+            materialPrice = MaterialPrice.builder("100", salesOfficeNumber, materialNumber, null, "01")
                     .standardPrice(1199.0)
                     .build();
         }
 
         Material material = Material.builder()
-                .materialNumber("119901")
+                .materialNumber(materialNumber)
                 .materialStandardPrice(materialPrice)
                 .build();
 
@@ -989,8 +1181,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .build();
         List<PriceRow> materials = new LinkedList<>();
         materials.add(priceRow);
+
         SalesOffice salesOffice = SalesOffice.builder()
-                .salesOffice("100")
+                .salesOffice(salesOfficeNumber)
                 .materialList(materials)
                 .build();
         List<SalesOffice> salesOffices = new LinkedList<>();
@@ -1016,14 +1209,13 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         String materialNumber = "50301";
         String deviceType = "B-0040-FO";
 
-        MaterialPrice materialPrice = MaterialPrice.builder()
-                .materialNumber(materialNumber)
+        MaterialPrice materialPrice = MaterialPrice.builder("100", "100", materialNumber, deviceType, null)
                 .standardPrice(175.0)
                 .pricingUnit(1)
                 .quantumUnit("ST")
@@ -1083,7 +1275,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
 
-        HttpResponse<String> response = createResponse();
+        HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
         User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
@@ -1094,36 +1286,20 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
 
-        if(powerOfAttorney == null) {
-            powerOfAttorney = PowerOfAttorney.builder()
-                    .salesOffice(104)
-                    .salesOfficeName("Skien")
-                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
-                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
-                    .dangerousWasteHolder(dangerousWasteHolder)
-                    .build();
-            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
-        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
-                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
-            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
-            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
-            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
-
-            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
-        }
+        createPowerOfAttorney(powerOfAttorney, ordinaryWasteHolder, ordinaryWasteHolderLvl2, dangerousWasteHolder);
 
         String salesOrg = "100";
         String salesOffice = "104";
+        String materialNumber = "159904";
         Material normalWaste = Material.builder()
-                .materialNumber("159904")
+                .materialNumber(materialNumber)
                 .salesOffice(salesOffice)
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, null)
                                 .standardPrice(170.0)
                                 .pricingUnit(1)
-                                .materialNumber("159904")
                                 .quantumUnit("ST")
                                 .build())
                 .designation("Degaussing harddisker")
@@ -1141,10 +1317,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .salesOrg(salesOrg)
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder("100", "100", "70120015", null, null)
                                 .standardPrice(16566.0)
                                 .pricingUnit(1000)
-                                .materialNumber("70120015")
                                 .quantumUnit("KG")
                                 .build())
                 .designation("Ikke refunderbar spillolje,Småemb")
@@ -1162,11 +1337,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 .deviceType("B-0-S")
                 .pricingUnit(1)
                 .materialStandardPrice(
-                        MaterialPrice.builder()
+                        MaterialPrice.builder("100", "100", "50301", "B-0-S", null)
                                 .standardPrice(13.00)
                                 .pricingUnit(1)
-                                .materialNumber("50301")
-                                .deviceType("B-0-S")
                                 .quantumUnit("ST")
                                 .build())
                 .designation("Flatvogn - Utsett")
@@ -1204,6 +1377,196 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         PriceOffer actual = service.save(priceOffer);
 
         assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+    }
+
+    @Test
+    public void shouldSetPriceOfferStatusBackToPendingWhenDiscountLevelIsSetToHighestPossibleLevel() throws JsonProcessingException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        List<DiscountLevel> discountLevels = Arrays.asList(
+                DiscountLevel.builder(0.0, 1).build(),
+                DiscountLevel.builder(5.0, 2).build(),
+                DiscountLevel.builder(10.0, 3).build(),
+                DiscountLevel.builder(15.0, 4).build(),
+                DiscountLevel.builder(20.0, 5).build()
+        );
+        when(discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn("100", "104", Collections.singletonList("159904"))).thenReturn(Collections.singletonList(Discount.builder("100", "104", "159904", 170.0, discountLevels).build()));
+
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromUriString("http://test.com");
+        HttpRequest request = HttpRequest.newBuilder().uri(urlBuilder.build().toUri()).build();
+
+        doReturn(request).when(sapHttpClient).createGetRequest(anyString(), any());
+
+        HttpResponse<String> response = createResponse(200);
+        when(sapHttpClient.getResponse(request)).thenReturn(response);
+
+        User dangerousWasteHolder = userService.findByEmail("alexander.brox@ngn.no");
+        User ordinaryWasteHolder = userService.findByEmail("Eirik.Flaa@ngn.no");
+        User ordinaryWasteHolderLvl2 = userService.findByEmail("kjetil.torvund.minde@ngn.no");
+
+        User salesConsultant = userService.findByEmail("birte.sundmo@ngn.no");
+
+        PowerOfAttorney powerOfAttorney = salesOfficePowerOfAttorneyService.findBySalesOffice(104);
+
+        createPowerOfAttorney(powerOfAttorney, ordinaryWasteHolder, ordinaryWasteHolderLvl2, dangerousWasteHolder);
+
+        String salesOrg = "100";
+        String salesOffice = "104";
+        Material normalWaste = Material.builder()
+                .materialNumber("159904")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder(salesOrg, salesOffice, "159904", null, null)
+                                .standardPrice(170.0)
+                                .pricingUnit(1)
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Degaussing harddisker")
+                .build();
+
+        PriceRow normalWasteRow = PriceRow.builder()
+                .material(normalWaste)
+                .standardPrice(170.0)
+                .discountLevel(2)
+                .needsApproval(false)
+                .build();
+        Material dangerousWaste = Material.builder()
+                .materialNumber("70120015")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder(salesOrg, salesOffice, "70120015", null, null)
+                                .standardPrice(16566.0)
+                                .pricingUnit(1000)
+                                .quantumUnit("KG")
+                                .build())
+                .designation("Ikke refunderbar spillolje,Småemb")
+                .build();
+        PriceRow dangerousWasteRow = PriceRow.builder()
+                .material(dangerousWaste)
+                .standardPrice(16566.0)
+                .needsApproval(false)
+                .build();
+
+        Material deviceType = Material.builder()
+                .materialNumber("50301")
+                .salesOffice(salesOffice)
+                .salesOrg(salesOrg)
+                .deviceType("B-0-S")
+                .pricingUnit(1)
+                .materialStandardPrice(
+                        MaterialPrice.builder(salesOrg, salesOffice, "50301", "B-0-S", null)
+                                .standardPrice(13.00)
+                                .pricingUnit(1)
+                                .materialNumber("50301")
+                                .deviceType("B-0-S")
+                                .quantumUnit("ST")
+                                .build())
+                .designation("Flatvogn - Utsett")
+                .build();
+
+        PriceRow deviceTypeRow = PriceRow.builder()
+                .material(deviceType)
+                .standardPrice(13.00)
+                .needsApproval(false)
+                .build();
+
+        SalesOffice salesOffice1 = SalesOffice.builder()
+                .salesOrg(salesOrg)
+                .salesOffice(salesOffice)
+                .salesOfficeName("Skien")
+                .materialList(List.of(
+                        normalWasteRow,
+                        dangerousWasteRow,
+                        deviceTypeRow
+                ))
+                .build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesConsultant)
+                .salesOfficeList(List.of(salesOffice1))
+                .needsApproval(false)
+                .build();
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        String json = objectToJson(priceOffer);
+
+        PriceOffer updatedPriceOffer = jsonToObject(json, PriceOffer.class);
+
+        PriceRow priceRow = updatedPriceOffer.getSalesOfficeList().get(0).getMaterialList().get(0);
+        priceRow.setNeedsApproval(true);
+        priceRow.setDiscountLevel(null);
+        priceRow.setManualPrice(1.0);
+
+        PriceOffer actual = service.save(updatedPriceOffer);
+
+        assertThat(actual.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+        assertThat(actual.getApprover(), is(ordinaryWasteHolderLvl2));
+    }
+
+    @Test
+    public void shouldApprovePriceOffer() throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(Objects.requireNonNull(classLoader.getResource("price_offers/218.json")).getFile());
+
+        assertThat(file.exists(), is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        assertThat("JSON is empty", json, not(emptyOrNullString()));
+
+        JSONObject results = new JSONObject(json);
+
+        ObjectMapper om = getObjectMapper();
+
+        PriceOfferDTO priceOfferDTO = om.readValue(results.toString(), PriceOfferDTO.class);
+
+        PriceOffer priceOffer = new ModelMapperV2Config().modelMapperV2(materialService, getSalesRoleRepository()).map(priceOfferDTO, PriceOffer.class);
+
+        User approver = userService.findByEmail(priceOffer.getApprover().getEmail());
+
+        if(approver == null) {
+            approver = getUserRepository().save(approver);
+        }
+        priceOffer.setApprover(approver);
+
+        User salesEmployee = userService.findByEmail(priceOffer.getSalesEmployee().getEmail());
+
+        if(salesEmployee == null) {
+            salesEmployee = getUserRepository().save(salesEmployee);
+        }
+        priceOffer.setSalesEmployee(salesEmployee);
+        priceOffer.setNeedsApproval(true);
+
+        priceOffer = priceOfferRepository.save(priceOffer);
+
+        Boolean approveResult = service.approvePriceOffer(priceOffer.getId(), approver.getId(), PriceOfferStatus.APPROVED.getStatus(), null);
+
+        assertThat(approveResult, is(true));
+    }
+
+    private void createPowerOfAttorney(PowerOfAttorney powerOfAttorney, User ordinaryWasteHolder, User ordinaryWasteHolderLvl2, User dangerousWasteHolder) {
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(104)
+                    .salesOfficeName("Skien")
+                    .ordinaryWasteLvlOneHolder(ordinaryWasteHolder)
+                    .ordinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2)
+                    .dangerousWasteHolder(dangerousWasteHolder)
+                    .build();
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        } else if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null ||
+                powerOfAttorney.getOrdinaryWasteLvlOneHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlOneHolder(ordinaryWasteHolder);
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(ordinaryWasteHolderLvl2);
+            powerOfAttorney.setDangerousWasteHolder(dangerousWasteHolder);
+
+            salesOfficePowerOfAttorneyService.save(powerOfAttorney);
+        }
     }
 
     private void prepareUsersAndSalesRoles() {

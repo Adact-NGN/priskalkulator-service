@@ -77,7 +77,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             },
             {
               "material": "50102",
@@ -96,7 +97,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             },
             {
               "material": "50103",
@@ -115,7 +117,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             },
             {
               "material": "50104",
@@ -134,7 +137,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             },
             {
               "material": "50105",
@@ -153,7 +157,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             },
             {
               "material": "50201",
@@ -172,7 +177,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000002"
             }
           ]
         },
@@ -201,7 +207,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             },
             {
               "material": "50102",
@@ -220,7 +227,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             },
             {
               "material": "50103",
@@ -239,7 +247,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             },
             {
               "material": "50104",
@@ -258,7 +267,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             },
             {
               "material": "50105",
@@ -277,7 +287,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             },
             {
               "material": "50201",
@@ -296,7 +307,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000003"
             }
           ]
         },
@@ -325,7 +337,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             },
             {
               "material": "50102",
@@ -344,7 +357,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             },
             {
               "material": "50103",
@@ -363,7 +377,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             },
             {
               "material": "50104",
@@ -382,7 +397,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             },
             {
               "material": "50105",
@@ -401,7 +417,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             },
             {
               "material": "50201",
@@ -420,7 +437,8 @@
               "classDescription": "",
               "pricingUnit": "1",
               "quantumUnit": "ST",
-              "needsApproval": false
+              "needsApproval": false,
+              "salesZone": "0000000001"
             }
           ]
         }
