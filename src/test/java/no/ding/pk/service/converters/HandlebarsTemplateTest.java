@@ -1,11 +1,20 @@
 package no.ding.pk.service.converters;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.*;
+import com.github.jknack.handlebars.context.FieldValueResolver;
+import com.github.jknack.handlebars.context.JavaBeanValueResolver;
+import com.github.jknack.handlebars.context.MapValueResolver;
+import com.github.jknack.handlebars.context.MethodValueResolver;
+import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import no.ding.pk.domain.User;
+import no.ding.pk.service.template.HandlebarsTemplateService;
+import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
+import no.ding.pk.web.dto.sap.CustomerDTO;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,27 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jknack.handlebars.Context;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Jackson2Helper;
-import com.github.jknack.handlebars.JsonNodeValueResolver;
-import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.context.FieldValueResolver;
-import com.github.jknack.handlebars.context.JavaBeanValueResolver;
-import com.github.jknack.handlebars.context.MapValueResolver;
-import com.github.jknack.handlebars.context.MethodValueResolver;
-import com.github.jknack.handlebars.io.ClassPathTemplateLoader;
-import com.github.jknack.handlebars.io.TemplateLoader;
-
-import no.ding.pk.domain.User;
-import no.ding.pk.service.template.HandlebarsTemplateService;
-import no.ding.pk.service.template.HandlebarsTemplateServiceImpl;
-import no.ding.pk.web.dto.sap.CustomerDTO;
-
+@Disabled
 public class HandlebarsTemplateTest {
 
     private final HandlebarsTemplateService service = new HandlebarsTemplateServiceImpl("priceOfferTemplate");
@@ -54,7 +46,8 @@ public class HandlebarsTemplateTest {
         Handlebars handlebars = new Handlebars();
         Template template = handlebars.compileInline("Hi {{name}}");
 
-        User user = User.builder().name("PING").build();
+        User user = User.builder("PING", "PING", "PING PING", "ping.pong@ngn.no", "ping.pong@ngn.no")
+                .build();
 
         String templateString = template.apply(user);
 

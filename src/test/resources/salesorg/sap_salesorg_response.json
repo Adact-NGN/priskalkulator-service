@@ -1,0 +1,14 @@
+{
+  "@odata.context": "$metadata#SalesorgPostal",
+  "@odata.metadataEtag": "W/\"20230828115643\"",
+  "value": [
+    {
+      "SalesOrganization": "100",
+      "PostalCode": "3933",
+      "SalesOffice": "104",
+      "SalesOfficeName": "Skien",
+      "SalesZone": "0000000002",
+      "City": "PORSGRUNN"
+    }
+  ]
+}

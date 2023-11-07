@@ -1,7 +1,6 @@
 create or replace table customer_terms
 (
-    id                                         bigint auto_increment
-        primary key,
+    id                                         bigint auto_increment primary key,
     created_by                                 varchar(25)                             null,
     create_date_time                           timestamp default '2021-06-10 20:47:05' null,
     modified_by                                varchar(25)                             null,

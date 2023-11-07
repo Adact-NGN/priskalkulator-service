@@ -1,13 +1,21 @@
 package no.ding.pk.service;
 
 import no.ding.pk.config.SchedulingTestConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
+import no.ding.pk.repository.bo.ConditionCodeRepository;
+import no.ding.pk.repository.bo.KeyCombinationRepository;
+import no.ding.pk.repository.offer.PriceOfferTermsRepository;
 import no.ding.pk.service.cache.InMemory3DCache;
-
+import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.utils.LocalJSONUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.kie.api.runtime.KieContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -23,8 +31,29 @@ import static org.hamcrest.Matchers.is;
 @Tag("unittest")
 @ActiveProfiles({ "test", "unit-test" })
 @TestPropertySource(properties = {"cache.max.amount.items=5000"})
-@SpringJUnitConfig({SchedulingTestConfig.class})
+@SpringJUnitConfig({SchedulingTestConfig.class, ModelMapperV2Config.class})
 public class MaterialInMemory3DCacheTest {
+
+    @MockBean
+    private SalesOfficePowerOfAttorneyRepository sopoaRepository;
+
+    @MockBean
+    private LocalJSONUtils localJSONUtils;
+
+    @MockBean
+    private ConditionCodeRepository conditionCodeRepository;
+
+    @MockBean
+    private KeyCombinationRepository keyCombinationRepository;
+
+    @MockBean
+    private PriceOfferTermsRepository priceOfferTermsRepository;
+
+    @MockBean
+    private SapMaterialService sapMaterialService;
+
+    @MockBean
+    private KieContainer kieContainer;
 
     @Autowired
     private InMemory3DCache<String, String, String> cache;

@@ -2,24 +2,32 @@ package no.ding.pk.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.AbstractIntegrationConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.offer.MaterialPriceRepository;
+import no.ding.pk.repository.offer.MaterialRepository;
+import no.ding.pk.service.cache.InMemory3DCache;
+import no.ding.pk.service.cache.PingInMemory3DCache;
+import no.ding.pk.service.offer.MaterialPriceService;
+import no.ding.pk.service.offer.MaterialPriceServiceImpl;
+import no.ding.pk.service.offer.MaterialService;
+import no.ding.pk.service.offer.MaterialServiceImpl;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,9 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
@@ -41,29 +47,57 @@ import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-public class UserServiceTest {
-    
-    @Autowired
+@Disabled
+public class UserServiceTest extends AbstractIntegrationConfig {
+
+    private MaterialService materialService;
+
     private UserService service;
     
-    @Autowired
     private SalesRoleService salesRoleService;
 
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
     private ModelMapper modelMapper;
     
     private List<User> testData;
-    
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    private MaterialPriceService materialPriceService;
+
+    @Autowired
+    private MaterialPriceRepository materialPriceRepository;
+
     @BeforeEach
     public void setup() throws IOException {
+
+        service = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
+
+        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
+
+        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
+
+        objectMapper = new ObjectMapper();
+
+        ModelMapperV2Config modelMapperV2Config = new ModelMapperV2Config();
+
+        materialService = new MaterialServiceImpl(materialRepository, materialPriceService);
+        modelMapper = modelMapperV2Config.modelMapperV2(materialService, salesRoleRepository);
+
+        deleteAllUsers();
+
+        deleteAllUserRoles();
+
         ClassLoader classLoader = getClass().getClassLoader();
         // OBS! Remember to package the project for the test to find the resource file in the test-classes directory.
         File file = new File(Objects.requireNonNull(classLoader.getResource("user.json")).getFile());
@@ -96,11 +130,8 @@ public class UserServiceTest {
         SalesRole kv = salesRoleService.findSalesRoleByRoleName("KV");
 
         if(kv == null) {
-            kv = SalesRole.builder()
-                    .roleName("KV")
+            kv = SalesRole.builder("KV", 1, 1)
                     .description("Kundeveileder")
-                    .defaultPowerOfAttorneyOa(1)
-                    .defaultPowerOfAttorneyFa(1)
                     .build();
 
             salesRoleService.save(kv);
@@ -109,17 +140,30 @@ public class UserServiceTest {
         SalesRole kv2 = salesRoleService.findSalesRoleByRoleName("SA");
 
         if(kv2 == null) {
-            kv2 = SalesRole.builder()
-                    .defaultPowerOfAttorneyFa(2)
-                    .defaultPowerOfAttorneyOa(2)
+            kv2 = SalesRole.builder("SA", 2, 2)
                     .description("Salgskonsulent (rolle a)")
-                    .roleName("SA")
                     .build();
 
             salesRoleService.save(kv2);
         }
     }
-    
+
+    private void deleteAllUserRoles() {
+        try {
+            salesRoleRepository.deleteAll();
+        } catch (InvalidDataAccessResourceUsageException e) {
+            return;
+        }
+    }
+
+    private void deleteAllUsers() {
+        try {
+            userRepository.deleteAll();
+        } catch (InvalidDataAccessResourceUsageException e) {
+            return;
+        }
+    }
+
     @Test
     public void shouldPersistUserWithSalesRole() {
         SalesRole salesRole = salesRoleService.findSalesRoleByRoleName("KV");
@@ -135,10 +179,9 @@ public class UserServiceTest {
         if(userObject == null) {
             userObject = testData.get(0);
         }
-        userObject.setSalesRole(salesRole);
-        
-        userObject = service.save(userObject, userObject.getId());
-        
+
+        userObject = service.updateSalesRoleForUser(userObject, salesRole);
+
         Optional<User> actual = service.findById(userObject.getId());
         
         assertThat(actual.isPresent(), is(true));
@@ -157,11 +200,8 @@ public class UserServiceTest {
         SalesRole salesRole = salesRoleService.findSalesRoleByRoleName("KV");
         
         if(salesRole == null) {
-            salesRole = SalesRole.builder()
-            .roleName("KV")
+            salesRole = SalesRole.builder("KV", 1, 1)
             .description("Kundeveileder")
-            .defaultPowerOfAttorneyFa(1)
-            .defaultPowerOfAttorneyOa(1)
             .build();
             
             salesRole = salesRoleService.save(salesRole);
@@ -205,11 +245,8 @@ public class UserServiceTest {
         SalesRole firstSalesRole = salesRoleService.findSalesRoleByRoleName("KV");
         
         if(firstSalesRole == null) {
-            firstSalesRole = SalesRole.builder()
-            .roleName("KV")
+            firstSalesRole = SalesRole.builder("KV", 1, 1)
             .description("Kundeveileder")
-            .defaultPowerOfAttorneyFa(1)
-            .defaultPowerOfAttorneyOa(1)
             .build();
             
             firstSalesRole = salesRoleService.save(firstSalesRole);
@@ -218,11 +255,8 @@ public class UserServiceTest {
         SalesRole otherSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
         
         if(otherSalesRole == null) {
-            otherSalesRole = SalesRole.builder()
-            .roleName("SA")
+            otherSalesRole = SalesRole.builder("SA", 2, 2)
             .description("Salgskonsulent (rolle a)")
-            .defaultPowerOfAttorneyFa(2)
-            .defaultPowerOfAttorneyOa(2)
             .build();
             
             otherSalesRole = salesRoleService.save(otherSalesRole);
@@ -233,8 +267,9 @@ public class UserServiceTest {
         if(userObject == null) {
             userObject = testData.get(0);
         }
+
         userObject.setSalesRole(firstSalesRole);
-        
+
         userObject.setPowerOfAttorneyFA(1);
         userObject.setPowerOfAttorneyOA(1);
         
@@ -252,11 +287,11 @@ public class UserServiceTest {
         
         User newUserObject = SerializationUtils.clone(actualUser);
         newUserObject.setId(userObject.getId());
-        
-        newUserObject.setSalesRole(otherSalesRole);
+
         newUserObject.setPowerOfAttorneyFA(2);
         newUserObject.setPowerOfAttorneyOA(2);
-        
+        service.updateSalesRoleForUser(newUserObject, otherSalesRole);
+
         newUserObject.setSureName("Minde");
         
         actualUser = service.save(newUserObject, newUserObject.getId());

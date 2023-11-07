@@ -27,12 +27,18 @@ public class PriceRow extends Auditable {
     private Double customerPrice;
 
     @Column
-    private Double discountPct;
+    private Double discountLevelPct;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
     @JoinColumn(name = "material_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "Fk_priceRow_material"))
     private Material material;
+
+    @Column
+    private String deviceType;
+
+    @Column
+    private String devicePlacement;
 
     @Column
     private Boolean showPriceInOffer;
@@ -77,6 +83,9 @@ public class PriceRow extends Auditable {
     @Column
     private String classDescription; // "
 
+    @Column
+    private String salesZone;
+
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
@@ -88,16 +97,11 @@ public class PriceRow extends Auditable {
     }
 
     public Boolean getNeedsApproval() {
-
         return needsApproval != null && needsApproval;
     }
 
-    public Boolean getApproved() {
+    public Boolean isApproved() {
         return approved != null && approved;
-    }
-
-    public boolean isApproved() {
-        return getApproved();
     }
 
     @Override
@@ -109,7 +113,7 @@ public class PriceRow extends Auditable {
                 "lastModifiedBy = " + lastModifiedBy + ", " +
                 "lastModifiedDate = " + lastModifiedDate + ", " +
                 "customerPrice = " + customerPrice + ", " +
-                "discountPct = " + discountPct + ", " +
+                "discountPct = " + discountLevelPct + ", " +
                 "material = " + material + ", " +
                 "showPriceInOffer = " + showPriceInOffer + ", " +
                 "manualPrice = " + manualPrice + ", " +

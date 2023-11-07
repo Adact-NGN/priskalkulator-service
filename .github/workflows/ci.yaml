@@ -6,14 +6,6 @@ on:
       - develop
     types:
       - closed
-#  pull_request_review:
-#    types:
-#      - submitted
-#  pull_request:
-#    branches:
-#      - develop
-#    types:
-#      - closed
 
 jobs:
   if_merged:
@@ -54,23 +46,9 @@ jobs:
           echo "New version: $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT 
 
-      #      - name: Update Kustomize Version
-      #        run: |
-      #          previous_version=${{ steps.get_previous_version.outputs.previous_version }}
-      #          new_version=${{ steps.increment_version.outputs.new_version }}
-      #          echo "New version: $new_version"
-      #          less manifests/dev/kustomization.yaml
-      #          sed -i "s/$previous_version/$new_version/g" manifests/dev/kustomization.yaml
-      #          less manifests/dev/kustomization.yaml
-
-      - uses: actions/checkout@v3
-        if: steps.increment_version.outcome == 'success'
-        id: checkout_code
-        with:
-          token: ${{ secrets.TOKEN_GITHUB_ACTION }}
       - name: Bump Version
-        if: steps.checkout_code.outcome == 'success'
         id: bump_version
+        if: steps.increment_version.outcome == 'success'
         working-directory: manifests/dev/
         run: |
           previous_version=${{ steps.get_previous_version.outputs.previous_version }}
@@ -105,48 +83,9 @@ jobs:
           git push origin ${{ steps.increment_version.outputs.new_version }}
 
       - name: Create and push Release
-        if: steps.commit_n_push.create_tag == 'success'
+        if: steps.create_tag.outcome == 'success'
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --release
-
-#      - name: Create Draft Release
-#        if: steps.commit_n_push.outcome == 'success'
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ steps.increment_version.outputs.new_version }}
-#          release_name: ${{ steps.increment_version.outputs.new_version }}
-#          draft: true
-#          prerelease: false
-
-#      - uses: actions/upload-release-asset@v1.0.1
-#        if: steps.create_release.outcome == 'success'
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: ./${{ steps.increment_version.outputs.new_version }}.zip
-#          asset_name: ${{ steps.increment_version.outputs.new_version }}.zip
-#          asset_content_type: application/zip
-
-#      - uses: eregon/publish-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          release_id: ${{ steps.create_release.outputs.id }}
-
-#      - name: Create release
-#        if: steps.commit_n_push.outcome == 'success'
-#        uses: avakar/tag-and-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ steps.increment_version.outputs.new_version }}
-##          release_name: ${{ steps.increment_version.outputs.new_version }}
-#          body: |
-#            Created release ${{ steps.increment_version.outputs.new_version }}
+          gh release create ${{ steps.increment_version.outputs.new_version }} --title "${{ steps.increment_version.outputs.new_version }}" --latest

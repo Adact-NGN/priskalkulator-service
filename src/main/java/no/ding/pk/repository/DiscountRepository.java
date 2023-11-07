@@ -11,15 +11,18 @@ import java.util.List;
 
 @Repository
 public interface DiscountRepository extends JpaRepository<Discount, Long>, JpaSpecificationExecutor<Discount>  {
-    Discount findBySalesOrgAndMaterialNumberAndZone(String salesOrg, String materialNumber, String zone);
+//    @Query("select d from Discount d where d.salesOrg = :salesOrg and d.materialNumber = :materialNumber and d.discountLevels")
+    Discount findBySalesOrgAndMaterialNumberAndDiscountLevelsZone(@Param("salesOrg") String salesOrg, @Param("materialNumber") String materialNumber, @Param("zone") Integer zone);
 
-    @Query("select distinct d from Discount d where d.salesOrg = :salesOrg")
     List<Discount> findAllBySalesOrg(@Param("salesOrg") String salesOrg);
 
-    List<Discount> findAllBySalesOrgAndZoneIsNullAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers);
+    List<Discount> findAllBySalesOrgAndDiscountLevelsZoneIsNullAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers);
 
-    @Query("select distinct d from Discount d where d.salesOrg = :salesOrg and d.zone = :zone and d.materialNumber in :materialNumbers")
-    List<Discount> findAllBySalesOrgAndMaterialNumberAndZoneInListQuery(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers, @Param("zone") String zone);
+//    @Query("select distinct d from Discount d where d.salesOrg = :salesOrg and d.zone = :zone and d.materialNumber in :materialNumbers")
+    List<Discount> findAllBySalesOrgAndMaterialNumberInAndDiscountLevelsZone(@Param("salesOrg") String salesOrg, @Param("materialNumbers") List<String> materialNumbers, @Param("zone") Integer zone);
 
-    List<Discount> findAllBySalesOrgAndSalesOfficeAndZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("salesOffice") String salesOffice, @Param("zones") List<String> zones, @Param("materialNumbers") List<String> materialNumbers);
+    @Query("select distinct d from Discount as d inner join d.discountLevels as dl where d.salesOffice = :salesOffice and d.salesOrg = :salesOrg and dl.zone in :zones and d.materialNumber in :materialNumbers")
+    List<Discount> findAllBySalesOrgAndSalesOfficeAndDiscountLevelsZoneInAndMaterialNumberIn(@Param("salesOrg") String salesOrg, @Param("salesOffice") String salesOffice, @Param("zones") List<Integer> zones, @Param("materialNumbers") List<String> materialNumbers);
+
+    List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
 }

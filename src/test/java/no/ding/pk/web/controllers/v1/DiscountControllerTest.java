@@ -1,13 +1,14 @@
 package no.ding.pk.web.controllers.v1;
 
 import no.ding.pk.domain.Discount;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.jdbc.SqlMergeMode;
@@ -19,12 +20,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 
+@Disabled("Move all test scenarios to service")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("/h2-db.properties")
+//@TestPropertySource("/h2-db.properties")
+@ActiveProfiles("unittest")
 @SqlConfig(commentPrefix = "#")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
-@Sql(value = {"/discout_db_scripts/drop_schema.sql", "/discout_db_scripts/create_schema.sql"})
-@Sql(value = {"/discout_db_scripts/discount_matrix.sql", "/discout_db_scripts/discount_levels.sql"})
+@Sql(value = {"classpath:discount_db_scripts/drop_schema.sql", "classpath:discount_db_scripts/create_schema.sql"})
+@Sql(value = {"classpath:discount_db_scripts/tiny_discount_matrix.sql", "classpath:discount_db_scripts/tiny_discount_levels.sql"})
 public class DiscountControllerTest {
 
     @LocalServerPort
@@ -58,8 +61,10 @@ public class DiscountControllerTest {
 
         Map<String, String> params = new HashMap<>();
         params.put("materialNumbers", materials);
+        params.put("serverPort", String.valueOf(serverPort));
+        params.put("salesOffice", salesOffice);
 
-        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/discount/in-list/100?salesOffice=" + salesOffice + "&materialNumbers={materialNumbers}&zones=", Discount[].class, params);
+        ResponseEntity<Discount[]> responseEntity = this.restTemplate.getForEntity("http://localhost:{serverPort}/api/v1/discount/in-list/100?salesOffice={salesOffice}&materialNumbers={materialNumbers}&zones=", Discount[].class, params);
 
         assertThat(responseEntity.getBody(), arrayWithSize(greaterThan(0)));
     }

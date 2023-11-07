@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Transactional
@@ -134,9 +135,37 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public User updateSalesRoleForUser(User user, SalesRole salesRole) {
+		if(user.getSalesRole() == null) {
+			salesRole.addUser(user);
+
+			return repository.save(user);
+		}
+
+		if(userHasRole(user.getSalesRole(), salesRole)) {
+			return user;
+		} else {
+			user = removeSalesRoleFromUser(user);
+
+			salesRole.addUser(user);
+
+			return repository.save(user);
+		}
+	}
+
+	private boolean userHasRole(SalesRole userRole, SalesRole salesRole) {
+		return Objects.equals(userRole, salesRole);
+	}
+
+	@Override
 	public User findByEmail(String employeeEail) {
 		log.debug("Search for User with email: {}", employeeEail);
 		return repository.findByEmailIgnoreCase(employeeEail);
 	}
-	
+
+	@Override
+	public List<User> findByEmailInList(List<String> emails) {
+		return repository.findAllByEmailIn(emails);
+	}
+
 }

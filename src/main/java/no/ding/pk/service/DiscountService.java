@@ -23,8 +23,13 @@ public interface DiscountService {
 
     List<Discount> findAllBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg, String salesOffice, String materialNumber, String zone);
 
-    List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String materialNumber,
-            Integer level);
+    List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String salesOffice, String materialNumber,
+                                                                                      Integer level, Integer zone);
 
-    List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndMaterialNumber(String salesOrg, String materialNumbers, String zone);
+    List<DiscountLevel> findAllDiscountLevelsForDiscountBySalesOrgAndSalesOfficeAndMaterialNumber(String salesOrg,
+                                                                                                  String salesOffice,
+                                                                                                  String materialNumbers, String zone);
+
+    List<Discount> findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials);
+
 }

@@ -4,7 +4,9 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Join;
+import java.util.List;
 
 public class ApprovalSpecifications {
     public static Specification<PriceOffer> withPriceOfferStatus(String priceOfferStatus) {
@@ -37,6 +39,33 @@ public class ApprovalSpecifications {
             return (root, query, criteriaBuilder) -> {
                 Join<PriceOffer, User> priceOfferApprover = root.join("approver");
                 return criteriaBuilder.equal(priceOfferApprover.get("id"), id);
+            };
+        }
+    }
+
+    public static Specification<PriceOffer> withSalesEmployeeId(Long id) {
+        if(id == null) {
+            return null;
+        } else {
+            return (root, query, criteriaBuilder) -> {
+                Join<PriceOffer, User> priceOfferSalesEmployee = root.join("salesEmployee");
+                return criteriaBuilder.equal(priceOfferSalesEmployee.get("id"), id);
+            };
+        }
+    }
+
+    public static Specification<PriceOffer> withPriceOfferStatusInList(List<String> statusList) {
+        if(statusList == null) {
+            return null;
+        } else {
+            return (root, query, criteriaBuilder) -> {
+                CriteriaBuilder.In<String> inClause = criteriaBuilder.in(root.get("priceOfferStatus"));
+
+                for(String status : statusList) {
+                    inClause.value(status);
+                }
+
+                return inClause;
             };
         }
     }

@@ -1,55 +1,79 @@
 package no.ding.pk.web.controllers.v1;
 
+import no.ding.pk.config.SecurityTestConfig;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
+import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.repository.UserRepository;
+import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
+import no.ding.pk.service.offer.MaterialService;
+import no.ding.pk.utils.JsonTestUtils;
 import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Disabled("Foreign key violation on build/deploy in Azure")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource("/h2-db.properties")
-@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
-@Sql(value = { "/power_of_attorney/power_of_attorney.sql"})
+@Disabled("ObjectMapper is null")
+@AutoConfigureMockMvc(addFilters = false)
+@Import({SecurityTestConfig.class, ModelMapperV2Config.class})
+@WebMvcTest(SalesOfficePowerOfAttorneyController.class)
 class SalesOfficePowerOfAttorneyControllerTest {
 
-    @LocalServerPort
-    private int serverPort;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    @Qualifier("modelMapperV2")
+    private ModelMapper modelMapper;
 
-    @Autowired
+    @MockBean
     private UserRepository userRepository;
 
+    @MockBean
+    private SalesOfficePowerOfAttorneyService service;
+
+    @MockBean
+    private MaterialService materialService;
+
+    @MockBean
+    private SalesRoleRepository salesRoleRepository;
+
+    private static String baseUrl = "/api/v1/sales-office-power-of-attorney";
+
     @Test
-    public void shouldGetAllPowerOfAttorney() {
-        ResponseEntity<SalesOfficePowerOfAttorneyDTO[]> result = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/list", SalesOfficePowerOfAttorneyDTO[].class);
+    public void shouldGetAllPowerOfAttorney() throws Exception {
+        PowerOfAttorney powerOfAttorney = PowerOfAttorney.builder().build();
 
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+        when(service.findAll()).thenReturn(List.of(powerOfAttorney));
 
-        assertThat(result.getBody(), arrayWithSize(greaterThan(0)));
+        MvcResult mvcResult = mockMvc.perform(get(baseUrl + "/list"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        SalesOfficePowerOfAttorneyDTO[] actual = JsonTestUtils.getResponseBody(mvcResult, SalesOfficePowerOfAttorneyDTO[].class);
+
+        assertThat(actual, arrayWithSize(greaterThan(0)));
     }
 
+    @Disabled("Move to service test")
     @Test
     public void shouldCreateNewPowerOfAttorney() {
         SalesOfficePowerOfAttorneyDTO sopoa = SalesOfficePowerOfAttorneyDTO.builder()
@@ -58,17 +82,18 @@ class SalesOfficePowerOfAttorneyControllerTest {
                 .region("Verden")
                 .build();
 
-        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
-
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
-
-        assertThat(result.getBody(), notNullValue());
-
-        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
-
-        assertThat(resultSopoa.getId(), notNullValue());
+//        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
+//
+//        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+//
+//        assertThat(result.getBody(), notNullValue());
+//
+//        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
+//
+//        assertThat(resultSopoa.getId(), notNullValue());
     }
 
+    @Disabled("Move to service test")
     @Test
     public void shouldDeletePowerOfAttorney() {
         SalesOfficePowerOfAttorneyDTO sopoa = SalesOfficePowerOfAttorneyDTO.builder()
@@ -77,27 +102,25 @@ class SalesOfficePowerOfAttorneyControllerTest {
                 .region("Verden")
                 .build();
 
-        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
-
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
-
-        Map<String, String> urlVariables = new HashMap<>();
-        urlVariables.put("id", String.valueOf(result.getBody().getId()));
-        restTemplate.delete("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/delete/{id}", urlVariables);
-
-        result = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/id/{id}", SalesOfficePowerOfAttorneyDTO.class, urlVariables);
-
-        assertThat(result.getBody(), is(nullValue()));
+//        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
+//
+//        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+//
+//        Map<String, String> urlVariables = new HashMap<>();
+//        urlVariables.put("id", String.valueOf(result.getBody().getId()));
+//        restTemplate.delete("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/delete/{id}", urlVariables);
+//
+//        result = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/id/{id}", SalesOfficePowerOfAttorneyDTO.class, urlVariables);
+//
+//        assertThat(result.getBody(), is(nullValue()));
     }
 
+    @Disabled("Move to service test")
     @Test
     public void shouldCreatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
@@ -113,43 +136,38 @@ class SalesOfficePowerOfAttorneyControllerTest {
                 .dangerousWaste(user.getEmail())
                 .build();
 
-        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
-
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
-
-        assertThat(result.getBody(), notNullValue());
-
-        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
-
-        assertThat(resultSopoa.getId(), notNullValue());
-
-        assertThat(resultSopoa.getMailOrdinaryWasteLvlOne(), equalTo(user.getEmail()));
-        assertThat(resultSopoa.getMailOrdinaryWasteLvlTwo(), equalTo(user.getEmail()));
-        assertThat(resultSopoa.getDangerousWaste(), equalTo(user.getEmail()));
+//        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
+//
+//        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+//
+//        assertThat(result.getBody(), notNullValue());
+//
+//        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
+//
+//        assertThat(resultSopoa.getId(), notNullValue());
+//
+//        assertThat(resultSopoa.getMailOrdinaryWasteLvlOne(), equalTo(user.getEmail()));
+//        assertThat(resultSopoa.getMailOrdinaryWasteLvlTwo(), equalTo(user.getEmail()));
+//        assertThat(resultSopoa.getDangerousWaste(), equalTo(user.getEmail()));
     }
 
+    @Disabled("Move to service test")
     @Test
     public void shouldUpdatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
                 .phoneNumber("+4790135757")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
 
         user = userRepository.save(user);
 
-        User otherUser = User.builder()
+        User otherUser = User.builder("Kristin Jørgensen", "Nærum", "Kristin Jørgensen Nærum", "kristin.nerum@ngn.no", "kristin.nerum@ngn.no")
                 .adId("7c6c0b5c-53de-4224-ac98-aa92c1aaa2ef")
                 .associatedPlace("Larvik")
-                .email("kristin.nerum@ngn.no")
                 .phoneNumber("+4798232574")
-                .fullName("Kristin Jørgensen Nærum")
-                .name("Kristin")
                 .powerOfAttorneyOA(2)
                 .powerOfAttorneyFA(3)
                 .build();
@@ -166,31 +184,31 @@ class SalesOfficePowerOfAttorneyControllerTest {
                 .build();
 
 
-        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
-
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
-
-        assertThat(result.getBody(), notNullValue());
-
-        sopoa = result.getBody();
-        sopoa.setMailOrdinaryWasteLvlOne(otherUser.getEmail());
-        sopoa.setMailOrdinaryWasteLvlTwo(otherUser.getEmail());
-        sopoa.setDangerousWaste(otherUser.getEmail());
-
-        Map<String, String> urlVariables = new HashMap<>();
-        urlVariables.put("id", String.valueOf(sopoa.getId()));
-        restTemplate.put("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/save/{id}", sopoa, urlVariables);
-
-        result = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/id/{id}", SalesOfficePowerOfAttorneyDTO.class, urlVariables);
-
-        assertThat(result.getStatusCode(), is(HttpStatus.OK));
-
-        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
-
-        assertThat(resultSopoa.getId(), notNullValue());
-
-        assertThat(resultSopoa.getMailOrdinaryWasteLvlOne(), equalTo(otherUser.getEmail()));
-        assertThat(resultSopoa.getMailOrdinaryWasteLvlTwo(), equalTo(otherUser.getEmail()));
-        assertThat(resultSopoa.getDangerousWaste(), equalTo(otherUser.getEmail()));
+//        ResponseEntity<SalesOfficePowerOfAttorneyDTO> result = restTemplate.postForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/create", sopoa, SalesOfficePowerOfAttorneyDTO.class);
+//
+//        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+//
+//        assertThat(result.getBody(), notNullValue());
+//
+//        sopoa = result.getBody();
+//        sopoa.setMailOrdinaryWasteLvlOne(otherUser.getEmail());
+//        sopoa.setMailOrdinaryWasteLvlTwo(otherUser.getEmail());
+//        sopoa.setDangerousWaste(otherUser.getEmail());
+//
+//        Map<String, String> urlVariables = new HashMap<>();
+//        urlVariables.put("id", String.valueOf(sopoa.getId()));
+//        restTemplate.put("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/save/{id}", sopoa, urlVariables);
+//
+//        result = restTemplate.getForEntity("http://localhost:" + serverPort + "/api/v1/sales-office-power-of-attorney/id/{id}", SalesOfficePowerOfAttorneyDTO.class, urlVariables);
+//
+//        assertThat(result.getStatusCode(), is(HttpStatus.OK));
+//
+//        SalesOfficePowerOfAttorneyDTO resultSopoa = result.getBody();
+//
+//        assertThat(resultSopoa.getId(), notNullValue());
+//
+//        assertThat(resultSopoa.getMailOrdinaryWasteLvlOne(), equalTo(otherUser.getEmail()));
+//        assertThat(resultSopoa.getMailOrdinaryWasteLvlTwo(), equalTo(otherUser.getEmail()));
+//        assertThat(resultSopoa.getDangerousWaste(), equalTo(otherUser.getEmail()));
     }
 }

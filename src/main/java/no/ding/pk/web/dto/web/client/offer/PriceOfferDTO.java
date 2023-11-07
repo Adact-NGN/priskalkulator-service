@@ -22,6 +22,11 @@ public class PriceOfferDTO {
     private String priceOfferStatus;
     private String customerNumber;
     private String customerName;
+    private String customerType;
+    private String streetAddress;
+    private String postalNumber;
+    private String city;
+    private String organizationNumber;
     private ContactPersonDTO contactPerson;
     private List<SalesOfficeDTO> salesOfficeList;
     private Date dateUpdated;
@@ -30,10 +35,12 @@ public class PriceOfferDTO {
     private Date approvalDate;
     private UserDTO approver;
     private Boolean needsApproval;
-    private String dismissalReason;
+    private String additionalInformation;
+    private String generalComment;
     private Date activationDate;
     private TermsDTO customerTerms;
     private Date dateIssued;
     private String createdBy;
     private String lastModifiedBy;
+    private UserDTO priceTeamUser;
 }

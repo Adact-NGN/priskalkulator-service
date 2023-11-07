@@ -10,7 +10,7 @@
       "name": "Skien",
       "materialList": [
         {
-          "discountPct": null,
+          "discountLevelPct": null,
           "material":  "111101",
           "priceLevel": 2,
           "priceLevelPrice": 0.1,
@@ -69,14 +69,15 @@
           "isStandardZone": true,
           "materialList": [
             {
-              "discountPct": null,
+              "discountLevelPct": null,
               "material": "50201",
               "materialDesignation": "Krok - Utsett",
               "priceLevel": 2,
               "priceLevelPrice": 0.1,
               "standardPrice": 1364,
               "priceIncMva": -1,
-              "discountLevel": 2
+              "discountLevel": 2,
+              "salesZone": "0000000002"
             }
           ]
         }

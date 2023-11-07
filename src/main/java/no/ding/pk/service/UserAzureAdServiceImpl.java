@@ -51,11 +51,42 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
     private final LocalJSONUtils localJSONUtils;
 
+//    @Value("${graph.url:https://graph.microsoft.com/v1.0}")
+//    public void setGraphBaseUrl(String graphBaseUrl) {
+//        log.debug("Setting graph url: " + graphBaseUrl);
+//        this.graphBaseUrl = graphBaseUrl;
+//    }
+
+//    @Value("${AD_USER_INFO_SELECT_LIST}")
+//    public void setAdUserInfoSelectList(String adUserInfoSelectList) {
+//        log.debug("Setting AD user info select list: " + adUserInfoSelectList);
+//        this.adUserInfoSelectList = adUserInfoSelectList;
+//    }
+
+//    @Value("${SCOPE}")
+//    public void setScope(String scope) {
+//        log.debug("Setting scope: " + scope);
+//        this.scope = scope;
+//    }
+
     @Autowired
     public UserAzureAdServiceImpl(ConfidentialClientApplication app,
                                   ObjectMapper objectMapper,
                                   MapperService mapperService,
-                                  LocalJSONUtils localJSONUtils) {
+                                  LocalJSONUtils localJSONUtils,
+                                  @Value("${graph.url:https://graph.microsoft.com/v1.0}") String graphBaseUrl,
+                                  @Value("${AD_USER_INFO_SELECT_LIST}") String adUserInfoSelectList,
+                                  @Value("${SCOPE}") String scope
+                                  ) {
+        log.debug("Setting graph url: " + graphBaseUrl);
+        this.graphBaseUrl = graphBaseUrl;
+
+        log.debug("Setting AD user info select list: " + adUserInfoSelectList);
+        this.adUserInfoSelectList = adUserInfoSelectList;
+
+        log.debug("Setting scope: " + scope);
+        this.scope = scope;
+
         this.app = app;
         this.objectMapper = objectMapper;
         this.mapperService = mapperService;
@@ -250,23 +281,5 @@ public class UserAzureAdServiceImpl implements UserAzureAdService {
 
             throw new RuntimeErrorException(new Error("Could not get Access token."));
         }
-    }
-
-    @Value("${graph.url:https://graph.microsoft.com/v1.0}")
-    public void setGraphBaseUrl(String graphBaseUrl) {
-        log.debug("Setting graph url: " + graphBaseUrl);
-        this.graphBaseUrl = graphBaseUrl;
-    }
-
-    @Value("${AD_USER_INFO_SELECT_LIST}")
-    public void setAdUserInfoSelectList(String adUserInfoSelectList) {
-        log.debug("Setting AD user info select list: " + adUserInfoSelectList);
-        this.adUserInfoSelectList = adUserInfoSelectList;
-    }
-
-    @Value("${SCOPE}")
-    public void setScope(String scope) {
-        log.debug("Setting scope: " + scope);
-        this.scope = scope;
     }
 }

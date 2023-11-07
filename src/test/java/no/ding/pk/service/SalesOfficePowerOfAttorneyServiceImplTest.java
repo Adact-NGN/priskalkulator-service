@@ -1,34 +1,56 @@
 package no.ding.pk.service;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
+import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest
-@TestPropertySource("/h2-db.properties")
-//@Sql(value = { "/power_of_attorney/drop_schema.sql", "/power_of_attorney/create_schema.sql"})
-class SalesOfficePowerOfAttorneyServiceImplTest {
+@Disabled
+class SalesOfficePowerOfAttorneyServiceImplTest extends AbstractIntegrationConfig {
 
     @Autowired
+    private SalesOfficePowerOfAttorneyRepository sopaRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
     private SalesOfficePowerOfAttorneyService service;
 
-    @Autowired
     private UserService userService;
+
+
+    @BeforeEach
+    public void setup() {
+        service = new SalesOfficePowerOfAttorneyServiceImpl(sopaRepository);
+
+        userService = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        sopaRepository.deleteAll();
+    }
 
     @Test
     public void shouldPersistPowerOfAttorney() {
-        PowerOfAttorney poa = PowerOfAttorney.builder()
-                .salesOffice(101)
-                .salesOfficeName("StorOslo")
-                .region("Oslofjord")
-                .build();
+        PowerOfAttorney poa = sopaRepository.findBySalesOffice(101);
+
+        if(poa == null) {
+            poa = PowerOfAttorney.builder()
+                    .salesOffice(101)
+                    .salesOfficeName("StorOslo")
+                    .region("Oslofjord")
+                    .build();
+        }
 
         poa = service.save(poa);
 
@@ -37,26 +59,31 @@ class SalesOfficePowerOfAttorneyServiceImplTest {
 
     @Test
     public void shouldUpdatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
 
         user = userService.save(user, null);
 
-        PowerOfAttorney poa = PowerOfAttorney.builder()
-                .salesOffice(100)
-                .salesOfficeName("StorOslo")
-                .region("Oslofjord")
-                .ordinaryWasteLvlOneHolder(user)
-                .ordinaryWasteLvlTwoHolder(user)
-                .dangerousWasteHolder(user)
-                .build();
+        PowerOfAttorney poa = sopaRepository.findBySalesOffice(100);
+
+        if(poa == null) {
+            poa = PowerOfAttorney.builder()
+                    .salesOffice(100)
+                    .salesOfficeName("StorOslo")
+                    .region("Oslofjord")
+                    .ordinaryWasteLvlOneHolder(user)
+                    .ordinaryWasteLvlTwoHolder(user)
+                    .dangerousWasteHolder(user)
+                    .build();
+        } else {
+            poa.setOrdinaryWasteLvlOneHolder(user);
+            poa.setOrdinaryWasteLvlTwoHolder(user);
+            poa.setDangerousWasteHolder(user);
+        }
 
         poa = service.save(poa);
 

@@ -12,6 +12,8 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Builder
 @Getter
@@ -22,14 +24,19 @@ import java.util.Date;
 public class PriceRowDTO {
     private Long id;
     private Double customerPrice;
-    private Double discountPct;
+    private Double discountLevelPct;
+    private Double discountLevelPrice;
     private String material;
     private String designation;
     private String materialDesignation;
     private String productGroupDesignation;
     private String deviceType;
+    private String salesZone;
+    private String devicePlacement;
     private Boolean showPriceInOffer;
     private Double manualPrice;
+    @JsonIgnore
+    private Double discountedPrice;
     private Integer priceLevel;
     private Double priceLevelPrice;
     private Double standardPrice;
@@ -52,13 +59,47 @@ public class PriceRowDTO {
     private String classDescription;
 
     @JsonIgnore
-    public String getMaterialId() {
-        StringBuilder sb = new StringBuilder(material);
+    public Map<String, String> getMaterialId() {
+        Map<String, String> materialIdMap = new HashMap<>();
+        materialIdMap.put("materialNumber", material);
 
         if(StringUtils.isNotBlank(deviceType)) {
-            sb.append("_").append(deviceType);
+            materialIdMap.put("deviceType", deviceType);
         }
 
-        return sb.toString();
+        if(StringUtils.isNotBlank(salesZone)) {
+            materialIdMap.put("salesZone", salesZone);
+        }
+
+        return materialIdMap;
+    }
+
+    @JsonIgnore
+    @JsonProperty("discountedPrice")
+    public void setDiscountedPrice(Double discounted) {
+        this.discountedPrice = discounted;
+    }
+
+    @JsonIgnore
+    @JsonProperty("discountedPrice")
+    public Double getDiscountedPrice() {
+        if(manualPrice != null) {
+            return manualPrice;
+        }
+
+        if(standardPrice != null) {
+            if(discountLevelPct != null) {
+                return standardPrice - (discountLevelPct * 100) / standardPrice;
+            }
+            if(discountLevelPrice != null) {
+                if(discountLevelPrice < 0.0) {
+                    return standardPrice + discountLevelPrice;
+                } else {
+                    return standardPrice - discountLevelPrice;
+                }
+            }
+        }
+
+        return null;
     }
 }

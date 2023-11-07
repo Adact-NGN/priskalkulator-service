@@ -39,7 +39,6 @@ public class Zone {
     private Boolean isStandardZone;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-//    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "zone_price_row_id", foreignKey = @ForeignKey(name = "Fk_zone_priceRows"))
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<PriceRow> priceRows;

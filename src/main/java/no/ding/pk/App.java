@@ -14,11 +14,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "no.ding.pk.*")
-@PropertySource({
-        "classpath:application.properties",
-        "classpath:sap.properties",
-        "classpath:msal.properties"
-})
 public class App {
     public static void main( String[] args )
     {
@@ -30,16 +25,5 @@ public class App {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Profile("!test")
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select().apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
-                .paths(PathSelectors.any()).build();
-    }
 
-//    @Bean
-//    public CsrfTokenRepository csrfTokenRepository() {
-//        return CookieCsrfTokenRepository.withHttpOnlyFalse();
-//    }
 }

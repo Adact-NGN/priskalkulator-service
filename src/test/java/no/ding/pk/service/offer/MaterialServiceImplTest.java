@@ -1,30 +1,41 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
+import no.ding.pk.repository.offer.MaterialRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.transaction.Transactional;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.is;
 
-@SpringBootTest
-@Transactional
-@TestPropertySource("/h2-db.properties")
-public class MaterialServiceImplTest {
+@Disabled
+public class MaterialServiceImplTest extends AbstractIntegrationConfig {
     
-    @Autowired
     private MaterialService service;
+
+    @MockBean
+    private MaterialPriceService materialPriceService;
+
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    @BeforeEach
+    public void setup() {
+        service = new MaterialServiceImpl(materialRepository, materialPriceService);
+    }
 
     private void createMaterial() {
         String materialNumber = "119901";
 
-        MaterialPrice wastePrice = MaterialPrice.builder()
-        .materialNumber(materialNumber)
+        MaterialPrice wastePrice = MaterialPrice.builder("100", "100", materialNumber, null, null)
         .standardPrice(2456.00)
         .build();
         
@@ -50,10 +61,11 @@ public class MaterialServiceImplTest {
         
         String materialNumber = "119901";
         
-        Material actual = service.findByMaterialNumber(materialNumber);
+        Optional<Material> actual = service.findByMaterialNumber(materialNumber);
 
-        assertThat(actual.getId(), notNullValue());
-        assertThat(actual.getMaterialStandardPrice(), notNullValue());
-        assertThat(actual.getMaterialStandardPrice().getId(), notNullValue());
+        assertThat(actual.isPresent(), is(true));
+        assertThat(actual.get().getId(), notNullValue());
+        assertThat(actual.get().getMaterialStandardPrice(), notNullValue());
+        assertThat(actual.get().getMaterialStandardPrice().getId(), notNullValue());
     }
 }

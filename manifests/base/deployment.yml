@@ -24,6 +24,9 @@ spec:
         - name: ding-ip-app-pk
           image: dingipacr.azurecr.io/ding-ip-app-pk-service:latest
           imagePullPolicy: Always
+          envFrom:
+          - secretRef:
+              name: ding-ip-app-pk-dev-secrets
           resources:
             requests:
               memory: "1Gi"

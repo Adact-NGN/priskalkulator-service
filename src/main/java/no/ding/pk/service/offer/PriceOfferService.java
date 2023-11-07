@@ -18,15 +18,17 @@ public interface PriceOfferService {
 
     boolean delete(Long id);
 
-    List<PriceOffer> findAllBySalesEmployeeId(Long userId);
+    List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList);
 
     List<PriceOffer> findAllByApproverIdAndPriceOfferStatus(Long approverId, String priceOfferStatus);
 
     Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String comment);
 
-    Boolean activatePriceOffer(Long approverId, Long priceOfferId, PriceOfferTerms customerTerms);
+    Boolean activatePriceOffer(Long activatedById, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment);
 
     List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
 
     List<PriceOffer> findAllPriceOffersRadyForBoReport();
+
+    void updateStatus(Long id, String status);
 }

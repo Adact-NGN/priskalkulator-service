@@ -2,30 +2,18 @@ package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
@@ -69,7 +57,7 @@ public class User extends Auditable implements Serializable {
     private String resourceNr;
     
     @JsonAlias("phone")
-    @Column()
+    @Column
     private String phoneNumber;
     
     @Column(unique = true)
@@ -112,6 +100,9 @@ public class User extends Auditable implements Serializable {
     
     @Column
     private String department;
+
+    @ManyToMany(mappedBy = "sharedWith")
+    private List<PriceOfferTemplate> priceOfferTemplates;
     
     @Override
     public String toString() {
@@ -184,5 +175,9 @@ public class User extends Auditable implements Serializable {
         } else if (!email.equals(other.email))
             return false;
         return true;
+    }
+
+    public static UserBuilder builder(String name, String sureName, String fullName, String username, String email) {
+        return hiddenBuilder().name(name).sureName(sureName).fullName(fullName).username(username).email(email);
     }
 }

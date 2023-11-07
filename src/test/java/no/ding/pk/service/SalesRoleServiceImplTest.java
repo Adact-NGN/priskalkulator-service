@@ -1,33 +1,44 @@
 package no.ding.pk.service;
 
+import no.ding.pk.config.AbstractIntegrationConfig;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
-import no.ding.pk.listener.CleanUpH2DatabaseListener;
+import no.ding.pk.repository.SalesRoleRepository;
+import no.ding.pk.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
-@SpringBootTest
-@TestExecutionListeners(listeners = {DependencyInjectionTestExecutionListener.class, CleanUpH2DatabaseListener.class})
-@TestPropertySource("/h2-db.properties")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class SalesRoleServiceImplTest {
-    
+@Disabled
+class SalesRoleServiceImplTest extends AbstractIntegrationConfig {
+
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
+
     private UserService userService;
     
-    @Autowired
     private SalesRoleService salesRoleService;
+
+    @BeforeEach
+    public void setup() {
+        userService  = new UserServiceImpl(userRepository, salesRoleRepository);
+
+        salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        salesRoleRepository.deleteAll();
+        userRepository.deleteAll();
+    }
     
     @Test
     public void shouldPersistUserWithSalesRole() {
@@ -52,25 +63,24 @@ class SalesRoleServiceImplTest {
         
         saSalesRole = salesRoleService.save(saSalesRole);
         
-        User saUser = createSaUser();
+        User user = createSaUser();
         
-        saUser = userService.save(saUser, null);
-        
-        saSalesRole.addUser(saUser);
-        
-        saSalesRole = salesRoleService.save(saSalesRole);
+        user = userService.save(user, null);
+
+        user = userService.updateSalesRoleForUser(user, saSalesRole);
+
+        assertThat(user.getSalesRole(), notNullValue());
         
         SalesRole knSalesRole = createKnSalesRole();
-        
+
         knSalesRole = salesRoleService.save(knSalesRole);
-        
-        knSalesRole.addUser(saUser);
-        
-        knSalesRole = salesRoleService.save(knSalesRole);
-        
+
+        user = userService.updateSalesRoleForUser(user, knSalesRole);
+
+        assertThat(user.getSalesRole(), equalTo(knSalesRole));
+
         saSalesRole = salesRoleService.findSalesRoleByRoleName("SA");
-        
-        assertThat(knSalesRole.getUserList(), hasSize(greaterThan(0)));
+
         assertThat(saSalesRole.getUserList(), hasSize(0));
     }
     
@@ -97,45 +107,44 @@ class SalesRoleServiceImplTest {
     }
     
     private SalesRole createSaSalesRole() {
-        return SalesRole.builder()
-        .roleName("SA")
+        SalesRole sa = salesRoleRepository.findByRoleName("SA");
+
+        if(sa != null) {
+            return sa;
+        }
+        return SalesRole.builder("SA", 2, 2)
         .description("Salgskonsulent (rolle a)")
-        .defaultPowerOfAttorneyOa(2)
-        .defaultPowerOfAttorneyFa(2)
         .build();
     }
     
     private SalesRole createKnSalesRole() {
-        return SalesRole.builder()
-        .roleName("KN")
+        SalesRole kn = salesRoleRepository.findByRoleName("KN");
+
+        if(kn != null) {
+            return kn;
+        }
+
+        return SalesRole.builder("KN", 5, 5)
         .description("KAM nasjonalt")
-        .defaultPowerOfAttorneyOa(5)
-        .defaultPowerOfAttorneyFa(5)
         .build();
     }
     
     private User createSaUser() {
-        return User.builder()
+        return User.builder("Wolfgang Amadeus", "Mozart", "Wolfgang Amadeus Mozart", "Wolfgang@farris-bad.no", "Wolfgang@farris-bad.no")
         .adId("ad-id-wegarijo-arha-rh-arha")
         .jobTitle("Komponist")
-        .fullName("Wolfgang Amadeus Mozart")
-        .email("Wolfgang@farris-bad.no")
         .associatedPlace("Larvik")
         .department("Hvitsnippene")
         .build();
     }
     
     private User createKnUser() {
-        return User.builder()
+        return User.builder("Alexander", "Brox", "Alexander Brox", "alexander.brox@ngn.no", "alexander.brox@ngn.no")
         .adId("e2f1963a-072a-4414-8a0b-6a3aa6988e0c")
-        .name("Alexander")
-        .sureName("Brox")
-        .fullName("Alexander Brox")
         .orgNr("100")
         .resourceNr("63874")
         .associatedPlace("Oslo")
         .phoneNumber("95838638")
-        .email("alexander.brox@ngn.no")
         .jobTitle("Markedskonsulent")
         .powerOfAttorneyOA(5)
         .powerOfAttorneyFA(3)

@@ -1,20 +1,15 @@
 package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder(builderMethodName = "hiddenBuilder")
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "discount_levels")
 public class DiscountLevel {
@@ -28,19 +23,19 @@ public class DiscountLevel {
     @Column
     private Double discount;
 
-    @Column
+    @Column(name = "calculated_discount")
     private Double calculatedDiscount;
 
-    @Column
+    @Column(name = "pct_discount")
     private Double pctDiscount;
+
+    @Column
+    private Integer zone;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="discount_id", nullable = false)
     private Discount parent;
-    
-    public DiscountLevel() {
-    }
     
     public DiscountLevel(int level, Double discount, Double calculatedDiscount, Double pctDiscount) {
         this.level = level;
@@ -57,42 +52,34 @@ public class DiscountLevel {
         this.id = id;
     }   
 
-    public int getLevel() {
-        return level;
-    }
     public void setLevel(int level) {
         this.level = level;
     }
-    public Double getDiscount() {
-        return discount;
-    }
+
     public void setDiscount(Double discount) {
         this.discount = discount;
     }
-    public Double getCalculatedDiscount() {
-        return calculatedDiscount;
-    }
+
     public void setCalculatedDiscount(Double calculatedDiscount) {
         this.calculatedDiscount = calculatedDiscount;
     }
-    public Double getPctDiscount() {
-        return pctDiscount;
-    }
+
     public void setPctDiscount(Double pctDiscount) {
         this.pctDiscount = pctDiscount;
     }
     
-    public Discount getParent() {
-        return parent;
-    }
     public void setParent(Discount parent) {
         this.parent = parent;
+    }
+
+    public void setZone(Integer zone) {
+        this.zone = zone;
     }
 
     @Override
     public String toString() {
         return "DiscountLevel [id=" + id + ", level=" + level + ", discount=" + discount + ", calculatedDiscount="
-                + calculatedDiscount + ", pctDiscount=" + pctDiscount + "]";
+                + calculatedDiscount + ", pctDiscount=" + pctDiscount + ", zone=" + zone + "]";
     }
 
     @Override
@@ -130,5 +117,8 @@ public class DiscountLevel {
         return true;
     }
 
+    public static DiscountLevelBuilder builder(Double discount, int level) {
+        return DiscountLevel.hiddenBuilder().discount(discount).level(level);
+    }
 
 }

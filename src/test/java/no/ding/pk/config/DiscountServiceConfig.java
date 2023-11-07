@@ -5,9 +5,11 @@ import no.ding.pk.repository.DiscountLevelRepository;
 import no.ding.pk.repository.DiscountRepository;
 import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.DiscountServiceImpl;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.TestPropertySource;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -18,9 +20,8 @@ import java.util.Random;
 
 @Profile("test")
 @TestConfiguration
-//@TestPropertySource("/h2-db.properties")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource("/h2-db.properties")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class DiscountServiceConfig {
     @Bean
     public DiscountService discountService() {
@@ -34,13 +35,10 @@ public class DiscountServiceConfig {
             Discount input = (Discount) invocationOnMock.getArguments()[0];
             Random random = new Random();
             long id = random.nextLong();
-            return Discount.builder()
+            return Discount.builder(input.getSalesOrg(), input.getSalesOffice(), input.getMaterialNumber(),
+                            input.getStandardPrice(), input.getDiscountLevels())
                     .id(id)
-                    .salesOrg(input.getSalesOrg())
-                    .materialNumber(input.getMaterialNumber())
                     .materialDesignation(input.getMaterialDesignation())
-                    .standardPrice(input.getStandardPrice())
-                    .discountLevels(input.getDiscountLevels())
                     .build();
         });
         return mock;

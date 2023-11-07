@@ -1,0 +1,808 @@
+import no.ding.pk.domain.bo.BoReportCondition;
+import no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination;
+
+global no.ding.pk.domain.bo.SuggestedConditionCodeKeyCombination suggestion;
+dialect "mvel"
+
+rule "Salgskontor per material per sone"
+when
+    BoReportCondition(terms == "Generelle Vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZPTR");
+    suggestion.setKeyCombination("Salgskontor per material per sone");
+    suggestion.setKeyCombinationTableName("A615");
+end
+
+rule "Salgskontor per material per avfall per sone"
+when
+    BoReportCondition(terms == "Generelle Vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == true,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZPTR");
+    suggestion.setKeyCombination("Salgskontor per material per avfall per sone");
+    suggestion.setKeyCombinationTableName("A783");
+end
+
+rule "Salgskontor per material per avfall per sone Per AP"
+salience 98
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == true,
+    isWaste == true,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZPTR");
+    suggestion.setKeyCombination("Salgskontor per material per avfall per sone Per AP");
+    suggestion.setKeyCombinationTableName("A791");
+end
+
+rule "Salgskontor per material per sone per AP"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZPTR");
+    suggestion.setKeyCombination("Salgskontor per material per sone per AP");
+    suggestion.setKeyCombinationTableName("A790");
+end
+
+rule "Rabatt per kunde/material"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt per kunde/material");
+    suggestion.setKeyCombinationTableName("A704");
+end
+
+rule "Rabatt salgskontor per kunde per material per avfall 01"
+when
+    BoReportCondition(terms == "Generelle Vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == true,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("?");
+end
+
+rule "Rabatt salgskontor per kunde per material per apparattype 01"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == true,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A766");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material 01"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == true,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material");
+    suggestion.setKeyCombinationTableName("A781");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 01"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == true,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("?");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 01"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == true,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == true,
+    isService == false,
+    isRental == false,
+    isProduct == false)
+then
+    suggestion.setConditionCode("ZR05");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A780");
+end
+
+rule "Rabatt per kunde/material Tjeneste"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt per kunde/material");
+    suggestion.setKeyCombinationTableName("A704");
+end
+
+rule "Rabatt salgskontor per kunde per material per avfall 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("A785");
+end
+
+rule "Rabatt salgskontor per kunde per material per apparattype 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A766");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material");
+    suggestion.setKeyCombinationTableName("A781");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("A784");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == true,
+    hasSalesDocument == false,
+    isWasteDisposalMaterial == false,
+    isService == true,
+    isRental == true,
+    isProduct == true)
+then
+    suggestion.setConditionCode("ZR02");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A780");
+end
+
+rule "Rabatt per kunde/material Sone"
+when
+    BoReportCondition(terms == "Generelle vilkår (metall)" || terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt per kunde/material");
+    suggestion.setKeyCombinationTableName("A704");
+end
+
+rule "Rabatt salgskontor per kunde per material per avfall 03"
+when
+    BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("A785");
+end
+
+rule "Rabatt salgskontor per kunde per material per apparattype 03"
+when
+    BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A766");
+end
+
+rule "Rabatt salgskontor per kunde per sone  per material"
+when
+    BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt salgskontor per kunde per sone  per material");
+    suggestion.setKeyCombinationTableName("A795");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material 03"
+when
+    BoReportCondition(terms == "Generelle vilkår (metall)" || terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPTR");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material");
+    suggestion.setKeyCombinationTableName("A781");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per avfall 03"
+when
+    BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == true,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per avfall");
+    suggestion.setKeyCombinationTableName("A784");
+end
+
+rule "Rabatt salgskontor per apparatplass  per kunde per material per apparattype 03"
+when
+    BoReportCondition(terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == true,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt salgskontor per apparatplass  per kunde per material per apparattype");
+    suggestion.setKeyCombinationTableName("A780");
+end
+
+rule "Rabatt kunde/SD-dokument/Material"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "NG prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == true)
+then
+    suggestion.setConditionCode("ZPRK");
+    suggestion.setKeyCombination("Rabatt kunde/SD-dokument/Material");
+    suggestion.setKeyCombinationTableName("A798");
+end
+
+rule "Kundehiearki per material 01"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH00");
+    suggestion.setKeyCombination("Kundehiearki per material");
+    suggestion.setKeyCombinationTableName("A767");
+end
+
+rule "Kundehiearki per material per avfall 01"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH00");
+    suggestion.setKeyCombination("Kundehiearki per material per avfall");
+    suggestion.setKeyCombinationTableName("A786");
+end
+
+rule "Kundehiearki per material per apparattype 01"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH00");
+    suggestion.setKeyCombination("Kundehiearki per material per apparattype");
+    suggestion.setKeyCombinationTableName("A768");
+end
+
+rule "Kundehiearki per material 02"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvikår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH02");
+    suggestion.setKeyCombination("Kundehiearki per material");
+    suggestion.setKeyCombinationTableName("A767");
+end
+
+rule "Kundehiearki per material per avfall 02"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZG02");
+    suggestion.setKeyCombination("Kundehiearki per material per avfall");
+    suggestion.setKeyCombinationTableName("A786");
+end
+
+rule "Kundehiearki per material per apparattype 02"
+when
+    BoReportCondition(terms == "Generelle vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH02");
+    suggestion.setKeyCombination("Kundehiearki per material per apparattype");
+    suggestion.setKeyCombinationTableName("A768");
+end
+
+rule "Kundehiearki per material 03"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per material");
+    suggestion.setKeyCombinationTableName("A767");
+end
+
+rule "Kundehiearki per material per avfall 03"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == true,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per material per avfall");
+    suggestion.setKeyCombinationTableName("A786");
+end
+
+rule "Kundehiearki per material per apparattype 03"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per material per apparattype");
+    suggestion.setKeyCombinationTableName("A805");
+end
+
+rule "Kundehiearki per SK per material"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per SK per material");
+    suggestion.setKeyCombinationTableName("A789");
+end
+
+rule "Kundehiearki per SK, sone og material"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per SK, sone og material");
+    suggestion.setKeyCombinationTableName("A775");
+end
+
+rule "Kundehiearki per SK, material og apparattype"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per SK, material og apparattype");
+    suggestion.setKeyCombinationTableName("A805");
+end
+
+rule "Kundehiearki per SK, sone, material og apparattype"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == true,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Kundehiearki per SK, sone, material og apparattype");
+    suggestion.setKeyCombinationTableName("A770");
+end
+
+rule "Kundehiearki per sone og material"
+when
+    BoReportCondition(terms == "Generelle vilkår" || terms == "Ng prisvilkår" || terms == "Kundens vilkår",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == true,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZH03");
+    suggestion.setKeyCombination("Salgskontor per material per sone");
+    suggestion.setKeyCombinationTableName("A775");
+end
+
+rule "Salgsorg./DistrKanal/kunde"
+when
+    BoReportCondition(terms == "Uavhengig av vilkår. Gjelder kun Adm. Gebyr",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == true,
+    isCustomer == true,
+    isNode == false,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZGEB");
+    suggestion.setKeyCombination("Salgsorg./DistrKanal/kunde");
+    suggestion.setKeyCombinationTableName("A765");
+end
+
+rule "Salgsorg./DistrKanal/node"
+when
+    BoReportCondition(terms == "Uavhengig av vilkår. Gjelder kun Adm. Gebyr",
+    hasSalesOrg == true,
+    isPricedOnSalesOffice == false,
+    isCustomer == false,
+    isNode == true,
+    isZoneMaterial == false,
+    isWaste == false,
+    hasDevicePlacement == false,
+    isDeviceType == false,
+    hasSalesDocument == false)
+then
+    suggestion.setConditionCode("ZGEB");
+    suggestion.setKeyCombination("Salgsorg./DistrKanal/node");
+    suggestion.setKeyCombinationTableName("A778");
+end
+
+rule "Behandlingsgebyr"
+when
+    BoReportCondition(terms == "Uavhengig av vilkår. Gjelder kun Behandlingsgebyr")
+then
+    suggestion.setConditionCode("ZBEH");
+    suggestion.setKeyCombination("Behandlingsgebyr");
+    suggestion.setKeyCombinationTableName("814: sorg/sk/kunde/apptype/varegruppe");
+end
+
+rule "Dersom miljøgebyr er satt til 0, må saken inn til OP."
+when
+    BoReportCondition(terms == "Uavhengig av vilkår. Gjelder kun miljøgebyr")
+then
+    suggestion.setConditionCode("ZMIL");
+    suggestion.setKeyCombination("Dersom miljøgebyr er satt til 0, må saken inn til OP.");
+    suggestion.setKeyCombinationTableName("777:Sorg/oppdr.giv/material; 776:sorg/oppdr.giv/varegruppe;803:sorg/oppdr.giv/AP/Varegruppe");
+end

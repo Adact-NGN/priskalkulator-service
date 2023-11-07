@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class ApprovalRequest {
     private String status;
-    private String dismissalReason;
+    private String additionalInformation;
 }

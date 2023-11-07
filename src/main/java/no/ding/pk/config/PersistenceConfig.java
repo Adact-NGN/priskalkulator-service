@@ -11,8 +11,4 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaAuditing()
 public class PersistenceConfig {
 
-//    @Bean
-//    public AuditorAware<String> auditorProvider() {
-//        return new AuditorAwareImpl();
-//    }
 }

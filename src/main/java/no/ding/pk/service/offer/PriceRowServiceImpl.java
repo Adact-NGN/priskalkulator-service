@@ -1,11 +1,13 @@
 package no.ding.pk.service.offer;
 
+import no.ding.pk.domain.Discount;
+import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.domain.offer.Material;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
+import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.sap.SapMaterialService;
-import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -19,16 +21,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
 public class PriceRowServiceImpl implements PriceRowService {
     
     private static final Logger log = LoggerFactory.getLogger(PriceRowServiceImpl.class);
-    
+
+    private final DiscountService discountService;
+
     private final PriceRowRepository repository;
 
     private final MaterialService materialService;
@@ -44,11 +46,15 @@ public class PriceRowServiceImpl implements PriceRowService {
     
     
     @Autowired
-    public PriceRowServiceImpl(PriceRowRepository priceRowRepository,
-                               MaterialService materialService,
-                               MaterialPriceService materialPriceService, EntityManagerFactory emFactory,
-                               StandardPriceService standardPriceService, SapMaterialService sapMaterialService,
-                               @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+    public PriceRowServiceImpl(
+            DiscountService discountService,
+            PriceRowRepository priceRowRepository,
+            MaterialService materialService,
+            MaterialPriceService materialPriceService,
+            EntityManagerFactory emFactory,
+            SapMaterialService sapMaterialService,
+            @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+        this.discountService = discountService;
         this.repository = priceRowRepository;
         this.materialPriceService = materialPriceService;
         this.materialService = materialService;
@@ -57,39 +63,104 @@ public class PriceRowServiceImpl implements PriceRowService {
         this.modelMapper = modelMapper;
     }
 
-    @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, List<MaterialPrice> materialStdPrices) {
-        return saveAll(priceRowList, salesOrg, salesOffice, null, materialStdPrices);
+    private static Integer getCurrentLevel(Discount discount, Double standardPrice, Double manualPrice) {
+        Integer currentLevel = 1;
+        for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
+            Double tempDiscount = standardPrice - discountLevel.getDiscount();
+
+            if(manualPrice < tempDiscount) {
+                currentLevel++;
+            } else {
+                break;
+            }
+        }
+        return currentLevel;
     }
     
+    private static Double getStandardPrice(PriceRow entity) {
+        if(entity.getStandardPrice() != null) {
+            return entity.getStandardPrice();
+        }
+
+        if (entity.getMaterial() != null && entity.getMaterial().getMaterialStandardPrice() != null && entity.getMaterial().getMaterialStandardPrice().getStandardPrice() != null) {
+            return entity.getMaterial().getMaterialStandardPrice().getStandardPrice();
+        }
+
+
+        return null;
+    }
+
+    private static boolean isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(PriceRow entity, Double currentDiscountedPrice) {
+        return entity.getDiscountedPrice() == null || (currentDiscountedPrice != null && !entity.getDiscountedPrice().equals(currentDiscountedPrice));
+    }
+
     @Override
-    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone, List<MaterialPrice> materialStdPrices) {
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice,
+                                  Map<String, MaterialPrice> materialStdPriceMap) {
+        return saveAll(priceRowList, salesOrg, salesOffice, null, materialStdPriceMap);
+    }
+
+    @Override
+    public List<PriceRow> saveAll(List<PriceRow> priceRowList, String salesOrg, String salesOffice, String zone,
+                                  Map<String, MaterialPrice> materialStdPriceMap) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-
-            MaterialPrice materialPrice = getMaterialPriceForMaterial(materialPriceRow.getMaterial(), materialStdPrices);
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(salesOrg, salesOffice, materialPriceRow.getMaterial(), materialStdPriceMap);
+            log.debug("Found standard price for material: {}: {}, zone: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice, zone);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice);
 
             returnList.add(entity);
         }
-        
+
         log.debug("Collected {} amount of PriceRows", returnList.size());
         return returnList;
     }
 
-    private MaterialPrice getMaterialPriceForMaterial(Material material, List<MaterialPrice> materialStdPrices) {
-        if(materialStdPrices == null || materialStdPrices.isEmpty()) {
+    private MaterialPrice getMaterialPriceForMaterial(String salesOrg, String salesOffice, Material material, Map<String, MaterialPrice> materialStdPriceMap) {
+        if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            return materialStdPrices.stream().filter(materialPrice ->
-                    materialPrice.getMaterialNumber().equals(material.getMaterialNumber()) && materialPrice.getDeviceType().equals(material.getDeviceType())).findFirst().orElse(null);
+
+        StringBuilder lookUpKey = new StringBuilder();
+
+        if(StringUtils.isNotBlank(salesOrg)) {
+            lookUpKey.append(salesOrg);
         }
-        return materialStdPrices.stream().filter(materialPrice -> materialPrice.getMaterialNumber().equals(material.getMaterialNumber())).findFirst().orElse(null);
+
+        if(StringUtils.isNotBlank(salesOffice)) {
+            if(!lookUpKey.isEmpty()) {
+                lookUpKey.append("_");
+            }
+
+            lookUpKey.append(salesOffice);
+        }
+
+        if(StringUtils.isNotBlank(material.getMaterialNumber())) {
+            if(!lookUpKey.isEmpty()) {
+                lookUpKey.append("_");
+            }
+
+            lookUpKey.append(material.getMaterialNumber());
+        }
+
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            if(!lookUpKey.isEmpty()) {
+                lookUpKey.append("_");
+            }
+            lookUpKey.append(material.getDeviceType());
+        }
+
+        MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
+
+        log.debug("Got material price: {}", materialPrice);
+
+        return materialPrice;
     }
 
-    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone, MaterialPrice materialPrice) {
+    private PriceRow save(PriceRow materialPriceRow, String salesOrg, String salesOffice, String zone,
+                          MaterialPrice materialPrice) {
         log.debug("Price Row: {}", materialPriceRow);
+        log.debug("Material Price: {}", materialPrice);
 
         PriceRow entity = new PriceRow();
 
@@ -103,11 +174,9 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
 
         entity.setCustomerPrice(materialPriceRow.getCustomerPrice());
-        entity.setDiscountPct(materialPriceRow.getDiscountPct());
+        entity.setDiscountLevelPct(materialPriceRow.getDiscountLevelPct());
         entity.setShowPriceInOffer(materialPriceRow.getShowPriceInOffer());
         entity.setManualPrice(materialPriceRow.getManualPrice());
-
-        calculateDiscountPrice(entity);
 
         entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
         entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
@@ -121,96 +190,60 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
-        entity.setApproved(materialPriceRow.getApproved());
 
         entity = repository.save(entity);
 
         if(materialPriceRow.getMaterial() != null) {
-            Material material = getMaterial(materialPriceRow.getMaterial());
-            log.debug("PriceRow->Material: {}", material);
 
-            EntityManager em = emFactory.createEntityManager();
-            log.debug("Is material attached: {}", em.contains(material));
+            Material material = getMaterial(salesOrg, salesOffice, materialPriceRow.getMaterial(), materialPrice);
+            log.debug("PriceRow->Material: {}", material);
 
             if(material.getId() == null) {
 
-                em.getTransaction().begin();
-                List materials;
+                log.debug("New Material to create with material number: {}", material.getMaterialNumber());
+                MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
 
-                if(StringUtils.isNotBlank(material.getDeviceType())) {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+                if(sapMaterial != null) {
+                    log.debug("Mapping MaterialDTO: {}", sapMaterial);
+                    Material fromSap = modelMapper.map(sapMaterial, Material.class);
+                    log.debug("Mapping result: {}", fromSap);
+
+                    updateMaterialWithMaterialPriceValues(materialPriceRow, materialPrice, fromSap);
+
+                    material = materialService.save(fromSap);
                 } else {
-                    materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+                    log.debug("Could not find material {} for salesorg {}, persisting what we have.", material.getMaterialNumber(), salesOrg);
+
+                    material = materialService.save(material);
                 }
-                em.getTransaction().commit();
-                em.close();
-
-                if(materials != null && materials.size() > 0) {
-                    Material persistedMaterial = (Material) materials.get(0);
-                    log.debug("Got Material: {}", persistedMaterial);
-                    updateMaterial(persistedMaterial, material);
-
-                    MaterialPrice persistedMaterialPrice = materialPriceService.findByMaterialNumber(persistedMaterial.getMaterialNumber());
-
-                    if(persistedMaterialPrice != null) {
-                        updateMaterialPrice(persistedMaterialPrice, material.getMaterialStandardPrice());
-                        persistedMaterial.setMaterialStandardPrice(persistedMaterialPrice);
-
-                        if(materialPrice != null) {
-                            persistedMaterial.setPricingUnit(materialPrice.getPricingUnit());
-                            persistedMaterial.setQuantumUnit(materialPrice.getQuantumUnit());
-                            persistedMaterial.setDeviceType(materialPrice.getDeviceType());
-                        }
-
-                    } else {
-                        log.debug("No MaterialPrice for Material, getting standard price for material: {}", material.getMaterialNumber());
-                        //MaterialPrice stdPrice = standardPriceService.getStandardPriceForMaterial(material.getMaterialNumber(), material.getDeviceType(), material.getSalesZone(), salesOrg, salesOffice);
-                        persistedMaterial.setMaterialStandardPrice(materialPrice);
-                        persistedMaterial.setPricingUnit(materialPrice.getPricingUnit());
-                        persistedMaterial.setQuantumUnit(materialPrice.getQuantumUnit());
-                        persistedMaterial.setDeviceType(materialPrice.getDeviceType());
-                    }
-
-                    persistedMaterial = materialService.save(persistedMaterial);
-
-                    entity.setMaterial(persistedMaterial);
-                } else {
-                    log.debug("New Material to create with material number: {}", material.getMaterialNumber());
-                    MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
-
-                    if(sapMaterial != null) {
-                        log.debug("Mapping MaterialDTO: {}", sapMaterial);
-                        Material fromSap = modelMapper.map(sapMaterial, Material.class);
-
-                        if(StringUtils.isBlank(fromSap.getDeviceType()) || fromSap.getPricingUnit() == null || StringUtils.isBlank(fromSap.getQuantumUnit())) {
-                            if(materialPrice != null) {
-                                fromSap.setDeviceType(materialPrice.getDeviceType());
-                                fromSap.setQuantumUnit(materialPrice.getQuantumUnit());
-                                fromSap.setPricingUnit(materialPrice.getPricingUnit());
-                            }
-                        }
-
-                        log.debug("Mapping result: {}", fromSap);
-
-                        material = materialService.save(fromSap);
-                    } else {
-                        log.debug("Could not find material {} for salesorg {}", material.getMaterialNumber(), salesOrg);
-                    }
-
-                    entity.setMaterial(material);
-                }
-
+                
+                entity.setMaterial(material);
             } else {
                 log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
 
-                if(materialPrice != null) {
-                    material.setDeviceType(materialPrice.getDeviceType());
-                    material.setQuantumUnit(materialPrice.getQuantumUnit());
-                    material.setPricingUnit(materialPrice.getPricingUnit());
+                updateMaterialWithMaterialPriceValues(entity, materialPrice, material);
+                material = materialService.save(material);
+                if(entity.getMaterial() == null) {
+                    entity.setMaterial(material);
                 }
-
-                entity.setMaterial(material);
             }
+        }
+
+        if(materialPriceRow.getManualPrice() != null) {
+            entity.setDiscountedPrice(entity.getManualPrice());
+
+            Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
+            if(discountLevel != null) {
+                entity.setDiscountLevel(discountLevel);
+            } else {
+                log.info("Could not get discount level equivalent for manual price.");
+            }
+        } else if(materialPriceRow.getDiscountLevel() != null) {
+            entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
+            entity.setDiscountLevelPct(materialPriceRow.getDiscountLevelPct());
+            entity.setDiscountLevelPrice(materialPriceRow.getDiscountLevelPrice());
+            Double currentDiscountedPrice = materialPriceRow.getDiscountedPrice();
+            calculateDiscountPrice(entity, currentDiscountedPrice, salesOrg, salesOffice, zone);
         }
 
         if(materialPriceRow.hasCombinedMaterials()) {
@@ -227,34 +260,124 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
-    private void calculateDiscountPrice(PriceRow entity) {
-        if(entity.getDiscountedPrice() == null) {
-            if(entity.getDiscountLevel() != null) {
-                // TODO: Being fixed in another branch.
-            }
+    private void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
+        if(materialPrice != null) {
+            material.setDeviceType(StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null);
+            material.setQuantumUnit(materialPrice.getQuantumUnit());
+            material.setPricingUnit(materialPrice.getPricingUnit());
+        } else {
+            log.debug("No material prices found.");
         }
     }
 
-    private Material getMaterial(Material material) {
+    private Integer getEquivalentDiscountLevel(PriceRow entity, String salesOrg, String salesOffice) {
+        Discount discount = getDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber());
+
+        if(discount == null) {
+            log.debug("No discount level found for {}", entity.getMaterial().getMaterialNumber());
+            return null;
+        }
+
+        Double standardPrice = getStandardPrice(entity);
+
+        if(standardPrice == null) {
+            log.debug("Could not get material information for calculating discount level: {}", entity);
+            return null;
+        }
+
+        Double manualPrice = entity.getManualPrice();
+
+        return getCurrentLevel(discount, standardPrice, manualPrice);
+    }
+
+    private Discount getDiscountLevel(String salesOrg, String salesOffice, String materialNumber) {
+        List<Discount> discounts = discountService.findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, Collections.singletonList(materialNumber));
+
+        if(discounts.isEmpty()) {
+            return null;
+        }
+        return discounts.get(0);
+    }
+
+    private List getMaterials(Material material) {
+        log.debug("Getting material from DB: {}", material);
+        EntityManager em = emFactory.createEntityManager();
+        log.debug("Is material attached: {}", em.contains(material));
+
+        em.getTransaction().begin();
+        List materials;
+
+        if(StringUtils.isNotBlank(material.getDeviceType())) {
+            materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
+        } else {
+            materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
+        }
+        em.getTransaction().commit();
+        em.close();
+        return materials;
+    }
+
+    private void calculateDiscountPrice(PriceRow entity, Double currentDiscountedPrice, String salesOrg, String salesOffice, String zone) {
+        if(isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(entity, currentDiscountedPrice)) {
+            if(entity.getDiscountLevel() != null) {
+                Integer zoneAsInt = StringUtils.isNotBlank(zone) ? Integer.valueOf(zone) : null;
+                List<DiscountLevel> discountLevels = discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber(), entity.getDiscountLevel(), zoneAsInt);
+
+                if(discountLevels.isEmpty()) {
+                    log.debug("Discount level was set, but no discount level with value {} was found for material {}.", entity.getDiscountLevel(), entity.getMaterial().getMaterialNumber());
+
+                    return;
+                }
+
+                DiscountLevel dl = discountLevels.get(0);
+
+                log.debug("Getting discount for material {}, with discount level {}, with discount {}", entity.getMaterial().getMaterialNumber(), dl.getLevel(), dl.getDiscount());
+
+                Double discountLevelPct = dl.getPctDiscount();
+                Double discountLevelPrice = dl.getDiscount();
+
+                if(entity.getStandardPrice() == null || entity.getStandardPrice() == 0.0) {
+                    discountLevelPct = 0.0;
+                    discountLevelPrice = 0.0;
+                } else if(discountLevelPct == null && discountLevelPrice != null) {
+                    if(discountLevelPrice < 0.0) {
+                        discountLevelPct = ((discountLevelPrice * -1.0)) / entity.getStandardPrice();
+                    } else {
+                        discountLevelPct = (discountLevelPrice) / entity.getStandardPrice();
+                    }
+                }
+                entity.setDiscountLevelPct(discountLevelPct);
+                entity.setDiscountLevelPrice(discountLevelPrice);
+
+                if(dl.getDiscount() < 0.0) {
+                    entity.setDiscountedPrice(entity.getStandardPrice() + dl.getDiscount());
+                } else {
+                    entity.setDiscountedPrice(entity.getStandardPrice() - dl.getDiscount());
+                }
+            } else {
+                log.debug("No discount level set for price row.");
+            }
+        } else {
+            log.debug("Discounted price already set.");
+        }
+    }
+
+    private Material getMaterial(String salesOrg, String salesOffice, Material material, MaterialPrice materialPrice) {
 
         if(material.getId() != null) {
             log.debug("Material has ID: {}", material.getId());
             return materialService.findById(material.getId()).orElse(material);
         }
 
-        Material byMaterialNumber;
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
-            byMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
-        } else {
-            log.debug("Material has no ID, search by material number: {}", material.getMaterialNumber());
-            byMaterialNumber = materialService.findByMaterialNumber(material.getMaterialNumber());
+        String deviceType = materialPrice != null ? StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null : null;
+        log.debug("Material has no ID, search by material number: {} and Device type: {}", material.getMaterialNumber(), material.getDeviceType());
+        Optional<Material> optionalByMaterialNumber = materialService.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
+
+        if(optionalByMaterialNumber.isPresent()) {
+            return optionalByMaterialNumber.get();
         }
 
-        if(byMaterialNumber != null) {
-            return byMaterialNumber;
-        }
-
+        log.debug("Material does not exist, returning material from request.");
         return material;
     }
 
@@ -266,11 +389,10 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setMaterialType(from.getMaterialType());
         to.setMaterialTypeDescription(from.getMaterialTypeDescription());
         to.setDeviceType(from.getDeviceType());
-        
+
         to.setCurrency(from.getCurrency());
         to.setPricingUnit(from.getPricingUnit());
         to.setQuantumUnit(from.getQuantumUnit());
-        to.setSalesZone(from.getSalesZone());
 
         to.setCategoryId(from.getCategoryId());
         to.setCategoryDescription(from.getCategoryDescription());
@@ -286,6 +408,8 @@ public class PriceRowServiceImpl implements PriceRowService {
         to.setValidFrom(from.getValidFrom());
         to.setValidTo(from.getValidTo());
         to.setDeviceType(from.getDeviceType());
+        to.setPricingUnit(from.getPricingUnit());
+        to.setMaterialNumber(from.getMaterialNumber());
+        to.setQuantumUnit(from.getQuantumUnit());
     }
-    
 }
