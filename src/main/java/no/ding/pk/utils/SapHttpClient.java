@@ -16,6 +16,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SapHttpClient {
@@ -32,6 +35,10 @@ public class SapHttpClient {
     }
 
     public HttpRequest createGetRequest(String urlString, MultiValueMap<String, String> params) {
+        return createGetRequest(urlString, params, null);
+    }
+
+    public HttpRequest createGetRequest(String urlString, MultiValueMap<String, String> params, Map<String, String> headers) {
         if(StringUtils.isBlank(sapUsername) || StringUtils.isBlank(sapPassword)) {
             log.debug("Credentials for SAP service is empty");
             throw new RuntimeException("Credentials for SAP service is empty");
@@ -43,7 +50,7 @@ public class SapHttpClient {
         }
 
         UriComponentsBuilder urlBuilder = UriComponentsBuilder
-        .fromUriString(urlString);
+                .fromUriString(urlString);
 
         if(params != null) {
             urlBuilder.queryParams(params);
@@ -51,11 +58,19 @@ public class SapHttpClient {
 
         UriComponents url = urlBuilder.build();
 
-        return HttpRequest.newBuilder()
-        .GET()
-        .uri(url.toUri())
-        .header(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword))
-        .build();
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(url.toUri())
+                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
+
+        if(headers != null) {
+            for (Map.Entry<String, String> stringStringEntry : headers.entrySet()) {
+                requestBuilder.setHeader(stringStringEntry.getKey(), stringStringEntry.getValue());
+            }
+        }
+
+        return requestBuilder
+                .build();
     }
 
     public HttpResponse<String> getResponse(HttpRequest request) {
