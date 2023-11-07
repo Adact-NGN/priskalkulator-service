@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -84,5 +85,9 @@ public class SapHttpClient {
 
             throw new Error(e.getMessage());
         }
+    }
+
+    public HttpRequest createPostRequest(String sapPricingConditionRecordUrl, LinkedMultiValueMap<Object, Object> objectObjectLinkedMultiValueMap, Map<String, String> headers) {
+        return null;
     }
 }
