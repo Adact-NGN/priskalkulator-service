@@ -26,6 +26,9 @@ public class ConditionCode {
     @Column(name = "code")
     private String code;
 
+    @Column(name = "price_type")
+    private String priceType;
+
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "conditionCode")
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<KeyCombination> keyCombinations;
