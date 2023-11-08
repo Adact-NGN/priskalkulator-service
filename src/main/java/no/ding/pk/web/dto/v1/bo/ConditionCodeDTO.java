@@ -8,4 +8,5 @@ import java.util.List;
 public class ConditionCodeDTO {
     private String code;
     private List<KeyCombinationDTO> keyCombinations;
+    private String priceType;
 }
