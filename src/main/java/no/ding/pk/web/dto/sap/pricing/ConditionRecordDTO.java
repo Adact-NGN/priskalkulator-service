@@ -21,7 +21,7 @@ public class ConditionRecordDTO {
     @JsonProperty(value = "ConditionType")
     private String conditionType; //"ZR05",
     @JsonProperty(value = "ConditionRateValue")
-    private Integer conditionRateValue; //"-1749.00", // beløp som skal inn 0.00 NOK/% maks to desimaler
+    private Double conditionRateValue; //"-1749.00", // beløp som skal inn 0.00 NOK/% maks to desimaler
     @JsonProperty(value = "ConditionRateValueUnit")
     private String conditionRateValueUnit; //"NOK",
     @JsonProperty(value = "ConditionQuantity")
@@ -32,7 +32,7 @@ public class ConditionRecordDTO {
     @JsonProperty(value = "to_SlsPrcgCndnRecdValidity")
     private List<ConditionRecordValidityDTO> conditionRecordValidityList;
 
-    public ConditionRecordDTOBuilder builder(String conditionTable, String conditionApplication,
+    public static ConditionRecordDTOBuilder builder(String conditionTable, String conditionApplication,
                                                                 String conditionType, Integer conditionRateValue,
                                                                 String conditionRateValueUnit, Integer conditionQuantity,
                                                                 String conditionQuantityUnit) {

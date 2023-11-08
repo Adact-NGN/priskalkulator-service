@@ -17,8 +17,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -50,6 +48,36 @@ public class SapHttpClient {
             throw new RuntimeException(String.format("Cannot execute GET request, malformed URL: %s", urlString));
         }
 
+        UriComponents url = getUriComponents(urlString, params);
+
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(url.toUri())
+                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
+
+        addHeaders(headers, requestBuilder);
+
+        return requestBuilder
+                .build();
+    }
+
+    public HttpRequest createPostRequest(String sapPricingConditionRecordUrl, String body, MultiValueMap<String, String> params, Map<String, String> headers) {
+
+        HttpRequest.BodyPublisher bodyPublisher = StringUtils.isBlank(body) ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body);
+
+        UriComponents url = getUriComponents(sapPricingConditionRecordUrl, params);
+
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .POST(bodyPublisher)
+                .uri(url.toUri())
+                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
+
+        addHeaders(headers, requestBuilder);
+
+        return requestBuilder.build();
+    }
+
+    private static UriComponents getUriComponents(String urlString, MultiValueMap<String, String> params) {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder
                 .fromUriString(urlString);
 
@@ -57,21 +85,15 @@ public class SapHttpClient {
             urlBuilder.queryParams(params);
         }
 
-        UriComponents url = urlBuilder.build();
+        return urlBuilder.build();
+    }
 
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .GET()
-                .uri(url.toUri())
-                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
-
+    private static void addHeaders(Map<String, String> headers, HttpRequest.Builder requestBuilder) {
         if(headers != null) {
             for (Map.Entry<String, String> stringStringEntry : headers.entrySet()) {
                 requestBuilder.setHeader(stringStringEntry.getKey(), stringStringEntry.getValue());
             }
         }
-
-        return requestBuilder
-                .build();
     }
 
     public HttpResponse<String> getResponse(HttpRequest request) {
@@ -85,9 +107,5 @@ public class SapHttpClient {
 
             throw new Error(e.getMessage());
         }
-    }
-
-    public HttpRequest createPostRequest(String sapPricingConditionRecordUrl, LinkedMultiValueMap<Object, Object> objectObjectLinkedMultiValueMap, Map<String, String> headers) {
-        return null;
     }
 }

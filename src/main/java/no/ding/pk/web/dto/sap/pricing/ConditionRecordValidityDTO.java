@@ -36,7 +36,14 @@ public class ConditionRecordValidityDTO {
     @JsonProperty(value = "Material", required = true)
     private String material;
 
-    public ConditionRecordValidityDTOBuilder builder(String salesOrganization, String salesOffice, String customer, String material) {
+    /**
+     * Equivalent to zone. <br/>
+     * Format example '01'
+     */
+    @JsonProperty(value = "CustomerConditionGroup")
+    private String customerConditionGroup;
+
+    public static ConditionRecordValidityDTOBuilder builder(String salesOrganization, String salesOffice, String customer, String material) {
         return hiddenBuilder().salesOrganization(salesOrganization).salesOffice(salesOffice).customer(customer).material(material);
     }
 }

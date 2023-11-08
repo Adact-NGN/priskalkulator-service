@@ -1,18 +1,16 @@
 package no.ding.pk.service.sap;
 
-import no.ding.pk.utils.RequestHeaderUtil;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.pricing.ConditionRecordValidityDTO;
+import no.ding.pk.web.dto.sap.pricing.PricingEntityCombinationMap;
 import no.ding.pk.web.handlers.ErrorRetrievingTokenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -36,11 +34,11 @@ public class SapPricingImpl implements SapPricing {
      * Add new pricing entity to SAP
      * <a href="https://sapdev.norskgjenvinning.no/sap(bD1ubyZjPTEwMA==)/bc/bsp/sap/zgw_openapi/index.html?service=API_SLSPRICINGCONDITIONRECORD_SRV&version=0001&repository=&group=#/Betingelsesposter/post_A_SlsPrcgConditionRecord">Add new entity to A_SlsPrcgConditionRecord</a>
      */
-    public ConditionRecordValidityDTO updateMaterialPricingEntity() {
+    public ConditionRecordValidityDTO updateMaterialPricingEntity(PricingEntityCombinationMap combinationMap) {
         String token = getToken();
 
         Map<String, String> headers = Map.of("X-CSRF-Token", token);
-        HttpRequest request = sapHttpClient.createPostRequest(sapPricingConditionRecordUrl, new LinkedMultiValueMap<>(), headers);
+        HttpRequest request = sapHttpClient.createPostRequest(sapPricingConditionRecordUrl, null, new LinkedMultiValueMap<>(), headers);
 
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 

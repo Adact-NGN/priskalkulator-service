@@ -2,13 +2,16 @@ package no.ding.pk.domain.offer;
 
 import lombok.*;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Setter
 @Getter
@@ -128,5 +131,20 @@ public class PriceRow extends Auditable {
                 "subCategoryDescription = " + subCategoryDescription + ", " +
                 "classId = " + classId + ", " +
                 "classDescription = " + classDescription + ")";
+    }
+
+    public Map<String, String> getMaterialId() {
+        Map<String, String> materialIdMap = new HashMap<>();
+        materialIdMap.put("materialNumber", material.getMaterialNumber());
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            materialIdMap.put("deviceType", deviceType);
+        }
+
+        if(StringUtils.isNotBlank(salesZone)) {
+            materialIdMap.put("salesZone", salesZone);
+        }
+
+        return materialIdMap;
     }
 }

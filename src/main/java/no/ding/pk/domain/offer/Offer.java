@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -84,5 +85,9 @@ public class Offer extends Auditable {
                 "customerName = " + customerName + ", " +
                 "approvalDate = " + approvalDate + ", " +
                 "dateIssued = " + dateIssued + ")";
+    }
+
+    public boolean isNodeCustomer() {
+        return !StringUtils.isBlank(customerType) && StringUtils.equals(customerType, "Node");
     }
 }
