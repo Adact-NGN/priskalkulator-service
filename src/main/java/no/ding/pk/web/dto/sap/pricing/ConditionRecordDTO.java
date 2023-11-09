@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,8 +17,6 @@ import java.util.List;
 public class ConditionRecordDTO {
     @JsonProperty(value = "ConditionTable")
     private String conditionTable;
-    @JsonProperty(value = "ConditionApplication")
-    private String conditionApplication; //"C",
     @JsonProperty(value = "ConditionType")
     private String conditionType; //"ZR05",
     @JsonProperty(value = "ConditionRateValue")
@@ -25,20 +24,32 @@ public class ConditionRecordDTO {
     @JsonProperty(value = "ConditionRateValueUnit")
     private String conditionRateValueUnit; //"NOK",
     @JsonProperty(value = "ConditionQuantity")
-    private Integer conditionQuantity; //"1000",
+    private Double conditionQuantity; //"1000",
     @JsonProperty(value = "ConditionQuantityUnit")
     private String conditionQuantityUnit; // "KG"
 
     @JsonProperty(value = "to_SlsPrcgCndnRecdValidity")
     private List<ConditionRecordValidityDTO> conditionRecordValidityList;
 
-    public static ConditionRecordDTOBuilder builder(String conditionTable, String conditionApplication,
-                                                                String conditionType, Integer conditionRateValue,
-                                                                String conditionRateValueUnit, Integer conditionQuantity,
-                                                                String conditionQuantityUnit) {
-        return hiddenBuilder().conditionTable(conditionTable). conditionApplication(conditionApplication)
-                .conditionType(conditionType).conditionRateValue(conditionRateValue)
-                .conditionRateValueUnit(conditionRateValueUnit).conditionQuantity(conditionQuantity)
+    public static ConditionRecordDTOBuilder builder(String conditionTable,
+                                                    String conditionType,
+                                                    Double conditionRateValue,
+                                                    String conditionRateValueUnit,
+                                                    Double conditionQuantity,
+                                                    String conditionQuantityUnit) {
+        return hiddenBuilder().conditionTable(conditionTable)
+                .conditionType(conditionType)
+                .conditionRateValue(conditionRateValue)
+                .conditionRateValueUnit(conditionRateValueUnit)
+                .conditionQuantity(conditionQuantity)
                 .conditionQuantityUnit(conditionQuantityUnit);
+    }
+
+    public void addConditionRecordValidity(ConditionRecordValidityDTO validityDTO) {
+        if(conditionRecordValidityList == null) {
+            conditionRecordValidityList = new ArrayList<>();
+        }
+
+        conditionRecordValidityList.add(validityDTO);
     }
 }

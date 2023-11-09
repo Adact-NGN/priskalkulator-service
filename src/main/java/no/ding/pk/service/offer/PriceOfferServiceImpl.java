@@ -581,4 +581,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         repository.save(priceOffer);
     }
 
+    @Override
+    public void updateCustomerNumber(Long id, String customerNumber) {
+
+    }
+
 }

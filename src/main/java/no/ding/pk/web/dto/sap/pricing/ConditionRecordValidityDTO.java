@@ -1,11 +1,10 @@
 package no.ding.pk.web.dto.sap.pricing;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 // Price Condition Record Validity
 
@@ -35,6 +34,12 @@ public class ConditionRecordValidityDTO {
 
     @JsonProperty(value = "Material", required = true)
     private String material;
+
+    @JsonProperty(value = "CustomerConditionGroup")
+    private String zone;
+
+    @JsonIgnore
+    private String deviceType;
 
     /**
      * Equivalent to zone. <br/>

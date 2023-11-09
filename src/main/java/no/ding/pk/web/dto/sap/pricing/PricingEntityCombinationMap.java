@@ -15,6 +15,7 @@ public class PricingEntityCombinationMap {
     private Date to;
     private String conditionCode;
     private String keyCombinationTableName;
+    private String valueUnit;
 
     @JsonIgnore
     public String getMaterialId() {
