@@ -2,7 +2,9 @@ package no.ding.pk.repository.specifications;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.SalesOffice;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.parameters.P;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Join;
@@ -63,6 +65,24 @@ public class ApprovalSpecifications {
 
                 for(String status : statusList) {
                     inClause.value(status);
+                }
+
+                return inClause;
+            };
+        }
+    }
+
+    public static Specification<PriceOffer> withSalesOfficeInList(List<String> salesOffices) {
+        if(salesOffices == null) {
+            return null;
+        } else {
+            return (root, query, criteriaBuilder) -> {
+                Join<PriceOffer, SalesOffice> salesOfficeJoin = root.join("salesOffices");
+
+                CriteriaBuilder.In<String> inClause = criteriaBuilder.in(salesOfficeJoin.get("salesOffice"));
+
+                for(String office : salesOffices) {
+                    inClause.value(office);
                 }
 
                 return inClause;

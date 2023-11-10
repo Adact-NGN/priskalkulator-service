@@ -16,10 +16,7 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.CustomerNotProvidedException;
-import no.ding.pk.web.handlers.EmployeeNotProvidedException;
-import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
-import no.ding.pk.web.handlers.PriceOfferStatusCodeNotFoundException;
+import no.ding.pk.web.handlers.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
@@ -107,17 +104,22 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
-    @GetMapping(path = "/list/{salesOffice}")
-    public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@PathVariable("salesOffice") String salesOffice, @RequestParam(value = "statuses", required = false) String statuses) {
+    @Operation(summary = "List Price offers with filtering by sales office number and by status.",
+    parameters = {
+            @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
+            @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
+    })
+    @GetMapping(path = "/list/sales-offices")
+    public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@RequestParam("offices") String salesOffices,
+                                                                        @RequestParam(value = "statuses", required = false) String statuses) {
 
-        List<PriceOffer> priceOffers;
-
-        if(StringUtils.isNotBlank(statuses)) {
-            List<String> statusList = Arrays.stream(statuses.split(",")).toList();
-            priceOffers = service.findAllBySalesOfficeAndStatus(List.of(salesOffice), statusList);
-        } else {
-            priceOffers = service.findAllBySalesOfficeAndStatus(List.of(salesOffice), null);
+        if(StringUtils.isBlank(salesOffices)) {
+            throw new BadRequestException("Missing comma separated list of sales office numbers.");
         }
+        List<String> salesOfficesList = Arrays.stream(salesOffices.split(",")).toList();
+        List<String> statusList = StringUtils.isNotBlank(statuses) ? Arrays.stream(statuses.split(",")).toList() : null;
+
+        List<PriceOffer> priceOffers = service.findAllBySalesOfficeAndStatus(salesOfficesList, statusList);
 
         if(!priceOffers.isEmpty()) {
             List<PriceOfferListDTO> offerListDTOS = priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());

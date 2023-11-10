@@ -583,7 +583,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses) {
-        return repository.findAllBySalesOfficeInList(salesOffices);
+        List<PriceOffer> allBySalesOfficeInList = repository.findAllBySalesOfficeInList(salesOffices);
+        List<PriceOffer> all = repository.findAll(Specification.where(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(statuses)));
+
+        return allBySalesOfficeInList;
     }
 
 }
