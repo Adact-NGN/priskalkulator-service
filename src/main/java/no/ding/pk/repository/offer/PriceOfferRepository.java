@@ -30,4 +30,7 @@ public interface PriceOfferRepository extends JpaRepository<PriceOffer, Long>, J
     @Modifying
     @Query("UPDATE PriceOffer po SET po.priceOfferStatus = :priceOfferStatus where po.id = :id")
     int updateStatus(@Param("id") Long id, @Param("priceOfferStatus") String status);
+
+    @Query("select distinct po from PriceOffer po inner join po.salesOfficeList so where so.salesOffice in :salesOfficeNumbers")
+    List<PriceOffer> findAllBySalesOfficeInList(@Param("salesOfficeNumbers") List<String> salesOfficeNumbers);
 }

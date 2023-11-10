@@ -581,4 +581,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         repository.save(priceOffer);
     }
 
+    @Override
+    public List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses) {
+        return repository.findAllBySalesOfficeInList(salesOffices);
+    }
+
 }

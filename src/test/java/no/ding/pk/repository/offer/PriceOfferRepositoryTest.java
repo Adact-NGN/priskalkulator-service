@@ -138,6 +138,34 @@ public class PriceOfferRepositoryTest {
         assertThat(actualPriceOffer.getPriceOfferStatus(), equalTo(PriceOfferStatus.DRAFT.getStatus()));
     }
 
+    @Test
+    public void shouldReturnAllPriceOffersInSalesOfficeNumberList() {
+
+        SalesOffice salesOffice100 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("100")
+                .build();
+
+        SalesOffice salesOffice104 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("104")
+                .build();
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(salesOffice100, salesOffice104))
+                .build();
+
+        repository.save(priceOffer);
+
+        List<String> salesOffices = List.of("100", "104");
+        List<PriceOffer> actual = repository.findAllBySalesOfficeInList(salesOffices);
+
+        assertThat(actual, hasSize(1));
+    }
+
     private void createCompleteOfferDtoList(User salesAndApproval) {
 
         Material material = Material.builder()

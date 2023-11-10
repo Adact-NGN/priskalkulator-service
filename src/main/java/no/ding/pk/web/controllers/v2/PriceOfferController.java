@@ -107,6 +107,26 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
+    @GetMapping(path = "/list/{salesOffice}")
+    public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@PathVariable("salesOffice") String salesOffice, @RequestParam(value = "statuses", required = false) String statuses) {
+
+        List<PriceOffer> priceOffers;
+
+        if(StringUtils.isNotBlank(statuses)) {
+            List<String> statusList = Arrays.stream(statuses.split(",")).toList();
+            priceOffers = service.findAllBySalesOfficeAndStatus(List.of(salesOffice), statusList);
+        } else {
+            priceOffers = service.findAllBySalesOfficeAndStatus(List.of(salesOffice), null);
+        }
+
+        if(!priceOffers.isEmpty()) {
+            List<PriceOfferListDTO> offerListDTOS = priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
+            return new ResponseEntity<>(offerListDTOS, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK) ;
+    }
+
     /**
      * Activate price offer
      * @param activatedById id for {@code User}
