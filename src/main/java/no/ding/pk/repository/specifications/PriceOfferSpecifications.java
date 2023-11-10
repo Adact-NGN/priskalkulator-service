@@ -4,13 +4,12 @@ import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.SalesOffice;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.parameters.P;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Join;
 import java.util.List;
 
-public class ApprovalSpecifications {
+public class PriceOfferSpecifications {
     public static Specification<PriceOffer> withPriceOfferStatus(String priceOfferStatus) {
         if(priceOfferStatus == null) {
             return null;
@@ -77,7 +76,7 @@ public class ApprovalSpecifications {
             return null;
         } else {
             return (root, query, criteriaBuilder) -> {
-                Join<PriceOffer, SalesOffice> salesOfficeJoin = root.join("salesOffices");
+                Join<PriceOffer, SalesOffice> salesOfficeJoin = root.join("salesOfficeList");
 
                 CriteriaBuilder.In<String> inClause = criteriaBuilder.in(salesOfficeJoin.get("salesOffice"));
 
@@ -88,5 +87,12 @@ public class ApprovalSpecifications {
                 return inClause;
             };
         }
+    }
+
+    public static Specification<PriceOffer> distinct() {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            return null;
+        };
     }
 }
