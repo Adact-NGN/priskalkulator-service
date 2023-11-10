@@ -76,9 +76,9 @@ public class SapPricingServiceImpl implements SapPricingService {
 
         List<ConditionRecordDTO> conditionRecordDTOS = createConditionRecordDTOS(pricingEntityCombinationMaps, materialPriceRowMap, priceOffer);
 
-        String token = getToken();
+        Map<String, String> tokenAndSessionMap = getTokenAndSession();
 
-        Map<String, String> headers = getStandardHeaders(token);
+        Map<String, String> headers = addStandardHeaders(tokenAndSessionMap);
 
         List<SapCreatePricingEntitiesResponse> materialPriceUpdatedStatusList = new ArrayList<>();
 
@@ -89,8 +89,13 @@ public class SapPricingServiceImpl implements SapPricingService {
 
             HttpResponse<String> response = sapHttpClient.getResponse(request);
 
+            if(response.statusCode() == HttpStatus.FORBIDDEN.value()) {
+                throw new RuntimeException("Request was not authorized by server, see message: " + response.body());
+            }
+
             if(response.statusCode() != HttpStatus.CREATED.value()) {
-                log.debug("Error adding new pricing entity. Service returned with status: " + response.statusCode());
+                log.debug("Error adding new pricing entity. Service returned with status: {}, with message: {}", response.statusCode(), response.body());
+                log.debug(response.headers().toString());
                 SapCreatePricingEntitiesResponse responseStatus = createUpdatedStatusResponse(conditionRecordDTO, false);
                 materialPriceUpdatedStatusList.add(responseStatus);
             } else {
@@ -157,10 +162,11 @@ public class SapPricingServiceImpl implements SapPricingService {
         }
     }
 
-    private static Map<String, String> getStandardHeaders(String token) {
-        return Map.of(cCsrfTokenHeaderName, token,
-                HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE,
-                HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+    private static Map<String, String> addStandardHeaders(Map<String, String> token) {
+        Map<String, String> headerMap = new HashMap<>(token);
+        headerMap.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        headerMap.put(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        return headerMap;
     }
 
     private Map<String, PriceRow> createMaterialPriceRowMap(PriceOffer priceOffer) {
@@ -180,7 +186,7 @@ public class SapPricingServiceImpl implements SapPricingService {
         return materialPriceRowMap;
     }
 
-    private String getToken() {
+    private Map<String, String> getTokenAndSession() {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$top", "1");
@@ -191,12 +197,13 @@ public class SapPricingServiceImpl implements SapPricingService {
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
-            log.debug("Got token request successful");
+            log.debug("Getting token and cookie request successful");
 
             Optional<String> optionalToken = response.headers().firstValue(cCsrfTokenHeaderName);
+            List<String> optionalCookie = response.headers().allValues("set-cookie");
 
-            if(optionalToken.isPresent()) {
-                return optionalToken.get();
+            if(optionalToken.isPresent() && !optionalCookie.isEmpty()) {
+                return Map.of(cCsrfTokenHeaderName, optionalToken.get(), "cookie", String.join("", optionalCookie));
             }
         }
 

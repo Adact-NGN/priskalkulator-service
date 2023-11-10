@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -65,6 +64,8 @@ public class SapHttpClient {
 
         HttpRequest.BodyPublisher bodyPublisher = StringUtils.isBlank(body) ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body);
 
+        log.debug("Body publisher created with content length: {}", bodyPublisher.contentLength());
+
         UriComponents url = getUriComponents(sapPricingConditionRecordUrl, params);
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
@@ -81,7 +82,7 @@ public class SapHttpClient {
         UriComponentsBuilder urlBuilder = UriComponentsBuilder
                 .fromUriString(urlString);
 
-        if(params != null) {
+        if(params != null && !params.isEmpty()) {
             urlBuilder.queryParams(params);
         }
 
