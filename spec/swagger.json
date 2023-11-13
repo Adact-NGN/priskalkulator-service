@@ -3589,7 +3589,7 @@
     "/api/v2/price-offer/activate/{activatedById}/{priceOfferId}" : {
       "put" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "activatePriceOffer",
+        "summary" : "Activate price offer",
         "operationId" : "activatePriceOfferUsingPUT",
         "consumes" : [ "application/json" ],
         "produces" : [ "*/*" ],
@@ -3618,7 +3618,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns value true or false depending on if the offer was activated or not.",
             "schema" : {
               "type" : "boolean"
             }
@@ -3899,6 +3899,47 @@
         }
       }
     },
+    "/api/v2/price-offer/list/sales-offices" : {
+      "get" : {
+        "tags" : [ "price-offer-controller" ],
+        "summary" : "List Price offers with filtering by sales office number and by status.",
+        "operationId" : "listAllBySalesOfficeUsingGET",
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "offices",
+          "in" : "query",
+          "description" : "offices",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "statuses",
+          "in" : "query",
+          "description" : "statuses",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/PriceOfferListDTO"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
     "/api/v2/price-offer/list/{salesEmployeeId}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
@@ -4134,6 +4175,9 @@
           "items" : {
             "$ref" : "#/definitions/KeyCombinationDTO"
           }
+        },
+        "priceType" : {
+          "type" : "string"
         }
       },
       "title" : "ConditionCodeDTO"
