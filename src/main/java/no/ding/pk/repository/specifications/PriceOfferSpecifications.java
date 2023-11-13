@@ -9,7 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Join;
 import java.util.List;
 
-public class ApprovalSpecifications {
+public class PriceOfferSpecifications {
     public static Specification<PriceOffer> withPriceOfferStatus(String priceOfferStatus) {
         if(priceOfferStatus == null) {
             return null;

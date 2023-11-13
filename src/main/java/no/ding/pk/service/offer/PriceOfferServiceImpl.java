@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
+import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
 
 @Transactional
 @Service
