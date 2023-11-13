@@ -1,11 +1,10 @@
 package no.ding.pk.web.dto.sap.pricing;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * DTO to use as request body to /A_SlsPrcgConditionRecord for setting material prices in SAP
@@ -19,8 +18,10 @@ public class ConditionRecordDTO {
     private String conditionTable;
     @JsonProperty(value = "ConditionType")
     private String conditionType; //"ZR05",
+
+    @JsonSerialize(using = ToStringSerializer.class)
     @JsonProperty(value = "ConditionRateValue")
-    private Double conditionRateValue; //"-1749.00", // beløp som skal inn 0.00 NOK/% maks to desimaler
+    private String conditionRateValue; //"-1749.00", // beløp som skal inn 0.00 NOK/% maks to desimaler
     @JsonProperty(value = "ConditionRateValueUnit")
     private String conditionRateValueUnit; //"NOK",
     @JsonProperty(value = "ConditionQuantity")
@@ -29,7 +30,11 @@ public class ConditionRecordDTO {
     private String conditionQuantityUnit; // "KG"
 
     @JsonProperty(value = "to_SlsPrcgCndnRecdValidity")
-    private List<ConditionRecordValidityDTO> conditionRecordValidityList;
+    private ConditionRecordValidityDTO conditionRecordValidity;
+
+    public void setConditionRateValue(Double value) {
+        this.conditionRateValue = String.format("%.2f", value);
+    }
 
     public static ConditionRecordDTOBuilder builder(String conditionTable,
                                                     String conditionType,
@@ -39,17 +44,9 @@ public class ConditionRecordDTO {
                                                     String conditionQuantityUnit) {
         return hiddenBuilder().conditionTable(conditionTable)
                 .conditionType(conditionType)
-                .conditionRateValue(conditionRateValue)
+                .conditionRateValue(String.format("%.2f", conditionRateValue))
                 .conditionRateValueUnit(conditionRateValueUnit)
                 .conditionQuantity(conditionQuantity)
                 .conditionQuantityUnit(conditionQuantityUnit);
-    }
-
-    public void addConditionRecordValidity(ConditionRecordValidityDTO validityDTO) {
-        if(conditionRecordValidityList == null) {
-            conditionRecordValidityList = new ArrayList<>();
-        }
-
-        conditionRecordValidityList.add(validityDTO);
     }
 }

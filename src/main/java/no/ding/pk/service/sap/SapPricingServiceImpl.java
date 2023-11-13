@@ -8,10 +8,7 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.utils.SapHttpClient;
-import no.ding.pk.web.dto.sap.pricing.ConditionRecordDTO;
-import no.ding.pk.web.dto.sap.pricing.ConditionRecordValidityDTO;
-import no.ding.pk.web.dto.sap.pricing.PricingEntityCombinationMap;
-import no.ding.pk.web.dto.sap.pricing.SapCreatePricingEntitiesResponse;
+import no.ding.pk.web.dto.sap.pricing.*;
 import no.ding.pk.web.handlers.ErrorRetrievingTokenException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,7 +53,7 @@ public class SapPricingServiceImpl implements SapPricingService {
      * @return List of ConditionRecordValidityDTO objects
      */
     @Override
-    public List<SapCreatePricingEntitiesResponse> updateMaterialPriceEntities(Long priceOfferId, String customerNumber, String customerName,
+    public List<SapCreatePricingEntitiesResponse> updateMaterialPriceEntities(Long priceOfferId, String customerNumber, String nodeNumber, String customerName,
                                                                               List<PricingEntityCombinationMap> pricingEntityCombinationMaps) {
         Optional<PriceOffer> priceOfferOptional = priceOfferService.findById(priceOfferId);
 
@@ -74,7 +71,7 @@ public class SapPricingServiceImpl implements SapPricingService {
 
         Map<String, PriceRow> materialPriceRowMap = createMaterialPriceRowMap(priceOffer);
 
-        List<ConditionRecordDTO> conditionRecordDTOS = createConditionRecordDTOS(pricingEntityCombinationMaps, materialPriceRowMap, priceOffer);
+        List<ConditionRecordDTO> conditionRecordDTOS = createConditionRecordDTOS(pricingEntityCombinationMaps, materialPriceRowMap, priceOffer, nodeNumber);
 
         Map<String, String> tokenAndSessionMap = getTokenAndSession();
 
@@ -86,6 +83,8 @@ public class SapPricingServiceImpl implements SapPricingService {
             String requestBody = writeObjectToRequestBodyString(conditionRecordDTO);
 
             HttpRequest request = sapHttpClient.createPostRequest(sapPricingConditionRecordUrl, requestBody, new LinkedMultiValueMap<>(), headers);
+
+            log.debug("Sending request with body:\n{}", requestBody);
 
             HttpResponse<String> response = sapHttpClient.getResponse(request);
 
@@ -107,7 +106,10 @@ public class SapPricingServiceImpl implements SapPricingService {
         return materialPriceUpdatedStatusList;
     }
 
-    private static List<ConditionRecordDTO> createConditionRecordDTOS(List<PricingEntityCombinationMap> pricingEntityCombinationMaps, Map<String, PriceRow> materialPriceRowMap, PriceOffer priceOffer) {
+    private static List<ConditionRecordDTO> createConditionRecordDTOS(List<PricingEntityCombinationMap> pricingEntityCombinationMaps,
+                                                                      Map<String, PriceRow> materialPriceRowMap,
+                                                                      PriceOffer priceOffer,
+                                                                      String nodeNumber) {
         List<ConditionRecordDTO> conditionRecordDTOS = new ArrayList<>();
         for (PricingEntityCombinationMap combinationMap : pricingEntityCombinationMaps) {
 
@@ -128,14 +130,23 @@ public class SapPricingServiceImpl implements SapPricingService {
                             priceRow.getMaterial().getQuantumUnit())
                     .build();
 
-            ConditionRecordValidityDTO validityDTO = ConditionRecordValidityDTO.builder(
+            ConditionRecordValidityItemDTO.ConditionRecordValidityItemDTOBuilder validityItemDTOBuilder = ConditionRecordValidityItemDTO.builder(
                             combinationMap.getSalesOrg(),
                             combinationMap.getSalesOffice(),
-                            priceOffer.getCustomerNumber(),
-                            combinationMap.getMaterialNumber())
-                    .build();
+                            combinationMap.getMaterialNumber());
 
-            conditionRecordDTO.addConditionRecordValidity(validityDTO);
+            if(StringUtils.isNotBlank(nodeNumber)) {
+                validityItemDTOBuilder.customerHierarchy(nodeNumber);
+            } else {
+                validityItemDTOBuilder.customer(priceOffer.getCustomerNumber());
+            }
+
+            List<ConditionRecordValidityItemDTO> conditionRecordValidityItems = new ArrayList<>();
+            conditionRecordValidityItems.add(validityItemDTOBuilder.build());
+
+            conditionRecordDTO.setConditionRecordValidity(ConditionRecordValidityDTO.builder()
+                            .conditionRecordValidityItemDTOS(conditionRecordValidityItems)
+                    .build());
 
             conditionRecordDTOS.add(conditionRecordDTO);
         }
@@ -143,10 +154,12 @@ public class SapPricingServiceImpl implements SapPricingService {
     }
 
     private static SapCreatePricingEntitiesResponse createUpdatedStatusResponse(ConditionRecordDTO conditionRecordDTO, boolean isUpdated) {
-        ConditionRecordValidityDTO validityDTO = conditionRecordDTO.getConditionRecordValidityList().get(0);
+        ConditionRecordValidityItemDTO validityDTO = conditionRecordDTO.getConditionRecordValidity().getConditionRecordValidityItemDTOS().get(0);
         return new SapCreatePricingEntitiesResponse(
                 validityDTO.getSalesOrganization(),
                 validityDTO.getSalesOffice(),
+                validityDTO.getCustomer(),
+                validityDTO.getCustomerHierarchy(),
                 validityDTO.getMaterial(),
                 validityDTO.getDeviceType(),
                 validityDTO.getZone(),
@@ -203,12 +216,32 @@ public class SapPricingServiceImpl implements SapPricingService {
             List<String> optionalCookie = response.headers().allValues("set-cookie");
 
             if(optionalToken.isPresent() && !optionalCookie.isEmpty()) {
-                return Map.of(cCsrfTokenHeaderName, optionalToken.get(), "cookie", String.join("", optionalCookie));
+                String mysapsso2 = getCookiePart(optionalCookie, "MYSAPSSO2");
+                String sapSession = getCookiePart(optionalCookie, "SAP_SESSIONID");
+                String userContext = getCookiePart(optionalCookie, "sap-usercontext");
+
+                return Map.of(cCsrfTokenHeaderName, optionalToken.get(), HttpHeaders.COOKIE, String.join("", String.join("; ", mysapsso2, sapSession, userContext)));
             }
         }
 
         log.debug("Requesting for Token resulting in bad response: {}", response.statusCode());
 
         throw new ErrorRetrievingTokenException();
+    }
+
+    private static String getCookiePart(List<String> optionalCookie, String cookiePartPrefix) {
+        Optional<String> cookiePartOptional = optionalCookie.stream().filter(s -> s.startsWith(cookiePartPrefix)).findFirst();
+
+        String cookiePart;
+        if(cookiePartOptional.isPresent()) {
+            cookiePart = cookiePartOptional.get();
+
+            if(cookiePart.split(";").length > 0) {
+                cookiePart = cookiePart.split(";")[0];
+            }
+        } else {
+            throw new RuntimeException(String.format("Could not get %s cookie element", cookiePartPrefix));
+        }
+        return cookiePart;
     }
 }

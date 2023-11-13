@@ -1,10 +1,11 @@
 package no.ding.pk.web.dto.sap.pricing;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // Price Condition Record Validity
 
@@ -16,39 +17,17 @@ import lombok.Data;
  * (such as business partner, material, and so on), and a condition type.
  * The start and end date will be handled automatically in sap if not set.
  */
-@Builder(builderMethodName = "hiddenBuilder")
+@Builder
 @Data
-@JsonRootName("results")
 public class ConditionRecordValidityDTO {
-    @JsonProperty(value = "ConditionRecord")
-    private String conditionRecord;
+    @JsonProperty(value = "results")
+    private List<ConditionRecordValidityItemDTO> conditionRecordValidityItemDTOS;
 
-    @JsonProperty(value = "SalesOrganization", required = true)
-    private String salesOrganization;
+    public void addConditionRecordValidity(ConditionRecordValidityItemDTO validityDTO) {
+        if(conditionRecordValidityItemDTOS == null) {
+            conditionRecordValidityItemDTOS = new ArrayList<>();
+        }
 
-    @JsonProperty(value = "SalesOffice", required = true)
-    private String salesOffice;
-
-    @JsonProperty(value = "Customer", required = true)
-    private String customer;
-
-    @JsonProperty(value = "Material", required = true)
-    private String material;
-
-    @JsonProperty(value = "CustomerConditionGroup")
-    private String zone;
-
-    @JsonIgnore
-    private String deviceType;
-
-    /**
-     * Equivalent to zone. <br/>
-     * Format example '01'
-     */
-    //@JsonProperty(value = "CustomerConditionGroup")
-    //private String customerConditionGroup;
-
-    public static ConditionRecordValidityDTOBuilder builder(String salesOrganization, String salesOffice, String customer, String material) {
-        return hiddenBuilder().salesOrganization(salesOrganization).salesOffice(salesOffice).customer(customer).material(material);
+        conditionRecordValidityItemDTOS.add(validityDTO);
     }
 }

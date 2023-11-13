@@ -8,6 +8,8 @@ import lombok.Data;
 public class SapCreatePricingEntitiesResponse {
     private String salesOrg;
     private String salesOffice;
+    private String customerNumber;
+    private String customerHierarchy;
     private String materialNumber;
     private String deviceType;
     private String zone;

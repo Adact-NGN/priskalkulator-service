@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -87,6 +88,7 @@ public class Offer extends Auditable {
                 "dateIssued = " + dateIssued + ")";
     }
 
+    @JsonIgnore
     public boolean isNodeCustomer() {
         return !StringUtils.isBlank(customerType) && StringUtils.equals(customerType, "Node");
     }

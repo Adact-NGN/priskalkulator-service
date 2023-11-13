@@ -114,4 +114,6 @@ public class WebTestConfig implements WebMvcConfigurer {
     @MockBean
     private ZoneRepository zoneRepository;
 
+    @MockBean
+    private SapPricingService sapPricingService;
 }

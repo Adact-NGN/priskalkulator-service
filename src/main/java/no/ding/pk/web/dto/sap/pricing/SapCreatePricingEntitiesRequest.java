@@ -9,5 +9,6 @@ public class SapCreatePricingEntitiesRequest {
     private Long priceOfferId;
     private String customerName;
     private String customerNumber;
+    private String nodeNumber;
     private List<PricingEntityCombinationMap> pricingEntityCombinationMaps;
 }

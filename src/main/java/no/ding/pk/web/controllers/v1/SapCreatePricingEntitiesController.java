@@ -35,6 +35,7 @@ public class SapCreatePricingEntitiesController {
 
         return sapPricingService.updateMaterialPriceEntities(pricingEntitiesRequest.getPriceOfferId(),
                 pricingEntitiesRequest.getCustomerNumber(),
+                pricingEntitiesRequest.getNodeNumber(),
                 pricingEntitiesRequest.getCustomerName(),
                 pricingEntitiesRequest.getPricingEntityCombinationMaps());
     }
