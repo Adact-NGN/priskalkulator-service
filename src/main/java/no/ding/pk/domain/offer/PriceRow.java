@@ -9,9 +9,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Setter
 @Getter
@@ -133,18 +131,19 @@ public class PriceRow extends Auditable {
                 "classDescription = " + classDescription + ")";
     }
 
-    public Map<String, String> getMaterialId() {
-        Map<String, String> materialIdMap = new HashMap<>();
-        materialIdMap.put("materialNumber", material.getMaterialNumber());
+    public String getMaterialId() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(material.getMaterialNumber());
 
         if(StringUtils.isNotBlank(deviceType)) {
-            materialIdMap.put("deviceType", deviceType);
+            sb.append("_").append(deviceType);
         }
 
         if(StringUtils.isNotBlank(salesZone)) {
-            materialIdMap.put("salesZone", salesZone);
+            sb.append("_").append(salesZone);
         }
 
-        return materialIdMap;
+        return sb.toString();
     }
 }

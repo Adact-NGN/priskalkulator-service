@@ -3,9 +3,7 @@ package no.ding.pk.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
-import no.ding.pk.repository.SalesOfficePowerOfAttorneyRepository;
-import no.ding.pk.repository.SalesRoleRepository;
-import no.ding.pk.repository.UserRepository;
+import no.ding.pk.repository.*;
 import no.ding.pk.repository.offer.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -57,6 +55,12 @@ public abstract class AbstractIntegrationConfig {
 
     @Autowired
     private SalesOfficePowerOfAttorneyRepository salesOfficePowerOfAttorneyRepository;
+
+    @Autowired
+    private DiscountRepository discountRepository;
+
+    @Autowired
+    private DiscountLevelRepository discountLevelRepository;
 
     @Autowired
     private EntityManagerFactory emFactory;

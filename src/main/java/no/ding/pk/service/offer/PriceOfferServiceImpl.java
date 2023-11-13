@@ -586,4 +586,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(statuses)));
     }
 
+    @Override
+    public void updateCustomerNumber(Long id, String customerNumber) {
+        repository.updateCustomerNumber(id, customerNumber);
+    }
+
 }

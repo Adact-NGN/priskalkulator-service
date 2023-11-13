@@ -95,8 +95,7 @@ public class SapPricingServiceImpl implements SapPricingService {
             if(response.statusCode() != HttpStatus.CREATED.value()) {
                 log.debug("Error adding new pricing entity. Service returned with status: {}, with message: {}", response.statusCode(), response.body());
                 log.debug(response.headers().toString());
-                SapCreatePricingEntitiesResponse responseStatus = createUpdatedStatusResponse(conditionRecordDTO, false);
-                materialPriceUpdatedStatusList.add(responseStatus);
+                throw new RuntimeException("Unable to process request by server, see message: " + response.body());
             } else {
                 SapCreatePricingEntitiesResponse responseStatus = createUpdatedStatusResponse(conditionRecordDTO, true);
                 materialPriceUpdatedStatusList.add(responseStatus);
@@ -124,7 +123,7 @@ public class SapPricingServiceImpl implements SapPricingService {
             ConditionRecordDTO conditionRecordDTO = ConditionRecordDTO.builder(
                             combinationMap.getKeyCombinationTableName(),
                             combinationMap.getConditionCode(),
-                            priceRow.getDiscountLevelPrice(),
+                            combinationMap.getRateValue(),
                             combinationMap.getValueUnit(),
                             priceRow.getMaterial().getScaleQuantum(),
                             priceRow.getMaterial().getQuantumUnit())
@@ -139,6 +138,14 @@ public class SapPricingServiceImpl implements SapPricingService {
                 validityItemDTOBuilder.customerHierarchy(nodeNumber);
             } else {
                 validityItemDTOBuilder.customer(priceOffer.getCustomerNumber());
+            }
+
+            if(combinationMap.getZone() != null) {
+                if(combinationMap.getZone() > 9) {
+                    validityItemDTOBuilder.zone(String.format("%d", combinationMap.getZone()));
+                } else {
+                    validityItemDTOBuilder.zone(String.format("%02d", combinationMap.getZone()));
+                }
             }
 
             List<ConditionRecordValidityItemDTO> conditionRecordValidityItems = new ArrayList<>();
@@ -191,7 +198,7 @@ public class SapPricingServiceImpl implements SapPricingService {
             for (PriceRow priceRow : salesOffice.getMaterialList()) {
                 String sb = salesOffice.getSalesOrg() + "_"
                         + salesOffice.getSalesOffice() + "_"
-                        + String.join("_", priceRow.getMaterialId().values());
+                        + String.join("_", priceRow.getMaterialId());
                 materialPriceRowMap.put(sb, priceRow);
             }
         }

@@ -1,10 +1,12 @@
 package no.ding.pk.web.dto.sap.pricing;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
+@Builder(builderMethodName = "hiddenBuilder")
 @Data
 public class PricingEntityCombinationMap {
     private String salesOrg;
@@ -15,6 +17,7 @@ public class PricingEntityCombinationMap {
     private Date to;
     private String conditionCode;
     private String keyCombinationTableName;
+    private Double rateValue;
     private String valueUnit;
 
     @JsonIgnore
@@ -32,5 +35,13 @@ public class PricingEntityCombinationMap {
         }
 
         return sb.toString();
+    }
+
+    public static PricingEntityCombinationMapBuilder builder(String salesOrg, String salesOffice, String materialNumber,
+                                                             String conditionCode, String keyCombinationTableName,
+                                                             Double rateValue, String valueUnit) {
+        return hiddenBuilder().salesOrg(salesOrg).salesOffice(salesOffice).materialNumber(materialNumber)
+                .conditionCode(conditionCode).keyCombinationTableName(keyCombinationTableName)
+                .rateValue(rateValue).valueUnit(valueUnit);
     }
 }
