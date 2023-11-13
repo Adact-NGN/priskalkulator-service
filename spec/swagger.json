@@ -3920,7 +3920,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "A list of price offers filtered on sales office numbers and, if given, a list of statuses.",
             "schema" : {
               "type" : "array",
               "items" : {

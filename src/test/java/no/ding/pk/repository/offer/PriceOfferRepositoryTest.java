@@ -20,8 +20,6 @@ import java.util.List;
 
 import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
 import static no.ding.pk.repository.specifications.PriceOfferSpecifications.withPriceOfferStatusInList;
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.withPriceOfferStatusInList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
