@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
+import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
 
 @Transactional
 @Service
@@ -582,8 +582,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public void updateCustomerNumber(Long id, String customerNumber) {
-
+    public List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses) {
+        return repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(statuses)));
     }
 
 }
