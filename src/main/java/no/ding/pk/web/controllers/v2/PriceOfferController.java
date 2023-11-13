@@ -16,10 +16,7 @@ import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.CustomerNotProvidedException;
-import no.ding.pk.web.handlers.EmployeeNotProvidedException;
-import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
-import no.ding.pk.web.handlers.PriceOfferStatusCodeNotFoundException;
+import no.ding.pk.web.handlers.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
@@ -36,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RestController(value = "priceOfferControllerV2")
@@ -107,6 +103,34 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
+    @Operation(summary = "List Price offers with filtering by sales office number and by status.",
+    parameters = {
+            @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
+            @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "A list of price offers filtered on sales office numbers and, if given, a list of statuses.")
+    })
+    @GetMapping(path = "/list/sales-offices")
+    public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@RequestParam("offices") String salesOffices,
+                                                                        @RequestParam(value = "statuses", required = false) String statuses) {
+
+        if(StringUtils.isBlank(salesOffices)) {
+            throw new BadRequestException("Missing comma separated list of sales office numbers.");
+        }
+        List<String> salesOfficesList = Arrays.stream(salesOffices.split(",")).toList();
+        List<String> statusList = StringUtils.isNotBlank(statuses) ? Arrays.stream(statuses.split(",")).toList() : null;
+
+        List<PriceOffer> priceOffers = service.findAllBySalesOfficeAndStatus(salesOfficesList, statusList);
+
+        if(!priceOffers.isEmpty()) {
+            List<PriceOfferListDTO> offerListDTOS = priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
+            return new ResponseEntity<>(offerListDTOS, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK) ;
+    }
+
     /**
      * Activate price offer
      * @param activatedById id for {@code User}
@@ -114,6 +138,16 @@ public class PriceOfferController {
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
+    @Operation(summary = "Activate price offer",
+            parameters = {
+                    @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by."),
+                    @Parameter(name = "priceOfferId", description = "ID for the price offer being activated."),
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body must contain updated contract terms. Optionally users can add a general comment to the priceing team.")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns value true or false depending on if the offer was activated or not.")
+    })
     @PutMapping(path = "/activate/{activatedById}/{priceOfferId}")
     public ResponseEntity<Boolean> activatePriceOffer(@PathVariable("activatedById") Long activatedById,
                                       @PathVariable("priceOfferId") Long priceOfferId,
@@ -254,49 +288,6 @@ public class PriceOfferController {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-
-    /**
-     * Adds missing fields for the {@code Material} object. The ModelMapper is unable to map all fields when converting from a string to an object.
-     * @param priceOfferDTO incoming price {@code PriceOfferDTO} offer to get missing values from
-     * @param priceOffer converted {@code PriceOffer} to update
-     */
-    private void mapMaterialValues(PriceOfferDTO priceOfferDTO, PriceOffer priceOffer) {
-        if(priceOfferDTO.getSalesOfficeList() == null) {
-            return;
-        }
-        priceOfferDTO.getSalesOfficeList().forEach(salesOfficeDTO -> {
-            SalesOffice salesOffice = priceOffer.getSalesOfficeList().stream().filter(so -> salesOfficeDTO.getSalesOffice().equals(so.getSalesOffice())).findAny().orElse(null);
-
-            if(salesOfficeDTO.getMaterialList() != null) {
-                salesOfficeDTO.getMaterialList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
-
-            if(salesOfficeDTO.getRentalList() != null) {
-                salesOfficeDTO.getRentalList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
-
-            if(salesOfficeDTO.getTransportServiceList() != null) {
-                salesOfficeDTO.getTransportServiceList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
-        });
-    }
-
-    private Consumer<PriceRowDTO> updateMaterialInPriceRowsIn(SalesOffice salesOffice) {
-        return priceRowDTO -> {
-            String materialNumber = priceRowDTO.getMaterial();
-
-            PriceRow priceRow = salesOffice.getMaterialList().stream().filter(pr -> materialNumber.equals(pr.getMaterial().getMaterialNumber())).findAny().orElse(null);
-
-            if (priceRow == null) {
-                return;
-            }
-            Material material = priceRow.getMaterial();
-
-            if (material != null) {
-                createMaterialFromPriceRowDTO(material, priceRowDTO, salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), priceRowDTO.getSalesZone());
-            }
-        };
-    }
 
     private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from, String salesOrg, String salesOffice, String salesZone) {
         log.debug("To: {}, from: {}", to, from);

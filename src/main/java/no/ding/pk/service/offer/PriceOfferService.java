@@ -31,4 +31,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllPriceOffersRadyForBoReport();
 
     void updateStatus(Long id, String status);
+
+    List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses);
 }

@@ -18,8 +18,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.withApproverId;
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.withPriceOfferStatus;
+import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
+import static no.ding.pk.repository.specifications.PriceOfferSpecifications.withPriceOfferStatusInList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -136,6 +136,305 @@ public class PriceOfferRepositoryTest {
 
         assertThat(actualPriceOffer.getPriceOfferStatus(), notNullValue());
         assertThat(actualPriceOffer.getPriceOfferStatus(), equalTo(PriceOfferStatus.DRAFT.getStatus()));
+    }
+
+    @Test
+    public void shouldReturnAllPriceOffersInSalesOfficeNumberList() {
+
+        SalesOffice salesOffice100 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("100")
+                .build();
+
+        SalesOffice salesOffice104 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("104")
+                .build();
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(salesOffice100, salesOffice104))
+                .build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(SalesOffice.builder().salesOffice("109").salesOrg("100").build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("100", "104");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(null)));
+
+        assertThat(actual, hasSize(1));
+    }
+
+    @Test
+    public void shouldReturnNoPriceOffersInSalesOfficeNumberList() {
+
+        SalesOffice salesOffice100 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("100")
+                .build();
+
+        SalesOffice salesOffice104 = SalesOffice.builder()
+                .salesOrg("100")
+                .salesOffice("104")
+                .build();
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(salesOffice100, salesOffice104))
+                .build();
+
+        repository.save(priceOffer);
+
+        List<String> salesOffices = List.of("109", "110");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(null)));
+
+        assertThat(actual, hasSize(0));
+    }
+
+    @Test
+    public void shouldReturnMultiplePriceOffersInSalesOfficeNumberList() {
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerName("First customer")
+                .customerNumber("123456789")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        User otherSalesEmployee = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no").build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .customerName("Other customer")
+                .customerNumber("987654321")
+                .salesEmployee(otherSalesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("100");
+        List<PriceOffer> actual = repository.findAllBySalesOfficeInList(salesOffices);
+
+        assertThat(actual, hasSize(2));
+    }
+
+    @Test
+    public void shouldReturnSinglePriceOffersInSalesOfficeNumberList() {
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("PENDING")
+                .customerName("First customer")
+                .customerNumber("123456789")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        User otherSalesEmployee = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no").build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("ACTIVATED")
+                .customerName("Other customer")
+                .customerNumber("987654321")
+                .salesEmployee(otherSalesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("102")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("104");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(List.of("PENDING"))));
+
+        assertThat(actual, hasSize(1));
+    }
+
+    @Test
+    public void shouldReturnAllPriceOffersWhenStatusIsNotGiven() {
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("PENDING")
+                .customerName("First customer")
+                .customerNumber("123456789")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        User otherSalesEmployee = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no").build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("ACTIVATED")
+                .customerName("Other customer")
+                .customerNumber("987654321")
+                .salesEmployee(otherSalesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("102")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("100", "102", "104");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(null)));
+
+        assertThat(actual, hasSize(2));
+    }
+
+    @Test
+    public void shouldReturnAllPriceOffersInSalesOfficeNumberListWithStatusesInList() {
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("PENDING")
+                .customerName("First customer")
+                .customerNumber("123456789")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        User otherSalesEmployee = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no").build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("ACTIVATED")
+                .customerName("Other customer")
+                .customerNumber("987654321")
+                .salesEmployee(otherSalesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("102")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("104");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(List.of("PENDING", "ACTIVATED"))));
+
+        assertThat(actual, hasSize(2));
+    }
+
+    @Test
+    public void shouldReturnAllPriceOffersInSalesOfficeNumberListAndStatusListIsEmpty() {
+
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("PENDING")
+                .customerName("First customer")
+                .customerNumber("123456789")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("100")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        User otherSalesEmployee = User.builder("Eirik", "Flaa", "Eirik Flaa", "Eirik.Flaa@ngn.no", "Eirik.Flaa@ngn.no").build();
+
+        PriceOffer otherPriceOffer = PriceOffer.priceOfferBuilder()
+                .priceOfferStatus("ACTIVATED")
+                .customerName("Other customer")
+                .customerNumber("987654321")
+                .salesEmployee(otherSalesEmployee)
+                .salesOfficeList(List.of(
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("102")
+                                .build(),
+                        SalesOffice.builder()
+                                .salesOrg("100")
+                                .salesOffice("104")
+                                .build()))
+                .build();
+
+        repository.save(priceOffer);
+        repository.save(otherPriceOffer);
+
+        List<String> salesOffices = List.of("104");
+        List<PriceOffer> actual = repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(null)));
+
+        assertThat(actual, hasSize(2));
     }
 
     private void createCompleteOfferDtoList(User salesAndApproval) {
@@ -362,13 +661,6 @@ public class PriceOfferRepositoryTest {
 
         MaterialPrice liftEmptyingPrice = MaterialPrice.builder("100", "100", "50103", null, formattedZoneId)
                 .standardPrice(1131.0)
-                .build();
-        Material liftEmptying = Material.builder()
-                .materialNumber("50103")
-                .designation("Lift - Tømming")
-                .pricingUnit(1)
-                .quantumUnit("ST")
-                .materialStandardPrice(liftEmptyingPrice)
                 .build();
 
         PriceRow liftEmptyingPriceRow = PriceRow.builder()
