@@ -83,6 +83,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         entity.setOrganizationNumber(newPriceOffer.getOrganizationNumber());
 
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
+
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
@@ -97,7 +98,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
             if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
                 entity.setContactPersonList(newPriceOffer.getContactPersonList());
-//                entity = repository.save(entity);
             }
         }
 
@@ -416,10 +416,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             } else {
                 priceOfferToApprove.setNeedsApproval(false);
                 priceOfferToApprove.setApprovalDate(new Date());
+                priceOfferToApprove.setMaterialsForApproval(null);
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
             priceOfferToApprove.setAdditionalInformation(additionalInformation);
+            priceOfferToApprove.setMaterialsForApproval(null);
         }
 
         priceOfferToApprove = repository.save(priceOfferToApprove);
@@ -589,6 +591,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     @Override
     public void updateCustomerNumber(Long id, String customerNumber) {
         repository.updateCustomerNumber(id, customerNumber);
+    }
+
+    @Override
+    public PriceOffer updatePriceOffer(PriceOffer priceOffer) {
+        return repository.save(priceOffer);
     }
 
 }

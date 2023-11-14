@@ -7,12 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.*;
+import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
@@ -289,31 +289,6 @@ public class PriceOfferController {
     }
 
 
-    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from, String salesOrg, String salesOffice, String salesZone) {
-        log.debug("To: {}, from: {}", to, from);
-        to.setDesignation(from.getDesignation());
-        to.setMaterialGroupDesignation(from.getProductGroupDesignation());
-        to.setMaterialTypeDescription(from.getMaterialDesignation());
-        to.setDeviceType(from.getDeviceType());
-        MaterialPrice materialStdPrice = MaterialPrice
-                .builder(salesOrg, salesOffice, from.getMaterial(), from.getDeviceType(), salesZone)
-                .standardPrice(from.getStandardPrice())
-                .pricingUnit(from.getPricingUnit())
-                .quantumUnit(from.getQuantumUnit())
-                .build();
-        to.setMaterialStandardPrice(materialStdPrice);
-
-        to.setPricingUnit(from.getPricingUnit());
-        to.setQuantumUnit(from.getQuantumUnit());
-
-        to.setCategoryId(from.getCategoryId());
-        to.setCategoryDescription(from.getCategoryDescription());
-        to.setSubCategoryId(from.getSubCategoryId());
-        to.setSubCategoryDescription(from.getSubCategoryDescription());
-        to.setClassId(from.getClassId());
-        to.setClassDescription(from.getClassDescription());
-    }
-
     /**
      * Update price offer
      * @param id Price offer id
@@ -341,34 +316,6 @@ public class PriceOfferController {
         watch.stop();
         log.debug("Time used to update price offer: {} ms", watch.getTime());
 
-        if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
-            updatedOffer.setNeedsApproval(true);
-            updatedOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-        }
-
-        // TODO: This probably overwrites what the service layer is doing :S
-        if(priceOfferCandidateForApprovalAndIsNotApproved(updatedOffer)) {
-            List<Integer> salesOffices = collectSalesOfficeNumbers(updatedOffer);
-            
-            if(!salesOffices.isEmpty()) {
-                List<PowerOfAttorney> poa = sopoaService.findBySalesOfficeInList(salesOffices);
-                
-                if(!poa.isEmpty()) {
-                    User approver = getApproverForPriceOffer(poa);
-                    
-                    if(approver != null) {
-                        updatedOffer.setApprover(approver);
-
-                        updatedOffer = service.save(updatedOffer);
-                    } else {
-                        log.debug("Could not find any eligible approver for offer with id: {}, sales offices: {}", updatedOffer.getId(), salesOffices);
-                    }
-                } else {
-                    log.debug("No Power of attorneys found for any sales offices added to the price offer: {}", salesOffices);
-                }
-            }
-        }
-        
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
 
