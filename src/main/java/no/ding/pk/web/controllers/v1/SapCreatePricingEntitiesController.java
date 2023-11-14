@@ -33,7 +33,22 @@ public class SapCreatePricingEntitiesController {
             throw new RuntimeException("No price offer id provided");
         }
 
-        return sapPricingService.updateMaterialPriceEntities(pricingEntitiesRequest.getPriceOfferId(),
+        return sapPricingService.updateMaterialPriceEntities(
+                pricingEntitiesRequest.getPriceOfferId(),
+                pricingEntitiesRequest.getCustomerNumber(),
+                pricingEntitiesRequest.getNodeNumber(),
+                pricingEntitiesRequest.getCustomerName(),
+                pricingEntitiesRequest.getPricingEntityCombinationMaps());
+    }
+
+    @PostMapping(path = "/create/batch")
+    public List<SapCreatePricingEntitiesResponse> createNewSapPricingEntitiesBatchOperation(@RequestBody SapCreatePricingEntitiesRequest pricingEntitiesRequest) {
+        if(pricingEntitiesRequest.getPriceOfferId() == null) {
+            log.debug("No price offer id provided");
+            throw new RuntimeException("No price offer id provided");
+        }
+
+        return sapPricingService.batchUpdateMaterialPriceEntities(pricingEntitiesRequest.getPriceOfferId(),
                 pricingEntitiesRequest.getCustomerNumber(),
                 pricingEntitiesRequest.getNodeNumber(),
                 pricingEntitiesRequest.getCustomerName(),

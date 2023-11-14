@@ -159,6 +159,69 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
     }
 
     @Test
+    public void shouldBatchUpdateZr05MaterialPrice() {
+        User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde",
+                "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no").build();
+
+        String salesOrg = "100";
+        String salesOffice = "100";
+        String conditionCode = "ZR05";
+        String keyCombination = "704";
+        String materialNumber = "111101";
+        String valueUnit = "NOK";
+        double rateValue = -1749.00;
+
+        Material material = Material.builder()
+                .materialNumber(materialNumber)
+                .designation("Matavfall, uembalert")
+                .build();
+        PriceOffer priceOffer = PriceOffer.priceOfferBuilder()
+                .customerNumber("115938")
+                .customerName("Bjørløw Campingdrift AS")
+                .salesEmployee(salesEmployee)
+                .salesOfficeList(List.of(SalesOffice.builder()
+                        .salesOrg(salesOrg)
+                        .salesOffice(salesOffice)
+                        .materialList(List.of(
+                                PriceRow.builder()
+                                        .standardPrice(2878.0)
+                                        .material(material)
+                                        .build(),
+                                PriceRow.builder()
+                                        .standardPrice(3878.0)
+                                        .material(Material.builder().materialNumber("111102").build())
+                                        .build()
+                        ))
+                        .build()))
+                .build();
+
+        priceOffer = getPriceOfferRepository().save(priceOffer);
+
+        List<PricingEntityCombinationMap> pricingEntityCombinationMaps = new ArrayList<>();
+
+        PricingEntityCombinationMap entityCombinationMap = PricingEntityCombinationMap.builder(
+                        salesOrg, salesOffice, materialNumber, conditionCode, keyCombination,
+                        rateValue, valueUnit)
+                .build();
+
+        pricingEntityCombinationMaps.add(entityCombinationMap);
+
+        PricingEntityCombinationMap otherEntityCombinationMap = PricingEntityCombinationMap.builder(
+                        salesOrg, salesOffice, "111102", conditionCode, "766",
+                        -10.0, valueUnit)
+                .build();
+
+        pricingEntityCombinationMaps.add(otherEntityCombinationMap);
+
+        List<SapCreatePricingEntitiesResponse> actual = sapPricingService.batchUpdateMaterialPriceEntities(priceOffer.getId(),
+                priceOffer.getCustomerNumber(), null, priceOffer.getCustomerName(),
+                pricingEntityCombinationMaps);
+
+        assertThat(actual, hasSize(1));
+        assertThat(actual.get(0).isUpdated(), is(true));
+    }
+
+    @Test
     public void shouldUpdateZptrMaterialPrice() {
 
         User salesEmployee = User.builder("Kjetil", "Minde", "Kjetil Minde",

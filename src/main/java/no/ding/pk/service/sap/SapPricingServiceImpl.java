@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -103,6 +104,109 @@ public class SapPricingServiceImpl implements SapPricingService {
         }
 
         return materialPriceUpdatedStatusList;
+    }
+
+    @Override
+    public List<SapCreatePricingEntitiesResponse> batchUpdateMaterialPriceEntities(Long priceOfferId, String customerNumber, String nodeNumber, String customerName, List<PricingEntityCombinationMap> pricingEntityCombinationMaps) {
+        Optional<PriceOffer> priceOfferOptional = priceOfferService.findById(priceOfferId);
+
+        if(priceOfferOptional.isEmpty()) {
+            String errorMessage = String.format("No price offer with id %d, found.", priceOfferId);
+            log.debug(errorMessage);
+            throw new RuntimeException(errorMessage);
+        }
+
+        PriceOffer priceOffer = priceOfferOptional.get();
+
+        if(StringUtils.isNotBlank(customerNumber) && !StringUtils.equals(customerNumber, priceOffer.getCustomerNumber())) {
+            priceOfferService.updateCustomerNumber(priceOffer.getId(), customerNumber);
+        }
+
+        Map<String, PriceRow> materialPriceRowMap = createMaterialPriceRowMap(priceOffer);
+
+        List<ConditionRecordDTO> conditionRecordDTOS = createConditionRecordDTOS(pricingEntityCombinationMaps, materialPriceRowMap, priceOffer, nodeNumber);
+
+        Map<String, String> tokenAndSessionMap = getTokenAndSession();
+
+        Map<String, String> headers = addStandardHeaders(tokenAndSessionMap);
+
+        List<SapCreatePricingEntitiesResponse> materialPriceUpdatedStatusList = new ArrayList<>();
+
+        List<String> changeSetRequestBodies = new ArrayList<>();
+
+        for (ConditionRecordDTO conditionRecordDTO : conditionRecordDTOS) {
+            String requestBody = writeObjectToRequestBodyString(conditionRecordDTO);
+            changeSetRequestBodies.add(requestBody);
+        }
+
+        StringBuilder batchRequestSb = new StringBuilder();
+
+        int batchNumber = 1;
+        int changeSet = 1;
+        String batchTitle = String.format("batch_B%02d", batchNumber);
+
+        for(String changeSetBody : changeSetRequestBodies) {
+            String changeSetTitle = String.format("changeset_%02d", changeSet);
+
+            String batchRequestPart = String.format("""
+                    --%s
+                    %s: %s; boundary=%s
+                    
+                    --%s
+                    %s: %s
+                    %s: %s
+                    
+                    
+                    %s %s HTTP/1.1
+                    sap-context-accept: header
+                    %s: %sl
+                    %s: %s
+                    
+                    %s
+                    
+                    --%s--
+                    
+                    """,
+                    batchTitle,
+                    HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_MIXED, changeSetTitle,
+                    changeSetTitle,
+                    HttpHeaders.CONTENT_TYPE, "application/http",
+                    "Content-Transfer-Encoding", "binary",
+                    HttpMethod.POST, "A_SlsPrcgConditionRecord",
+                    HttpHeaders.CONTENT_TYPE, headers.get(HttpHeaders.CONTENT_TYPE),
+                    HttpHeaders.ACCEPT, headers.get(HttpHeaders.ACCEPT),
+                    changeSetBody,
+                    changeSetTitle);
+
+            batchRequestSb.append("\n").append(batchRequestPart);
+
+            changeSet++;
+        }
+
+        batchRequestSb.append(String.format("--%s--", batchTitle));
+
+        String batchRequestSbString = batchRequestSb.toString();
+        Map<String, String> multipartHeader = Map.of(
+                cCsrfTokenHeaderName, headers.get(cCsrfTokenHeaderName),
+                HttpHeaders.COOKIE, headers.get(HttpHeaders.COOKIE),
+                HttpHeaders.CONTENT_TYPE, "multipart/mixed; boundary=batch");
+        HttpRequest request = sapHttpClient.createPostRequest(sapPricingConditionRecordUrl, batchRequestSbString, new LinkedMultiValueMap<>(), multipartHeader);
+
+        log.debug("Sending request with body length: {}", batchRequestSbString.length());
+
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
+
+        if(response.statusCode() == HttpStatus.FORBIDDEN.value()) {
+            throw new RuntimeException("Request was not authorized by server, see message: " + response.body());
+        }
+
+        if(response.statusCode() != HttpStatus.OK.value()) {
+            log.debug("Error adding new pricing entity. Service returned with status: {}, with message: {}", response.statusCode(), response.body());
+            log.debug(response.headers().toString());
+            throw new RuntimeException("Unable to process request by server, see message: " + response.body());
+        }
+
+        return null;
     }
 
     private static List<ConditionRecordDTO> createConditionRecordDTOS(List<PricingEntityCombinationMap> pricingEntityCombinationMaps,
