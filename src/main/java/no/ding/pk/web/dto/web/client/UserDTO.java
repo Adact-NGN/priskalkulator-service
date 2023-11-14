@@ -1,10 +1,12 @@
 package no.ding.pk.web.dto.web.client;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -28,6 +30,7 @@ public class UserDTO {
     private String email;
     private Long salesRoleId;
     private String associatedPlace;
+    private List<String> salesOffices;
 
     /**
      * Fullmaktsnivå Vanlig Avfall
@@ -58,7 +61,7 @@ public class UserDTO {
                 + ", powerOfAttorneyOA=" + powerOfAttorneyOA + ", regionName=" + regionName
                 + ", regionalManagersPowerOfAttorney=" + regionalManagersPowerOfAttorney + ", resourceNr=" + resourceNr
                 + ", salesRoleId=" + salesRoleId + ", sureName=" + sureName + ", username=" + username + ", usernameAlias="
-                + usernameAlias + "]";
+                + usernameAlias + ", salesOffices=" + salesOffices + "]";
     }
 }
     
