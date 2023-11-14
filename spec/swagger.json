@@ -6272,6 +6272,9 @@
         "resourceNr" : {
           "type" : "string"
         },
+        "salesOffices" : {
+          "type" : "string"
+        },
         "salesRole" : {
           "$ref" : "#/definitions/SalesRole"
         },
@@ -6347,6 +6350,12 @@
         },
         "resourceNr" : {
           "type" : "string"
+        },
+        "salesOffices" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
         },
         "salesRoleId" : {
           "type" : "integer",

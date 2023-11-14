@@ -113,6 +113,10 @@ public class User extends Auditable implements Serializable {
     }
 
     public void setSalesOffices(String salesOffices) {
+        if(StringUtils.isBlank(salesOffices)) {
+            return;
+        }
+
         Set<String> offices = getSalesOfficeSet();
 
         String[] officeArray = salesOffices.split(",");
