@@ -59,6 +59,9 @@
     "name" : "sales-role-controller",
     "description" : "Sales Role Controller"
   }, {
+    "name" : "sap-create-pricing-entities-controller",
+    "description" : "Sap Create Pricing Entities Controller"
+  }, {
     "name" : "standard-price-controller",
     "description" : "Standard Price Controller"
   }, {
@@ -3112,6 +3115,88 @@
         }
       }
     },
+    "/api/v1/sap-pricing/create" : {
+      "post" : {
+        "tags" : [ "sap-create-pricing-entities-controller" ],
+        "summary" : "createNewSapPricingEntities",
+        "operationId" : "createNewSapPricingEntitiesUsingPOST",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "pricingEntitiesRequest",
+          "description" : "pricingEntitiesRequest",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SapCreatePricingEntitiesRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/SapCreatePricingEntitiesResponse"
+              }
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/sap-pricing/create/batch" : {
+      "post" : {
+        "tags" : [ "sap-create-pricing-entities-controller" ],
+        "summary" : "createNewSapPricingEntitiesBatchOperation",
+        "operationId" : "createNewSapPricingEntitiesBatchOperationUsingPOST",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "pricingEntitiesRequest",
+          "description" : "pricingEntitiesRequest",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SapCreatePricingEntitiesRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/SapCreatePricingEntitiesResponse"
+              }
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
     "/api/v1/standard-price/{salesorg}/{salesoffice}" : {
       "get" : {
         "tags" : [ "standard-price-controller" ],
@@ -5532,6 +5617,46 @@
       },
       "title" : "PriceRowDTO"
     },
+    "PricingEntityCombinationMap" : {
+      "type" : "object",
+      "properties" : {
+        "conditionCode" : {
+          "type" : "string"
+        },
+        "from" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "keyCombinationTableName" : {
+          "type" : "string"
+        },
+        "materialNumber" : {
+          "type" : "string"
+        },
+        "rateValue" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
+        "to" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "valueUnit" : {
+          "type" : "string"
+        },
+        "zone" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      },
+      "title" : "PricingEntityCombinationMap"
+    },
     "Resource" : {
       "type" : "object",
       "properties" : {
@@ -5781,6 +5906,61 @@
         }
       },
       "title" : "SalesRoleDTO"
+    },
+    "SapCreatePricingEntitiesRequest" : {
+      "type" : "object",
+      "properties" : {
+        "customerName" : {
+          "type" : "string"
+        },
+        "customerNumber" : {
+          "type" : "string"
+        },
+        "nodeNumber" : {
+          "type" : "string"
+        },
+        "priceOfferId" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "pricingEntityCombinationMaps" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/PricingEntityCombinationMap"
+          }
+        }
+      },
+      "title" : "SapCreatePricingEntitiesRequest"
+    },
+    "SapCreatePricingEntitiesResponse" : {
+      "type" : "object",
+      "properties" : {
+        "customerHierarchy" : {
+          "type" : "string"
+        },
+        "customerNumber" : {
+          "type" : "string"
+        },
+        "deviceType" : {
+          "type" : "string"
+        },
+        "materialNumber" : {
+          "type" : "string"
+        },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
+        "updated" : {
+          "type" : "boolean"
+        },
+        "zone" : {
+          "type" : "string"
+        }
+      },
+      "title" : "SapCreatePricingEntitiesResponse"
     },
     "SimpleSalesEmployeeDTO" : {
       "type" : "object",

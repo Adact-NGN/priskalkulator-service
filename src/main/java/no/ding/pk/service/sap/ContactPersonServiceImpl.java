@@ -59,7 +59,7 @@ public class ContactPersonServiceImpl implements ContactPersonService {
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
-            log.debug("Request was successfull");
+            log.debug("Request was successful");
 
             return responseToContactPersonsDTOList(response);
         }

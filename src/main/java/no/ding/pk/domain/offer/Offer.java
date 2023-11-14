@@ -1,11 +1,13 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -84,5 +86,10 @@ public class Offer extends Auditable {
                 "customerName = " + customerName + ", " +
                 "approvalDate = " + approvalDate + ", " +
                 "dateIssued = " + dateIssued + ")";
+    }
+
+    @JsonIgnore
+    public boolean isNodeCustomer() {
+        return !StringUtils.isBlank(customerType) && StringUtils.equals(customerType, "Node");
     }
 }

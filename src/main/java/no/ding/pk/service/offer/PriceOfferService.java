@@ -33,4 +33,6 @@ public interface PriceOfferService {
     void updateStatus(Long id, String status);
 
     List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses);
+
+    void updateCustomerNumber(Long id, String customerNumber);
 }
