@@ -1,5 +1,6 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.Auditable;
 import org.apache.commons.lang3.StringUtils;
@@ -131,6 +132,7 @@ public class PriceRow extends Auditable {
                 "classDescription = " + classDescription + ")";
     }
 
+    @JsonIgnore
     public String getMaterialId() {
         StringBuilder sb = new StringBuilder();
 

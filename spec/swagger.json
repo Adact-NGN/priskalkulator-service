@@ -3156,6 +3156,47 @@
         }
       }
     },
+    "/api/v1/sap-pricing/create/batch" : {
+      "post" : {
+        "tags" : [ "sap-create-pricing-entities-controller" ],
+        "summary" : "createNewSapPricingEntitiesBatchOperation",
+        "operationId" : "createNewSapPricingEntitiesBatchOperationUsingPOST",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "pricingEntitiesRequest",
+          "description" : "pricingEntitiesRequest",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SapCreatePricingEntitiesRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/SapCreatePricingEntitiesResponse"
+              }
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
     "/api/v1/standard-price/{salesorg}/{salesoffice}" : {
       "get" : {
         "tags" : [ "standard-price-controller" ],
@@ -5489,12 +5530,6 @@
         "material" : {
           "$ref" : "#/definitions/Material"
         },
-        "materialId" : {
-          "type" : "object",
-          "additionalProperties" : {
-            "type" : "string"
-          }
-        },
         "needsApproval" : {
           "type" : "boolean"
         },
@@ -5597,6 +5632,10 @@
         },
         "materialNumber" : {
           "type" : "string"
+        },
+        "rateValue" : {
+          "type" : "number",
+          "format" : "double"
         },
         "salesOffice" : {
           "type" : "string"
