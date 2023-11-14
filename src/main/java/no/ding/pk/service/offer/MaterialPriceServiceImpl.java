@@ -1,25 +1,29 @@
 package no.ding.pk.service.offer;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.offer.MaterialPriceRepository;
+import no.ding.pk.service.cache.InMemory3DCache;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
 public class MaterialPriceServiceImpl implements MaterialPriceService {
 
     private final MaterialPriceRepository repository;
+    private final InMemory3DCache<String, String, MaterialPrice> materialPriceCache;
     
     @Autowired
-    public MaterialPriceServiceImpl(MaterialPriceRepository repository) {
+    public MaterialPriceServiceImpl(MaterialPriceRepository repository,
+                                    @Qualifier("materialPriceCache") InMemory3DCache<String, String, MaterialPrice> materialPriceCache) {
         this.repository = repository;
+        this.materialPriceCache = materialPriceCache;
     }
 
     @Override
@@ -36,6 +40,9 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
 
         entity.setMaterialNumber(materialPrice.getMaterialNumber());
         entity.setStandardPrice(materialPrice.getStandardPrice());
+        entity.setSalesOrg(materialPrice.getSalesOrg());
+        entity.setSalesOffice(materialPrice.getSalesOffice());
+        entity.setZone(materialPrice.getZone());
 
         return repository.save(entity);
     }
@@ -54,5 +61,16 @@ public class MaterialPriceServiceImpl implements MaterialPriceService {
     public List<MaterialPrice> findAll() {
         return repository.findAll();
     }
-    
+
+    @Override
+    public Optional<MaterialPrice> findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(String salesOrg, String salesOffice, String materialNumber, String deviceType, String salesZone) {
+        String salesOrgToUse = StringUtils.isNotBlank(salesOrg) ? salesOrg : "";
+        String salesOfficeToUse = StringUtils.isNotBlank(salesOffice) ? salesOffice : "";
+        String zone = StringUtils.isNotBlank(salesZone) ? salesZone : "";
+        String deviceTypeToUse = StringUtils.isNotBlank(deviceType) ? deviceType : "";
+
+        return repository.findMaterialPriceBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndZone(
+                salesOrgToUse, salesOfficeToUse, materialNumber, deviceTypeToUse, zone);
+    }
+
 }

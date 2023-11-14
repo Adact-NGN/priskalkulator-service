@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-@Profile({"default", "dev", "prod"})
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
@@ -18,6 +17,7 @@ public class SecurityConfig extends AadResourceServerWebSecurityConfigurerAdapte
         super.configure(http);
         http.authorizeHttpRequests()
                 .anyRequest().permitAll()
-                .and().csrf().disable();
+                .and()
+                .csrf().disable();
     }
 }

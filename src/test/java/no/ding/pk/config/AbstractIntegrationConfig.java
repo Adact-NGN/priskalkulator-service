@@ -1,8 +1,14 @@
 package no.ding.pk.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
+import no.ding.pk.repository.*;
+import no.ding.pk.repository.offer.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
@@ -10,16 +16,59 @@ import uk.org.webcompere.systemstubs.environment.EnvironmentVariables;
 import uk.org.webcompere.systemstubs.jupiter.SystemStub;
 import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension;
 
+import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 
 import static uk.org.webcompere.systemstubs.SystemStubs.withEnvironmentVariable;
 
 @Tag("integrationtest")
 @ContextConfiguration
-@Import(H2TestConfig.class)
+@Import({H2UnitTestConfig.class, ModelMapperV2Config.class, MaterialServicesConfig.class})
 @DataJpaTest
 @ExtendWith(SystemStubsExtension.class)
+@Getter
 public abstract class AbstractIntegrationConfig {
+
+    @Autowired
+    private CustomerTermsRepository customerTermsRepository;
+
+    @Autowired
+    private PriceOfferRepository priceOfferRepository;
+
+    @Autowired
+    private SalesOfficeRepository salesOfficeRepository;
+
+    @Autowired
+    private MaterialRepository materialRepository;
+
+    @Autowired
+    private MaterialPriceRepository materialPriceRepository;
+
+    @Autowired
+    private PriceRowRepository priceRowRepository;
+
+    @Autowired
+    private ZoneRepository zoneRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private SalesOfficePowerOfAttorneyRepository salesOfficePowerOfAttorneyRepository;
+
+    @Autowired
+    private DiscountRepository discountRepository;
+
+    @Autowired
+    private DiscountLevelRepository discountLevelRepository;
+
+    @Autowired
+    private EntityManagerFactory emFactory;
+
+    private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+
+    @Autowired
+    private SalesRoleRepository salesRoleRepository;
 
     @BeforeAll
     public abstract void setup() throws IOException;
@@ -65,8 +114,10 @@ public abstract class AbstractIntegrationConfig {
         environmentVariables.set(PK_MSAL_SECRET, "");
         environmentVariables.set(PK_MSAL_SCOPE, "");
         environmentVariables.set(PK_MSAL_AD_USER_INFO_SELECT_LIST, "");
-        environmentVariables.set("sap.api.standard.price.url", "");
+        environmentVariables.set("sap.api.standard.price.url", "http://saptest.norskgjenvinning.no");
         environmentVariables.set("sap.api.contact.person.url", "");
         environmentVariables.set("sap.api.salesorg.url", "");
+        environmentVariables.set("sales.offices.requires.fa.approvment", "100");
     }
+
 }

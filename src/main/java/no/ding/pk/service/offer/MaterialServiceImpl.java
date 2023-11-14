@@ -7,12 +7,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static no.ding.pk.repository.specifications.MaterialSpecifications.*;
 
 @Transactional
 @Service
@@ -28,26 +31,27 @@ public class MaterialServiceImpl implements MaterialService {
         this.repository = repository;
         this.materialPriceService = materialPriceService;
     }
-    
+
+    @Override
+    public List<Material> findAll() {
+        return repository.findAll();
+    }
+
     @Override
     public Material save(Material material) {
         
         if(material.getMaterialNumber() == null) {
             throw new RuntimeException("Received material without a material number.");
         }
-        
+
+        String deviceType = StringUtils.isNotBlank(material.getDeviceType()) ? material.getDeviceType() : null;
+        log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), deviceType);
+        Optional<Material> optionalEntity = repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), deviceType);
+
+        log.debug("Found material: {}", optionalEntity.isPresent());
 
         Material entity;
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            log.debug("Searching for material with number: {} and device type: {}", material.getMaterialNumber(), material.getDeviceType());
-            entity = repository.findByMaterialNumberAndDeviceType(material.getMaterialNumber(), material.getDeviceType());
-        } else {
-            log.debug("Searching for material with number: {}", material.getMaterialNumber());
-            entity = repository.findByMaterialNumber(material.getMaterialNumber());
-        }
-        log.debug("Found material: {}", entity);
-        
-        if(entity == null) {
+        if(optionalEntity.isEmpty()) {
             log.debug("Didn't find a material with the number: {}", material.getMaterialNumber());
             log.debug("Creating a new one...");
             entity = new Material();
@@ -55,6 +59,7 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setDeviceType(material.getDeviceType());
         } else {
             log.debug("Found material {} ...", material.getMaterialNumber());
+            entity = optionalEntity.get();
         }
 
         if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
@@ -83,32 +88,12 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setMaterialTypeDescription(material.getMaterialTypeDescription());
         }
         
-        if(!StringUtils.equals(entity.getDeviceType(), material.getDesignation())) {
+        if(StringUtils.isNotBlank(material.getDeviceType()) && !StringUtils.equals(entity.getDeviceType(), material.getDeviceType())) {
             entity.setDeviceType(material.getDeviceType());
-        }
-
-        log.debug("Getting std price for material: {}", material.getMaterialNumber());
-        MaterialPrice materialPriceEntity = materialPriceService.findByMaterialNumber(material.getMaterialNumber());
-        
-        if(materialPriceEntity == null) {
-            log.debug("Std price for material not found.");
-            materialPriceEntity = material.getMaterialStandardPrice();
-        } else if(material.getMaterialStandardPrice() != null){
-            materialPriceEntity.copy(material.getMaterialStandardPrice());
-        }
-
-        entity.setMaterialStandardPrice(materialPriceEntity);
-
-        if(materialPriceEntity != null && !StringUtils.equals(entity.getDeviceType(), materialPriceEntity.getDeviceType())) {
-            entity.setDeviceType(materialPriceEntity.getDeviceType());
         }
 
         if(!StringUtils.equals(entity.getCurrency(), material.getCurrency())) {
             entity.setCurrency(material.getCurrency());
-        }
-        
-        if(entity.getPricingUnit() != null && !entity.getPricingUnit().equals(material.getPricingUnit())) {
-            entity.setPricingUnit(material.getPricingUnit());
         }
         
         if(!StringUtils.equals(entity.getQuantumUnit(), material.getQuantumUnit())) {
@@ -119,13 +104,28 @@ public class MaterialServiceImpl implements MaterialService {
             entity.setScaleQuantum(material.getScaleQuantum());
         }
         
-        if(!StringUtils.equals(entity.getSalesZone(), material.getSalesZone())) {
-            entity.setSalesZone(material.getSalesZone());
-        }
-        
         return repository.save(entity);
     }
-    
+
+    private MaterialPrice getMaterialPrice(String salesOrg, String salesOffice, Material material, String salesZone) {
+        log.debug("Getting std price for material: {}", material.getMaterialNumber());
+        Optional<MaterialPrice> materialPriceEntityOptional = materialPriceService
+                .findBySalesOrgAndSalesOfficeAndMaterialNumberAndDeviceTypeAndSalesZone(
+                        salesOrg,
+                        salesOffice,
+                        material.getMaterialNumber(),
+                        material.getDeviceType(),
+                        salesZone);
+
+        if(materialPriceEntityOptional.isEmpty()) {
+            log.debug("Std price for material not found.");
+            return material.getMaterialStandardPrice();
+        } else if(material.getMaterialStandardPrice() != null){
+            return material.getMaterialStandardPrice();
+        }
+        return null;
+    }
+
     @Override
     public List<Material> saveAll(List<Material> materialList) {
         List<Material> returnMaterials = new ArrayList<>();
@@ -145,12 +145,38 @@ public class MaterialServiceImpl implements MaterialService {
     }
     
     @Override
-    public Material findByMaterialNumber(String materialNumber) {
+    public Optional<Material> findByMaterialNumber(String materialNumber) {
         return repository.findByMaterialNumber(materialNumber);
     }
 
     @Override
-    public Material findByMaterialNumberAndDeviceType(String material, String deviceType) {
+    public Optional<Material> findByMaterialNumberAndDeviceType(String material, String deviceType) {
+        log.debug("Finding material: {}, {}", material, deviceType);
         return repository.findByMaterialNumberAndDeviceType(material, deviceType);
+    }
+
+    @Override
+    public Optional<Material> findBy(String salesOrg, String salesOffice, String materialNumber, String deviceType, String zone) {
+        List<Material> materials = repository.findAll(Specification.where(withSalesOrg(salesOrg))
+                .and(withSalesOffice(salesOffice))
+                .and(withMaterialNumber(materialNumber))
+                .and(withDeviceType(deviceType))
+                .and(withZone(zone)));
+
+        if(materials.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if(materials.size() > 1) {
+            log.debug("Found more than one material.");
+            throw new RuntimeException("Found more than one material.");
+        }
+
+        return Optional.ofNullable(materials.get(0));
+    }
+
+    @Override
+    public List<Material> findBy(String materialNumber, String deviceType, String salesZone) {
+        return repository.findAll(Specification.where(withMaterialNumber(materialNumber)).and(withDeviceType(deviceType)).and(withZone(salesZone)));
     }
 }

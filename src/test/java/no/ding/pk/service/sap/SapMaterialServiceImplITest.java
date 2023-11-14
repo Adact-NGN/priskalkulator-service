@@ -27,14 +27,14 @@ class SapMaterialServiceImplITest {
 
     @Test
     public void shouldGetMaterialsFromSAPByMaterialNumber() {
-        List<MaterialDTO> materialsWithStdPrice = service.getAllMaterialsForSalesOrgAndSalesOffice("100", "100", null, 0, 5000);
+        List<MaterialDTO> materialsWithStdPrice = service.getAllMaterialsForSalesOrgByZone("100", null, 0, 5000);
 
         assertThat(materialsWithStdPrice, hasSize(greaterThan(0)));
     }
 
     @Test
     public void shouldGetMaterialWithStdPriceForZones() {
-        List<MaterialDTO> materialsWithStdPriceForZone = service.getAllMaterialsForSalesOrgAndSalesOffice("100", "100", "02",0, 5000);
+        List<MaterialDTO> materialsWithStdPriceForZone = service.getAllMaterialsForSalesOrgByZone("100", "02",0, 5000);
 
         assertThat(materialsWithStdPriceForZone, hasSize(greaterThan(0)));
     }

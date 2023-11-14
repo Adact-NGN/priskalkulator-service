@@ -1,9 +1,9 @@
 name: Release Container Image
 
 on:
-  push:
-    tags:
-      ["v*.*.*"]
+  release:
+    types:
+      - released
 
 env:
   IMAGE_NAME: ding-ip-app-pk-service

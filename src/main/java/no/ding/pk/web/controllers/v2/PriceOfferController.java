@@ -1,22 +1,24 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
-import no.ding.pk.domain.offer.*;
+import no.ding.pk.domain.offer.PriceOffer;
+import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
-import no.ding.pk.web.dto.web.client.offer.PriceRowDTO;
-import no.ding.pk.web.dto.web.client.offer.TermsDTO;
 import no.ding.pk.web.dto.web.client.requests.ActivatePriceOfferRequest;
 import no.ding.pk.web.dto.web.client.requests.ApprovalRequest;
 import no.ding.pk.web.enums.PriceOfferStatus;
-import no.ding.pk.web.handlers.CustomerNotProvidedException;
-import no.ding.pk.web.handlers.EmployeeNotProvidedException;
-import no.ding.pk.web.handlers.MissingTermsInRequestPayloadException;
+import no.ding.pk.web.handlers.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RestController(value = "priceOfferControllerV2")
@@ -84,14 +85,50 @@ public class PriceOfferController {
      * @return list of price offers connected to sales employee, else empty list.
      */
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId) {
-        List<PriceOffer> priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId);
+    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId,
+                                                       @RequestParam(value = "statuses", required = false) String statuses) {
+        List<PriceOffer> priceOffers;
+
+        if(StringUtils.isNotBlank(statuses)) {
+            List<String> statusList = Arrays.stream(statuses.split(",")).toList();
+            priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId, statusList);
+        } else {
+            priceOffers = service.findAllBySalesEmployeeId(salesEmployeeId, null);
+        }
         
         if(!priceOffers.isEmpty()) {
             return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
         }
         
         return new ArrayList<>();
+    }
+
+    @Operation(summary = "List Price offers with filtering by sales office number and by status.",
+    parameters = {
+            @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
+            @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
+    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "A list of price offers filtered on sales office numbers and, if given, a list of statuses.")
+    })
+    @GetMapping(path = "/list/sales-offices")
+    public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@RequestParam("offices") String salesOffices,
+                                                                        @RequestParam(value = "statuses", required = false) String statuses) {
+
+        if(StringUtils.isBlank(salesOffices)) {
+            throw new BadRequestException("Missing comma separated list of sales office numbers.");
+        }
+        List<String> salesOfficesList = Arrays.stream(salesOffices.split(",")).toList();
+        List<String> statusList = StringUtils.isNotBlank(statuses) ? Arrays.stream(statuses.split(",")).toList() : null;
+
+        List<PriceOffer> priceOffers = service.findAllBySalesOfficeAndStatus(salesOfficesList, statusList);
+
+        if(!priceOffers.isEmpty()) {
+            List<PriceOfferListDTO> offerListDTOS = priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
+            return new ResponseEntity<>(offerListDTOS, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK) ;
     }
 
     /**
@@ -101,6 +138,16 @@ public class PriceOfferController {
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
+    @Operation(summary = "Activate price offer",
+            parameters = {
+                    @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by."),
+                    @Parameter(name = "priceOfferId", description = "ID for the price offer being activated."),
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body must contain updated contract terms. Optionally users can add a general comment to the priceing team.")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns value true or false depending on if the offer was activated or not.")
+    })
     @PutMapping(path = "/activate/{activatedById}/{priceOfferId}")
     public ResponseEntity<Boolean> activatePriceOffer(@PathVariable("activatedById") Long activatedById,
                                       @PathVariable("priceOfferId") Long priceOfferId,
@@ -192,83 +239,55 @@ public class PriceOfferController {
         log.debug("Got new Price offer object: " + priceOfferDTO);
         
         if(priceOfferDTO.getSalesEmployee() == null) throw new EmployeeNotProvidedException();
+        if(priceOfferDTO.getCustomerName() == null) throw new CustomerNotProvidedException("Customer name not provided.");
 
         PriceOffer priceOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
         priceOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+        StopWatch watch = new StopWatch();
+        watch.start();
         priceOffer = service.save(priceOffer);
+        watch.stop();
+        log.debug("Time used to create price offer: {} ms", watch.getTime());
         
         return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
     }
 
     /**
-     * Adds missing fields for the {@code Material} object. The ModelMapper is unable to map all fields when converting from a string to an object.
-     * @param priceOfferDTO incoming price {@code PriceOfferDTO} offer to get missing values from
-     * @param priceOffer converted {@code PriceOffer} to update
+     * Update PriceOffer with new status
+     * @param id price offer id
+     * @param status the new status to set
+     * @return Message if the update was successfull.
      */
-    private void mapMaterialValues(PriceOfferDTO priceOfferDTO, PriceOffer priceOffer) {
-        if(priceOfferDTO.getSalesOfficeList() == null) {
-            return;
+    @Operation(summary = "Set new status for the price offer by id.",
+            parameters = {
+                    @Parameter(name = "id", required = true, description = "ID for price offer to update"),
+                    @Parameter(name = "status", required = true, description = "The status to update the price offer with.")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns status OK when status has successfully been updated."),
+            @ApiResponse(responseCode = "400", description = "Price offer not found"),
+            @ApiResponse(responseCode = "404", description = "Given status not found")
+    })
+    @PutMapping("/status/{id}")
+    public ResponseEntity<String> updateStatus(@PathVariable("id") Long id, @RequestParam("status") String status) {
+        if(!PriceOfferStatus.getAllPriceOfferStatuses().contains(status)) {
+            String message = String.format("Given status is not valid: %s", status);
+            throw new PriceOfferStatusCodeNotFoundException(message);
         }
-        priceOfferDTO.getSalesOfficeList().forEach(salesOfficeDTO -> {
-            SalesOffice salesOffice = priceOffer.getSalesOfficeList().stream().filter(so -> salesOfficeDTO.getSalesOffice().equals(so.getSalesOffice())).findAny().orElse(null);
 
-            if(salesOfficeDTO.getMaterialList() != null) {
-                salesOfficeDTO.getMaterialList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
+        service.updateStatus(id, status);
 
-            if(salesOfficeDTO.getRentalList() != null) {
-                salesOfficeDTO.getRentalList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
-
-            if(salesOfficeDTO.getTransportServiceList() != null) {
-                salesOfficeDTO.getTransportServiceList().forEach(updateMaterialInPriceRowsIn(salesOffice));
-            }
-        });
+        String returnMessage = String.format("Price offer with id: %d was updated with status: %s", id, status);
+        return new ResponseEntity<>(returnMessage, HttpStatus.OK);
     }
 
-    private Consumer<PriceRowDTO> updateMaterialInPriceRowsIn(SalesOffice salesOffice) {
-        return priceRowDTO -> {
-            String materialNumber = priceRowDTO.getMaterial();
-
-            PriceRow priceRow = salesOffice.getMaterialList().stream().filter(pr -> materialNumber.equals(pr.getMaterial().getMaterialNumber())).findAny().orElse(null);
-
-            if (priceRow == null) {
-                return;
-            }
-            Material material = priceRow.getMaterial();
-
-            if (material != null) {
-                createMaterialFromPriceRowDTO(material, priceRowDTO);
-            }
-        };
+    @ExceptionHandler({PriceOfferStatusCodeNotFoundException.class})
+    public ResponseEntity<Object> handlePriceOfferStatusCodeNotFoundException(RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    private void createMaterialFromPriceRowDTO(Material to, PriceRowDTO from) {
-        log.debug("To: {}, from: {}", to, from);
-        to.setDesignation(from.getDesignation());
-        to.setMaterialGroupDesignation(from.getProductGroupDesignation());
-        to.setMaterialTypeDescription(from.getMaterialDesignation());
-        to.setDeviceType(from.getDeviceType());
-        MaterialPrice materialStdPrice = MaterialPrice.builder()
-                .materialNumber(from.getMaterial())
-                .deviceType(from.getDeviceType())
-                .standardPrice(from.getStandardPrice())
-                .pricingUnit(from.getPricingUnit())
-                .quantumUnit(from.getQuantumUnit())
-                .build();
-        to.setMaterialStandardPrice(materialStdPrice);
-
-        to.setPricingUnit(from.getPricingUnit());
-        to.setQuantumUnit(from.getQuantumUnit());
-
-        to.setCategoryId(from.getCategoryId());
-        to.setCategoryDescription(from.getCategoryDescription());
-        to.setSubCategoryId(from.getSubCategoryId());
-        to.setSubCategoryDescription(from.getSubCategoryDescription());
-        to.setClassId(from.getClassId());
-        to.setClassDescription(from.getClassDescription());
-    }
 
     /**
      * Update price offer
@@ -291,36 +310,12 @@ public class PriceOfferController {
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
 
+        StopWatch watch = new StopWatch();
+        watch.start();
         updatedOffer = service.save(updatedOffer);
+        watch.stop();
+        log.debug("Time used to update price offer: {} ms", watch.getTime());
 
-        if(StringUtils.isNotBlank(updatedOffer.getMaterialsForApproval())) {
-            updatedOffer.setNeedsApproval(true);
-            updatedOffer.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-        }
-
-        // TODO: This probably overwrites what the service layer is doing :S
-        if(priceOfferCandidateForApprovalAndIsNotApproved(updatedOffer)) {
-            List<Integer> salesOffices = collectSalesOfficeNumbers(updatedOffer);
-            
-            if(!salesOffices.isEmpty()) {
-                List<PowerOfAttorney> poa = sopoaService.findBySalesOfficeInList(salesOffices);
-                
-                if(!poa.isEmpty()) {
-                    User approver = getApproverForPriceOffer(poa);
-                    
-                    if(approver != null) {
-                        updatedOffer.setApprover(approver);
-
-                        updatedOffer = service.save(updatedOffer);
-                    } else {
-                        log.debug("Could not find any eligible approver for offer with id: {}, sales offices: {}", updatedOffer.getId(), salesOffices);
-                    }
-                } else {
-                    log.debug("No Power of attorneys found for any sales offices added to the price offer: {}", salesOffices);
-                }
-            }
-        }
-        
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
 

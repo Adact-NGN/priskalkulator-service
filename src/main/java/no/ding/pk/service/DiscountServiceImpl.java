@@ -107,15 +107,12 @@ public class DiscountServiceImpl implements DiscountService {
             List<Discount> returnList = new ArrayList<>();
 
             for(Discount discount : discounts) {
-                Discount d = Discount.builder()
-                        .salesOrg(discount.getSalesOrg())
-                        .salesOffice(discount.getSalesOffice())
-                        .materialNumber(discount.getMaterialNumber())
+                Discount d = Discount.builder(discount.getSalesOrg(), discount.getSalesOffice(),
+                                discount.getMaterialNumber(), discount.getStandardPrice(), new ArrayList<>())
                         .deviceType(discount.getDeviceType())
                         .materialDesignation(discount.getMaterialDesignation())
                         .standardPrice(discount.getStandardPrice())
                         .fa(discount.getFa())
-                        .discountLevels(new ArrayList<>())
                         .build();
 
                 for (DiscountLevel discountLevel : discount.getDiscountLevels()) {
@@ -171,8 +168,8 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public List<DiscountLevel> findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(String salesOrg, String salesOffice,
-            String materialNumber, Integer level) {
-        return discountLevelRepository.findAllByParentSalesOrgAndParentMaterialNumberAndLevel(salesOrg, materialNumber, level);
+                                                                                             String materialNumber, Integer level, Integer zone) {
+        return discountLevelRepository.findAllByParentSalesOrgAndParentSalesOfficeAndParentMaterialNumberAndLevelAndZone(salesOrg, salesOffice, materialNumber, level, zone);
     }
 
     @Override
@@ -187,7 +184,8 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public List<Discount> findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials) {
+    public List<Discount> findAllDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(String salesOrg, String salesOffice, List<String> materials) {
         return repository.findAllBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materials);
     }
+
 }

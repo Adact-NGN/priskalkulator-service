@@ -59,6 +59,9 @@
     "name" : "sales-role-controller",
     "description" : "Sales Role Controller"
   }, {
+    "name" : "sap-create-pricing-entities-controller",
+    "description" : "Sap Create Pricing Entities Controller"
+  }, {
     "name" : "standard-price-controller",
     "description" : "Standard Price Controller"
   }, {
@@ -507,6 +510,13 @@
           "description" : "salesOrg",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "zone",
+          "in" : "query",
+          "description" : "zone",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
         } ],
         "responses" : {
           "200" : {
@@ -1671,6 +1681,13 @@
           "description" : "salesOrg",
           "required" : true,
           "type" : "string"
+        }, {
+          "name" : "zone",
+          "in" : "query",
+          "description" : "zone",
+          "required" : false,
+          "type" : "integer",
+          "format" : "int32"
         } ],
         "responses" : {
           "200" : {
@@ -1905,6 +1922,34 @@
           },
           "201" : {
             "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/material/list" : {
+      "get" : {
+        "tags" : [ "material-controller" ],
+        "summary" : "getAllMaterialsForTemplate",
+        "operationId" : "getAllMaterialsForTemplateUsingGET",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/MaterialDTO"
+              }
+            }
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2159,67 +2204,35 @@
         }
       }
     },
-    "/api/v1/price-offer-template" : {
+    "/api/v1/price-offer-template/create" : {
       "post" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "createTemplate",
+        "summary" : "Create a new price offer template",
+        "description" : "Creates a new price offer template with the given request body.",
         "operationId" : "createTemplateUsingPOST",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
         "parameters" : [ {
           "in" : "body",
-          "name" : "newTemplate",
-          "description" : "newTemplate",
+          "name" : "newTemplateDto",
+          "description" : "newTemplateDto",
           "required" : true,
           "schema" : {
-            "$ref" : "#/definitions/PriceOfferTemplate"
+            "$ref" : "#/definitions/PriceOfferTemplateDTO"
           }
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns newly created price offer template",
             "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
           },
           "201" : {
             "description" : "Created"
           },
-          "401" : {
-            "description" : "Unauthorized"
-          },
-          "403" : {
-            "description" : "Forbidden"
-          },
-          "404" : {
-            "description" : "Not Found"
-          }
-        }
-      },
-      "put" : {
-        "tags" : [ "price-offer-template-controller" ],
-        "summary" : "save",
-        "operationId" : "saveUsingPUT_3",
-        "consumes" : [ "application/json" ],
-        "produces" : [ "application/json" ],
-        "parameters" : [ {
-          "in" : "body",
-          "name" : "priceOfferTemplate",
-          "description" : "priceOfferTemplate",
-          "required" : true,
-          "schema" : {
-            "$ref" : "#/definitions/PriceOfferTemplate"
-          }
-        } ],
-        "responses" : {
-          "200" : {
-            "description" : "OK",
-            "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
-            }
-          },
-          "201" : {
-            "description" : "Created"
+          "400" : {
+            "description" : "Bad request, missing name for template."
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2239,15 +2252,103 @@
         "summary" : "getAllTemplates",
         "operationId" : "getAllTemplatesUsingGET",
         "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "user",
+          "in" : "query",
+          "description" : "user",
+          "required" : false,
+          "type" : "string"
+        } ],
         "responses" : {
           "200" : {
             "description" : "OK",
             "schema" : {
               "type" : "array",
               "items" : {
-                "$ref" : "#/definitions/PriceOfferTemplate"
+                "$ref" : "#/definitions/PriceOfferTemplateDTO"
               }
             }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/list/shared/{sharedWithEmail}" : {
+      "get" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "List all price offer templates shared with user by email",
+        "operationId" : "getAllTemplatesSharedWithUsingGET",
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "sharedWithEmail",
+          "in" : "path",
+          "description" : "sharedWithEmail",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns a list of shared price offer templates",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/PriceOfferTemplateDTO"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/price-offer-template/save/{id}" : {
+      "put" : {
+        "tags" : [ "price-offer-template-controller" ],
+        "summary" : "Update price offer template",
+        "description" : "Update existing price offer template with new values.",
+        "operationId" : "saveUsingPUT_3",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "in" : "body",
+          "name" : "priceOfferTemplateDto",
+          "description" : "priceOfferTemplateDto",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/PriceOfferTemplateDTO"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Updated price offer template",
+            "schema" : {
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
+            }
+          },
+          "201" : {
+            "description" : "Created"
           },
           "401" : {
             "description" : "Unauthorized"
@@ -2264,9 +2365,9 @@
     "/api/v1/price-offer-template/{id}" : {
       "get" : {
         "tags" : [ "price-offer-template-controller" ],
-        "summary" : "getTemplateById",
+        "summary" : "Get a specific price offer template",
         "operationId" : "getTemplateByIdUsingGET",
-        "produces" : [ "*/*" ],
+        "produces" : [ "application/json" ],
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2279,7 +2380,7 @@
           "200" : {
             "description" : "OK",
             "schema" : {
-              "$ref" : "#/definitions/PriceOfferTemplate"
+              "$ref" : "#/definitions/PriceOfferTemplateDTO"
             }
           },
           "401" : {
@@ -3014,6 +3115,88 @@
         }
       }
     },
+    "/api/v1/sap-pricing/create" : {
+      "post" : {
+        "tags" : [ "sap-create-pricing-entities-controller" ],
+        "summary" : "createNewSapPricingEntities",
+        "operationId" : "createNewSapPricingEntitiesUsingPOST",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "pricingEntitiesRequest",
+          "description" : "pricingEntitiesRequest",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SapCreatePricingEntitiesRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/SapCreatePricingEntitiesResponse"
+              }
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/sap-pricing/create/batch" : {
+      "post" : {
+        "tags" : [ "sap-create-pricing-entities-controller" ],
+        "summary" : "createNewSapPricingEntitiesBatchOperation",
+        "operationId" : "createNewSapPricingEntitiesBatchOperationUsingPOST",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "pricingEntitiesRequest",
+          "description" : "pricingEntitiesRequest",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/definitions/SapCreatePricingEntitiesRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/SapCreatePricingEntitiesResponse"
+              }
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
     "/api/v1/standard-price/{salesorg}/{salesoffice}" : {
       "get" : {
         "tags" : [ "standard-price-controller" ],
@@ -3491,7 +3674,7 @@
     "/api/v2/price-offer/activate/{activatedById}/{priceOfferId}" : {
       "put" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "activatePriceOffer",
+        "summary" : "Activate price offer",
         "operationId" : "activatePriceOfferUsingPUT",
         "consumes" : [ "application/json" ],
         "produces" : [ "*/*" ],
@@ -3520,7 +3703,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns value true or false depending on if the offer was activated or not.",
             "schema" : {
               "type" : "boolean"
             }
@@ -3801,6 +3984,47 @@
         }
       }
     },
+    "/api/v2/price-offer/list/sales-offices" : {
+      "get" : {
+        "tags" : [ "price-offer-controller" ],
+        "summary" : "List Price offers with filtering by sales office number and by status.",
+        "operationId" : "listAllBySalesOfficeUsingGET",
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "offices",
+          "in" : "query",
+          "description" : "offices",
+          "required" : true,
+          "type" : "string"
+        }, {
+          "name" : "statuses",
+          "in" : "query",
+          "description" : "statuses",
+          "required" : false,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "A list of price offers filtered on sales office numbers and, if given, a list of statuses.",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/PriceOfferListDTO"
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Not Found"
+          }
+        }
+      }
+    },
     "/api/v2/price-offer/list/{salesEmployeeId}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
@@ -3814,6 +4038,12 @@
           "required" : true,
           "type" : "integer",
           "format" : "int64"
+        }, {
+          "name" : "statuses",
+          "in" : "query",
+          "description" : "statuses",
+          "required" : false,
+          "type" : "string"
         } ],
         "responses" : {
           "200" : {
@@ -3878,6 +4108,52 @@
           },
           "404" : {
             "description" : "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v2/price-offer/status/{id}" : {
+      "put" : {
+        "tags" : [ "price-offer-controller" ],
+        "summary" : "Set new status for the price offer by id.",
+        "operationId" : "updateStatusUsingPUT",
+        "consumes" : [ "application/json" ],
+        "produces" : [ "*/*" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "status",
+          "required" : true,
+          "type" : "string"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Returns status OK when status has successfully been updated.",
+            "schema" : {
+              "type" : "string"
+            }
+          },
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "description" : "Price offer not found"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          },
+          "404" : {
+            "description" : "Given status not found"
           }
         }
       }
@@ -3984,6 +4260,9 @@
           "items" : {
             "$ref" : "#/definitions/KeyCombinationDTO"
           }
+        },
+        "priceType" : {
+          "type" : "string"
         }
       },
       "title" : "ConditionCodeDTO"
@@ -4463,15 +4742,6 @@
         "quantumUnit" : {
           "type" : "string"
         },
-        "salesOffice" : {
-          "type" : "string"
-        },
-        "salesOrg" : {
-          "type" : "string"
-        },
-        "salesZone" : {
-          "type" : "string"
-        },
         "scaleQuantum" : {
           "type" : "number",
           "format" : "double"
@@ -4648,6 +4918,12 @@
         "quantumUnit" : {
           "type" : "string"
         },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
         "standardPrice" : {
           "type" : "number",
           "format" : "double"
@@ -4659,6 +4935,9 @@
         "validTo" : {
           "type" : "string",
           "format" : "date-time"
+        },
+        "zone" : {
+          "type" : "string"
         }
       },
       "title" : "MaterialPrice"
@@ -4791,6 +5070,9 @@
         "approver" : {
           "$ref" : "#/definitions/User"
         },
+        "city" : {
+          "type" : "string"
+        },
         "contactPersonList" : {
           "type" : "array",
           "items" : {
@@ -4843,8 +5125,17 @@
         "needsApproval" : {
           "type" : "boolean"
         },
+        "organizationNumber" : {
+          "type" : "string"
+        },
+        "postalNumber" : {
+          "type" : "string"
+        },
         "priceOfferStatus" : {
           "type" : "string"
+        },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/User"
         },
         "salesEmployee" : {
           "$ref" : "#/definitions/User"
@@ -4854,6 +5145,9 @@
           "items" : {
             "$ref" : "#/definitions/SalesOffice"
           }
+        },
+        "streetAddress" : {
+          "type" : "string"
         }
       },
       "title" : "PriceOffer"
@@ -4874,6 +5168,9 @@
         },
         "approver" : {
           "$ref" : "#/definitions/UserDTO"
+        },
+        "city" : {
+          "type" : "string"
         },
         "contactPerson" : {
           "$ref" : "#/definitions/ContactPersonDTO"
@@ -4918,8 +5215,17 @@
         "needsApproval" : {
           "type" : "boolean"
         },
+        "organizationNumber" : {
+          "type" : "string"
+        },
+        "postalNumber" : {
+          "type" : "string"
+        },
         "priceOfferStatus" : {
           "type" : "string"
+        },
+        "priceTeamUser" : {
+          "$ref" : "#/definitions/UserDTO"
         },
         "salesEmployee" : {
           "$ref" : "#/definitions/UserDTO"
@@ -4929,6 +5235,9 @@
           "items" : {
             "$ref" : "#/definitions/SalesOfficeDTO"
           }
+        },
+        "streetAddress" : {
+          "type" : "string"
         }
       },
       "title" : "PriceOfferDTO"
@@ -4966,67 +5275,76 @@
     "PriceOfferTemplate" : {
       "type" : "object",
       "properties" : {
-        "approvalDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "approver" : {
+        "author" : {
           "$ref" : "#/definitions/User"
-        },
-        "contactPersonList" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "#/definitions/ContactPerson"
-          }
-        },
-        "createdBy" : {
-          "type" : "string"
-        },
-        "createdDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "customerName" : {
-          "type" : "string"
-        },
-        "customerNumber" : {
-          "type" : "string"
-        },
-        "customerTerms" : {
-          "$ref" : "#/definitions/PriceOfferTerms"
-        },
-        "customerType" : {
-          "type" : "string"
-        },
-        "dateIssued" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "deleted" : {
-          "type" : "boolean"
         },
         "id" : {
           "type" : "integer",
           "format" : "int64"
         },
-        "lastModifiedBy" : {
-          "type" : "string"
+        "isShareable" : {
+          "type" : "boolean"
         },
-        "lastModifiedDate" : {
-          "type" : "string",
-          "format" : "date-time"
-        },
-        "salesEmployee" : {
-          "$ref" : "#/definitions/User"
-        },
-        "salesOfficeList" : {
+        "materials" : {
           "type" : "array",
           "items" : {
-            "$ref" : "#/definitions/SalesOffice"
+            "$ref" : "#/definitions/TemplateMaterial"
+          }
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "sharedWith" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/User"
+          }
+        },
+        "zoneBasedMaterials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterial"
           }
         }
       },
       "title" : "PriceOfferTemplate"
+    },
+    "PriceOfferTemplateDTO" : {
+      "type" : "object",
+      "properties" : {
+        "author" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "isShareable" : {
+          "type" : "boolean"
+        },
+        "materials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterialDTO"
+          }
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "sharedWith" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
+        },
+        "zoneBasedMaterials" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/TemplateMaterialDTO"
+          }
+        }
+      },
+      "title" : "PriceOfferTemplateDTO"
     },
     "PriceOfferTerms" : {
       "type" : "object",
@@ -5219,6 +5537,9 @@
           "type" : "number",
           "format" : "double"
         },
+        "salesZone" : {
+          "type" : "string"
+        },
         "showPriceInOffer" : {
           "type" : "boolean"
         },
@@ -5295,6 +5616,46 @@
         }
       },
       "title" : "PriceRowDTO"
+    },
+    "PricingEntityCombinationMap" : {
+      "type" : "object",
+      "properties" : {
+        "conditionCode" : {
+          "type" : "string"
+        },
+        "from" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "keyCombinationTableName" : {
+          "type" : "string"
+        },
+        "materialNumber" : {
+          "type" : "string"
+        },
+        "rateValue" : {
+          "type" : "number",
+          "format" : "double"
+        },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
+        "to" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "valueUnit" : {
+          "type" : "string"
+        },
+        "zone" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      },
+      "title" : "PricingEntityCombinationMap"
     },
     "Resource" : {
       "type" : "object",
@@ -5546,6 +5907,61 @@
       },
       "title" : "SalesRoleDTO"
     },
+    "SapCreatePricingEntitiesRequest" : {
+      "type" : "object",
+      "properties" : {
+        "customerName" : {
+          "type" : "string"
+        },
+        "customerNumber" : {
+          "type" : "string"
+        },
+        "nodeNumber" : {
+          "type" : "string"
+        },
+        "priceOfferId" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "pricingEntityCombinationMaps" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/PricingEntityCombinationMap"
+          }
+        }
+      },
+      "title" : "SapCreatePricingEntitiesRequest"
+    },
+    "SapCreatePricingEntitiesResponse" : {
+      "type" : "object",
+      "properties" : {
+        "customerHierarchy" : {
+          "type" : "string"
+        },
+        "customerNumber" : {
+          "type" : "string"
+        },
+        "deviceType" : {
+          "type" : "string"
+        },
+        "materialNumber" : {
+          "type" : "string"
+        },
+        "salesOffice" : {
+          "type" : "string"
+        },
+        "salesOrg" : {
+          "type" : "string"
+        },
+        "updated" : {
+          "type" : "boolean"
+        },
+        "zone" : {
+          "type" : "string"
+        }
+      },
+      "title" : "SapCreatePricingEntitiesResponse"
+    },
     "SimpleSalesEmployeeDTO" : {
       "type" : "object",
       "properties" : {
@@ -5554,6 +5970,38 @@
         }
       },
       "title" : "SimpleSalesEmployeeDTO"
+    },
+    "TemplateMaterial" : {
+      "type" : "object",
+      "properties" : {
+        "deviceType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "material" : {
+          "type" : "string"
+        }
+      },
+      "title" : "TemplateMaterial"
+    },
+    "TemplateMaterialDTO" : {
+      "type" : "object",
+      "properties" : {
+        "deviceType" : {
+          "type" : "string"
+        },
+        "id" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "material" : {
+          "type" : "string"
+        }
+      },
+      "title" : "TemplateMaterialDTO"
     },
     "Terms" : {
       "type" : "object",
@@ -5809,6 +6257,12 @@
           "type" : "integer",
           "format" : "int32"
         },
+        "priceOfferTemplates" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/PriceOfferTemplate"
+          }
+        },
         "regionName" : {
           "type" : "string"
         },
@@ -5816,6 +6270,9 @@
           "type" : "string"
         },
         "resourceNr" : {
+          "type" : "string"
+        },
+        "salesOffices" : {
           "type" : "string"
         },
         "salesRole" : {
@@ -5893,6 +6350,12 @@
         },
         "resourceNr" : {
           "type" : "string"
+        },
+        "salesOffices" : {
+          "type" : "array",
+          "items" : {
+            "type" : "string"
+          }
         },
         "salesRoleId" : {
           "type" : "integer",

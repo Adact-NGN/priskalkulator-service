@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -23,10 +23,10 @@ public class DiscountLevel {
     @Column
     private Double discount;
 
-    @Column
+    @Column(name = "calculated_discount")
     private Double calculatedDiscount;
 
-    @Column
+    @Column(name = "pct_discount")
     private Double pctDiscount;
 
     @Column
@@ -52,40 +52,24 @@ public class DiscountLevel {
         this.id = id;
     }   
 
-    public int getLevel() {
-        return level;
-    }
     public void setLevel(int level) {
         this.level = level;
     }
-    public Double getDiscount() {
-        return discount;
-    }
+
     public void setDiscount(Double discount) {
         this.discount = discount;
     }
-    public Double getCalculatedDiscount() {
-        return calculatedDiscount;
-    }
+
     public void setCalculatedDiscount(Double calculatedDiscount) {
         this.calculatedDiscount = calculatedDiscount;
     }
-    public Double getPctDiscount() {
-        return pctDiscount;
-    }
+
     public void setPctDiscount(Double pctDiscount) {
         this.pctDiscount = pctDiscount;
     }
     
-    public Discount getParent() {
-        return parent;
-    }
     public void setParent(Discount parent) {
         this.parent = parent;
-    }
-
-    public Integer getZone() {
-        return zone;
     }
 
     public void setZone(Integer zone) {
@@ -133,5 +117,8 @@ public class DiscountLevel {
         return true;
     }
 
+    public static DiscountLevelBuilder builder(Double discount, int level) {
+        return DiscountLevel.hiddenBuilder().discount(discount).level(level);
+    }
 
 }

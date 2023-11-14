@@ -1,10 +1,16 @@
 package no.ding.pk.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.core.Is;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.platform.commons.util.StringUtils;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -12,7 +18,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,5 +56,55 @@ public class JsonTestUtils {
 
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssz").create();
         return gson.fromJson(jsonString, clazz);
+    }
+
+    public static List<MaterialDTO> mockSapMaterialServiceResponse(ClassLoader classLoader) throws IOException {
+        File file = new File(classLoader.getResource("materials100.json").getFile());
+
+        assertThat(file.exists(), Is.is(true));
+
+        String json = IOUtils.toString(new FileInputStream(file), StandardCharsets.UTF_8);
+
+        JSONObject jsonObjectResult = new JSONObject(json);
+
+        JSONArray result = jsonObjectResult.getJSONArray("value");
+
+        ObjectMapper om = new ObjectMapper();
+
+        List<MaterialDTO> materialDTOS = new ArrayList<>();
+
+        for(int i = 0; i < result.length(); i++) {
+            JSONObject jsonObject = result.getJSONObject(i);
+
+            MaterialDTO materialDTO = om.readValue(jsonObject.toString(), MaterialDTO.class);
+
+            materialDTOS.add(materialDTO);
+        }
+
+        return materialDTOS;
+    }
+
+    public static <T> String objectToJson(T object) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        ObjectWriter objectWriter = om.writer().withDefaultPrettyPrinter();
+
+        return objectWriter.writeValueAsString(object);
+    }
+
+    public static <T> T jsonToObject(String json, Class<T> clazz) throws JsonProcessingException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        //objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        ObjectReader om = objectMapper.readerForUpdating(clazz.getDeclaredConstructor().newInstance());
+
+        return om.readValue(json);
     }
 }

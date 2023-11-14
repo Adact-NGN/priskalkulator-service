@@ -1,22 +1,19 @@
 package no.ding.pk.service.offer;
 
-import no.ding.pk.domain.Discount;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.domain.offer.Zone;
 import no.ding.pk.repository.offer.SalesOfficeRepository;
 import no.ding.pk.service.sap.StandardPriceService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 @Service
@@ -43,23 +40,15 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
     }
     
     @Override
-    public List<SalesOffice> saveAll(List<SalesOffice> salesOfficeList, String customerNumber, Map<String, Map<String, Map<String, Discount>>> discountMap) {
+    public List<SalesOffice> saveAll(List<SalesOffice> salesOfficeList, String customerNumber) {
         List<SalesOffice> returnList = new ArrayList<>();
-        if(salesOfficeList != null && salesOfficeList.size() > 0) {
+        if(salesOfficeList != null && !salesOfficeList.isEmpty()) {
             for (SalesOffice salesOffice : salesOfficeList) {
                 if (salesOffice == null) {
                     continue;
                 }
 
-                SalesOffice entity = new SalesOffice();
-
-                if (salesOffice.getId() != null) {
-                    Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
-
-                    if (optSalesOffice.isPresent()) {
-                        entity = optSalesOffice.get();
-                    }
-                }
+                SalesOffice entity = getSalesOffice(salesOffice);
 
                 entity.setCustomerNumber(salesOffice.getCustomerNumber());
                 entity.setSalesOrg(salesOffice.getSalesOrg());
@@ -68,34 +57,38 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
                 entity.setPostalNumber(salesOffice.getPostalNumber());
                 entity.setCity(salesOffice.getCity());
 
-                List<MaterialPrice> materialStdPrices = standardPriceService.getStandardPriceForSalesOrgAndSalesOffice(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
+                Map<String, MaterialPrice> materialStdPrices = getMaterialPriceMap(salesOffice);
 
-                if (salesOffice.getMaterialList() != null && salesOffice.getMaterialList().size() > 0) {
+                log.debug("Material prices fetched: {}", materialStdPrices.size());
+
+                if (salesOffice.getMaterialList() != null && !salesOffice.getMaterialList().isEmpty()) {
                     log.debug("Adding Sales office material list");
-                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    List<PriceRow> materialList = priceRowService.saveAll(salesOffice.getMaterialList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
                     
                     entity.setMaterialList(materialList);
 
                     log.debug("Finished adding Sales office material list");
                 }
 
-                if (salesOffice.getTransportServiceList() != null && salesOffice.getTransportServiceList().size() > 0) {
+                if (salesOffice.getTransportServiceList() != null && !salesOffice.getTransportServiceList().isEmpty()) {
                     log.debug("Adding transport service material list");
-                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    List<PriceRow> transportServiceMaterialList = priceRowService.saveAll(salesOffice.getTransportServiceList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
                     
                     entity.setTransportServiceList(transportServiceMaterialList);
                     log.debug("Finished adding transport materials");
                 }
 
-                if (salesOffice.getRentalList() != null && salesOffice.getRentalList().size() > 0) {
+                if (salesOffice.getRentalList() != null && !salesOffice.getRentalList().isEmpty()) {
                     log.debug("Adding rental service material list");
-                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices, discountMap);
+                    List<PriceRow> rentalMaterialList = priceRowService.saveAll(salesOffice.getRentalList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), materialStdPrices);
                     
                     entity.setRentalList(rentalMaterialList);
                     log.debug("Finished adding rental materials");
                 }
 
-                if (salesOffice.getZoneList() != null && salesOffice.getZoneList().size() > 0) {
+                entity = repository.save(entity);
+
+                if (salesOffice.getZoneList() != null && !salesOffice.getZoneList().isEmpty()) {
                     log.debug("Adding zones service material list");
                     List<Zone> zones = zoneService.saveAll(salesOffice.getZoneList(), salesOffice.getSalesOrg(), salesOffice.getSalesOffice());
 
@@ -107,5 +100,26 @@ public class SalesOfficeServiceImpl implements SalesOfficeService {
             }
         }
         return returnList;
+    }
+
+    private Map<String, MaterialPrice> getMaterialPriceMap(SalesOffice salesOffice) {
+        if(CollectionUtils.isNotEmpty(salesOffice.getMaterialList()) ||
+                CollectionUtils.isNotEmpty(salesOffice.getTransportServiceList()) ||
+                CollectionUtils.isNotEmpty(salesOffice.getRentalList())) {
+            return standardPriceService.getStandardPriceForSalesOrgAndSalesOfficeMap(salesOffice.getSalesOrg(), salesOffice.getSalesOffice(), null);
+        }
+        log.debug("All material lists are empty, no material prices to get.");
+        return new HashMap<>();
+    }
+
+    private SalesOffice getSalesOffice(SalesOffice salesOffice) {
+        if (salesOffice.getId() != null) {
+            Optional<SalesOffice> optSalesOffice = repository.findById(salesOffice.getId());
+
+            if (optSalesOffice.isPresent()) {
+                return optSalesOffice.get();
+            }
+        }
+        return new SalesOffice();
     }
 }

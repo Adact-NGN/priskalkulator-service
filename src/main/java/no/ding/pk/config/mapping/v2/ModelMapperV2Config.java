@@ -3,6 +3,7 @@ package no.ding.pk.config.mapping.v2;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.repository.SalesRoleRepository;
 import no.ding.pk.service.offer.MaterialService;
 import no.ding.pk.web.dto.azure.ad.AdUserDTO;
@@ -10,9 +11,8 @@ import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.dto.web.client.offer.*;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
+import no.ding.pk.web.dto.web.client.offer.template.PriceOfferTemplateDTO;
+import org.modelmapper.*;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Configuration
 public class ModelMapperV2Config {
@@ -28,9 +30,10 @@ public class ModelMapperV2Config {
     private static final Logger log = LoggerFactory.getLogger(ModelMapperV2Config.class);
 
     @Bean(name = "modelMapperV2")
-    public ModelMapper modelMapperV2(MaterialService materialRepository, SalesRoleRepository salesRoleRepository) {
+    public ModelMapper modelMapperV2(MaterialService materialService, SalesRoleRepository salesRoleRepository) {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
         priceOfferDtoToPriceOfferMapping(modelMapper);
 
@@ -55,6 +58,15 @@ public class ModelMapperV2Config {
                 .addMapping(MaterialDTO::getClassDescription, Material::setClassDescription)
         ;
 
+        PropertyMap<Material, Material> skipModifiedFieldsMap = new PropertyMap<>() {
+            @Override
+            protected void configure() {
+                skip().setId(null);
+            }
+        };
+
+        modelMapper.addMappings(skipModifiedFieldsMap);
+
         modelMapper.typeMap(ZoneDTO.class, Zone.class)
                 .addMapping(ZoneDTO::getNumber, Zone::setZoneId)
                 .addMapping(ZoneDTO::getMaterialList, Zone::setPriceRows);
@@ -71,16 +83,44 @@ public class ModelMapperV2Config {
 
         priceOfferToPriceOfferListDto(modelMapper);
 
-        priceRowDtoToPriceRowTypeMapping(materialRepository, modelMapper);
+        priceRowDtoToPriceRowTypeMapping(materialService, modelMapper);
 
         priceRowToPriceRowDtoTypeMapping(modelMapper);
 
         userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
+        Converter<List<String>, String> listToCommaSeparatedString = context -> {
+            if(context.getSource() != null) {
+                if (!context.getSource().isEmpty()) {
+                    return String.join(",", context.getSource());
+                }
+            }
+
+            return null;
+        };
+        modelMapper.typeMap(UserDTO.class, User.class).addMappings(mapping -> mapping.using(listToCommaSeparatedString)
+                .map(UserDTO::getSalesOffices, (destination, value) -> destination.setSalesOffices((String) value)));
 
         modelMapper.typeMap(MaterialStdPriceDTO.class, MaterialPrice.class)
                 .addMapping(MaterialStdPriceDTO::getMaterial, MaterialPrice::setMaterialNumber);
 
+        priceOfferTemplateToDto(modelMapper);
+
         return modelMapper;
+    }
+
+    private static void priceOfferTemplateToDto(ModelMapper modelMapper) {
+        Converter<User, String> userToEmailConverter = context -> context.getSource().getEmail();
+
+        Converter<List<User>, List<String>> userListToEmailList = context -> {
+            if(context.getSource() != null) {
+                return context.getSource().stream().map(User::getEmail).collect(Collectors.toList());
+            }
+
+            return null;
+        };
+        modelMapper.createTypeMap(PriceOfferTemplate.class, PriceOfferTemplateDTO.class)
+                .addMappings(mapping -> mapping.using(userToEmailConverter).map(PriceOfferTemplate::getAuthor, PriceOfferTemplateDTO::setAuthor))
+                .addMappings(mapping -> mapping.using(userListToEmailList).map(PriceOfferTemplate::getSharedWith, PriceOfferTemplateDTO::setSharedWith));
     }
 
     private static void priceOfferToPriceOfferListDto(ModelMapper modelMapper) {
@@ -111,6 +151,10 @@ public class ModelMapperV2Config {
                 .addMapping(PriceOffer::getLastModifiedDate, PriceOfferDTO::setDateUpdated)
                 .addMapping(PriceOffer::getAdditionalInformation, PriceOfferDTO::setAdditionalInformation)
                 .addMapping(PriceOffer::getGeneralComment, PriceOfferDTO::setGeneralComment)
+                .addMapping(PriceOffer::getOrganizationNumber, PriceOfferDTO::setOrganizationNumber)
+                .addMapping(PriceOffer::getStreetAddress, PriceOfferDTO::setStreetAddress)
+                .addMapping(PriceOffer::getPostalNumber, PriceOfferDTO::setPostalNumber)
+                .addMapping(PriceOffer::getCity, PriceOfferDTO::setCity)
                 .addMappings(mapping -> mapping.using(entityToDto).map(PriceOffer::getContactPersonList, PriceOfferDTO::setContactPerson));
     }
 
@@ -128,33 +172,35 @@ public class ModelMapperV2Config {
         modelMapper.typeMap(PriceOfferDTO.class, PriceOffer.class)
                 .addMapping(PriceOfferDTO::getAdditionalInformation, PriceOffer::setAdditionalInformation)
                 .addMapping(PriceOfferDTO::getGeneralComment, PriceOffer::setGeneralComment)
+                .addMapping(PriceOfferDTO::getOrganizationNumber, PriceOffer::setOrganizationNumber)
+                .addMapping(PriceOfferDTO::getStreetAddress, PriceOffer::setStreetAddress)
+                .addMapping(PriceOfferDTO::getPostalNumber, PriceOffer::setPostalNumber)
+                .addMapping(PriceOfferDTO::getCity, PriceOffer::setCity)
                 .addMappings(mapping -> mapping.using(dtoToList).map(PriceOfferDTO::getContactPerson, PriceOffer::setContactPersonList));
     }
 
     private static void priceRowDtoToPriceRowTypeMapping(MaterialService materialRepository, ModelMapper modelMapper) {
         // https://amydegregorio.com/2018/01/17/using-custom-modelmapper-converters-and-mappings/
-        Converter<String, Material> stringToMaterial = c -> {
+        Converter<Map<String, String>, Material> stringToMaterial = c -> {
             Material material = null;
             if(c.getSource() != null) {
-                String[] materialDeviceTypeId = c.getSource().split("_");
+                Map<String, String> materialDeviceTypeId = c.getSource();
 
-                if(materialDeviceTypeId.length > 1) {
-                    material = materialRepository.findByMaterialNumberAndDeviceType(materialDeviceTypeId[0], materialDeviceTypeId[1]);
-                } else {
-                    material = materialRepository.findByMaterialNumber(c.getSource());
-                }
+                log.debug("Looking up material: {}", materialDeviceTypeId.get("materialNumber"));
 
-                if(material != null) {
-                    return material;
+                Optional<Material> optionalMaterial = materialRepository.findByMaterialNumberAndDeviceType(
+                        materialDeviceTypeId.get("materialNumber"),
+                        materialDeviceTypeId.get("deviceType"));
+
+                if(optionalMaterial.isPresent()) {
+                    return optionalMaterial.get();
                 }
 
                 log.debug("No material number was found. Material object must be created.");
 
-                if(materialDeviceTypeId.length > 1) {
-                    material = Material.builder().materialNumber(materialDeviceTypeId[0]).deviceType(materialDeviceTypeId[1]).build();
-                } else {
-                    material = Material.builder().materialNumber(c.getSource()).build();
-                }
+                material = Material.builder().materialNumber(materialDeviceTypeId.get("materialNumber"))
+                        .deviceType(materialDeviceTypeId.get("deviceType"))
+                        .build();
             }
 
             return material;

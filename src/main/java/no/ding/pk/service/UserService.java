@@ -16,5 +16,5 @@ public interface UserService {
     User updateSalesRoleForUser(User user, SalesRole salesRole);
     User findByEmail(String salesEmployeeEmail);
 
-    List<User> findByEmailInList(List<String> superAdmins);
+    List<User> findByEmailInList(List<String> emails);
 }

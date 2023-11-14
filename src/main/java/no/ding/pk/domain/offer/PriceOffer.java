@@ -1,10 +1,7 @@
 package no.ding.pk.domain.offer;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import no.ding.pk.domain.User;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -12,17 +9,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -39,7 +26,7 @@ public class PriceOffer extends Offer implements Serializable {
     @Column
     private String priceOfferStatus;
 
-    @Column(length = 21844)
+    @Column
     private String materialsForApproval;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -47,12 +34,12 @@ public class PriceOffer extends Offer implements Serializable {
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<SalesOffice> salesOfficeList;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "po_salesEmployee_id", foreignKey = @ForeignKey(name = "Fk_price_offer_sales_employee"))
     private User salesEmployee;
 
     @ManyToOne
-    @JoinColumn(name = "po_approverUser_id", foreignKey = @ForeignKey(name = "Fk_price_offer_approver"))
+    @JoinColumn(name = "po_approverUser_id", foreignKey = @ForeignKey(name = "Fk_price_offer_approver"), nullable = true)
     private User approver;
 
     @Column
@@ -74,11 +61,25 @@ public class PriceOffer extends Offer implements Serializable {
     @JoinColumn(name = "po_customerTerms_id", foreignKey = @ForeignKey(name = "Fk_price_offer_customerTerms"))
     private PriceOfferTerms customerTerms;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "priceTeamUserId", foreignKey = @ForeignKey(name = "Fk_price_offer_price_team_user"))
+    private User priceTeamUser;
+
     @Builder(builderMethodName = "priceOfferBuilder")
-    public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType, List<SalesOffice> salesOfficeList, User salesEmployee,
-            Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
+    public PriceOffer(Long id, Boolean deleted, String customerNumber, String customerName, String customerType,
+                      String streetAddress,
+                      String postalNumber,
+                      String city,
+                      String organizationNumber,
+                      List<SalesOffice> salesOfficeList, User salesEmployee,
+                      Boolean needsApproval, User approver, Date approvalDate, Date dateIssued, PriceOfferTerms priceOfferTerms,
                       String priceOfferStatus, Date activationDate, List<ContactPerson> contactPersonList) {
-        super(id, deleted, customerNumber, customerName, customerType, contactPersonList, approvalDate,
+        super(id, deleted, customerNumber, customerName, customerType,
+                streetAddress,
+                postalNumber,
+                city,
+                organizationNumber,
+                contactPersonList, approvalDate,
                 dateIssued);
 
         this.needsApproval = needsApproval;
@@ -95,6 +96,18 @@ public class PriceOffer extends Offer implements Serializable {
         return needsApproval != null && needsApproval;
     }
 
+    @JsonIgnore
+    public Integer getHighestSelectedDiscountLevel() {
+        Integer highestSelectedDiscountLevel = null;
+        if(salesOfficeList  != null) {
+            for(SalesOffice salesOffice : salesOfficeList) {
+                highestSelectedDiscountLevel = salesOffice.getHighestSelectedDiscountLevel();
+            }
+        }
+
+        return highestSelectedDiscountLevel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -103,11 +116,17 @@ public class PriceOffer extends Offer implements Serializable {
 
         PriceOffer that = (PriceOffer) o;
 
-        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList).append(salesEmployee, that.salesEmployee).append(approver, that.approver).append(approvalDate, that.approvalDate).append(activationDate, that.activationDate).append(customerTerms, that.customerTerms).isEquals();
+        return new EqualsBuilder().append(priceOfferStatus, that.priceOfferStatus).append(salesOfficeList, that.salesOfficeList)
+                .append(salesEmployee, that.salesEmployee).append(approver, that.approver)
+                .append(approvalDate, that.approvalDate).append(activationDate, that.activationDate)
+                .append(customerTerms, that.customerTerms).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList).append(salesEmployee).append(approver).append(approvalDate).append(activationDate).append(customerTerms).toHashCode();
+        return new HashCodeBuilder(17, 37).append(priceOfferStatus).append(salesOfficeList)
+                .append(salesEmployee).append(approver).append(approvalDate).append(activationDate)
+                .append(customerTerms).toHashCode();
     }
 }
+

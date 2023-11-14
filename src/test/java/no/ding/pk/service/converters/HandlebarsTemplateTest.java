@@ -46,7 +46,8 @@ public class HandlebarsTemplateTest {
         Handlebars handlebars = new Handlebars();
         Template template = handlebars.compileInline("Hi {{name}}");
 
-        User user = User.builder().name("PING").build();
+        User user = User.builder("PING", "PING", "PING PING", "ping.pong@ngn.no", "ping.pong@ngn.no")
+                .build();
 
         String templateString = template.apply(user);
 

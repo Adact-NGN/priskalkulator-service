@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserAzureAdService;
+import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
 import no.ding.pk.web.mappers.MapperService;
 import org.slf4j.Logger;
@@ -20,14 +21,16 @@ import java.util.List;
 @RequestMapping("/api/ad/users")
 public class AdUserController {
 
-    private static Logger log = LoggerFactory.getLogger(AdUserController.class);
+    private static final Logger log = LoggerFactory.getLogger(AdUserController.class);
 
-    private UserAzureAdService adService;
-    private MapperService mapperService;
+    private final UserAzureAdService adService;
+    private final UserService userService;
+    private final MapperService mapperService;
 
     @Autowired
-    public AdUserController(UserAzureAdService adService, MapperService mapperService) {
+    public AdUserController(UserAzureAdService adService, UserService userService, MapperService mapperService) {
         this.adService = adService;
+        this.userService = userService;
         this.mapperService = mapperService;
     }
 
@@ -39,13 +42,16 @@ public class AdUserController {
     @GetMapping(path = "/mail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getAdUserByMail(@PathVariable("email") String email) {
         log.debug("Starting request to AD for user with email: " + email);
-        User user = adService.getUserByEmail(email);
+        User adUser = adService.getUserByEmail(email);
 
-        if(user == null) {
+        if(adUser == null) {
             return null;
         }
 
-        return mapperService.toUserDTO(user);
+        User user = userService.findByEmail(adUser.getEmail());
+        adUser.setSalesRole(user.getSalesRole());
+
+        return mapperService.toUserDTO(adUser);
     }
 
     /**
@@ -57,9 +63,18 @@ public class AdUserController {
     public List<UserDTO> searchForUserByEmail(@RequestParam("email") String email) {
         log.debug("Searching for user with email: " + email);
 
-        List<User> searchResults = adService.searchForUserByEmail(email);
+        List<User> adUsers = adService.searchForUserByEmail(email);
 
-        return mapperService.toUserDTOList(searchResults);
+        List<String> adUserEmails = adUsers.stream().map(User::getEmail).toList();
+
+        List<User> users = userService.findByEmailInList(adUserEmails);
+
+        adUsers.forEach(adUser -> {
+            users.stream().filter(user -> user.getEmail().equals(adUser.getEmail())).findFirst()
+                    .ifPresent(filteredUser -> adUser.setSalesRole(filteredUser.getSalesRole()));
+        });
+
+        return mapperService.toUserDTOList(adUsers);
     }
     
 }

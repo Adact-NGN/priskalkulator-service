@@ -1,7 +1,9 @@
 package no.ding.pk.domain.offer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.ding.pk.domain.Auditable;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -29,7 +31,7 @@ public class PriceRow extends Auditable {
     @Column
     private Double discountLevelPct;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH})
     @JoinColumn(name = "material_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "Fk_priceRow_material"))
     private Material material;
@@ -83,6 +85,9 @@ public class PriceRow extends Auditable {
     @Column
     private String classDescription; // "
 
+    @Column
+    private String salesZone;
+
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(foreignKey = @ForeignKey(name = "Fk_priceRow_combinedMaterials"))
     @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
@@ -94,16 +99,11 @@ public class PriceRow extends Auditable {
     }
 
     public Boolean getNeedsApproval() {
-
         return needsApproval != null && needsApproval;
     }
 
-    public Boolean getApproved() {
+    public Boolean isApproved() {
         return approved != null && approved;
-    }
-
-    public boolean isApproved() {
-        return getApproved();
     }
 
     @Override
@@ -130,5 +130,22 @@ public class PriceRow extends Auditable {
                 "subCategoryDescription = " + subCategoryDescription + ", " +
                 "classId = " + classId + ", " +
                 "classDescription = " + classDescription + ")";
+    }
+
+    @JsonIgnore
+    public String getMaterialId() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(material.getMaterialNumber());
+
+        if(StringUtils.isNotBlank(deviceType)) {
+            sb.append("_").append(deviceType);
+        }
+
+        if(StringUtils.isNotBlank(salesZone)) {
+            sb.append("_").append(salesZone);
+        }
+
+        return sb.toString();
     }
 }

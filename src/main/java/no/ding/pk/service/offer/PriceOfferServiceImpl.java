@@ -1,29 +1,29 @@
 package no.ding.pk.service.offer;
 
-import no.ding.pk.domain.Discount;
+import lombok.Data;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
 import no.ding.pk.repository.offer.PriceOfferRepository;
-import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.handlers.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static no.ding.pk.repository.specifications.ApprovalSpecifications.*;
+import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
 
 @Transactional
 @Service
@@ -39,25 +39,25 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final SalesOfficePowerOfAttorneyService powerOfAttorneyService;
 
-    private final DiscountService discountService;
-
     private final CustomerTermsService customerTermsService;
     private final ModelMapper modelMapper;
+    private final List<Integer> salesOfficesWhichRequiresOwnFaApprover;
 
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
                                  SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
-                                 DiscountService discountService, CustomerTermsService customerTermsService,
-                                 @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+                                 CustomerTermsService customerTermsService,
+                                 @Qualifier("modelMapperV2") ModelMapper modelMapper,
+                                 @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
-        this.discountService = discountService;
         this.customerTermsService = customerTermsService;
         this.modelMapper = modelMapper;
+        this.salesOfficesWhichRequiresOwnFaApprover = salesOfficesWhichRequiresOwnFaApprover;
     }
 
     @Override
@@ -70,11 +70,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         entity.setApprover(salesEmployee);
 
-        entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
-        if(newPriceOffer.getCustomerName() != null) {
-            entity.setCustomerName(newPriceOffer.getCustomerName());
+        if(newPriceOffer.getCustomerNumber() != null) {
+            entity.setCustomerNumber(newPriceOffer.getCustomerNumber());
         }
+
+        entity.setCustomerName(newPriceOffer.getCustomerName());
+
+        entity.setStreetAddress(newPriceOffer.getStreetAddress());
+        entity.setPostalNumber(newPriceOffer.getPostalNumber());
+        entity.setCity(newPriceOffer.getCity());
+
+        entity.setOrganizationNumber(newPriceOffer.getOrganizationNumber());
+
         entity.setNeedsApproval(newPriceOffer.getNeedsApproval());
+
         entity.setApprovalDate(newPriceOffer.getApprovalDate());
         entity.setDateIssued(newPriceOffer.getDateIssued());
 
@@ -86,14 +95,15 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             entity.setAdditionalInformation(newPriceOffer.getAdditionalInformation());
         }
 
-        entity.setContactPersonList(newPriceOffer.getContactPersonList());
-
-        // salesOrg, salesOffice, material, Discount
-        Map<String, Map<String, Map<String, Discount>>> discountMap = createDiscountMapForSalesOrg(newPriceOffer);
+        if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
+            if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
+                entity.setContactPersonList(newPriceOffer.getContactPersonList());
+            }
+        }
 
         if(newPriceOffer.getSalesOfficeList() != null) {
-            if(newPriceOffer.getSalesOfficeList().size() > 0) {
-                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber(), discountMap);
+            if(!newPriceOffer.getSalesOfficeList().isEmpty()) {
+                List<SalesOffice> salesOffices = salesOfficeService.saveAll(newPriceOffer.getSalesOfficeList(), entity.getCustomerNumber());
 
                 entity.setSalesOfficeList(salesOffices);
 
@@ -101,35 +111,46 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
 
-        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(newPriceOffer);
+        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(entity);
 
         if(!materialsForApproval.isEmpty()) {
+            log.debug("Materials needs approving by responsible person.");
             entity.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
+            entity.setNeedsApproval(true);
             String materialNumbersForApproval = flattenMaterialNumbersMapToCommaseparatedListString(materialsForApproval);
 
             entity.setMaterialsForApproval(materialNumbersForApproval);
 
-            User approver = getApproverForOffer(materialsForApproval);
+            User approver = getApproverForOffer(materialsForApproval, entity.getSalesEmployee());
 
             if(approver != null) {
                 entity.setApprover(approver);
             } else {
                 log.debug("No approver found for PriceOffer with sales organization(s) {} and sales office {}", newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOrg).toList(), newPriceOffer.getSalesOfficeList().stream().map(SalesOffice::getSalesOffice).toList());
             }
-        } else {
-            log.debug("No materials needs to be approved, set price offer as APPROVED.");
-            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
-        }
 
-        if(newPriceOffer.getApprover() != null) {
+            if(approver != null && approver.equals(entity.getSalesEmployee())) {
+                log.debug("Sales employee has the rights to approve the price offer. Set it to approved.");
+                entity.setNeedsApproval(false);
+                entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
+            }
+        } else if(newPriceOffer.getApprover() != null) {
+            log.debug("Setting approver from new price offer object.");
             User approver = checkUserObject(newPriceOffer.getApprover());
 
             if(approver != null) {
                 entity.setApprover(approver);
             } else {
-                approver = getApproverForOffer(materialsForApproval);
+                approver = getApproverForOffer(materialsForApproval, entity.getSalesEmployee());
                 entity.setApprover(approver);
             }
+
+            entity.setNeedsApproval(false);
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
+        } else {
+            log.debug("No materials needs to be approved, set price offer as APPROVED.");
+            entity.setNeedsApproval(false);
+            entity.setPriceOfferStatus(PriceOfferStatus.APPROVED.getStatus());
         }
 
         if(newPriceOffer.getCustomerTerms() != null) {
@@ -144,80 +165,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
             String materials = String.join(",", listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
 
-            if(materialNumbersForApproval.length() > 0) {
+            if(!materialNumbersForApproval.isEmpty()) {
                 materialNumbersForApproval.append(",").append(materials);
             } else {
                 materialNumbersForApproval = new StringBuilder(materials);
             }
         }
         return materialNumbersForApproval.toString();
-    }
-
-    private Map<String, Map<String, Map<String, Discount>>> createDiscountMapForSalesOrg(PriceOffer newPriceOffer) {
-        Map<String, Map<String, Set<String>>> discountMap = new HashMap<>();
-        for (SalesOffice salesOffice : newPriceOffer.getSalesOfficeList()) {
-
-            // Collect all Material numbers in each price row lists.
-            Set<String> mateiralNumberSet = getMateiralNumberSet(salesOffice.getMaterialList());
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getRentalList()));
-            mateiralNumberSet.addAll(getMateiralNumberSet(salesOffice.getTransportServiceList()));
-
-            if(salesOffice.getZoneList() != null && !salesOffice.getZoneList().isEmpty()) {
-                for (Zone zone : salesOffice.getZoneList()) {
-                    if(zone.getPriceRows() == null) {
-                        continue;
-                    }
-
-                    for (PriceRow priceRow : zone.getPriceRows()) {
-                        mateiralNumberSet.add(priceRow.getMaterial().getMaterialNumber());
-                    }
-                }
-            }
-
-            // Create sales office to material number map.
-            Map<String, Set<String>> salesOfficeMaterialMap = new HashMap<>();
-            salesOfficeMaterialMap.put(salesOffice.getSalesOffice(), mateiralNumberSet);
-
-            // Add map to sales org map, sales office, material number map.
-            if(discountMap.containsKey(salesOffice.getSalesOrg())) {
-                discountMap.get(salesOffice.getSalesOrg()).putAll(salesOfficeMaterialMap);
-            } else {
-                discountMap.put(salesOffice.getSalesOrg(), salesOfficeMaterialMap);
-            }
-        }
-
-        Map<String, Map<String, Map<String, Discount>>> orgOfficeMaterialDiscount = new HashMap<>();
-
-        for (String salesOrg : discountMap.keySet()) {
-            if(!orgOfficeMaterialDiscount.containsKey(salesOrg)) {
-                orgOfficeMaterialDiscount.put(salesOrg, new HashMap<>());
-            }
-
-            Map<String, Map<String, Discount>> salesOfficeToMaterialDiscountMap = new HashMap<>();
-            for(String salesOffice : discountMap.get(salesOrg).keySet()) {
-                Map<String, Discount> materialNumberToDiscountMap = new HashMap<>();
-                List<String> materialNumbers = discountMap.get(salesOrg).get(salesOffice).stream().toList();
-
-                List<Discount> discounts = discountService.findAllDiscountForDiscountBySalesOrgAndSalesOfficeAndMaterialNumberIn(salesOrg, salesOffice, materialNumbers);
-
-                if(discounts != null && !discounts.isEmpty()) {
-                    discounts.forEach(discount -> materialNumberToDiscountMap.put(discount.getMaterialNumber(), discount));
-                }
-
-                salesOfficeToMaterialDiscountMap.put(salesOffice, materialNumberToDiscountMap);
-            }
-
-            orgOfficeMaterialDiscount.put(salesOrg, salesOfficeToMaterialDiscountMap);
-        }
-
-        return orgOfficeMaterialDiscount;
-    }
-
-    private static Set<String> getMateiralNumberSet(List<PriceRow> materialList) {
-        if(materialList == null) {
-            return new HashSet<>();
-        }
-        return materialList.stream().map(material -> material.getMaterial().getMaterialNumber()).collect(Collectors.toSet());
     }
 
     private PriceOffer getPriceOffer(PriceOffer newPriceOffer, User salesEmployee) {
@@ -237,54 +191,74 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         return entity;
     }
 
-    private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval) {
-        Set<User> approvalUsers = new HashSet<>();
+    @Data
+    private static class HighestDiscountLevelAndType {
+        boolean faMaterial = false;
+        boolean oaMaterial = false;
 
-        for (Map.Entry<String, List<PriceRow>> listEntry : materialsForApproval.entrySet()) {
-            boolean hasFaMaterialForApproval = false;
-            boolean hasRegularMaterialForApproval = false;
+        int highestDiscountLevel = 0;
+    }
 
-            int highestDiscountLevel = 0;
+    private HighestDiscountLevelAndType getHighestSetDiscountLevel(List<PriceRow> listEntry) {
+        HighestDiscountLevelAndType levelAndType = new HighestDiscountLevelAndType();
 
-            for(PriceRow priceRow : listEntry.getValue()) {
-                Material material = priceRow.getMaterial();
-                if(material.isFaMaterial()) {
-                    hasFaMaterialForApproval = true;
-                } else {
-                    hasRegularMaterialForApproval = true;
-                }
-
-                if(priceRow.getDiscountLevel() != null && priceRow.getDiscountLevel() > highestDiscountLevel) {
-                    highestDiscountLevel = priceRow.getDiscountLevel();
-                }
+        for (PriceRow priceRow : listEntry) {
+            Material material = priceRow.getMaterial();
+            if (material.isFaMaterial()) {
+                levelAndType.setFaMaterial(true);
+            } else {
+                levelAndType.setOaMaterial(true);
             }
 
-            Integer salesOfficeNumber = Integer.valueOf(listEntry.getKey());
+            if (priceRow.getDiscountLevel() != null && priceRow.getDiscountLevel() > levelAndType.getHighestDiscountLevel()) {
+                levelAndType.setHighestDiscountLevel(priceRow.getDiscountLevel());
+            }
+        }
+
+        return levelAndType;
+    }
+
+    private User getApproverForOffer(Map<String, List<PriceRow>> materialsForApproval, User salesEmployee) {
+        Set<User> approvalUsers = new HashSet<>();
+
+        for (Map.Entry<String, List<PriceRow>> salesOfficePriceRowMap : materialsForApproval.entrySet()) {
+            HighestDiscountLevelAndType levelAndType = getHighestSetDiscountLevel(salesOfficePriceRowMap.getValue());
+
+            log.debug("Highest discount level registered: {}", levelAndType.getHighestDiscountLevel());
+
+            Integer salesOfficeNumber = Integer.valueOf(salesOfficePriceRowMap.getKey());
             PowerOfAttorney poa = powerOfAttorneyService.findBySalesOffice(salesOfficeNumber);
 
             if(poa == null) {
                 log.debug("No power of attorney found for sales office {}", salesOfficeNumber);
-                log.debug("Unable to set any approved for given price offer");
+                log.debug("Unable to set any approver for given price offer");
             } else {
-                if (hasFaMaterialForApproval && !hasRegularMaterialForApproval) {
+                if(levelAndType.isFaMaterial() && salesOfficesWhichRequiresOwnFaApprover.contains(salesOfficeNumber)) {
                     if(poa.getDangerousWasteHolder() == null) {
                         log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
                     } else {
                         approvalUsers.add(poa.getDangerousWasteHolder());
                     }
-                } else {
-                    if (highestDiscountLevel > 5) {
-                        if(poa.getOrdinaryWasteLvlTwoHolder() == null) {
-                            log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
-                        } else {
-                            approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
-                        }
+                } else if (levelAndType.getHighestDiscountLevel() > 5) {
+                    if (poa.getOrdinaryWasteLvlTwoHolder() == null) {
+                        log.debug("No regional manager elected for ordinary waste for sales office {}", salesOfficeNumber);
                     } else {
-                        if(poa.getOrdinaryWasteLvlOneHolder() == null) {
-                            log.debug("No sales manager elected for approval of ordinary waste for sales office {}", salesOfficeNumber);
-                        } else {
-                            approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
-                        }
+                        approvalUsers.add(poa.getOrdinaryWasteLvlTwoHolder());
+                    }
+                } else if (salesEmployee.getPowerOfAttorneyOA() >= levelAndType.getHighestDiscountLevel()) {
+                    log.debug("Sales employee has the correct level to approve this.");
+                    approvalUsers.add(salesEmployee);
+                } else if (levelAndType.isFaMaterial() && !levelAndType.isOaMaterial()) {
+                    if (poa.getDangerousWasteHolder() == null) {
+                        log.debug("No approver elected for dangerous waste for sales office {}", salesOfficeNumber);
+                    } else {
+                        approvalUsers.add(poa.getDangerousWasteHolder());
+                    }
+                } else {
+                    if (poa.getOrdinaryWasteLvlOneHolder() == null) {
+                        log.debug("No sales manager elected for approval of ordinary waste for sales office {}", salesOfficeNumber);
+                    } else {
+                        approvalUsers.add(poa.getOrdinaryWasteLvlOneHolder());
                     }
                 }
             }
@@ -298,9 +272,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private Map<String, List<PriceRow>> getAllMaterialsForApproval(PriceOffer priceOffer) {
+        log.debug("Getting all materials which needs approval.");
         Map<String, List<PriceRow>> salesOfficeMaterialsMap = new HashMap<>();
 
-        if(priceOffer.getSalesOfficeList() == null) {
+        if(CollectionUtils.isEmpty(priceOffer.getSalesOfficeList())) {
+            log.debug("No sales offices registered on the Price offer, returning.");
             return salesOfficeMaterialsMap;
         }
         for(SalesOffice salesOffice : priceOffer.getSalesOfficeList()) {
@@ -318,12 +294,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 salesOfficeMaterialsMap.put(salesOffice.getSalesOffice(), materialsInPriceOffer);
             }
         }
+        log.debug("Filtering done, found {} materials which needs to be approved.", salesOfficeMaterialsMap.size());
         return salesOfficeMaterialsMap;
     }
 
     private static void collectMaterial(List<PriceRow> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
-            if(pr.getNeedsApproval() && !pr.isApproved()) {
+            if(pr.getDiscountLevel() != null && !pr.isApproved()) {
                 materialsInPriceOffer.add(pr);
             }
         }
@@ -385,8 +362,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public List<PriceOffer> findAllBySalesEmployeeId(Long userId) {
-        return repository.findAllBySalesEmployeeId(userId);
+    public List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList) {
+        return repository.findAll(Specification.where(withSalesEmployeeId(userId)).and(withPriceOfferStatusInList(statusList)));
     }
 
     @Override
@@ -396,6 +373,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Boolean approvePriceOffer(Long priceOfferId, Long approverId, String priceOfferStatus, String additionalInformation) {
+        Optional<User> approverOptional = userService.findById(approverId);
+
+        if(approverOptional.isEmpty()) {
+            log.debug("User with id {} trying to approve the offer was not found.", approverId);
+            throw new UserNotFoundException(String.format("Approver User with id %d was not found.", approverId));
+        }
+
         PriceOffer priceOfferToApprove = repository.findByIdAndApproverIdAndNeedsApprovalIsTrue(priceOfferId, approverId);
 
         if(priceOfferToApprove == null) {
@@ -416,19 +400,28 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 
             if(needsReApproval) {
+                log.debug("Price offer still needs approval. Setting status to PENDING and needsApproval to true.");
                 priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
                 priceOfferToApprove.setNeedsApproval(true);
 
+                log.debug("Checking if Price offer has an approver registered on it.");
                 if(priceOfferToApprove.getApprover() == null) {
+                    log.debug("No approver set.");
                     Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
-                    User approver = getApproverForOffer(materialsForApproval);
+                    User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
-                    priceOfferToApprove.setApprover(approver);
+                    log.debug("Found approver? {}", neededApprover != null);
+                    priceOfferToApprove.setApprover(neededApprover);
                 }
+            } else {
+                priceOfferToApprove.setNeedsApproval(false);
+                priceOfferToApprove.setApprovalDate(new Date());
+                priceOfferToApprove.setMaterialsForApproval(null);
             }
         } else {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
             priceOfferToApprove.setAdditionalInformation(additionalInformation);
+            priceOfferToApprove.setMaterialsForApproval(null);
         }
 
         priceOfferToApprove = repository.save(priceOfferToApprove);
@@ -438,12 +431,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Boolean activatePriceOffer(Long activatedById, Long priceOfferId, PriceOfferTerms customerTerms, String generalComment) {
-        PriceOffer priceOfferToActivate = repository.findById(priceOfferId).orElse(null);
+        Optional<PriceOffer> priceOfferToActivateOptional = repository.findById(priceOfferId);
 
-        if(priceOfferToActivate == null) {
+        if(priceOfferToActivateOptional.isEmpty()) {
             String message = String.format("No PriceOffer with given id %d was found.", priceOfferId);
             throw new PriceOfferNotFoundException(message);
         }
+
+        PriceOffer priceOfferToActivate = priceOfferToActivateOptional.get();
 
         if(StringUtils.isBlank(priceOfferToActivate.getPriceOfferStatus())) {
             String message = "Given Price offer has no status assigned.";
@@ -556,7 +551,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
+        log.debug("Checking if price offer needs approval.");
         List<String> currentMaterialInPriceOffer = new ArrayList<>();
+
         for (Map.Entry<String, List<PriceRow>> listEntry : getAllMaterialsForApproval(priceOfferToApprove).entrySet()) {
             currentMaterialInPriceOffer.addAll(listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
         }
@@ -570,6 +567,35 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public List<PriceOffer> findAllPriceOffersRadyForBoReport() {
         
         return repository.findAllByPriceOfferStatusIn(List.of(PriceOfferStatus.ACTIVATED.getStatus()));
+    }
+
+    @Override
+    public void updateStatus(Long id, String status) {
+        PriceOffer priceOffer = repository.findById(id).orElse(null);
+
+        if(priceOffer == null) {
+            String message = String.format("Price offer with id %d not found", id);
+            throw new PriceOfferNotFoundException(message);
+        }
+
+        priceOffer.setPriceOfferStatus(status);
+
+        repository.save(priceOffer);
+    }
+
+    @Override
+    public List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses) {
+        return repository.findAll(Specification.where(distinct()).and(withSalesOfficeInList(salesOffices)).and(withPriceOfferStatusInList(statuses)));
+    }
+
+    @Override
+    public void updateCustomerNumber(Long id, String customerNumber) {
+        repository.updateCustomerNumber(id, customerNumber);
+    }
+
+    @Override
+    public PriceOffer updatePriceOffer(PriceOffer priceOffer) {
+        return repository.save(priceOffer);
     }
 
 }

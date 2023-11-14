@@ -5,13 +5,8 @@ import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -70,13 +65,13 @@ public class MaterialController {
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,
                                              @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize) {
         log.debug("Getting materials for sales organization: {}", salesOrg);
-        return service.getAllMaterialsForSalesOrg(salesOrg, page, pageSize);
+        return service.getAllMaterialsForSalesOrgByZone(salesOrg, page, pageSize);
     }
 
     /**
      * Get a list of materials with standard price included.
      * @param salesOrg sales organization number. Required!
-     * @param salesOffice sales office number. Required!
+     * @param salesOffice sales office number.
      * @param zone given zone to get materials for. Not required! Set a numeric value with a zero as a suffix to get zone prices. Format ex. 02
      * @param page selected page to view. Default 0
      * @param pageSize page size to view. Default 5000
@@ -84,12 +79,24 @@ public class MaterialController {
      */
     @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialsWithStdPrice(@PathVariable(value = "salesOrg") String salesOrg,
-                                                      @PathVariable(value = "salesOffice") String salesOffice,
+                                                      @PathVariable(value = "salesOffice", required = false) String salesOffice,
                                                       @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                       @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize,
                                                       @RequestParam(value = "zone", required = false) String zone) {
         log.debug("Getting materials for salesOrg: {} and salesOffice: {} for zone: {}", salesOrg, salesOffice, zone != null ? zone : "no zone");
 
-        return service.getAllMaterialsForSalesOrgAndSalesOffice(salesOrg, salesOffice, zone, page, pageSize);
+        return service.getAllMaterialsForSalesOrgByZone(salesOrg, zone, page, pageSize);
+    }
+
+    /**
+     * Get a list of all materials for sales org 100.
+     * NB: This is used by the PriceOfferTemplate page to create templates.
+     * @return list of Materials.
+     */
+    @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<MaterialDTO>  getAllMaterialsForTemplate() {
+        log.debug("Getting all materials for PriceOffer Template");
+
+        return service.getAllMaterialsForSalesOrgByZone("100", 0, 5000);
     }
 }

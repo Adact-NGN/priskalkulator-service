@@ -80,6 +80,8 @@ public class BoReportConditionCodeServiceImpl implements BoReportConditionCodeSe
             boReportConditionMap.put(salesOffice.getSalesOffice(), soBoReportConditionMap);
         }
 
+        log.debug("Conditions for priceOffer: {}", boReportConditionMap);
+
         return boReportConditionMap;
     }
 

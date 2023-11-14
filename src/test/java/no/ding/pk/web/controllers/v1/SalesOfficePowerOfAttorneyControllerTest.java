@@ -19,17 +19,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -122,12 +118,9 @@ class SalesOfficePowerOfAttorneyControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldCreatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
@@ -161,26 +154,20 @@ class SalesOfficePowerOfAttorneyControllerTest {
     @Disabled("Move to service test")
     @Test
     public void shouldUpdatePowerOfAttorneyWithUsers() {
-        User user = User.builder()
+        User user = User.builder("Kjetil Torvund", "Minde", "Kjetil Torvund Minde", "kjetil.torvund.minde@ngn.no", "kjetil.torvund.minde@ngn.no")
                 .adId("dc804853-6a82-4022-8eb5-244fff724af2")
                 .associatedPlace("Larvik")
-                .email("kjetil.torvund.minde@ngn.no")
                 .phoneNumber("+4790135757")
-                .fullName("Kjetil Torvund Minde")
-                .name("Kjetil")
                 .powerOfAttorneyOA(5)
                 .powerOfAttorneyFA(5)
                 .build();
 
         user = userRepository.save(user);
 
-        User otherUser = User.builder()
+        User otherUser = User.builder("Kristin Jørgensen", "Nærum", "Kristin Jørgensen Nærum", "kristin.nerum@ngn.no", "kristin.nerum@ngn.no")
                 .adId("7c6c0b5c-53de-4224-ac98-aa92c1aaa2ef")
                 .associatedPlace("Larvik")
-                .email("kristin.nerum@ngn.no")
                 .phoneNumber("+4798232574")
-                .fullName("Kristin Jørgensen Nærum")
-                .name("Kristin")
                 .powerOfAttorneyOA(2)
                 .powerOfAttorneyFA(3)
                 .build();

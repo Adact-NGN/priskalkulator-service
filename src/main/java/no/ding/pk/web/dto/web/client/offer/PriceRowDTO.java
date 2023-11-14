@@ -12,6 +12,8 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Builder
 @Getter
@@ -29,6 +31,7 @@ public class PriceRowDTO {
     private String materialDesignation;
     private String productGroupDesignation;
     private String deviceType;
+    private String salesZone;
     private String devicePlacement;
     private Boolean showPriceInOffer;
     private Double manualPrice;
@@ -56,14 +59,19 @@ public class PriceRowDTO {
     private String classDescription;
 
     @JsonIgnore
-    public String getMaterialId() {
-        StringBuilder sb = new StringBuilder(material);
+    public Map<String, String> getMaterialId() {
+        Map<String, String> materialIdMap = new HashMap<>();
+        materialIdMap.put("materialNumber", material);
 
         if(StringUtils.isNotBlank(deviceType)) {
-            sb.append("_").append(deviceType);
+            materialIdMap.put("deviceType", deviceType);
         }
 
-        return sb.toString();
+        if(StringUtils.isNotBlank(salesZone)) {
+            materialIdMap.put("salesZone", salesZone);
+        }
+
+        return materialIdMap;
     }
 
     @JsonIgnore

@@ -16,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Map;
 
 @Component
 public class SapHttpClient {
@@ -32,6 +33,10 @@ public class SapHttpClient {
     }
 
     public HttpRequest createGetRequest(String urlString, MultiValueMap<String, String> params) {
+        return createGetRequest(urlString, params, null);
+    }
+
+    public HttpRequest createGetRequest(String urlString, MultiValueMap<String, String> params, Map<String, String> headers) {
         if(StringUtils.isBlank(sapUsername) || StringUtils.isBlank(sapPassword)) {
             log.debug("Credentials for SAP service is empty");
             throw new RuntimeException("Credentials for SAP service is empty");
@@ -42,20 +47,54 @@ public class SapHttpClient {
             throw new RuntimeException(String.format("Cannot execute GET request, malformed URL: %s", urlString));
         }
 
-        UriComponentsBuilder urlBuilder = UriComponentsBuilder
-        .fromUriString(urlString);
+        UriComponents url = getUriComponents(urlString, params);
 
-        if(params != null) {
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .GET()
+                .uri(url.toUri())
+                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
+
+        addHeaders(headers, requestBuilder);
+
+        return requestBuilder
+                .build();
+    }
+
+    public HttpRequest createPostRequest(String sapPricingConditionRecordUrl, String body, MultiValueMap<String, String> params, Map<String, String> headers) {
+
+        HttpRequest.BodyPublisher bodyPublisher = StringUtils.isBlank(body) ? HttpRequest.BodyPublishers.noBody() : HttpRequest.BodyPublishers.ofString(body);
+
+        log.debug("Body publisher created with content length: {}", bodyPublisher.contentLength());
+
+        UriComponents url = getUriComponents(sapPricingConditionRecordUrl, params);
+
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .POST(bodyPublisher)
+                .uri(url.toUri())
+                .setHeader(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword));
+
+        addHeaders(headers, requestBuilder);
+
+        return requestBuilder.build();
+    }
+
+    private static UriComponents getUriComponents(String urlString, MultiValueMap<String, String> params) {
+        UriComponentsBuilder urlBuilder = UriComponentsBuilder
+                .fromUriString(urlString);
+
+        if(params != null && !params.isEmpty()) {
             urlBuilder.queryParams(params);
         }
 
-        UriComponents url = urlBuilder.build();
+        return urlBuilder.build();
+    }
 
-        return HttpRequest.newBuilder()
-        .GET()
-        .uri(url.toUri())
-        .header(HttpHeaders.AUTHORIZATION, RequestHeaderUtil.getBasicAuthenticationHeader(sapUsername, sapPassword))
-        .build();
+    private static void addHeaders(Map<String, String> headers, HttpRequest.Builder requestBuilder) {
+        if(headers != null) {
+            for (Map.Entry<String, String> stringStringEntry : headers.entrySet()) {
+                requestBuilder.setHeader(stringStringEntry.getKey(), stringStringEntry.getValue());
+            }
+        }
     }
 
     public HttpResponse<String> getResponse(HttpRequest request) {

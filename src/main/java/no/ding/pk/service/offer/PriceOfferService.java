@@ -18,7 +18,7 @@ public interface PriceOfferService {
 
     boolean delete(Long id);
 
-    List<PriceOffer> findAllBySalesEmployeeId(Long userId);
+    List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList);
 
     List<PriceOffer> findAllByApproverIdAndPriceOfferStatus(Long approverId, String priceOfferStatus);
 
@@ -29,4 +29,12 @@ public interface PriceOfferService {
     List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList);
 
     List<PriceOffer> findAllPriceOffersRadyForBoReport();
+
+    void updateStatus(Long id, String status);
+
+    List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses);
+
+    void updateCustomerNumber(Long id, String customerNumber);
+
+    PriceOffer updatePriceOffer(PriceOffer updatedOffer);
 }

@@ -2,30 +2,19 @@ package no.ding.pk.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import no.ding.pk.domain.offer.template.PriceOfferTemplate;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @NamedEntityGraph(name = "User.salesRole", attributeNodes = @NamedAttributeNode("salesRole"))
 @Table(name = "users")
@@ -69,7 +58,7 @@ public class User extends Auditable implements Serializable {
     private String resourceNr;
     
     @JsonAlias("phone")
-    @Column()
+    @Column
     private String phoneNumber;
     
     @Column(unique = true)
@@ -112,7 +101,68 @@ public class User extends Auditable implements Serializable {
     
     @Column
     private String department;
-    
+
+    @ManyToMany(mappedBy = "sharedWith")
+    private List<PriceOfferTemplate> priceOfferTemplates;
+
+    @Column
+    private String salesOffices;
+
+    public List<String> getSalesOffices() {
+        return StringUtils.isNotBlank(salesOffices) ? Arrays.stream(salesOffices.split(",")).toList() : new ArrayList<>();
+    }
+
+    public void setSalesOffices(String salesOffices) {
+        if(StringUtils.isBlank(salesOffices)) {
+            return;
+        }
+
+        Set<String> offices = getSalesOfficeSet();
+
+        String[] officeArray = salesOffices.split(",");
+
+        offices.addAll(Arrays.stream(officeArray).toList());
+
+        updateSalesOffices(offices);
+    }
+
+    public void setSalesOffices(List<String> salesOffices) {
+        Set<String> offices = getSalesOfficeSet();
+
+        offices.addAll(salesOffices);
+
+        updateSalesOffices(offices);
+    }
+
+    private Set<String> getSalesOfficeSet() {
+        if(StringUtils.isNotBlank(this.salesOffices)) {
+             return new HashSet<>(Arrays.stream(this.salesOffices.split(",")).toList());
+        }
+        return new HashSet<>();
+    }
+
+    public void addSalesOffice(String salesOffices) {
+        Set<String> offices = getSalesOfficeSet();
+
+        offices.add(salesOffices);
+
+        updateSalesOffices(offices);
+    }
+
+    public boolean removeSalesOffice(String salesOffice) {
+        Set<String> offices = getSalesOfficeSet();
+
+        boolean removed = offices.remove(salesOffice);
+
+        updateSalesOffices(offices);
+
+        return removed;
+    }
+
+    private void updateSalesOffices(Set<String> offices) {
+        this.salesOffices = String.join(",", offices);
+    }
+
     @Override
     public String toString() {
         return "User [adId=" + adId + ", associatedPlace=" + associatedPlace + ", email=" + email
@@ -184,5 +234,9 @@ public class User extends Auditable implements Serializable {
         } else if (!email.equals(other.email))
             return false;
         return true;
+    }
+
+    public static UserBuilder builder(String name, String sureName, String fullName, String username, String email) {
+        return hiddenBuilder().name(name).sureName(sureName).fullName(fullName).username(username).email(email);
     }
 }

@@ -5,15 +5,8 @@ import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,9 +36,10 @@ public class DiscountLevelController {
     public List<DiscountLevel> getSpecificDiscountLevel(@RequestParam("salesOrg") String salesOrg,
                                                         @RequestParam("salesOffice") String salesOffice,
                                                         @RequestParam("materialNumber") String materialNumber,
-                                                        @RequestParam(name = "level", required = false) Integer level) {
+                                                        @RequestParam(name = "level", required = false) Integer level,
+                                                        @RequestParam(name = "zone", required = false) Integer zone) {
         log.debug("Getting discount level for: salesOrg: {}, salesOffice: {}, materialNumber: {} level: {}", salesOrg, salesOffice, materialNumber, level);
-        return service.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, materialNumber, level);
+        return service.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, materialNumber, level, zone);
     }
 
     /**

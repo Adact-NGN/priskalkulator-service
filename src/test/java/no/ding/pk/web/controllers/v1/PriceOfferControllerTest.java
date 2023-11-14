@@ -66,11 +66,10 @@ public class PriceOfferControllerTest {
     public void setup() {
         String salesEmployeeEmail = "Wolfgang@farris-bad.no";
 
-        this.salesEmployee = User.builder()
+        this.salesEmployee = User.builder("Wolfgang Amadeus", "Mozart",
+                        "Wolfgang Amadeus Mozart", salesEmployeeEmail, salesEmployeeEmail)
             .adId("ad-id-wegarijo-arha-rh-arha")
             .jobTitle("Salgskonsulent")
-            .fullName("Wolfgang Amadeus Mozart")
-            .email(salesEmployeeEmail)
             .associatedPlace("Larvik")
             .department("Hvitsnippene")
             .build();
@@ -78,14 +77,11 @@ public class PriceOfferControllerTest {
         when(userService.findByEmail(salesEmployeeEmail)).thenReturn(salesEmployee);
         
         String approverEmail = "alexander.brox@ngn.no";
-        this.approver = User.builder()
+        this.approver = User.builder("Alexander", "Brox", "Alexander Brox",
+                        approverEmail, approverEmail)
             .adId("ad-ww-wegarijo-arha-rh-arha")
             .associatedPlace("Oslo")
-            .email(approverEmail)
             .department("Salg")
-            .fullName("Alexander Brox")
-            .name("Alexander")
-            .sureName("Brox")
             .jobTitle("Markedskonsulent")
             .build();
 
