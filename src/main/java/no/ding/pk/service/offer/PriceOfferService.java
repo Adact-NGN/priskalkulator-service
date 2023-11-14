@@ -35,4 +35,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses);
 
     void updateCustomerNumber(Long id, String customerNumber);
+
+    PriceOffer updatePriceOffer(PriceOffer updatedOffer);
 }
