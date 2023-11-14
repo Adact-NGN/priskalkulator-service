@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -103,7 +104,65 @@ public class User extends Auditable implements Serializable {
 
     @ManyToMany(mappedBy = "sharedWith")
     private List<PriceOfferTemplate> priceOfferTemplates;
-    
+
+    @Column
+    private String salesOffices;
+
+    public List<String> getSalesOffices() {
+        return StringUtils.isNotBlank(salesOffices) ? Arrays.stream(salesOffices.split(",")).toList() : new ArrayList<>();
+    }
+
+    public void setSalesOffices(String salesOffices) {
+        if(StringUtils.isBlank(salesOffices)) {
+            return;
+        }
+
+        Set<String> offices = getSalesOfficeSet();
+
+        String[] officeArray = salesOffices.split(",");
+
+        offices.addAll(Arrays.stream(officeArray).toList());
+
+        updateSalesOffices(offices);
+    }
+
+    public void setSalesOffices(List<String> salesOffices) {
+        Set<String> offices = getSalesOfficeSet();
+
+        offices.addAll(salesOffices);
+
+        updateSalesOffices(offices);
+    }
+
+    private Set<String> getSalesOfficeSet() {
+        if(StringUtils.isNotBlank(this.salesOffices)) {
+             return new HashSet<>(Arrays.stream(this.salesOffices.split(",")).toList());
+        }
+        return new HashSet<>();
+    }
+
+    public void addSalesOffice(String salesOffices) {
+        Set<String> offices = getSalesOfficeSet();
+
+        offices.add(salesOffices);
+
+        updateSalesOffices(offices);
+    }
+
+    public boolean removeSalesOffice(String salesOffice) {
+        Set<String> offices = getSalesOfficeSet();
+
+        boolean removed = offices.remove(salesOffice);
+
+        updateSalesOffices(offices);
+
+        return removed;
+    }
+
+    private void updateSalesOffices(Set<String> offices) {
+        this.salesOffices = String.join(",", offices);
+    }
+
     @Override
     public String toString() {
         return "User [adId=" + adId + ", associatedPlace=" + associatedPlace + ", email=" + email

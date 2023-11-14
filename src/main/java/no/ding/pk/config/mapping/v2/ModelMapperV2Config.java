@@ -88,6 +88,17 @@ public class ModelMapperV2Config {
         priceRowToPriceRowDtoTypeMapping(modelMapper);
 
         userDtoToUserTypeMapping(modelMapper, salesRoleRepository);
+        Converter<List<String>, String> listToCommaSeparatedString = context -> {
+            if(context.getSource() != null) {
+                if (!context.getSource().isEmpty()) {
+                    return String.join(",", context.getSource());
+                }
+            }
+
+            return null;
+        };
+        modelMapper.typeMap(UserDTO.class, User.class).addMappings(mapping -> mapping.using(listToCommaSeparatedString)
+                .map(UserDTO::getSalesOffices, (destination, value) -> destination.setSalesOffices((String) value)));
 
         modelMapper.typeMap(MaterialStdPriceDTO.class, MaterialPrice.class)
                 .addMapping(MaterialStdPriceDTO::getMaterial, MaterialPrice::setMaterialNumber);
