@@ -226,7 +226,7 @@ public class SalesOrgController {
             standardZones = standardZones.stream().filter(salesOrgDTO -> StringUtils.isNotBlank(salesOrgDTO.getSalesZone())).collect(Collectors.toList());
         }
 
-        if(standardZones.size() >= 1) {
+        if(!standardZones.isEmpty()) {
             return standardZones.get(0);
         }
 
@@ -234,7 +234,7 @@ public class SalesOrgController {
     }
 
     private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {
-        if(queryBuilder.length() > 0) {
+        if(!queryBuilder.isEmpty()) {
             queryBuilder.append(logicDivider);
         }
     }

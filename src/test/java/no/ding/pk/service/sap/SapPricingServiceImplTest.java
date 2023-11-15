@@ -83,7 +83,7 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
         priceRowService = new PriceRowServiceImpl(discountService, getPriceRowRepository(), materialService,
                 materialPriceService, getEmFactory(), sapMaterialService, new ModelMapper());
         salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
-        PriceOfferService priceOfferService = new PriceOfferServiceImpl(getPriceOfferRepository(), salesOfficeService,
+        PriceOfferService priceOfferService = new PriceOfferServiceImpl(getPriceOfferRepository(), getContactPersonRepository(), salesOfficeService,
                 userService, poaService, customerTermsService, new ModelMapper(), List.of(100));
 
         ClassLoader classLoader = getClass().getClassLoader();
