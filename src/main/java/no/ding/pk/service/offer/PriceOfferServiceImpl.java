@@ -532,18 +532,21 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {
         List<String> approvedMaterials = new ArrayList<>();
-        for(PriceRow pr : materialList) {
-            if(pr.getMaterial() == null) {
-                continue;
+        List<PriceRow> filteredMaterials = materialList.stream().filter(priceRow -> {
+            if(priceRow.getMaterial() == null) {
+                return false;
+            }
+            return materialsToApprove.contains(priceRow.getMaterial().getMaterialNumber());
+        }).toList();
+        for(PriceRow pr : filteredMaterials) {
+
+            if(pr.getNeedsApproval() && !pr.isApproved()) {
+                pr.setApproved(isApproved);
+                approvedMaterials.add(pr.getMaterial().getMaterialNumber());
             }
 
-            if(materialsToApprove.contains(pr.getMaterial().getMaterialNumber())) {
-                if(pr.getNeedsApproval() && !pr.isApproved()) {
-                    pr.setApproved(isApproved);
-
-                    approvedMaterials.add(pr.getMaterial().getMaterialNumber());
-                    materialsToApprove.remove(pr.getMaterial().getMaterialNumber());
-                }
+            if(!pr.getNeedsApproval()) {
+                approvedMaterials.add(pr.getMaterial().getMaterialNumber());
             }
         }
 
