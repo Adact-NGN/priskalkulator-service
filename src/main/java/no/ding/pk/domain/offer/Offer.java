@@ -51,7 +51,7 @@ public class Offer extends Auditable {
     private String organizationNumber;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}, orphanRemoval = true)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ContactPerson> contactPersonList;
 
@@ -91,5 +91,13 @@ public class Offer extends Auditable {
     @JsonIgnore
     public boolean isNodeCustomer() {
         return !StringUtils.isBlank(customerType) && StringUtils.equals(customerType, "Node");
+    }
+
+    public void addContactPerson(ContactPerson contactPerson) {
+        if(contactPersonList == null) {
+            contactPersonList = new ArrayList<>();
+        }
+
+        contactPersonList.add(contactPerson);
     }
 }

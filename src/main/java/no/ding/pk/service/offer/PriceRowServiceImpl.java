@@ -189,7 +189,9 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setSubCategoryDescription(materialPriceRow.getSubCategoryDescription());
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
+
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
+        entity.setApproved(materialPriceRow.getApproved());
 
         entity = repository.save(entity);
 
@@ -232,11 +234,14 @@ public class PriceRowServiceImpl implements PriceRowService {
         if(materialPriceRow.getManualPrice() != null) {
             entity.setDiscountedPrice(entity.getManualPrice());
 
-            Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
-            if(discountLevel != null) {
-                entity.setDiscountLevel(discountLevel);
-            } else {
-                log.info("Could not get discount level equivalent for manual price.");
+            if(entity.getDiscountLevel() == null) {
+                Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
+                if (discountLevel != null) {
+                    entity.setDiscountLevel(discountLevel);
+                } else {
+                    log.info("Could not get discount level equivalent for manual price. Setting highest disount level.");
+                    entity.setDiscountLevel(6);
+                }
             }
         } else if(materialPriceRow.getDiscountLevel() != null) {
             entity.setDiscountLevel(materialPriceRow.getDiscountLevel());

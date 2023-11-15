@@ -15,10 +15,13 @@ import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.dto.web.client.UserDTO;
+import no.ding.pk.web.dto.web.client.offer.ContactPersonDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.enums.PriceOfferStatus;
 import no.ding.pk.web.enums.TermsTypes;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,8 +49,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static no.ding.pk.utils.JsonTestUtils.jsonToObject;
-import static no.ding.pk.utils.JsonTestUtils.objectToJson;
+import static no.ding.pk.utils.JsonTestUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
@@ -129,7 +131,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         customerTermsService = new CustomerTermsServiceImpl(getCustomerTermsRepository());
 
 
-        service = new PriceOfferServiceImpl(getPriceOfferRepository(), salesOfficeService, userService,
+        service = new PriceOfferServiceImpl(getPriceOfferRepository(), getContactPersonRepository(), salesOfficeService, userService,
                 salesOfficePowerOfAttorneyService, customerTermsService, modelMapper,
                 List.of(100));
 
@@ -409,6 +411,17 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(updatedPriceOffer.getContactPersonList(), hasSize(1));
 
+        updatedPriceOffer.addContactPerson(ContactPerson.builder()
+                .firstName("Test2")
+                .lastName("Testesen")
+                .emailAddress("test2.testesen@testing.com")
+                .mobileNumber("23456789")
+                .build()
+        );
+
+        updatedPriceOffer = service.save(updatedPriceOffer);
+
+        assertThat(updatedPriceOffer.getContactPersonList(), hasSize(2));
     }
 
     @Test
@@ -607,6 +620,92 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(actual.getApprover(), notNullValue());
         assertThat(actual.getApprover().getEmail(), equalTo(ordinaryWasteHolderLvl2.getEmail()));
+    }
+
+    @Test
+    public void shouldCreateOfferNeedingApprovalThenApproveThenUpdateItAndSetItBackToPending() throws IOException {
+
+        PriceOfferDTO offerDto = createCompleteOfferDto("price_offers/82.json");
+
+        ContactPersonDTO contactPersonDTO = offerDto.getContactPerson();
+
+        ContactPerson contactPerson = modelMapper.map(contactPersonDTO, ContactPerson.class);
+
+        contactPerson.setId(null);
+
+        UserDTO salesEmployeeDto = offerDto.getSalesEmployee();
+        User salesEmployee = modelMapper.map(salesEmployeeDto, User.class);
+
+        salesEmployee = getUserRepository().save(salesEmployee);
+
+        UserDTO approverDto = offerDto.getApprover();
+        User approver = modelMapper.map(approverDto, User.class);
+
+        approver = getUserRepository().save(approver);
+
+        Integer salesOffice = Integer.valueOf(offerDto.getSalesOfficeList().get(0).getSalesOffice());
+
+        PowerOfAttorney powerOfAttorney = getSalesOfficePowerOfAttorneyRepository().findBySalesOffice(salesOffice);
+
+        if(powerOfAttorney == null) {
+            powerOfAttorney = PowerOfAttorney.builder()
+                    .salesOffice(salesOffice)
+                    .ordinaryWasteLvlTwoHolder(approver)
+                    .build();
+
+            powerOfAttorney = getSalesOfficePowerOfAttorneyRepository().save(powerOfAttorney);
+        }
+
+        if(powerOfAttorney.getOrdinaryWasteLvlTwoHolder() == null) {
+            powerOfAttorney.setOrdinaryWasteLvlTwoHolder(approver);
+            powerOfAttorney = getSalesOfficePowerOfAttorneyRepository().save(powerOfAttorney);
+        }
+
+        PriceOffer priceOffer = modelMapper.map(offerDto, PriceOffer.class);
+
+        priceOffer.setApprover(approver);
+        priceOffer.setSalesEmployee(salesEmployee);
+
+        priceOffer.setContactPersonList(new ArrayList<>());
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
+
+        Boolean isPriceOfferApproved = service.approvePriceOffer(priceOffer.getId(), approver.getId(), PriceOfferStatus.APPROVED.getStatus(), null);
+
+        assertThat(isPriceOfferApproved, is(true));
+
+        priceOffer = service.findById(priceOffer.getId()).orElse(null);
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        assertThat(priceOffer, notNullValue());
+
+        List<PriceRow> priceRows = priceOffer.getSalesOfficeList().get(0).getMaterialList().stream().filter(priceRow -> StringUtils.equals(priceRow.getMaterial().getMaterialNumber(), "171194")).toList();
+
+        assertThat(priceRows, hasSize(1));
+
+        priceRows.get(0).setNeedsApproval(true);
+        priceRows.get(0).setApproved(false);
+        priceRows.get(0).setManualPrice(1200.0);
+        priceRows.get(0).setDiscountLevel(4);
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
+
+        priceRows = priceOffer.getSalesOfficeList().get(0).getMaterialList().stream().filter(priceRow -> StringUtils.equals(priceRow.getMaterial().getMaterialNumber(), "171194")).toList();
+
+        assertThat(priceRows, hasSize(1));
+
+        priceRows.get(0).setNeedsApproval(true);
+        priceRows.get(0).setApproved(false);
+        priceRows.get(0).setManualPrice(100.0);
+        priceRows.get(0).setDiscountLevel(6);
+
+        priceOffer = service.save(priceOffer);
+
+        assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.PENDING.getStatus()));
     }
 
     private static HttpResponse<String> createResponse(final int responseStatusCode) {
@@ -1360,7 +1459,9 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(priceOffer.getPriceOfferStatus(), is(PriceOfferStatus.APPROVED.getStatus()));
 
-        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setDiscountLevel(3);
+        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setDiscountLevel(5);
+        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setNeedsApproval(true);
+        priceOffer.getSalesOfficeList().get(0).getMaterialList().get(0).setApproved(false);
 
         PriceOffer actual = service.save(priceOffer);
 

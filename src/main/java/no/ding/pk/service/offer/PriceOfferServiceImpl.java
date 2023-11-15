@@ -4,6 +4,7 @@ import lombok.Data;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.*;
+import no.ding.pk.repository.offer.ContactPersonRepository;
 import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.UserService;
@@ -33,6 +34,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private final PriceOfferRepository repository;
 
+    private final ContactPersonRepository contactPersonRepository;
+
     private final SalesOfficeService salesOfficeService;
 
     private final UserService userService;
@@ -45,13 +48,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Autowired
     public PriceOfferServiceImpl(PriceOfferRepository repository,
-                                 SalesOfficeService salesOfficeService,
+                                 ContactPersonRepository contactPersonRepository, SalesOfficeService salesOfficeService,
                                  UserService userService,
                                  SalesOfficePowerOfAttorneyService powerOfAttorneyService,
                                  CustomerTermsService customerTermsService,
                                  @Qualifier("modelMapperV2") ModelMapper modelMapper,
                                  @Value("${sales.offices.requires.fa.approvment}") List<Integer> salesOfficesWhichRequiresOwnFaApprover) {
         this.repository = repository;
+        this.contactPersonRepository = contactPersonRepository;
         this.salesOfficeService = salesOfficeService;
         this.userService = userService;
         this.powerOfAttorneyService = powerOfAttorneyService;
@@ -96,8 +100,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         if(!CollectionUtils.isEmpty(newPriceOffer.getContactPersonList())) {
+
             if (CollectionUtils.isEmpty(entity.getContactPersonList()) || !CollectionUtils.containsAll(entity.getContactPersonList(), newPriceOffer.getContactPersonList())) {
-                entity.setContactPersonList(newPriceOffer.getContactPersonList());
+                List<ContactPerson> contactPersonList = contactPersonRepository.saveAll(newPriceOffer.getContactPersonList());
+                entity.setContactPersonList(contactPersonList);
             }
         }
 
@@ -300,7 +306,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private static void collectMaterial(List<PriceRow> materialsInPriceOffer, List<PriceRow> priceRows) {
         for(PriceRow pr : priceRows) {
-            if(pr.getDiscountLevel() != null && !pr.isApproved()) {
+            if(pr.getDiscountLevel() != null && pr.getNeedsApproval() && !pr.isApproved()) {
+                materialsInPriceOffer.add(pr);
+            } else if(pr.getNeedsApproval() && !pr.isApproved()) {
                 materialsInPriceOffer.add(pr);
             }
         }
@@ -532,6 +540,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {
         List<String> approvedMaterials = new ArrayList<>();
+
+        if(materialList == null || materialList.isEmpty()) {
+            return approvedMaterials;
+        }
+
         List<PriceRow> filteredMaterials = materialList.stream().filter(priceRow -> {
             if(priceRow.getMaterial() == null) {
                 return false;

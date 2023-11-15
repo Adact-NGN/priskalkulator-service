@@ -30,10 +30,11 @@ public class PriceOfferServiceConfig {
                                                UserService userService,
                                                SalesOfficePowerOfAttorneyService poaService,
                                                CustomerTermsService customerTermsService,
-                                               @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+                                               @Qualifier("modelMapperV2") ModelMapper modelMapper,
+                                               ContactPersonRepository contactPersonRepository) {
         List<Integer> salesOfficeRequiringOwnFaApproverList = new ArrayList<>();
         salesOfficeRequiringOwnFaApproverList.add(100);
-        return new PriceOfferServiceImpl(priceOfferRepository, salesOfficeService, userService, poaService,
+        return new PriceOfferServiceImpl(priceOfferRepository, contactPersonRepository, salesOfficeService, userService, poaService,
                 customerTermsService, modelMapper, salesOfficeRequiringOwnFaApproverList);
     }
 
