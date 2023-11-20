@@ -323,9 +323,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     private static void addOrExcludeZone(String zoneString, StringBuilder filterQuery) {
         if(StringUtils.isNotBlank(zoneString)) {
-            Integer zoneNumber = Integer.valueOf(zoneString);
+            if(zoneString.equals("00")) {
+                filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), zoneString));
+            } else {
+                Integer zoneNumber = Integer.valueOf(zoneString);
 
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
+                filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
+            }
         } else {
             filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
