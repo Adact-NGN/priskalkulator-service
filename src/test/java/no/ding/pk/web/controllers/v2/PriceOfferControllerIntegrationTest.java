@@ -94,13 +94,9 @@ class PriceOfferControllerIntegrationTest {
     @Autowired
     private PriceOfferService priceOfferService;
 
-    @Autowired
-    @Qualifier("sopoaTestService")
-    private SalesOfficePowerOfAttorneyService sopoaService;
-
     @BeforeEach
     public void setup() {
-        PriceOfferController priceOfferController1 = new PriceOfferController(priceOfferService, sopoaService, modelMapper);
+        PriceOfferController priceOfferController1 = new PriceOfferController(priceOfferService, modelMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(priceOfferController1).build();
     }
 
@@ -120,7 +116,7 @@ class PriceOfferControllerIntegrationTest {
         mockMvc.perform(post(baseUrl + "/create")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(priceOffer))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -143,7 +139,7 @@ class PriceOfferControllerIntegrationTest {
 
         MvcResult result = mockMvc.perform(post(createUrl).contentType(MediaType.APPLICATION_JSON_VALUE).content(json))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         String resultAsString = result.getResponse().getContentAsString();

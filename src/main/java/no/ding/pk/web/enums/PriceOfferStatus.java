@@ -52,6 +52,8 @@ public enum PriceOfferStatus {
         return APPROVED.status.equals(priceOfferStatus);
     }
 
+    public static boolean isActivated(String priceOfferStatus) { return ACTIVATED.status.equals(priceOfferStatus); }
+
     @Override
     public String toString() {
         return status;

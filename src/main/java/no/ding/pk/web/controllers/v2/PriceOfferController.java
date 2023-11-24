@@ -5,11 +5,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import no.ding.pk.domain.PowerOfAttorney;
-import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
-import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
@@ -41,18 +38,14 @@ public class PriceOfferController {
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
     
     private final PriceOfferService service;
-    
-    private final SalesOfficePowerOfAttorneyService sopoaService;
-    
+
     private final ModelMapper modelMapper;
     
     @Autowired
     public PriceOfferController(
             PriceOfferService service,
-            SalesOfficePowerOfAttorneyService sopoaService,
             @Qualifier(value = "modelMapperV2") ModelMapper modelMapper) {
         this.service = service;
-        this.sopoaService = sopoaService;
         this.modelMapper = modelMapper;
     }
     
@@ -62,7 +55,7 @@ public class PriceOfferController {
      * @return List of price offers, else empty list
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferListDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
+    public ResponseEntity<List<PriceOfferListDTO>> list(@RequestParam(value = "statuses", required = false) String statuses) {
 
         List<PriceOffer> priceOfferList;
         if(StringUtils.isNotBlank(statuses)) {
@@ -73,10 +66,10 @@ public class PriceOfferController {
         }
 
         if(!priceOfferList.isEmpty()) {
-            return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
+            return ResponseEntity.ok(priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList()));
         }
         
-        return new ArrayList<>();
+        return ResponseEntity.noContent().build();
     }
     
     /**
@@ -85,7 +78,7 @@ public class PriceOfferController {
      * @return list of price offers connected to sales employee, else empty list.
      */
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId,
+    public ResponseEntity<List<PriceOfferListDTO>> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId,
                                                        @RequestParam(value = "statuses", required = false) String statuses) {
         List<PriceOffer> priceOffers;
 
@@ -97,10 +90,10 @@ public class PriceOfferController {
         }
         
         if(!priceOffers.isEmpty()) {
-            return priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
+            return ResponseEntity.ok(priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList()));
         }
         
-        return new ArrayList<>();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "List Price offers with filtering by sales office number and by status.",
@@ -128,7 +121,7 @@ public class PriceOfferController {
             return new ResponseEntity<>(offerListDTOS, HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK) ;
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT) ;
     }
 
     /**
@@ -136,7 +129,7 @@ public class PriceOfferController {
      * @param activatedById id for {@code User}
      * @param priceOfferId id for price offer
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
-     * @return true if price offer is updated, else false
+     * @return {@code true} if price offer is updated, else {@code false}
      */
     @Operation(summary = "Activate price offer",
             parameters = {
@@ -171,11 +164,11 @@ public class PriceOfferController {
      * @return True if price offer was successfully approved, else false.
      */
     @PutMapping(path = "/approval/{approverId}/{priceOfferId}")
-    public Boolean priceOfferApproval(@PathVariable("approverId") Long approverId,
+    public ResponseEntity<Boolean> priceOfferApproval(@PathVariable("approverId") Long approverId,
                                       @PathVariable("priceOfferId") Long priceOfferId,
                                       @RequestBody ApprovalRequest approvalRequest) {
         log.debug("Approval request received with request body: {}", approvalRequest);
-        return service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getAdditionalInformation());
+        return ResponseEntity.ok(service.approvePriceOffer(priceOfferId, approverId, approvalRequest.getStatus(), approvalRequest.getAdditionalInformation()));
     }
     
     /**
@@ -185,7 +178,7 @@ public class PriceOfferController {
      * @return List of price offers for approver
      */
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<PriceOfferListDTO> listByApprover(@PathVariable("approverId") Long approverId,
+    public ResponseEntity<List<PriceOfferListDTO>> listByApprover(@PathVariable("approverId") Long approverId,
                                               @RequestParam(value = "status", required = false) String priceOfferStatus) {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndPriceOfferStatus(approverId, priceOfferStatus);
         
@@ -193,12 +186,13 @@ public class PriceOfferController {
             log.debug("Found price offers, {}, for approver", priceOffers.size());
             PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
             log.debug("Mapped {} amount", priceOfferDTOS.length);
-            return Arrays.stream(priceOfferDTOS).map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).toList();
+            List<PriceOfferListDTO> priceOfferListDTOList = Arrays.stream(priceOfferDTOS).map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).toList();
+            return ResponseEntity.ok(priceOfferListDTOList);
         }
 
         log.debug("No price offers for approver {} was found.", approverId);
 
-        return new ArrayList<>();
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
     }
     
     /**
@@ -207,7 +201,7 @@ public class PriceOfferController {
      * @return Price offer, else null
      */
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOfferDTO getById(@PathVariable("id") Long id) {
+    public ResponseEntity<PriceOfferDTO> getById(@PathVariable("id") Long id) {
         if(id != null) {
             Optional<PriceOffer> optPriceOffer = service.findById(id);
             if(optPriceOffer.isEmpty()) {
@@ -217,10 +211,10 @@ public class PriceOfferController {
             PriceOffer priceOffer = optPriceOffer.get();
             
             log.debug("Returning priceOffer: {}", priceOffer);
-            return modelMapper.map(priceOffer, PriceOfferDTO.class);
+            return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
         }
         
-        return null;
+        return ResponseEntity.noContent().build();
     }
     
     @ExceptionHandler({EmployeeNotProvidedException.class})
@@ -250,7 +244,7 @@ public class PriceOfferController {
         watch.stop();
         log.debug("Time used to create price offer: {} ms", watch.getTime());
         
-        return ResponseEntity.ok(modelMapper.map(priceOffer, PriceOfferDTO.class));
+        return new ResponseEntity<>(modelMapper.map(priceOffer, PriceOfferDTO.class), HttpStatus.CREATED);
     }
 
     /**
@@ -297,7 +291,7 @@ public class PriceOfferController {
      * @throws JsonProcessingException if not real JSON is passed.
      */
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
+    public ResponseEntity<PriceOfferDTO> save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
         log.debug("Values received for PriceOffer: {}", priceOfferDTO);
         
@@ -305,7 +299,14 @@ public class PriceOfferController {
         
         if(result.isEmpty()) {
             log.debug("{} {} {}", "Price offer with ID", id, "was not found");
-            return null;
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        PriceOffer priceOffer = result.get();
+
+        if(PriceOfferStatus.isActivated(priceOffer.getPriceOfferStatus())) {
+            log.debug("Cannot update price offer with id {}, it has already been activated.", id);
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         
         PriceOffer updatedOffer = modelMapper.map(priceOfferDTO, PriceOffer.class);
@@ -316,33 +317,9 @@ public class PriceOfferController {
         watch.stop();
         log.debug("Time used to update price offer: {} ms", watch.getTime());
 
-        return modelMapper.map(updatedOffer, PriceOfferDTO.class);
+        return new ResponseEntity<>(modelMapper.map(updatedOffer, PriceOfferDTO.class), HttpStatus.OK);
     }
 
-    private static List<Integer> collectSalesOfficeNumbers(PriceOffer updatedOffer) {
-        return updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
-    }
-
-    private static boolean priceOfferCandidateForApprovalAndIsNotApproved(PriceOffer updatedOffer) {
-        return updatedOffer.getNeedsApproval() && !PriceOfferStatus.isApprovalState(updatedOffer.getPriceOfferStatus());
-    }
-
-    private User getApproverForPriceOffer(List<PowerOfAttorney> poa) {
-        Optional<PowerOfAttorney> findAnyPoaLvl1 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlOneHolder() != null).findAny();
-        
-        if(findAnyPoaLvl1.isPresent()) {
-            PowerOfAttorney lvl1Poa = findAnyPoaLvl1.get();
-            return lvl1Poa.getOrdinaryWasteLvlOneHolder();
-        } else {
-            Optional<PowerOfAttorney> findAnyPoaLvl2 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlTwoHolder() != null).findAny();
-            
-            if(findAnyPoaLvl2.isPresent()) {
-                return findAnyPoaLvl2.get().getOrdinaryWasteLvlTwoHolder();
-            }
-        }
-        return null;
-    }
-    
     /**
      * Soft deletes price offer by id
      * @param id Price offer id
