@@ -67,21 +67,21 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
         String salesOrgServiceUrl = "";
         salesOrgService = new SalesOrgServiceImpl(salesOrgServiceUrl, getObjectMapper(), sapHttpClient);
         String standardPriceSapUrl = "";
-        standardPriceService = new StandardPriceServiceImpl(standardPriceSapUrl, getObjectMapper(), new PingInMemory3DCache<>(5000), sapMaterialService,
+        standardPriceService = new StandardPriceServiceImpl(standardPriceSapUrl, getObjectMapper(), sapMaterialService,
                 sapHttpClient, modelMapper, salesOrgService);
         String materialServiceUrl = "";
         sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new LocalJSONUtils(getObjectMapper()), new PingInMemory3DCache<>(5000));
         materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), new PingInMemory3DCache<>(5000));
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
         discountService = new DiscountServiceImpl(getDiscountRepository(), getDiscountLevelRepository());
-        priceRowService = new PriceRowServiceImpl(discountService, getPriceRowRepository(), materialService, materialPriceService, getEmFactory(), sapMaterialService, modelMapper);
+        priceRowService = new PriceRowServiceImpl(discountService, getPriceRowRepository(), materialService, getEmFactory(), sapMaterialService, modelMapper);
         zoneService = new ZoneServiceImpl(getZoneRepository(), priceRowService, standardPriceService);
         userService = new UserServiceImpl(getUserRepository(), getSalesRoleRepository());
         poaService = new SalesOfficePowerOfAttorneyServiceImpl(getSalesOfficePowerOfAttorneyRepository());
         customerTermsService = new CustomerTermsServiceImpl(getCustomerTermsRepository());
         sapPricingConditionRecordUrl = "https://saptest.norskgjenvinning.no/sap/opu/odata/sap/API_SLSPRICINGCONDITIONRECORD_SRV/A_SlsPrcgConditionRecord";
         priceRowService = new PriceRowServiceImpl(discountService, getPriceRowRepository(), materialService,
-                materialPriceService, getEmFactory(), sapMaterialService, new ModelMapper());
+                getEmFactory(), sapMaterialService, new ModelMapper());
         salesOfficeService = new SalesOfficeServiceImpl(getSalesOfficeRepository(), priceRowService, zoneService, standardPriceService);
         PriceOfferService priceOfferService = new PriceOfferServiceImpl(getPriceOfferRepository(), getContactPersonRepository(), salesOfficeService,
                 userService, poaService, customerTermsService, new ModelMapper(), List.of(100));

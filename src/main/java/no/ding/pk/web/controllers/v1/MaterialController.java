@@ -24,7 +24,7 @@ public class MaterialController {
     }
 
     /**
-     * Get Material by sales orfanization and material number
+     * Get Material by sales organization and material number
      * @param salesOrg The sales organization number
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
@@ -50,7 +50,7 @@ public class MaterialController {
                                                                        @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {} and sales office {}", material, salesOrg, salesOffice);
 
-        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, salesOrg, salesOffice, null);
+        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(salesOrg, null, material,null);
     }
 
     /**

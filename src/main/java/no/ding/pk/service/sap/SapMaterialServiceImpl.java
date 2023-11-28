@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
@@ -35,6 +36,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     private final InMemory3DCache<String, String, MaterialDTO> inMemoryCache;
 
     private final LocalJSONUtils localJSONUtils;
+    private final String DISTRIBUTION_CHANNEL_DOWN_STREAM = "01";
 
     @Autowired
     public SapMaterialServiceImpl(@Value(value = "${PK_SAP_API_MATERIAL_URL}") String materialServiceUrl,
@@ -47,36 +49,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         this.inMemoryCache = inMemoryCache;
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Async
-//    @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
-    public void updateMaterialCache() {
-        log.debug("Starting to populate Material cache.");
-        List<MaterialDTO> materials = getAllMaterialsForSalesOrgByZone("100", 0, 5000);
-        log.debug("Got {} amount of materials.", materials.size());
-        materials.forEach(materialDTO -> inMemoryCache.put("100", materialDTO.getMaterial(), materialDTO));
-        log.debug("Added materials to cache. Cache size is: {}", inMemoryCache.size("100"));
-    }
-
-
+    @Cacheable(cacheNames = "sapMaterialCache", keyGenerator = "sapMaterialKeyGenerator")
     @Override
     public MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String material, String salesOrg) {
-        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired()) {
-            log.debug("Initiating cache build for Sap Materials.");
-            initiateCacheBuild(salesOrg, material);
-        }
-
-        if(!inMemoryCache.contains(salesOrg, material)) {
-            log.debug("Cache does not contain material {} for sales org {}. Updating", material, salesOrg);
-            updateMaterialCache(salesOrg, material, null, null);
-        }
-
-        return inMemoryCache.get(salesOrg, material);
-    }
-
-    @Override
-    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String salesOrg,
-                                                                            String salesOffice, String zone) {
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
 
@@ -85,59 +60,80 @@ public class SapMaterialServiceImpl implements SapMaterialService {
                         salesOrgExpression, LogicOperator.And));
         String filterQuery = createFilterQuery(queryMap);
 
-        if(!inMemoryCache.contains(salesOrg, material)) {
-            log.debug("Cache is missing the material.");
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, 0, 5000, "json");
 
-            updateMaterialCache(salesOrg, filterQuery);
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
-            return inMemoryCache.get(salesOrg, material);
+        log.debug("Created request: " + request.toString());
+
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
+
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            MaterialDTO materialDTO = localJSONUtils.jsonStringToObject(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+            log.debug("MaterialDTOList {}", materialDTO);
+
+            return materialDTO;
         }
 
-        log.debug("Got material {} sales org {}", material, salesOrg);
-        return inMemoryCache.get(salesOrg, material);
+        return null;
     }
 
-    private void initiateCacheBuild(String salesOrg, String material) {
-        log.debug("Getting Material data for {}", material);
+    @Cacheable(cacheNames = "sapMaterialCache", keyGenerator = "sapMaterialKeyGenerator")
+    @Override
+    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String material,
+                                                                             String zone) {
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-        Map<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(materialExpression, LogicOperator.And,
-                salesOrgExpression, LogicOperator.And));
+
+        Map<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(
+                ImmutableMap.of(materialExpression, LogicOperator.And,
+                        salesOrgExpression, LogicOperator.And));
         String filterQuery = createFilterQuery(queryMap);
 
-        log.debug(String.format("Filter query: %s", filterQuery));
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, 0, 5000, "json");
 
-        buildMaterialCache(salesOrg, filterQuery, null, null);
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
-        log.debug("Returning from new cache");
+        log.debug("Created request: " + request.toString());
+
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
+
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+            log.debug("MaterialDTOList {}", materialDTOList.size());
+
+            if(materialDTOList.size() > 0) {
+                return materialDTOList.get(0);
+            }
+        }
+
+        return null;
     }
 
+    @Cacheable(cacheNames = "sapMaterialCache", key = "#salesOrg")
     @Override
     public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
         // Get material size count from SAP
         Integer materialCount = getCountFromSap(salesOrg, null);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
 
-        if(materialCount != inMemoryCache.size(salesOrg)) {
-            LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-            String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
+        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
+        String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
 
-            MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
 
-            HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
-            log.debug("Created request: " + request.toString());
+        log.debug("Created request: " + request.toString());
 
-            HttpResponse<String> response = sapHttpClient.getResponse(request);
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
 
-            if (response.statusCode() == HttpStatus.OK.value()) {
-                List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
-                log.debug("MaterialDTOList {}", materialDTOList.size());
-                return materialDTOList;
-            }
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+            log.debug("MaterialDTOList {}", materialDTOList.size());
+            return materialDTOList;
         }
-
-        return inMemoryCache.getAllInList(salesOrg);
+        return new ArrayList<>();
     }
 
     private Integer getCountFromSap(String salesOrg, String zone) {
@@ -217,38 +213,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return new ArrayList<>();
     }
 
-    private void buildMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Building cache");
-
-        updateMaterialCache(salesOrg, filterQuery, page, pageSize);
-    }
-
-    private void updateMaterialCache(String salesOrg, String filterQuery) {
-        log.debug("Got sales org {}, query {}", salesOrg, filterQuery);
-
-        updateMaterialCache(salesOrg, filterQuery, null, null);
-    }
-
-    private void updateMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Update material cache with sales org {}", salesOrg);
-
-        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
-
-        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
-
-        log.debug("Created request: " + request.toString());
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
-
-        if(response.statusCode() == HttpStatus.OK.value()) {
-            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
-
-            addMaterialsToCache(salesOrg, materialDTOList);
-        } else {
-            log.debug("Response code {}", response.statusCode());
-        }
-    }
-
     private static MultiValueMap<String, String> createParameterMap(String filterQuery, Integer page, Integer pageSize, String format) {
         MultiValueMap<String, String> params = new org.springframework.util.LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
@@ -265,22 +229,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return params;
     }
 
-    private void addMaterialsToCache(String salesOrg, List<MaterialDTO> materialDTOs) {
-        log.debug("Adding {} items to cache.", materialDTOs.size());
-
-        for(MaterialDTO material : materialDTOs) {
-            inMemoryCache.put(salesOrg, material.getMaterial(), material);
-        }
-
-        log.debug("Added {} items to cache.", inMemoryCache.size(salesOrg));
-    }
-
     private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap) {
-        return createFilterQuery(queryMap, "01");
-    }
-
-    private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap, String distributionChannel) {
-        LogicExpression distributionChannelExpression = LogicExpression.builder().field(MaterialField.DistributionChannel).value(distributionChannel).comparator(LogicComparator.Equal).build();
+        LogicExpression distributionChannelExpression = LogicExpression.builder()
+                .field(MaterialField.DistributionChannel).value(DISTRIBUTION_CHANNEL_DOWN_STREAM).comparator(LogicComparator.Equal).build();
         queryMap.put(distributionChannelExpression, null);
         StringBuilder sb = new StringBuilder();
 
