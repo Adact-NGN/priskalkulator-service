@@ -5,7 +5,9 @@ import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,10 +33,15 @@ public class MaterialController {
      */
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
-    public MaterialDTO getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
-                                                         @PathVariable(value = "material") String material) {
+    public ResponseEntity<MaterialDTO> getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
+                                                                  @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {}", material, salesOrg);
-        return service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
+        MaterialDTO materialDTO = service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
+
+        if(materialDTO == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.ok(materialDTO);
     }
 
     /**
@@ -94,9 +101,15 @@ public class MaterialController {
      * @return list of Materials.
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<MaterialDTO>  getAllMaterialsForTemplate() {
+    public ResponseEntity<List<MaterialDTO>>  getAllMaterialsForTemplate() {
         log.debug("Getting all materials for PriceOffer Template");
 
-        return service.getAllMaterialsForSalesOrgByZone("100", 0, 5000);
+        List<MaterialDTO> materialDTOS = service.getAllMaterialsForSalesOrgByZone("100", 0, 5000);
+
+        if(materialDTOS.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(materialDTOS);
     }
 }

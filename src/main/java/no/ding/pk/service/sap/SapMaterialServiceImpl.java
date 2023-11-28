@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
@@ -68,11 +70,15 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
-        if (response.statusCode() == HttpStatus.OK.value()) {
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
             MaterialDTO materialDTO = localJSONUtils.jsonStringToObject(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
             log.debug("MaterialDTOList {}", materialDTO);
 
             return materialDTO;
+        } else {
+            log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }
 
         return null;
@@ -102,7 +108,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
             List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
             log.debug("MaterialDTOList {}", materialDTOList.size());
 
-            if(materialDTOList.size() > 0) {
+            if(!materialDTOList.isEmpty()) {
                 return materialDTOList.get(0);
             }
         }
@@ -113,10 +119,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Cacheable(cacheNames = "sapMaterialCache", key = "#salesOrg")
     @Override
     public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
-        // Get material size count from SAP
-        Integer materialCount = getCountFromSap(salesOrg, null);
-        log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
-
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
 
@@ -128,11 +130,16 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
-        if (response.statusCode() == HttpStatus.OK.value()) {
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
             List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
             log.debug("MaterialDTOList {}", materialDTOList.size());
             return materialDTOList;
+        } else {
+            log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }
+
         return new ArrayList<>();
     }
 
@@ -153,7 +160,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         log.debug("Count response: {}", response);
 
-        if(response.statusCode() == HttpStatus.OK.value()) {
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if(response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
             return Integer.valueOf(response.body());
         }
 
