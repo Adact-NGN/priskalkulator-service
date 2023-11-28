@@ -402,35 +402,36 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             throw new MissingApprovalStatusException(message);
         }
 
-        if(StringUtils.isNotBlank(priceOfferStatus) && PriceOfferStatus.isApprovalState(priceOfferStatus))  {
+        Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
+
+        if(!materialsForApproval.isEmpty())  {
             priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
-            approveMaterialsSinceLastUpdate(priceOfferToApprove);
-            boolean needsReApproval = checkIfPriceOfferNeedsApproval(priceOfferToApprove);
 
-            if(needsReApproval) {
-                log.debug("Price offer still needs approval. Setting status to PENDING and needsApproval to true.");
-                priceOfferToApprove.setPriceOfferStatus(PriceOfferStatus.PENDING.getStatus());
-                priceOfferToApprove.setNeedsApproval(true);
+            log.debug("Checking if Price offer has an approver registered on it.");
+            if(priceOfferToApprove.getApprover() == null) {
+                log.debug("No approver set. Trying to find approver for price offer.");
+                User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
 
-                log.debug("Checking if Price offer has an approver registered on it.");
-                if(priceOfferToApprove.getApprover() == null) {
-                    log.debug("No approver set.");
-                    Map<String, List<PriceRow>> materialsForApproval = getAllMaterialsForApproval(priceOfferToApprove);
-                    User neededApprover = getApproverForOffer(materialsForApproval, priceOfferToApprove.getSalesEmployee());
-
-                    log.debug("Found approver? {}", neededApprover != null);
-                    priceOfferToApprove.setApprover(neededApprover);
-                }
-            } else {
-                priceOfferToApprove.setNeedsApproval(false);
-                priceOfferToApprove.setApprovalDate(new Date());
-                priceOfferToApprove.setMaterialsForApproval(null);
+                log.debug("Found approver? {}", neededApprover != null);
+                priceOfferToApprove.setApprover(neededApprover);
             }
-        } else {
-            priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
-            priceOfferToApprove.setAdditionalInformation(additionalInformation);
-            priceOfferToApprove.setMaterialsForApproval(null);
+            if(priceOfferToApprove.getApprover() != approverOptional.get()) {
+                log.error("Current user trying to approve price offer did not match.");
+                return false;
+            }
         }
+
+        for (Map.Entry<String, List<PriceRow>> salesOfficePriceRowSet : materialsForApproval.entrySet()) {
+            for (PriceRow priceRow : salesOfficePriceRowSet.getValue()) {
+                priceRow.setApproved(true);
+            }
+        }
+
+        priceOfferToApprove.setPriceOfferStatus(priceOfferStatus);
+        priceOfferToApprove.setAdditionalInformation(additionalInformation);
+        priceOfferToApprove.setNeedsApproval(false);
+        priceOfferToApprove.setApprovalDate(new Date());
+        priceOfferToApprove.setMaterialsForApproval(null);
 
         priceOfferToApprove = repository.save(priceOfferToApprove);
 
@@ -564,19 +565,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         }
 
         return approvedMaterials;
-    }
-
-    private boolean checkIfPriceOfferNeedsApproval(PriceOffer priceOfferToApprove) {
-        log.debug("Checking if price offer needs approval.");
-        List<String> currentMaterialInPriceOffer = new ArrayList<>();
-
-        for (Map.Entry<String, List<PriceRow>> listEntry : getAllMaterialsForApproval(priceOfferToApprove).entrySet()) {
-            currentMaterialInPriceOffer.addAll(listEntry.getValue().stream().map(priceRow -> priceRow.getMaterial().getMaterialNumber()).toList());
-        }
-
-        List<String> previousMaterialInPriceOffer = Arrays.stream(priceOfferToApprove.getMaterialsForApproval().split(",")).sorted().toList();
-
-        return currentMaterialInPriceOffer.equals(previousMaterialInPriceOffer);
     }
 
     @Override
