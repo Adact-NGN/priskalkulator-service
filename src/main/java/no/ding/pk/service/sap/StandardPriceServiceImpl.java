@@ -186,10 +186,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return StringUtils.isNotBlank(zone) ? String.format("0%d", Integer.valueOf(zone)) : null;
     }
 
+    @Cacheable(cacheNames = {"getStdPricesForSalesOfficeAndSalesOrg"}, keyGenerator = "stdPriceKeyGenerator")
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceForSalesOrgSalesOfficeAndMaterial(String salesOrg, String salesOffice, String material, String zone) {
-
-        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberCombination(salesOffice, material, zone, null);
 
         String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone, null);
 
@@ -212,7 +211,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return new ArrayList<>();
     }
 
-    private String createSalesOfficeMaterialNumberCombination(String salesOffice, String material, String zone, CharSequence deviceType) {
+    private String createSalesOfficeMaterialNumberLookupKey(String salesOffice, String material, String zone, CharSequence deviceType) {
         StringBuilder sb = new StringBuilder();
         sb.append(salesOffice).append("_").append(material);
 
@@ -364,7 +363,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceDTO(String salesOrg, String salesOffice, String material) {
 
-        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberCombination(salesOffice, material, null, null);
+        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberLookupKey(salesOffice, material, null, null);
 
         String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
 
