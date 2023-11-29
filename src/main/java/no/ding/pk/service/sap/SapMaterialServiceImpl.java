@@ -152,13 +152,11 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return new ArrayList<>();
     }
 
-    private Integer getCountFromSap(String salesOrg, String zone) {
+    private Integer getCountFromSap(String salesOrg) {
         String countUrl = String.format("%s/%s", materialServiceUrl, "$count");
 
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         LinkedHashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 
@@ -178,26 +176,14 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return -1;
     }
 
-    private static void includeOrExcludeZonedPricedMaterials(String zone, Map<LogicExpression, LogicOperator> queryMap) {
-        if(StringUtils.isNotBlank(zone)) {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.Equal).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        } else {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.NotEqual).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        }
-    }
-
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, String zone, Integer page, Integer pageSize) {
-        Integer materialCount = getCountFromSap(salesOrg, zone);
+    public List<MaterialDTO> getAllMaterialsForSalesOrgBy(String salesOrg, String zone, Integer page, Integer pageSize) {
+        Integer materialCount = getCountFromSap(salesOrg);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
 
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         HashMap<LogicExpression, LogicOperator> queryMap =
                 Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 

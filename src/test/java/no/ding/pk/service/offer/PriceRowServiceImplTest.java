@@ -70,7 +70,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
         ClassLoader classLoader = getClass().getClassLoader();
         sapMaterialDTOS = mockSapMaterialServiceResponse(classLoader);
 
-        doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), any());
+        doReturn(sapMaterialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgBy(anyString(), anyInt(), any());
     }
 
     @Test

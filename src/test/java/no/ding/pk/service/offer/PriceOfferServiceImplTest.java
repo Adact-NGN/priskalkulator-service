@@ -547,7 +547,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
+        when(sapMaterialService.getAllMaterialsForSalesOrgBy(anyString(), anyInt(), anyInt())).thenReturn(List.of(MaterialDTO.builder()
                         .material("159904")
                         .categoryDescription("Degaussing harddisker")
                         .salesOrganization("100")
@@ -929,7 +929,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
         HttpResponse<String> response = createResponse(200);
         when(sapHttpClient.getResponse(request)).thenReturn(response);
 
-        when(sapMaterialService.getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt())).thenReturn(
+        when(sapMaterialService.getAllMaterialsForSalesOrgBy(anyString(), anyInt(), anyInt())).thenReturn(
                 List.of(
                         MaterialDTO.builder()
                                 .material("159904")
@@ -1758,7 +1758,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
             materialDTOS.add(materialDTO);
         }
 
-        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgByZone(anyString(), anyInt(), anyInt());
+        doReturn(materialDTOS).when(sapMaterialService).getAllMaterialsForSalesOrgBy(anyString(), anyInt(), anyInt());
     }
 
     private void mockCallForStandardPrice(ClassLoader classLoader) throws IOException {

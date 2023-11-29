@@ -47,7 +47,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private final String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
-    
+
     private final SapHttpClient sapHttpClient;
 
     private final SapMaterialService sapMaterialService;
@@ -95,7 +95,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Cacheable(cacheNames = {"getStdPricesForSalesOfficeAndSalesOrg"}, keyGenerator = "stdPriceKeyGenerator")
     public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg, String zone) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -105,7 +105,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             standardPriceDTOList = filterStdPricesByZone(zone, standardPriceDTOList);
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
 
             if(allMaterialsForSalesOrg.isEmpty()) {
                 return standardPriceDTOList;
@@ -160,7 +160,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         String formattedZone = getFormattedZone(zone);
         log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, formattedZone);
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, formattedZone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
@@ -182,7 +182,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 return new HashMap<>();
             }
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
 
             Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
@@ -265,10 +265,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
     
     private String createFilterQuery(String salesOffice, String salesOrg) {
-        return createFilterQuery(salesOffice, salesOrg, null, null, null);
+        return createFilterQuery(salesOffice, salesOrg, null, null);
     }
     
-    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
+    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
                 String.format("%s eq '%s' and %s eq '%s' and %s eq ''",
@@ -279,8 +279,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         addMaterialNumber(materialNumber, filterQuery);
 
-        addOrExcludeZone(zone, filterQuery);
-
         addDeviceType(deviceType, filterQuery, "and %s eq '%s'", MaterialField.DeviceCategory);
         return filterQuery.toString();
     }
@@ -288,16 +286,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private static void addDeviceType(String deviceType, StringBuilder filterQuery, String format, MaterialField deviceCategory) {
         if (StringUtils.isNotBlank(deviceType)) {
             filterQuery.append(String.format(format, deviceCategory.getValue(), deviceType));
-        }
-    }
-
-    private static void addOrExcludeZone(String zoneString, StringBuilder filterQuery) {
-        if(StringUtils.isNotBlank(zoneString)) {
-            Integer zoneNumber = Integer.valueOf(zoneString);
-
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
-        } else {
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
     }
 
@@ -315,7 +303,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             throw new Error(e.getMessage(), e);
         }
     }
-    
+
     private List<MaterialStdPriceDTO> jsonToMaterialStdPriceDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         
