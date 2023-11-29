@@ -52,7 +52,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 //    @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
     public void updateMaterialCache() {
         log.debug("Starting to populate Material cache.");
-        List<MaterialDTO> materials = getAllMaterialsForSalesOrgByZone("100", 0, 5000);
+        List<MaterialDTO> materials = getAllMaterialsForSalesOrgBy("100", 0, 5000);
         log.debug("Got {} amount of materials.", materials.size());
         materials.forEach(materialDTO -> inMemoryCache.put("100", materialDTO.getMaterial(), materialDTO));
         log.debug("Added materials to cache. Cache size is: {}", inMemoryCache.size("100"));
@@ -113,9 +113,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
+    public List<MaterialDTO> getAllMaterialsForSalesOrgBy(String salesOrg, Integer page, Integer pageSize) {
         // Get material size count from SAP
-        Integer materialCount = getCountFromSap(salesOrg, null);
+        Integer materialCount = getCountFromSap(salesOrg);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
 
         if(materialCount != inMemoryCache.size(salesOrg)) {
@@ -131,7 +131,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
             HttpResponse<String> response = sapHttpClient.getResponse(request);
 
             if (response.statusCode() == HttpStatus.OK.value()) {
-                List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+                List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
                 log.debug("MaterialDTOList {}", materialDTOList.size());
                 return materialDTOList;
             }
@@ -140,13 +140,11 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return inMemoryCache.getAllInList(salesOrg);
     }
 
-    private Integer getCountFromSap(String salesOrg, String zone) {
+    private Integer getCountFromSap(String salesOrg) {
         String countUrl = String.format("%s/%s", materialServiceUrl, "$count");
 
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         LinkedHashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 
@@ -164,26 +162,14 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return -1;
     }
 
-    private static void includeOrExcludeZonedPricedMaterials(String zone, Map<LogicExpression, LogicOperator> queryMap) {
-        if(StringUtils.isNotBlank(zone)) {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.Equal).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        } else {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.NotEqual).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        }
-    }
-
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, String zone, Integer page, Integer pageSize) {
-        Integer materialCount = getCountFromSap(salesOrg, zone);
+    public List<MaterialDTO> getAllMaterialsForSalesOrgBy(String salesOrg, String zone, Integer page, Integer pageSize) {
+        Integer materialCount = getCountFromSap(salesOrg);
         log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
 
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         HashMap<LogicExpression, LogicOperator> queryMap =
                 Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 
