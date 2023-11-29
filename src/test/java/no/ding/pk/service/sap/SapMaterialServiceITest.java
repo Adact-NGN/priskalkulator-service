@@ -28,7 +28,7 @@ public class SapMaterialServiceITest {
 
     @Test
     public void shouldGetAListOfMaterialsFromSapMaterialService() {
-        List<MaterialDTO> materialDTOs = sapMaterialService.getAllMaterialsForSalesOrgByZone("100", 0, 100);
+        List<MaterialDTO> materialDTOs = sapMaterialService.getAllMaterialsForSalesOrgBy("100", 0, 100);
 
         assertThat(materialDTOs, hasSize(greaterThan(0)));
     }
@@ -40,6 +40,13 @@ public class SapMaterialServiceITest {
 
         // assertThat(materialDto, hasSize(greaterThan(0)));
         assertThat(materialDto.getMaterial(), equalTo(materialNumber));
+    }
+
+    @Test
+    public void shouldGetMaterialByMaterialNumberAndZoneFromSapMaterialService() {
+        List<MaterialDTO> allMaterialsForZone = sapMaterialService.getAllMaterialsForSalesOrgBy("100", "00", 0, 100);
+
+        assertThat(allMaterialsForZone, hasSize(greaterThan(0)));
     }
     
 }

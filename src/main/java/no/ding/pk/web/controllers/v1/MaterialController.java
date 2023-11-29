@@ -65,7 +65,7 @@ public class MaterialController {
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,
                                              @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize) {
         log.debug("Getting materials for sales organization: {}", salesOrg);
-        return service.getAllMaterialsForSalesOrgByZone(salesOrg, page, pageSize);
+        return service.getAllMaterialsForSalesOrgBy(salesOrg, page, pageSize);
     }
 
     /**
@@ -85,7 +85,7 @@ public class MaterialController {
                                                       @RequestParam(value = "zone", required = false) String zone) {
         log.debug("Getting materials for salesOrg: {} and salesOffice: {} for zone: {}", salesOrg, salesOffice, zone != null ? zone : "no zone");
 
-        return service.getAllMaterialsForSalesOrgByZone(salesOrg, zone, page, pageSize);
+        return service.getAllMaterialsForSalesOrgBy(salesOrg, zone, page, pageSize);
     }
 
     /**
@@ -97,6 +97,6 @@ public class MaterialController {
     public List<MaterialDTO>  getAllMaterialsForTemplate() {
         log.debug("Getting all materials for PriceOffer Template");
 
-        return service.getAllMaterialsForSalesOrgByZone("100", 0, 5000);
+        return service.getAllMaterialsForSalesOrgBy("100", 0, 5000);
     }
 }

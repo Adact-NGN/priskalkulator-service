@@ -94,7 +94,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg, String zone) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -104,7 +104,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             standardPriceDTOList = filterStdPricesByZone(zone, standardPriceDTOList);
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
 
             if(StringUtils.isBlank(zone)) {
                 List<MaterialDTO> nonZonedMaterialsDTO = allMaterialsForSalesOrg.stream().filter(p -> !"Sone differensiert".equals(p.getSubCategoryDescription())).toList();
@@ -156,7 +156,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         String formattedZone = getFormattedZone(zone);
         log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, formattedZone);
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, formattedZone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
@@ -178,7 +178,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 return new HashMap<>();
             }
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
 
             Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
@@ -205,7 +205,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             return Collections.singletonList(inMemoryCache.get(salesOrg, salesOfficeMaterialNumber));
         }
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -269,18 +269,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         log.debug("Returning from new cache");
     }
 
-    private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
-        return MaterialPrice.builder(materialStdPriceDTO.getSalesOrg(), materialStdPriceDTO.getSalesOffice(),
-                        materialNumber, materialStdPriceDTO.getDeviceType(), materialStdPriceDTO.getZone())
-                .deviceType(materialStdPriceDTO.getDeviceType())
-                .standardPrice(materialStdPriceDTO.getStandardPrice())
-                .validFrom(materialStdPriceDTO.getValidFrom())
-                .validTo(materialStdPriceDTO.getValidTo())
-                .pricingUnit(Integer.valueOf(materialStdPriceDTO.getPricingUnit()))
-                .quantumUnit(materialStdPriceDTO.getQuantumUnit())
-                .build();
-    }
-    
     private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -295,10 +283,10 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     }
     
     private String createFilterQuery(String salesOffice, String salesOrg) {
-        return createFilterQuery(salesOffice, salesOrg, null, null, null);
+        return createFilterQuery(salesOffice, salesOrg, null, null);
     }
     
-    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
+    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
                 String.format("%s eq '%s' and %s eq '%s' and %s eq ''",
@@ -309,8 +297,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         addMaterialNumber(materialNumber, filterQuery);
 
-        addOrExcludeZone(zone, filterQuery);
-
         addDeviceType(deviceType, filterQuery, "and %s eq '%s'", MaterialField.DeviceCategory);
         return filterQuery.toString();
     }
@@ -318,20 +304,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private static void addDeviceType(String deviceType, StringBuilder filterQuery, String format, MaterialField deviceCategory) {
         if (StringUtils.isNotBlank(deviceType)) {
             filterQuery.append(String.format(format, deviceCategory.getValue(), deviceType));
-        }
-    }
-
-    private static void addOrExcludeZone(String zoneString, StringBuilder filterQuery) {
-        if(StringUtils.isNotBlank(zoneString)) {
-            if(zoneString.equals("00")) {
-                filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), zoneString));
-            } else {
-                Integer zoneNumber = Integer.valueOf(zoneString);
-
-                filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
-            }
-        } else {
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
     }
 
@@ -404,7 +376,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             return Collections.singletonList(inMemoryCache.get(salesOffice, salesOfficeMaterialNumber));
         }
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
