@@ -104,7 +104,7 @@ public class MaterialController {
     public ResponseEntity<List<MaterialDTO>>  getAllMaterialsForTemplate() {
         log.debug("Getting all materials for PriceOffer Template");
 
-        List<MaterialDTO> materialDTOS = service.getAllMaterialsForSalesOrgByZone("100", 0, 5000);
+        List<MaterialDTO> materialDTOS = service.getAllMaterialsForSalesOrgBy("100", 0, 5000);
 
         if(materialDTOS.isEmpty()) {
             return ResponseEntity.noContent().build();

@@ -122,12 +122,13 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Scheduled(initialDelay = 0L, fixedRate = 60 * 60 * 1000)
     public void getSapMaterialsFromSap() {
         log.debug("Warming up SAP material cache");
-        getAllMaterialsForSalesOrgByZone("100", 0, 1000000);
+        List<MaterialDTO> materialsForSalesOrg = getAllMaterialsForSalesOrgBy("100", 0, 1000000);
+        log.debug("Cached {} amount of materials.", materialsForSalesOrg.size());
     }
 
     @Cacheable(cacheNames = "sapMaterialCache", key = "#salesOrg")
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
+    public List<MaterialDTO> getAllMaterialsForSalesOrgBy(String salesOrg, Integer page, Integer pageSize) {
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
 

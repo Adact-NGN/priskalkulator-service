@@ -204,7 +204,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceForSalesOrgSalesOfficeAndMaterial(String salesOrg, String salesOffice, String material, String zone) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -342,7 +342,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceDTO(String salesOrg, String salesOffice, String material) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
