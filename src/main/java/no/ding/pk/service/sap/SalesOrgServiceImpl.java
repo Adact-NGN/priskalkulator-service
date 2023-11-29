@@ -2,12 +2,12 @@ package no.ding.pk.service.sap;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
+import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -156,6 +156,100 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         }
 
         return new ArrayList<>();
+    }
+
+    @Cacheable(cacheNames = "sapSalesOfficeZoneCache", key = "#salesOffice")
+    @Override
+    public List<ZoneDTO> getZonesForSalesOffice(String salesOffice, String postalCode) {
+        List<String> params = List.of("100", salesOffice, "");
+
+        List<SalesOrgField> fieldList = List
+                .of(SalesOrgField.SalesOrganization,
+                        SalesOrgField.SalesOffice,
+                        SalesOrgField.SalesZone);
+
+        StringBuilder queryBuilder = new StringBuilder();
+
+        String logicDivider = " and ";
+
+        for(int i = 0; i < params.size(); i++) {
+            String param = params.get(i);
+
+            if(StringUtils.isNotBlank(param)) {
+                String fieldType = fieldList.get(i).getType();
+
+                if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
+                    param = param.toUpperCase();
+                }
+
+                log.debug("Parameter: {} fieldType: {}", param, fieldType);
+
+                if(StringUtils.equals(fieldType, "numeric") && !StringUtils.isNumeric(param)) {
+                    continue;
+                }
+
+                log.debug("Parameter ({}) and parameter type ({}) matches. Add to query.", param, fieldType);
+
+                String field = fieldList.get(i).getName();
+                addAndToQuery(queryBuilder, logicDivider);
+
+                String comparator = " eq ";
+
+                if(fieldList.get(i) == SalesOrgField.SalesZone) {
+                    comparator = " ne ";
+                }
+                queryBuilder.append(field).append(comparator).append(String.format("'%s'", param));
+            }
+        }
+
+        List<SalesOrgDTO> salesOrgDTOList = findByQuery(queryBuilder.toString(), 0);
+
+        salesOrgDTOList.sort(Comparator.comparing(SalesOrgDTO::getSalesZone));
+
+        SalesOrgDTO standardZone = getStandardZoneForPostalCode(postalCode, salesOrgDTOList);
+
+        if(standardZone != null) {
+            salesOrgDTOList.add(0, standardZone);
+        }
+
+        Map<String, SalesOrgDTO> distinctSalesOrgMap = new TreeMap<>();
+        salesOrgDTOList.forEach(salesOrgDTO -> {
+            if(StringUtils.isNotBlank(salesOrgDTO.getSalesZone()) && !distinctSalesOrgMap.containsKey(salesOrgDTO.getSalesZone())) {
+                distinctSalesOrgMap.put(salesOrgDTO.getSalesZone(), salesOrgDTO);
+            }
+        });
+        return distinctSalesOrgMap.values().stream().map(data -> {
+            boolean isStandardZone = standardZone != null && StringUtils.isNotBlank(data.getSalesZone()) && StringUtils.equals(data.getSalesZone(), standardZone.getSalesZone());
+            return ZoneDTO.builder()
+                    .isStandardZone(isStandardZone)
+                    .postalCode(data.getPostalCode())
+                    .zoneId(data.getSalesZone().replace("0", ""))
+                    .postalName(data.getCity()).build();
+        }).collect(Collectors.toList());
+    }
+
+    private SalesOrgDTO getStandardZoneForPostalCode(String postalCode, List<SalesOrgDTO> salesOrgDTOList) {
+        if(salesOrgDTOList.isEmpty()) {
+            return null;
+        }
+
+        List<SalesOrgDTO> standardZones = salesOrgDTOList.stream().filter(salesOrgDTO -> salesOrgDTO.getPostalCode().equals(postalCode)).collect(Collectors.toList());
+
+        if(standardZones.size() > 1) {
+            standardZones = standardZones.stream().filter(salesOrgDTO -> StringUtils.isNotBlank(salesOrgDTO.getSalesZone())).collect(Collectors.toList());
+        }
+
+        if(!standardZones.isEmpty()) {
+            return standardZones.get(0);
+        }
+
+        return null;
+    }
+
+    private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {
+        if(!queryBuilder.isEmpty()) {
+            queryBuilder.append(logicDivider);
+        }
     }
 
     private List<SalesOrgDTO> responseToDtoList(HttpResponse<String> response) {

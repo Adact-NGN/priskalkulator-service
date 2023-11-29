@@ -20,6 +20,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
@@ -114,6 +116,13 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         }
 
         return null;
+    }
+
+    @Async("asyncTaskExecutor")
+    @Scheduled(initialDelay = 0L, fixedRate = 60 * 60 * 1000)
+    public void getSapMaterialsFromSap() {
+        log.debug("Warming up SAP material cache");
+        getAllMaterialsForSalesOrgByZone("100", 0, 1000000);
     }
 
     @Cacheable(cacheNames = "sapMaterialCache", key = "#salesOrg")

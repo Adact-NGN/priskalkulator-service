@@ -6,6 +6,8 @@ import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
+import no.ding.pk.web.dto.sap.SalesOrgDTO;
+import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
 import no.ding.pk.web.enums.MaterialField;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -19,7 +21,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -36,7 +39,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@EnableAsync
 @Service
 public class StandardPriceServiceImpl implements StandardPriceService {
     
@@ -71,9 +73,23 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Async
-//    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
+    @Async("asyncTaskExecutor")
+    @Scheduled(initialDelay = 0L, fixedRate = 60 * 60 * 1000)
+    public void getStandardPricesFromSap() {
+        log.debug("Warming up Standard price cache");
+        List<SalesOrgDTO> salesOrgDTOS = salesOrgService.getAll();
+
+        for (SalesOrgDTO salesOrgDTO : salesOrgDTOS) {
+            List<ZoneDTO> zonesForSalesOffice = salesOrgService.getZonesForSalesOffice(salesOrgDTO.getSalesOffice(), salesOrgDTO.getPostalCode());
+
+            if(zonesForSalesOffice.isEmpty()) {
+                getStdPricesForSalesOfficeAndSalesOrg(salesOrgDTO.getSalesOffice(), "100", null);
+            } else {
+                zonesForSalesOffice.forEach(zoneDTO -> getStdPricesForSalesOfficeAndSalesOrg(salesOrgDTO.getSalesOffice(), "100", zoneDTO.getZoneId()));
+            }
+        }
+    }
+
 
     @Override
     @Cacheable(cacheNames = {"getStdPricesForSalesOfficeAndSalesOrg"}, keyGenerator = "stdPriceKeyGenerator")
@@ -119,9 +135,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         if(StringUtils.isNotBlank(zone)) {
             standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
         }
-//        else {
-//            standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isBlank(p.getZone())).toList();
-//        }
         return standardPriceDTOList;
     }
 
@@ -141,6 +154,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return materialDTOMap;
     }
 
+    @Cacheable(cacheNames = {"getStdPricesForSalesOfficeAndSalesOrgMap"}, keyGenerator = "stdPriceKeyGenerator")
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
 
@@ -238,17 +252,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return sapHttpClient.getResponse(request);
     }
 
-//    private void initiateCacheBuild(String salesOrg, String salesOffice) {
-//        log.debug("Getting Materials data for sales org {} and sales office {}", salesOrg, salesOffice);
-//        String filterQuery = createFilterQuery(salesOffice, salesOrg);
-//
-//        log.debug(String.format("Filter query: %s", filterQuery));
-//
-//        buildUpStandardPriceCache(salesOffice, filterQuery);
-//
-//        log.debug("Returning from new cache");
-//    }
-
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder(materialStdPriceDTO.getSalesOrg(), materialStdPriceDTO.getSalesOffice(),
                         materialNumber, materialStdPriceDTO.getDeviceType(), materialStdPriceDTO.getZone())
@@ -260,18 +263,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 .quantumUnit(materialStdPriceDTO.getQuantumUnit())
                 .build();
     }
-    
-//    private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
-//        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
-//
-//        log.debug("Response code: {}", response.statusCode());
-//        if(response.statusCode() == HttpStatus.OK.value()) {
-//            List<MaterialStdPriceDTO> standardPriceDTOList = jsonToMaterialStdPriceDTO(response);
-//
-//        } else {
-//            log.debug("Response code was {}", response.statusCode());
-//        }
-//    }
     
     private String createFilterQuery(String salesOffice, String salesOrg) {
         return createFilterQuery(salesOffice, salesOrg, null, null, null);
@@ -362,8 +353,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Cacheable("stdPriceCache")
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceDTO(String salesOrg, String salesOffice, String material) {
-
-        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberLookupKey(salesOffice, material, null, null);
 
         String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
 

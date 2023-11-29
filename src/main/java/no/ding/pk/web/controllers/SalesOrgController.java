@@ -10,20 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = {"/api/salesorg", "/api/v1/salesorg"})
@@ -125,6 +114,12 @@ public class SalesOrgController {
         return service.findByQuery(queryBuilder.toString(), skipTokens);
     }
 
+    private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {
+        if(!queryBuilder.isEmpty()) {
+            queryBuilder.append(logicDivider);
+        }
+    }
+
     private Map<SalesOrgField, String> createParameterList(String... params) {
         Map<SalesOrgField, String> returnMap = new LinkedHashMap<>();
         for(int i = 0; i < params.length; i++) {
@@ -148,94 +143,6 @@ public class SalesOrgController {
             @PathVariable("salesOrg") String salesOrg,
             @PathVariable("salesOffice") String salesOffice,
             @RequestParam(value = "postalCode", required = false) String postalCode) {
-        List<String> params = List.of(salesOrg, salesOffice, "");
-
-        List<SalesOrgField> fieldList = List
-                .of(SalesOrgField.SalesOrganization,
-                        SalesOrgField.SalesOffice,
-                        SalesOrgField.SalesZone);
-
-        StringBuilder queryBuilder = new StringBuilder();
-
-        String logicDivider = " and ";
-
-        for(int i = 0; i < params.size(); i++) {
-            String param = params.get(i);
-
-            if(StringUtils.isNotBlank(param)) {
-                String fieldType = fieldList.get(i).getType();
-
-                if(Objects.equals(fieldList.get(i).getName(), SalesOrgField.City.getName())) {
-                    param = param.toUpperCase();
-                }
-
-                log.debug("Parameter: {} fieldType: {}", param, fieldType);
-
-                if(StringUtils.equals(fieldType, "numeric") && !StringUtils.isNumeric(param)) {
-                    continue;
-                }
-
-                log.debug("Parameter ({}) and parameter type ({}) matches. Add to query.", param, fieldType);
-
-                String field = fieldList.get(i).getName();
-                addAndToQuery(queryBuilder, logicDivider);
-
-                String comparator = " eq ";
-
-                if(fieldList.get(i) == SalesOrgField.SalesZone) {
-                    comparator = " ne ";
-                }
-                queryBuilder.append(field).append(comparator).append(String.format("'%s'", param));
-            }
-        }
-
-        List<SalesOrgDTO> salesOrgDTOList = service.findByQuery(queryBuilder.toString(), 0);
-
-        salesOrgDTOList.sort(Comparator.comparing(SalesOrgDTO::getSalesZone));
-
-        SalesOrgDTO standardZone = getStandardZoneForPostalCode(postalCode, salesOrgDTOList);
-
-        if(standardZone != null) {
-            salesOrgDTOList.add(0, standardZone);
-        }
-
-        Map<String, SalesOrgDTO> distinctSalesOrgMap = new TreeMap<>();
-        salesOrgDTOList.forEach(salesOrgDTO -> {
-            if(StringUtils.isNotBlank(salesOrgDTO.getSalesZone()) && !distinctSalesOrgMap.containsKey(salesOrgDTO.getSalesZone())) {
-                distinctSalesOrgMap.put(salesOrgDTO.getSalesZone(), salesOrgDTO);
-            }
-        });
-        return distinctSalesOrgMap.values().stream().map(data -> {
-            boolean isStandardZone = standardZone != null && StringUtils.isNotBlank(data.getSalesZone()) && StringUtils.equals(data.getSalesZone(), standardZone.getSalesZone());
-            return ZoneDTO.builder()
-                    .isStandardZone(isStandardZone)
-                    .postalCode(data.getPostalCode())
-                    .zoneId(data.getSalesZone().replace("0", ""))
-                    .postalName(data.getCity()).build();
-        }).collect(Collectors.toList());
-    }
-
-    private SalesOrgDTO getStandardZoneForPostalCode(String postalCode, List<SalesOrgDTO> salesOrgDTOList) {
-        if(salesOrgDTOList.isEmpty()) {
-            return null;
-        }
-
-        List<SalesOrgDTO> standardZones = salesOrgDTOList.stream().filter(salesOrgDTO -> salesOrgDTO.getPostalCode().equals(postalCode)).collect(Collectors.toList());
-
-        if(standardZones.size() > 1) {
-            standardZones = standardZones.stream().filter(salesOrgDTO -> StringUtils.isNotBlank(salesOrgDTO.getSalesZone())).collect(Collectors.toList());
-        }
-
-        if(!standardZones.isEmpty()) {
-            return standardZones.get(0);
-        }
-
-        return null;
-    }
-
-    private void addAndToQuery(StringBuilder queryBuilder, String logicDivider) {
-        if(!queryBuilder.isEmpty()) {
-            queryBuilder.append(logicDivider);
-        }
+        return service.getZonesForSalesOffice(salesOffice, postalCode);
     }
 }
