@@ -14,7 +14,6 @@ public class StandardPriceKeyGenerator implements KeyGenerator {
 
     @Override
     public Object generate(Object target, Method method, Object... params) {
-        log.debug("Generating key.");
         Object[] nonNulls = Arrays.stream(params).filter(Objects::nonNull).toList().toArray();
         return StringUtils.arrayToDelimitedString(nonNulls, "_");
     }

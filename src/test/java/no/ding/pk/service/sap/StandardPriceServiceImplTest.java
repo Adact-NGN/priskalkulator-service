@@ -3,6 +3,7 @@ package no.ding.pk.service.sap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import no.ding.pk.config.cache.StandardPriceKeyGenerator;
 import no.ding.pk.config.mapping.v2.ModelMapperV2Config;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.repository.SalesRoleRepository;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 
@@ -98,7 +100,7 @@ public class StandardPriceServiceImplTest {
         inMemoryCache = new PingInMemory3DCache<>(capacity);
         service = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", new ObjectMapper(),
         sapMaterialService,
-        sapHttpClient, modelMapper, salesOrgService);
+        sapHttpClient, modelMapper, salesOrgService, new CaffeineCacheManager());
     }
 
     private void mockMaterialServiceResponse(ClassLoader classLoader) throws IOException {

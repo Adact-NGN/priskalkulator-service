@@ -21,6 +21,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.File;
@@ -68,7 +69,7 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
         salesOrgService = new SalesOrgServiceImpl(salesOrgServiceUrl, getObjectMapper(), sapHttpClient);
         String standardPriceSapUrl = "";
         standardPriceService = new StandardPriceServiceImpl(standardPriceSapUrl, getObjectMapper(), sapMaterialService,
-                sapHttpClient, modelMapper, salesOrgService);
+                sapHttpClient, modelMapper, salesOrgService, new CaffeineCacheManager());
         String materialServiceUrl = "";
         sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new LocalJSONUtils(getObjectMapper()), new PingInMemory3DCache<>(5000));
         materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), new PingInMemory3DCache<>(5000));

@@ -2,14 +2,15 @@ package no.ding.pk.service.sap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.cache.StandardPriceKeyGenerator;
 import no.ding.pk.domain.offer.MaterialPrice;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
-import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
 import no.ding.pk.web.enums.MaterialField;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,7 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -55,6 +60,8 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     private final SalesOrgService salesOrgService;
 
+    private final CacheManager cacheManager;
+
     @Autowired
     public StandardPriceServiceImpl(
             @Value("${sap.api.standard.price.url}")
@@ -63,7 +70,8 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             SapMaterialService sapMaterialService,
             SapHttpClient sapHttpClient,
             @Qualifier("modelMapperV2") ModelMapper modelMapper,
-            SalesOrgService salesOrgService) {
+            SalesOrgService salesOrgService,
+            CacheManager cacheManager) {
         this.standardPriceSapUrl = standardPriceSapUrl;
         this.objectMapper = objectMapper;
         this.sapHttpClient = sapHttpClient;
@@ -71,23 +79,75 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         this.modelMapper = modelMapper;
         this.salesOrgService = salesOrgService;
 
+        this.cacheManager = cacheManager;
     }
 
     @Async("asyncTaskExecutor")
     @Scheduled(initialDelay = 0L, fixedRate = 60 * 60 * 1000)
     public void getStandardPricesFromSap() {
         log.debug("Warming up Standard price cache");
-        List<SalesOrgDTO> salesOrgDTOS = salesOrgService.getAll();
 
-        for (SalesOrgDTO salesOrgDTO : salesOrgDTOS) {
-            List<ZoneDTO> zonesForSalesOffice = salesOrgService.getZonesForSalesOffice(salesOrgDTO.getSalesOffice(), salesOrgDTO.getPostalCode());
+        StopWatch watch = new StopWatch();
+        watch.start();
+        List<MaterialStdPriceDTO> allStandardPrices = getAllStandardPrices();
+        watch.stop();
+        log.debug("Time used to get all standard prices: {} sec", watch.getTime() / 1000);
 
-            if(zonesForSalesOffice.isEmpty()) {
-                getStdPricesForSalesOfficeAndSalesOrg(salesOrgDTO.getSalesOffice(), "100", null);
-            } else {
-                zonesForSalesOffice.forEach(zoneDTO -> getStdPricesForSalesOfficeAndSalesOrg(salesOrgDTO.getSalesOffice(), "100", zoneDTO.getZoneId()));
+        StandardPriceKeyGenerator keyGenerator = new StandardPriceKeyGenerator();
+
+        SimpleKeyGenerator simpleKeyGenerator = new SimpleKeyGenerator();
+
+        Map<String, List<MaterialStdPriceDTO>> collect = new HashMap<>();
+        Map<String, List<MaterialStdPriceDTO>> stdPriceCacheMap = new HashMap<>();
+
+        for(MaterialStdPriceDTO stdPriceDTO : allStandardPrices) {
+            Object stdPriceForSalesOfficeAndSalesOrgKey = keyGenerator.generate(null, null, (Object[]) new String[]{
+                    stdPriceDTO.getSalesOffice(), stdPriceDTO.getSalesOrg(), stdPriceDTO.getZone()
+            });
+
+            if(!collect.containsKey(stdPriceForSalesOfficeAndSalesOrgKey.toString())) {
+                collect.put(stdPriceForSalesOfficeAndSalesOrgKey.toString(), new ArrayList<>());
+            }
+
+            collect.get(stdPriceForSalesOfficeAndSalesOrgKey.toString()).add(stdPriceDTO);
+
+            Object simpleKey = simpleKeyGenerator.generate(null, null, (Object[]) new String[]{stdPriceDTO.getSalesOrg(), stdPriceDTO.getSalesOffice(), stdPriceDTO.getMaterial()});
+
+            if(!stdPriceCacheMap.containsKey(stdPriceForSalesOfficeAndSalesOrgKey.toString())) {
+                stdPriceCacheMap.put(simpleKey.toString(), new ArrayList<>());
+            }
+
+            stdPriceCacheMap.get(simpleKey.toString()).add(stdPriceDTO);
+        }
+
+        Cache getStdPricesForSalesOfficeAndSalesOrg = cacheManager.getCache("getStdPricesForSalesOfficeAndSalesOrg");
+        if (getStdPricesForSalesOfficeAndSalesOrg != null) {
+            getStdPricesForSalesOfficeAndSalesOrg.invalidate();
+        }
+        Cache getStdPricesForSalesOfficeAndSalesOrgMap = cacheManager.getCache("getStdPricesForSalesOfficeAndSalesOrgMap");
+        if (getStdPricesForSalesOfficeAndSalesOrgMap != null) {
+            getStdPricesForSalesOfficeAndSalesOrgMap.invalidate();
+        }
+        for (Map.Entry<String, List<MaterialStdPriceDTO>> stringListEntry : collect.entrySet()) {
+            if (getStdPricesForSalesOfficeAndSalesOrg != null) {
+                getStdPricesForSalesOfficeAndSalesOrg.putIfAbsent(stringListEntry.getKey(), stringListEntry.getValue());
+            }
+            if (getStdPricesForSalesOfficeAndSalesOrgMap != null) {
+                getStdPricesForSalesOfficeAndSalesOrgMap.putIfAbsent(stringListEntry.getKey(), stringListEntry.getValue());
             }
         }
+
+        Cache stdPriceCache = cacheManager.getCache("stdPriceCache");
+        if (stdPriceCache != null) {
+            stdPriceCache.invalidate();
+        }
+        for(Map.Entry<String, List<MaterialStdPriceDTO>> stdPriceCacheItem : stdPriceCacheMap.entrySet()) {
+            if (stdPriceCache != null) {
+                stdPriceCache.putIfAbsent(stdPriceCacheItem.getKey(), stdPriceCacheItem.getValue());
+            }
+        }
+
+        log.debug("Standard Price Cache done");
     }
 
 
@@ -351,6 +411,27 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         
         log.debug("Created request: " + request.toString());
         
+        HttpResponse<String> response = sendRequest(request);
+
+        log.debug("Response code: {}", response.statusCode());
+        if(response.statusCode() == HttpStatus.OK.value()) {
+            return jsonToMaterialStdPriceDTO(response);
+        }
+        return new ArrayList<>();
+    }
+
+    public List<MaterialStdPriceDTO> getAllStandardPrices() {
+        String filterQuery = "SalesOrganization eq '100'";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("$filter", filterQuery);
+        params.add("$top", "1000000");
+        params.add("$format", "json");
+
+        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
+
+        log.debug("Created request: " + request.toString());
+
         HttpResponse<String> response = sendRequest(request);
 
         log.debug("Response code: {}", response.statusCode());

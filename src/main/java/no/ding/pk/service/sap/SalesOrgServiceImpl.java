@@ -51,7 +51,10 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     @Override
     @Cacheable("salesOrganizationCache")
     public List<SalesOrgDTO> getAll() {
-        HttpRequest request = sapHttpClient.createGetRequest(salesOrgServiceUrl, new LinkedMultiValueMap<>());
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("$filter", "SalesOrganization eq '100'");
+        params.add("$top", "100000");
+        HttpRequest request = sapHttpClient.createGetRequest(salesOrgServiceUrl, params);
         HttpResponse<String> response = sapHttpClient.getResponse(request);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
