@@ -31,11 +31,13 @@ public class CacheConfig extends CachingConfigurerSupport {
     @Bean
     @Primary
     public CacheManager cacheManager() {
-        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
-        caffeineCacheManager.setCaffeine(Caffeine.newBuilder()
+        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 .expireAfterWrite(60, TimeUnit.MINUTES)
-                .initialCapacity(5000)
-                .recordStats());
+                .initialCapacity(500000)
+                .recordStats();
+
+        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
+        caffeineCacheManager.setCaffeine(caffeine);
         return caffeineCacheManager;
     }
 
@@ -47,20 +49,5 @@ public class CacheConfig extends CachingConfigurerSupport {
     @Bean("sapMaterialKeyGenerator")
     public KeyGenerator sapMaterialKeyGenerator() {
         return new SapMaterialKeyGenerator();
-    }
-
-    @Bean
-    public InMemory3DCache<String, String, MaterialStdPriceDTO> standardPriceInMemoryCache() {
-        return new PingInMemory3DCache<>(capacity);
-    }
-
-    @Bean
-    public InMemory3DCache<String, String, MaterialDTO> materialInMemoryCache() {
-        return new PingInMemory3DCache<>(capacity);
-    }
-
-    @Bean
-    public InMemory3DCache<String, String, MaterialPrice> materialPriceCache() {
-        return new PingInMemory3DCache<>(capacity);
     }
 }

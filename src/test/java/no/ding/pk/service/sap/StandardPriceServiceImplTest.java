@@ -59,7 +59,8 @@ import static org.mockito.Mockito.mock;
 @DataJpaTest
 @TestPropertySource("classpath:h2-db.properties")
 public class StandardPriceServiceImplTest {
-    
+
+    private CaffeineCacheManager cacheManager;
     private StandardPriceService service;
     private Path workingDir;
     
@@ -97,10 +98,14 @@ public class StandardPriceServiceImplTest {
 
         mockMaterialServiceResponse(classLoader);
 
+        cacheManager = mock(CaffeineCacheManager.class);
+
+
+
         inMemoryCache = new PingInMemory3DCache<>(capacity);
         service = new StandardPriceServiceImpl("http://saptest.norskgjenvinning.no", new ObjectMapper(),
         sapMaterialService,
-        sapHttpClient, modelMapper, salesOrgService, new CaffeineCacheManager());
+        sapHttpClient, modelMapper, salesOrgService, cacheManager);
     }
 
     private void mockMaterialServiceResponse(ClassLoader classLoader) throws IOException {

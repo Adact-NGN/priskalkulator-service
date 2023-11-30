@@ -52,14 +52,8 @@ public class PriceOfferServiceConfig {
     }
 
     @Bean
-    public InMemory3DCache<String, String, MaterialPrice> materialPriceCache() {
-        return new PingInMemory3DCache<>(5000);
-    }
-
-    @Bean
-    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository,
-                                                     InMemory3DCache<String, String, MaterialPrice> materialPriceCache) {
-        return new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
+    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository) {
+        return new MaterialPriceServiceImpl(materialPriceRepository);
     }
 
     @Bean

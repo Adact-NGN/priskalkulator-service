@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ public class MaterialController {
         return ResponseEntity.ok(materialDTO);
     }
 
+    @Operation(deprecated = true)
     /**
      * Get Material by material number, sales organization and sales office
      * @param salesOrg The sales organization number
@@ -82,6 +84,7 @@ public class MaterialController {
      * @param zone given zone to get materials for. Not required! Set a numeric value with a zero as a suffix to get zone prices. Format ex. 02
      * @param page selected page to view. Default 0
      * @param pageSize page size to view. Default 5000
+     * @deprecated function is similar to {@code getMaterialList(...)}
      * @return list of Materials with standard price
      */
     @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,9 +93,9 @@ public class MaterialController {
                                                       @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                       @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize,
                                                       @RequestParam(value = "zone", required = false) String zone) {
-        log.debug("Getting materials for salesOrg: {} and salesOffice: {} for zone: {}", salesOrg, salesOffice, zone != null ? zone : "no zone");
+        log.debug("Getting materials for salesOrg: {}", salesOrg);
 
-        return service.getAllMaterialsForSalesOrgBy(salesOrg, zone, page, pageSize);
+        return service.getAllMaterialsForSalesOrgBy(salesOrg, page, pageSize);
     }
 
     /**

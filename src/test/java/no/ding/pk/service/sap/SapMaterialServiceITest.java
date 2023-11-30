@@ -44,7 +44,7 @@ public class SapMaterialServiceITest {
 
     @Test
     public void shouldGetMaterialByMaterialNumberAndZoneFromSapMaterialService() {
-        List<MaterialDTO> allMaterialsForZone = sapMaterialService.getAllMaterialsForSalesOrgBy("100", "00", 0, 100);
+        List<MaterialDTO> allMaterialsForZone = sapMaterialService.getAllMaterialsForSalesOrgBy("100", 0, 100);
 
         assertThat(allMaterialsForZone, hasSize(greaterThan(0)));
     }

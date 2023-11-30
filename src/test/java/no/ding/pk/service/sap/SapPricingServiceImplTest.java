@@ -7,7 +7,6 @@ import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.domain.offer.SalesOffice;
 import no.ding.pk.service.*;
-import no.ding.pk.service.cache.PingInMemory3DCache;
 import no.ding.pk.service.offer.*;
 import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.utils.SapHttpClient;
@@ -71,8 +70,8 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
         standardPriceService = new StandardPriceServiceImpl(standardPriceSapUrl, getObjectMapper(), sapMaterialService,
                 sapHttpClient, modelMapper, salesOrgService, new CaffeineCacheManager());
         String materialServiceUrl = "";
-        sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new LocalJSONUtils(getObjectMapper()), new PingInMemory3DCache<>(5000));
-        materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), new PingInMemory3DCache<>(5000));
+        sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new CaffeineCacheManager(), new LocalJSONUtils(getObjectMapper()));
+        materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
         discountService = new DiscountServiceImpl(getDiscountRepository(), getDiscountLevelRepository());
         priceRowService = new PriceRowServiceImpl(discountService, getPriceRowRepository(), materialService, getEmFactory(), sapMaterialService, modelMapper);
