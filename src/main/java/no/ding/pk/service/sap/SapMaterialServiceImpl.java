@@ -29,7 +29,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
 
-//@EnableAsync
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
     private static final Logger log = LoggerFactory.getLogger(SapMaterialServiceImpl.class);
