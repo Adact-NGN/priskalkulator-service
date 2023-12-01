@@ -35,7 +35,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -98,6 +101,12 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         Map<String, List<MaterialStdPriceDTO>> collect = new HashMap<>();
         Map<String, List<MaterialStdPriceDTO>> stdPriceCacheMap = new HashMap<>();
+
+        List<MaterialDTO> materialsForSalesOrgBy = sapMaterialService.getAllMaterialsForSalesOrgBy("100", null, 100000);
+
+        Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(materialsForSalesOrgBy);
+
+        addMaterialDataToStandardPrice(allStandardPrices, materialDTOMap);
 
         for(MaterialStdPriceDTO stdPriceDTO : allStandardPrices) {
             Object stdPriceForSalesOfficeAndSalesOrgKey = createCacheKeyForStdPriceList(
