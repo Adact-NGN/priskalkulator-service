@@ -29,10 +29,10 @@ spec:
               name: ding-ip-app-pk-dev-secrets
           resources:
             requests:
-              memory: "2Gi"
+              memory: "5Gi"
               cpu: "500m"
             limits:
 #              cpu: "500m"
-              memory: "2Gi"
+              memory: "5Gi"
           ports:
             - containerPort: 8080
