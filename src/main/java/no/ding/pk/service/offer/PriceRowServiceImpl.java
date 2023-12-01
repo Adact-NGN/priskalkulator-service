@@ -198,7 +198,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             if(material.getId() == null) {
 
                 log.debug("New Material to create with material number: {}", material.getMaterialNumber());
-                MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(salesOrg, salesOffice, material.getMaterialNumber(), zone);
+                MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material.getMaterialNumber());
 
                 if(sapMaterial != null) {
                     log.debug("Mapping MaterialDTO: {}", sapMaterial);

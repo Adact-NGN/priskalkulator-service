@@ -29,8 +29,6 @@ import org.springframework.util.MultiValueMap;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
@@ -90,12 +88,27 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     private static Map<String, MaterialDTO> createMaterialMapFromList(List<MaterialDTO> materialsForSalesOrg) {
-        return materialsForSalesOrg.stream().collect(Collectors.toMap(MaterialDTO::getMaterial, Function.identity()));
+        Map<String, MaterialDTO> map = new HashMap<>();
+        materialsForSalesOrg.stream().filter(materialDTO -> !map.containsKey(materialDTO.getMaterial())).filter(materialDTO -> map.put(materialDTO.getMaterial(), materialDTO) != null).forEach(materialDTO -> {
+            throw new IllegalStateException("Duplicate key");
+        });
+        return map;
     }
 
-    @Cacheable(cacheNames = "sapMaterialCache", key = "{#material + '_' + #salesOrg}")
+    @Cacheable(cacheNames = "sapMaterialCache", key = "{#salesOrg + '_' + #material}")
     @Override
     public MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String salesOrg, String material) {
+
+        List<String> cacheKeys = sapMaterialCache.keySet().stream().filter(s -> s.contains(salesOrg)).toList();
+
+        if(!cacheKeys.isEmpty()) {
+            List<MaterialDTO> materialDTOS = sapMaterialCache.entrySet().stream().filter(stringMaterialDTOEntry -> stringMaterialDTOEntry.getKey().contains(material)).map(Map.Entry::getValue).toList();
+
+            if(!materialDTOS.isEmpty()) {
+                return materialDTOS.stream().filter(materialDTO -> materialDTO.getMaterial().equals(material)).distinct().findAny().orElse(null);
+            }
+        }
+
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
 
@@ -114,45 +127,17 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
 
-        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
+        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.contains(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
             MaterialDTO materialDTO = localJSONUtils.jsonStringToObject(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
             log.debug("MaterialDTOList {}", materialDTO);
+
+            if(!sapMaterialCache.containsKey(material)) {
+                sapMaterialCache.put(material, materialDTO);
+            }
 
             return materialDTO;
         } else {
             log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
-        }
-
-        return null;
-    }
-
-    @Cacheable(cacheNames = "sapMaterialCache", keyGenerator = "sapMaterialKeyGenerator")
-    @Override
-    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String salesOrg, String salesOffice, String material,
-                                                                             String zone) {
-        LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
-        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-
-        Map<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(
-                ImmutableMap.of(materialExpression, LogicOperator.And,
-                        salesOrgExpression, LogicOperator.And));
-        String filterQuery = createFilterQuery(queryMap);
-
-        MultiValueMap<String, String> params = createParameterMap(filterQuery, 0, 5000, "json");
-
-        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
-
-        log.debug("Created request: " + request.toString());
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
-
-        if (response.statusCode() == HttpStatus.OK.value()) {
-            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
-            log.debug("MaterialDTOList {}", materialDTOList.size());
-
-            if(!materialDTOList.isEmpty()) {
-                return materialDTOList.get(0);
-            }
         }
 
         return null;

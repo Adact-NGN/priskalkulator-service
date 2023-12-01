@@ -38,6 +38,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class StandardPriceServiceImpl implements StandardPriceService {
@@ -99,9 +100,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         Map<String, List<MaterialStdPriceDTO>> stdPriceCacheMap = new HashMap<>();
 
         for(MaterialStdPriceDTO stdPriceDTO : allStandardPrices) {
-            Object stdPriceForSalesOfficeAndSalesOrgKey = standardPriceKeyGenerator.generate(null, null, List.of(
-                    stdPriceDTO.getSalesOffice(), stdPriceDTO.getSalesOrg(), stdPriceDTO.getZone()
-            ));
+            Object stdPriceForSalesOfficeAndSalesOrgKey = createCacheKeyForStdPriceList(
+                    stdPriceDTO.getSalesOrg(), stdPriceDTO.getSalesOffice(), stdPriceDTO.getZone()
+            );
 
             if(!collect.containsKey(stdPriceForSalesOfficeAndSalesOrgKey.toString())) {
                 collect.put(stdPriceForSalesOfficeAndSalesOrgKey.toString(), new ArrayList<>());
@@ -152,14 +153,16 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     //@Cacheable(cacheNames = {getStdPricesForSalesOfficeAndSalesOrgName}, keyGenerator = "stdPriceKeyGenerator")
     public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOrg, String salesOffice, String zone) {
-        Object cacheKey = standardPriceKeyGenerator.generate(null, null, null, List.of(salesOffice, salesOrg, zone));
+        Object cacheKey = createCacheKeyForStdPriceList(salesOrg, salesOffice, zone != null ? zone : "");
         Cache cache = cacheManager.getCache(getStdPricesForSalesOfficeAndSalesOrgName);
 
         if(cache != null) {
             if(cache.get(cacheKey) != null) {
+                log.debug("Cache hit");
                 return (List<MaterialStdPriceDTO>) cache.get(cacheKey).get();
             }
         }
+        log.debug("Cache not hit");
         String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
@@ -187,10 +190,18 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             addMaterialDataToStandardPrice(standardPriceDTOList, materialDTOMap);
 
+            if (cache != null) {
+                cache.putIfAbsent(cacheKey, standardPriceDTOList);
+            }
+
             return standardPriceDTOList;
         }
         
         return new ArrayList<>();
+    }
+
+    private Object createCacheKeyForStdPriceList(String salesOrg, String salesOffice, String zone) {
+        return standardPriceKeyGenerator.generate(null, null, null, Stream.of(salesOrg, salesOffice, zone != null ? zone : "").toList());
     }
 
     private static List<MaterialStdPriceDTO> filterStdPricesByZone(String zone, List<MaterialStdPriceDTO> standardPriceDTOList) {
@@ -223,7 +234,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
 
-        Object cacheKey = standardPriceKeyGenerator.generate(null, null, null, List.of(salesOrg, salesOffice, zone));
+        Object cacheKey = createCacheKeyForStdPriceList(salesOffice, salesOrg, zone);
         Cache cache = cacheManager.getCache(getStdPricesForSalesOfficeAndSalesOrgMapName);
 
         if(cache != null) {
@@ -264,7 +275,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             List<MaterialPrice> materialPrices = List.of(modelMapper.map(materialStdPriceDTO, MaterialPrice[].class));
 
-            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+            Map<String, MaterialPrice> materialPriceMap = materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+
+            if(cache != null) {
+                cache.putIfAbsent(cacheKey, materialPriceMap);
+            }
+
+            return materialPriceMap;
         }
         
         return new HashMap<>();

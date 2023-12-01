@@ -81,7 +81,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         Optional<MaterialDTO> dtoOptional = sapMaterialDTOS.stream().filter(materialDTO -> materialDTO.getMaterial().equals(zoneMaterialNumber)).findAny();
         assertThat(dtoOptional.isPresent(), is(true));
-        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(salesOrg, salesOffice, zoneMaterialNumber, "01")).thenReturn(dtoOptional.get());
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrg(salesOrg, zoneMaterialNumber)).thenReturn(dtoOptional.get());
 
         DiscountLevel levelOne = DiscountLevel.builder(0.0, 1)
                 .pctDiscount(0.0)
@@ -184,7 +184,7 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
 
         String salesOrg = "100";
         String salesOffice = "104";
-        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(salesOrg, salesOffice, materialNumber, null)).thenReturn(dtoOptional.get());
+        when(sapMaterialService.getMaterialByMaterialNumberAndSalesOrg(salesOrg, materialNumber)).thenReturn(dtoOptional.get());
 
         MaterialPrice wastePrice = MaterialPrice.builder(salesOrg, salesOffice, materialNumber, null, "01")
                 .materialNumber(materialNumber)

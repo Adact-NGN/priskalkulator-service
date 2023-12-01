@@ -45,7 +45,7 @@ public class MaterialController {
         return ResponseEntity.ok(materialDTO);
     }
 
-    @Operation(deprecated = true)
+
     /**
      * Get Material by material number, sales organization and sales office
      * @param salesOrg The sales organization number
@@ -53,13 +53,14 @@ public class MaterialController {
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
+    @Operation(deprecated = true)
     @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
                                                                        @PathVariable(value = "salesOffice") String salesOffice,
                                                                        @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {} and sales office {}", material, salesOrg, salesOffice);
 
-        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(salesOrg, null, material,null);
+        return service.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material);
     }
 
     /**
