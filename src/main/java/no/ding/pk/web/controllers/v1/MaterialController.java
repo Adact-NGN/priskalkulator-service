@@ -1,11 +1,14 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,18 +27,24 @@ public class MaterialController {
     }
 
     /**
-     * Get Material by sales orfanization and material number
+     * Get Material by sales organization and material number
      * @param salesOrg The sales organization number
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
-    public MaterialDTO getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
-                                                         @PathVariable(value = "material") String material) {
+    public ResponseEntity<MaterialDTO> getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
+                                                                  @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {}", material, salesOrg);
-        return service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
+        MaterialDTO materialDTO = service.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material);
+
+        if(materialDTO == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.ok(materialDTO);
     }
+
 
     /**
      * Get Material by material number, sales organization and sales office
@@ -44,13 +53,14 @@ public class MaterialController {
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
+    @Operation(deprecated = true)
     @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
                                                                        @PathVariable(value = "salesOffice") String salesOffice,
                                                                        @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {} and sales office {}", material, salesOrg, salesOffice);
 
-        return service.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material, salesOrg, salesOffice, null);
+        return service.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material);
     }
 
     /**
@@ -75,6 +85,7 @@ public class MaterialController {
      * @param zone given zone to get materials for. Not required! Set a numeric value with a zero as a suffix to get zone prices. Format ex. 02
      * @param page selected page to view. Default 0
      * @param pageSize page size to view. Default 5000
+     * @deprecated function is similar to {@code getMaterialList(...)}
      * @return list of Materials with standard price
      */
     @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -83,9 +94,9 @@ public class MaterialController {
                                                       @RequestParam(value = "page", defaultValue = "0") Integer page,
                                                       @RequestParam(value = "pageSize", defaultValue = "5000") Integer pageSize,
                                                       @RequestParam(value = "zone", required = false) String zone) {
-        log.debug("Getting materials for salesOrg: {} and salesOffice: {} for zone: {}", salesOrg, salesOffice, zone != null ? zone : "no zone");
+        log.debug("Getting materials for salesOrg: {}", salesOrg);
 
-        return service.getAllMaterialsForSalesOrgBy(salesOrg, zone, page, pageSize);
+        return service.getAllMaterialsForSalesOrgBy(salesOrg, page, pageSize);
     }
 
     /**
@@ -94,9 +105,15 @@ public class MaterialController {
      * @return list of Materials.
      */
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<MaterialDTO>  getAllMaterialsForTemplate() {
+    public ResponseEntity<List<MaterialDTO>>  getAllMaterialsForTemplate() {
         log.debug("Getting all materials for PriceOffer Template");
 
-        return service.getAllMaterialsForSalesOrgBy("100", 0, 5000);
+        List<MaterialDTO> materialDTOS = service.getAllMaterialsForSalesOrgBy("100", 0, 5000);
+
+        if(materialDTOS.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(materialDTOS);
     }
 }

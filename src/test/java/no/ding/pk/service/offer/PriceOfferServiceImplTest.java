@@ -94,8 +94,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         priceOfferRepository = getPriceOfferRepository();
 
-        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
-        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository(), materialPriceCache);
+        MaterialPriceService materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
 
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
 
@@ -109,7 +108,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 discountService,
                 getPriceRowRepository(),
                 materialService,
-                materialPriceService,
                 getEmFactory(),
                 sapMaterialService,
                 modelMapper);

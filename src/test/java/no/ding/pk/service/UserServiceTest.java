@@ -83,9 +83,7 @@ public class UserServiceTest extends AbstractIntegrationConfig {
 
         salesRoleService = new SalesRoleServiceImpl(salesRoleRepository);
 
-        InMemory3DCache<String, String, MaterialPrice> materialPriceCache = new PingInMemory3DCache<>(5000);
-
-        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
+        materialPriceService = new MaterialPriceServiceImpl(materialPriceRepository);
 
         objectMapper = new ObjectMapper();
 
