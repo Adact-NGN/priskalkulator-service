@@ -37,7 +37,7 @@ public class MaterialController {
     public ResponseEntity<MaterialDTO> getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
                                                                   @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {}", material, salesOrg);
-        MaterialDTO materialDTO = service.getMaterialByMaterialNumberAndSalesOrg(material, salesOrg);
+        MaterialDTO materialDTO = service.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material);
 
         if(materialDTO == null) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

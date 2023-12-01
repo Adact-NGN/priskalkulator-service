@@ -104,8 +104,6 @@ public class SapHttpClient {
         try {
             return client.send(request, BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-
-
             throw new Error(e.getMessage());
         }
     }
