@@ -13,6 +13,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: test
+                name: ding-ip-app-pk
                 port:
                   number: 8080
