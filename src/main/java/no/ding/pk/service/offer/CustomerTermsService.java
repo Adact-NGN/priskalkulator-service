@@ -16,7 +16,9 @@ public interface CustomerTermsService {
 
     CustomerTerms save(String salesOffice, String customerNumber, String customerName, CustomerTerms customerTerms);
 
-    List<CustomerTerms> findAll(String salesOffice, String customerNumber);
+    List<CustomerTerms> findAll();
+
+    List<CustomerTerms> findAll(String salesOffice, String customerNumber, List<String> customerTermList);
     CustomerTerms findActiveTermsForCustomerForSalesOfficeAndSalesOrg(String customerNumber, String salesOffice,
             String salesOrg);
 

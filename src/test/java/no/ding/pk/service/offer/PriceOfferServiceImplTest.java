@@ -992,7 +992,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         priceOffer = service.save(priceOffer);
 
-        List<CustomerTerms> activeTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber);
+        List<CustomerTerms> activeTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber, null);
         assertThat(activeTermsList, hasSize(1));
 
         PriceOfferTerms priceOfferTerms = PriceOfferTerms.builder()
@@ -1009,7 +1009,7 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
 
         assertThat(actual, is(true));
 
-        List<CustomerTerms> actualActiveTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber).stream().filter(customerTerms -> customerTerms.getAgreementEndDate() == null).toList();
+        List<CustomerTerms> actualActiveTermsList = customerTermsService.findAll(salesOfficeNumber, customerNumber, null).stream().filter(customerTerms -> customerTerms.getAgreementEndDate() == null).toList();
 
         assertThat(actualActiveTermsList, hasSize(1));
     }
