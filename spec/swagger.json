@@ -3342,6 +3342,12 @@
         "operationId" : "listUsingGET_1",
         "produces" : [ "*/*" ],
         "parameters" : [ {
+          "name" : "byTerms",
+          "in" : "query",
+          "description" : "byTerms",
+          "required" : false,
+          "type" : "string"
+        }, {
           "name" : "customerNumber",
           "in" : "query",
           "description" : "customerNumber",

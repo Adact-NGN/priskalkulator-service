@@ -6,6 +6,7 @@ import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
 import no.ding.pk.web.handlers.CustomerNotProvidedException;
 import no.ding.pk.web.handlers.MissingAgreementStartDateException;
 import no.ding.pk.web.handlers.SalesOfficeNotProvidedException;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +45,14 @@ public class CustomerTermsController {
      */
     @GetMapping("/list")
     public List<CustomerTermsDTO> list(@RequestParam(name = "salesOffice", required = false) String salesOffice,
-                                       @RequestParam(name = "customerNumber", required = false) String customerNumber) {
-        List<CustomerTerms> customerTermsList = service.findAll(salesOffice, customerNumber);
+                                       @RequestParam(name = "customerNumber", required = false) String customerNumber,
+                                       @RequestParam(name = "byTerms", required = false) String terms) {
+        List<String> customerTermList = new ArrayList<>();
+
+        if(StringUtils.isNotBlank(terms)) {
+            customerTermList = Arrays.stream(terms.split(",")).toList();
+        }
+        List<CustomerTerms> customerTermsList = service.findAll(salesOffice, customerNumber, customerTermList);
 
         return customerTermsList.stream().map(customerTerms -> modelMapper.map(customerTerms, CustomerTermsDTO.class)).collect(Collectors.toList());
     }
