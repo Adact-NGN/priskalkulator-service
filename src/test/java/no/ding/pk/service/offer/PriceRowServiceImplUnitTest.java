@@ -54,7 +54,7 @@ public class PriceRowServiceImplUnitTest {
         modelMapper = new ModelMapper();
         discountService = mock(DiscountService.class);
 
-        service = new PriceRowServiceImpl(discountService, repository, materialService, materialPriceService, emFactory, sapMaterialService, modelMapper);
+        service = new PriceRowServiceImpl(discountService, repository, materialService, emFactory, sapMaterialService, modelMapper);
     }
 
     @Test
