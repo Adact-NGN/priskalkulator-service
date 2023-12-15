@@ -353,6 +353,12 @@ public class PriceOfferController {
         return service.delete(id);
     }
 
+    @DeleteMapping(path = "/force/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean forceDelete(@PathVariable("id") Long id) {
+        log.debug("Force deleting PriceOffer with id: {}", id);
+        return service.forceDeleteById(id);
+    }
+
     /**
      * Get all price offers ready for BO-report.
      * @return List of all price offers ready for BO-report.

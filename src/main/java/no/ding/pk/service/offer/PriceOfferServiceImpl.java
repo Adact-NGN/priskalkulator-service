@@ -370,6 +370,13 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
+    public boolean forceDeleteById(Long id) {
+        repository.deleteById(id);
+
+        return repository.findById(id).isEmpty();
+    }
+
+    @Override
     public List<PriceOffer> findAllBySalesEmployeeId(Long userId, List<String> statusList) {
         return repository.findAll(Specification.where(withSalesEmployeeId(userId)).and(withPriceOfferStatusInList(statusList)));
     }
@@ -569,7 +576,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public List<PriceOffer> findAllPriceOffersRadyForBoReport() {
-        
+
         return repository.findAllByPriceOfferStatusIn(List.of(PriceOfferStatus.ACTIVATED.getStatus()));
     }
 
