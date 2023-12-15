@@ -363,7 +363,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 .quantumUnit(materialStdPriceDTO.getQuantumUnit())
                 .build();
     }
-    
+
     private String createFilterQuery(String salesOffice, String salesOrg) {
         return createFilterQuery(salesOffice, salesOrg, null, null);
     }
@@ -448,9 +448,9 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         params.add("$filter", filterQuery);
         params.add("$format", "json");
         HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-        
+
         log.debug("Created request: " + request.toString());
-        
+
         HttpResponse<String> response = sendRequest(request);
 
         log.debug("Response code: {}", response.statusCode());

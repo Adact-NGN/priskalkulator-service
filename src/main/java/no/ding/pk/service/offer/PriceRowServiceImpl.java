@@ -8,6 +8,7 @@ import no.ding.pk.domain.offer.PriceRow;
 import no.ding.pk.repository.offer.PriceRowRepository;
 import no.ding.pk.service.DiscountService;
 import no.ding.pk.service.sap.SapMaterialService;
+import no.ding.pk.utils.ZoneUtils;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -100,7 +101,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                                   Map<String, MaterialPrice> materialStdPriceMap) {
         List<PriceRow> returnList = new ArrayList<>();
         for (PriceRow materialPriceRow : priceRowList) {
-            MaterialPrice materialPrice = getMaterialPriceForMaterial(salesOrg, salesOffice, materialPriceRow.getMaterial(), materialStdPriceMap);
+            MaterialPrice materialPrice = getMaterialPriceForMaterial(salesOrg, salesOffice, materialPriceRow.getMaterial(), zone, materialStdPriceMap);
             log.debug("Found standard price for material: {}: {}, zone: {}", materialPriceRow.getMaterial().getMaterialNumber(), materialPrice, zone);
             PriceRow entity = save(materialPriceRow, salesOrg, salesOffice, zone, materialPrice);
 
@@ -111,7 +112,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return returnList;
     }
 
-    private MaterialPrice getMaterialPriceForMaterial(String salesOrg, String salesOffice, Material material, Map<String, MaterialPrice> materialStdPriceMap) {
+    private MaterialPrice getMaterialPriceForMaterial(String salesOrg, String salesOffice, Material material, String zone, Map<String, MaterialPrice> materialStdPriceMap) {
         if(materialStdPriceMap == null || materialStdPriceMap.isEmpty()) {
             return null;
         }
@@ -143,6 +144,16 @@ public class PriceRowServiceImpl implements PriceRowService {
                 lookUpKey.append("_");
             }
             lookUpKey.append(material.getDeviceType());
+        }
+
+        if(StringUtils.isNotBlank(zone) && StringUtils.isNumeric(zone)) {
+            String formattedZone = ZoneUtils.getFormattedZone(zone);
+
+            if(!lookUpKey.isEmpty()) {
+                lookUpKey.append("_");
+            }
+
+            lookUpKey.append(formattedZone);
         }
 
         MaterialPrice materialPrice = materialStdPriceMap.getOrDefault(lookUpKey.toString(), null);
