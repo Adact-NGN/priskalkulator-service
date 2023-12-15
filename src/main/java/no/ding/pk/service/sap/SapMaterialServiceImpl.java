@@ -2,7 +2,6 @@ package no.ding.pk.service.sap;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.utils.LocalJSONUtils;
 import no.ding.pk.utils.LogicExpression;
 import no.ding.pk.utils.SapHttpClient;
@@ -14,69 +13,47 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-//@EnableAsync
 @Service
 public class SapMaterialServiceImpl implements SapMaterialService {
     private static final Logger log = LoggerFactory.getLogger(SapMaterialServiceImpl.class);
 
     private final String materialServiceUrl;
     private final SapHttpClient sapHttpClient;
-
-    private final InMemory3DCache<String, String, MaterialDTO> inMemoryCache;
+    private final CacheManager cacheManager;
 
     private final LocalJSONUtils localJSONUtils;
+    private final String DISTRIBUTION_CHANNEL_DOWN_STREAM = "01";
 
     @Autowired
     public SapMaterialServiceImpl(@Value(value = "${PK_SAP_API_MATERIAL_URL}") String materialServiceUrl,
                                   SapHttpClient sapHttpClient,
-                                  LocalJSONUtils localJSONUtils,
-                                  @Qualifier("materialInMemoryCache") InMemory3DCache<String, String, MaterialDTO> inMemoryCache) {
+                                  CacheManager cacheManager, LocalJSONUtils localJSONUtils) {
         this.materialServiceUrl = materialServiceUrl;
         this.sapHttpClient = sapHttpClient;
+        this.cacheManager = cacheManager;
         this.localJSONUtils = localJSONUtils;
-        this.inMemoryCache = inMemoryCache;
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Async
-//    @Scheduled(cron = "0 0 * * *", zone = "Europe/Paris")
-    public void updateMaterialCache() {
-        log.debug("Starting to populate Material cache.");
-        List<MaterialDTO> materials = getAllMaterialsForSalesOrgByZone("100", 0, 5000);
-        log.debug("Got {} amount of materials.", materials.size());
-        materials.forEach(materialDTO -> inMemoryCache.put("100", materialDTO.getMaterial(), materialDTO));
-        log.debug("Added materials to cache. Cache size is: {}", inMemoryCache.size("100"));
-    }
-
-
+    @Cacheable(cacheNames = "sapMaterialCache", key = "{#salesOrg + '_' + #material}")
     @Override
-    public MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String material, String salesOrg) {
-        if(inMemoryCache.size(salesOrg) == 0 || inMemoryCache.isExpired()) {
-            log.debug("Initiating cache build for Sap Materials.");
-            initiateCacheBuild(salesOrg, material);
-        }
+    public MaterialDTO getMaterialByMaterialNumberAndSalesOrg(String salesOrg, String material) {
 
-        if(!inMemoryCache.contains(salesOrg, material)) {
-            log.debug("Cache does not contain material {} for sales org {}. Updating", material, salesOrg);
-            updateMaterialCache(salesOrg, material, null, null);
-        }
-
-        return inMemoryCache.get(salesOrg, material);
-    }
-
-    @Override
-    public MaterialDTO getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(String material, String salesOrg,
-                                                                            String salesOffice, String zone) {
         LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
 
@@ -85,68 +62,60 @@ public class SapMaterialServiceImpl implements SapMaterialService {
                         salesOrgExpression, LogicOperator.And));
         String filterQuery = createFilterQuery(queryMap);
 
-        if(!inMemoryCache.contains(salesOrg, material)) {
-            log.debug("Cache is missing the material.");
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, 0, 5000, "json");
 
-            updateMaterialCache(salesOrg, filterQuery);
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
-            return inMemoryCache.get(salesOrg, material);
+        log.debug("Created request: " + request.toString());
+
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
+
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.contains(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
+
+            return localJSONUtils.jsonStringToObject(response.body(), MaterialDTO.class);
+        } else {
+            log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }
 
-        log.debug("Got material {} sales org {}", material, salesOrg);
-        return inMemoryCache.get(salesOrg, material);
+        return null;
     }
 
-    private void initiateCacheBuild(String salesOrg, String material) {
-        log.debug("Getting Material data for {}", material);
-        LogicExpression materialExpression = LogicExpression.builder().field(MaterialField.Material).value(material).comparator(LogicComparator.Equal).build();
-        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-        Map<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(materialExpression, LogicOperator.And,
-                salesOrgExpression, LogicOperator.And));
-        String filterQuery = createFilterQuery(queryMap);
-
-        log.debug(String.format("Filter query: %s", filterQuery));
-
-        buildMaterialCache(salesOrg, filterQuery, null, null);
-
-        log.debug("Returning from new cache");
-    }
-
+    @Cacheable(cacheNames = "sapMaterialCache", key = "#salesOrg")
     @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, Integer page, Integer pageSize) {
-        // Get material size count from SAP
-        Integer materialCount = getCountFromSap(salesOrg, null);
-        log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
+    public List<MaterialDTO> getAllMaterialsForSalesOrgBy(String salesOrg, Integer page, Integer pageSize) {
+        log.debug("Material cache not hit");
 
-        if(materialCount != inMemoryCache.size(salesOrg)) {
-            LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-            String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
+        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
+        String filterQuery = createFilterQuery(Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And)));
 
-            MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
+        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
 
-            HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
+        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
 
-            log.debug("Created request: " + request.toString());
+        log.debug("Created request: " + request.toString());
 
-            HttpResponse<String> response = sapHttpClient.getResponse(request);
+        HttpResponse<String> response = sapHttpClient.getResponse(request);
 
-            if (response.statusCode() == HttpStatus.OK.value()) {
-                List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
-                log.debug("MaterialDTOList {}", materialDTOList.size());
-                return materialDTOList;
-            }
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if (response.statusCode() == HttpStatus.OK.value() && StringUtils.contains(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
+            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class); //jsonToMaterialDTO(response);
+
+            return materialDTOList;
+        } else {
+            log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }
 
-        return inMemoryCache.getAllInList(salesOrg);
+        return new ArrayList<>();
     }
 
-    private Integer getCountFromSap(String salesOrg, String zone) {
+    private Integer getCountFromSap(String salesOrg) {
         String countUrl = String.format("%s/%s", materialServiceUrl, "$count");
 
         LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
         LinkedHashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
 
         String filterQuery = createFilterQuery(queryMap);
 
@@ -157,38 +126,13 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         log.debug("Count response: {}", response);
 
-        if(response.statusCode() == HttpStatus.OK.value()) {
+        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
+
+        if(response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
             return Integer.valueOf(response.body());
         }
 
         return -1;
-    }
-
-    private static void includeOrExcludeZonedPricedMaterials(String zone, Map<LogicExpression, LogicOperator> queryMap) {
-        if(StringUtils.isNotBlank(zone)) {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.Equal).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        } else {
-            LogicExpression zoneDifferentiated = LogicExpression.builder().field(MaterialField.SubCategoryDescription).value("Sone differensiert").comparator(LogicComparator.NotEqual).build();
-            queryMap.put(zoneDifferentiated, LogicOperator.And);
-        }
-    }
-
-    @Override
-    public List<MaterialDTO> getAllMaterialsForSalesOrgByZone(String salesOrg, String zone, Integer page, Integer pageSize) {
-        Integer materialCount = getCountFromSap(salesOrg, zone);
-        log.debug("Got amount of materials for sales org: {} amount: {} vs cache {}", salesOrg, materialCount, inMemoryCache.size(salesOrg));
-
-        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-        HashMap<LogicExpression, LogicOperator> queryMap =
-                Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        includeOrExcludeZonedPricedMaterials(zone, queryMap);
-
-        String filterQuery = createFilterQuery(queryMap);
-
-        log.debug("Filter query: {}", filterQuery);
-        return requestSapMaterialService(filterQuery, page, pageSize);
     }
 
     /**
@@ -217,38 +161,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         return new ArrayList<>();
     }
 
-    private void buildMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Building cache");
-
-        updateMaterialCache(salesOrg, filterQuery, page, pageSize);
-    }
-
-    private void updateMaterialCache(String salesOrg, String filterQuery) {
-        log.debug("Got sales org {}, query {}", salesOrg, filterQuery);
-
-        updateMaterialCache(salesOrg, filterQuery, null, null);
-    }
-
-    private void updateMaterialCache(String salesOrg, String filterQuery, Integer page, Integer pageSize) {
-        log.debug("Update material cache with sales org {}", salesOrg);
-
-        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
-
-        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
-
-        log.debug("Created request: " + request.toString());
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
-
-        if(response.statusCode() == HttpStatus.OK.value()) {
-            List<MaterialDTO> materialDTOList = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
-
-            addMaterialsToCache(salesOrg, materialDTOList);
-        } else {
-            log.debug("Response code {}", response.statusCode());
-        }
-    }
-
     private static MultiValueMap<String, String> createParameterMap(String filterQuery, Integer page, Integer pageSize, String format) {
         MultiValueMap<String, String> params = new org.springframework.util.LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
@@ -256,31 +168,21 @@ public class SapMaterialServiceImpl implements SapMaterialService {
             params.add("$format", format);
         }
 
+        if(pageSize != null) {
+            params.add("$top", String.valueOf(pageSize));
+        }
+
         if(page != null && pageSize != null) {
             Integer skipTokens = page * pageSize;
 
             params.add("$skiptoken", String.valueOf(skipTokens));
-            params.add("$top", String.valueOf(pageSize));
         }
         return params;
     }
 
-    private void addMaterialsToCache(String salesOrg, List<MaterialDTO> materialDTOs) {
-        log.debug("Adding {} items to cache.", materialDTOs.size());
-
-        for(MaterialDTO material : materialDTOs) {
-            inMemoryCache.put(salesOrg, material.getMaterial(), material);
-        }
-
-        log.debug("Added {} items to cache.", inMemoryCache.size(salesOrg));
-    }
-
     private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap) {
-        return createFilterQuery(queryMap, "01");
-    }
-
-    private String createFilterQuery(Map<LogicExpression, LogicOperator> queryMap, String distributionChannel) {
-        LogicExpression distributionChannelExpression = LogicExpression.builder().field(MaterialField.DistributionChannel).value(distributionChannel).comparator(LogicComparator.Equal).build();
+        LogicExpression distributionChannelExpression = LogicExpression.builder()
+                .field(MaterialField.DistributionChannel).value(DISTRIBUTION_CHANNEL_DOWN_STREAM).comparator(LogicComparator.Equal).build();
         queryMap.put(distributionChannelExpression, null);
         StringBuilder sb = new StringBuilder();
 
@@ -296,7 +198,7 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     }
 
     private void addLogicOperator(StringBuilder sb, String operator) {
-        if(sb.length() > 0) {
+        if(!sb.isEmpty()) {
             if(StringUtils.endsWith(sb, "'")) {
                 sb.append(String.format(" %s ", operator));
             }

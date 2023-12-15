@@ -17,13 +17,10 @@ import java.util.Optional;
 public class MaterialPriceServiceImpl implements MaterialPriceService {
 
     private final MaterialPriceRepository repository;
-    private final InMemory3DCache<String, String, MaterialPrice> materialPriceCache;
-    
+
     @Autowired
-    public MaterialPriceServiceImpl(MaterialPriceRepository repository,
-                                    @Qualifier("materialPriceCache") InMemory3DCache<String, String, MaterialPrice> materialPriceCache) {
+    public MaterialPriceServiceImpl(MaterialPriceRepository repository) {
         this.repository = repository;
-        this.materialPriceCache = materialPriceCache;
     }
 
     @Override

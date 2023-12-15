@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Bean;
 public class MaterialServicesConfig {
     @Bean
     protected MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository) {
-        return new MaterialPriceServiceImpl(materialPriceRepository, new PingInMemory3DCache<>(5000));
+        return new MaterialPriceServiceImpl(materialPriceRepository);
     }
 
     @Bean

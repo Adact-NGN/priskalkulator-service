@@ -114,7 +114,6 @@ public class PriceOfferController {
     @GetMapping(path = "/list/sales-offices")
     public ResponseEntity<List<PriceOfferListDTO>> listAllBySalesOffice(@RequestParam("offices") String salesOffices,
                                                                         @RequestParam(value = "statuses", required = false) String statuses) {
-
         if(StringUtils.isBlank(salesOffices)) {
             throw new BadRequestException("Missing comma separated list of sales office numbers.");
         }

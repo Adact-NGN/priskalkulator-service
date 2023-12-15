@@ -2,14 +2,14 @@ package no.ding.pk.service.sap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.config.cache.StandardPriceKeyGenerator;
 import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.service.cache.InMemory3DCache;
 import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
-import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import no.ding.pk.web.enums.MaterialField;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,11 +35,14 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@EnableAsync
 @Service
 public class StandardPriceServiceImpl implements StandardPriceService {
     
@@ -43,8 +51,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private final String standardPriceSapUrl;
 
     private final ObjectMapper objectMapper;
-    
-    private final InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache;
 
     private final SapHttpClient sapHttpClient;
 
@@ -53,48 +59,120 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
     private final SalesOrgService salesOrgService;
 
+    private final CacheManager cacheManager;
+    private final String getStdPricesForSalesOfficeAndSalesOrgName = "getStdPricesForSalesOfficeAndSalesOrg";
+    private final String getStdPricesForSalesOfficeAndSalesOrgMapName = "getStdPricesForSalesOfficeAndSalesOrgMap";
+    private final String stdPriceCacheName = "stdPriceCache";
+    private final StandardPriceKeyGenerator standardPriceKeyGenerator;
+    private final SimpleKeyGenerator simpleKeyGenerator;
+
     @Autowired
     public StandardPriceServiceImpl(
             @Value("${sap.api.standard.price.url}")
             String standardPriceSapUrl,
             ObjectMapper objectMapper,
-            @Qualifier("standardPriceInMemoryCache") InMemory3DCache<String, String, MaterialStdPriceDTO> inMemoryCache,
             SapMaterialService sapMaterialService,
             SapHttpClient sapHttpClient,
             @Qualifier("modelMapperV2") ModelMapper modelMapper,
-            SalesOrgService salesOrgService) {
+            SalesOrgService salesOrgService,
+            CacheManager cacheManager) {
         this.standardPriceSapUrl = standardPriceSapUrl;
         this.objectMapper = objectMapper;
-        this.inMemoryCache = inMemoryCache;
         this.sapHttpClient = sapHttpClient;
         this.sapMaterialService = sapMaterialService;
         this.modelMapper = modelMapper;
         this.salesOrgService = salesOrgService;
+
+        this.cacheManager = cacheManager;
+        standardPriceKeyGenerator = new StandardPriceKeyGenerator();
+        simpleKeyGenerator = new SimpleKeyGenerator();
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Async
-//    @Scheduled(cron = "0 1 * * *", zone = "Europe/Paris")
-    public void updateStandardPriceCache() {
-        log.debug("Starting to populate Standard price cache.");
-        List<SalesOrgDTO> salesOrgs = salesOrgService.getAll();
+    @Async("asyncTaskExecutor")
+    @Scheduled(initialDelay = 0L, fixedRate = 60 * 60 * 1000)
+    public void getStandardPricesFromSap() {
+        log.debug("Warming up Standard price cache");
 
-        log.debug("Got all sales organizations: {}", salesOrgs.stream().distinct().count());
-        salesOrgs.stream().distinct().forEach(salesOrgDTO -> {
-            initiateCacheBuild(salesOrgDTO.getSalesOrganization(), salesOrgDTO.getSalesOffice());
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        StopWatch watch = new StopWatch();
+        watch.start();
+        List<MaterialStdPriceDTO> allStandardPrices = getAllStandardPrices();
+        watch.stop();
+        log.debug("Time used to get all standard prices: {} sec", watch.getTime() / 1000);
+
+        Map<String, List<MaterialStdPriceDTO>> collect = new HashMap<>();
+        Map<String, List<MaterialStdPriceDTO>> stdPriceCacheMap = new HashMap<>();
+
+        List<MaterialDTO> materialsForSalesOrgBy = sapMaterialService.getAllMaterialsForSalesOrgBy("100", null, 100000);
+
+        Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(materialsForSalesOrgBy);
+
+        addMaterialDataToStandardPrice(allStandardPrices, materialDTOMap);
+
+        for(MaterialStdPriceDTO stdPriceDTO : allStandardPrices) {
+            Object stdPriceForSalesOfficeAndSalesOrgKey = createCacheKeyForStdPriceList(
+                    stdPriceDTO.getSalesOrg(), stdPriceDTO.getSalesOffice(), stdPriceDTO.getZone()
+            );
+
+            if(!collect.containsKey(stdPriceForSalesOfficeAndSalesOrgKey.toString())) {
+                collect.put(stdPriceForSalesOfficeAndSalesOrgKey.toString(), new ArrayList<>());
             }
-        });
-        log.debug("Finished updating Standard price cache");
-    }
-    
-    @Override
-    public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOffice, String salesOrg, String zone) {
 
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, zone, null);
+            collect.get(stdPriceForSalesOfficeAndSalesOrgKey.toString()).add(stdPriceDTO);
+
+            Object simpleKey = simpleKeyGenerator.generate(null, null, List.of(stdPriceDTO.getSalesOrg(), stdPriceDTO.getSalesOffice(), stdPriceDTO.getMaterial()));
+
+            if(!stdPriceCacheMap.containsKey(stdPriceForSalesOfficeAndSalesOrgKey.toString())) {
+                stdPriceCacheMap.put(simpleKey.toString(), new ArrayList<>());
+            }
+
+            stdPriceCacheMap.get(simpleKey.toString()).add(stdPriceDTO);
+        }
+
+        Cache getStdPricesForSalesOfficeAndSalesOrg = cacheManager.getCache(this.getStdPricesForSalesOfficeAndSalesOrgName);
+        if (getStdPricesForSalesOfficeAndSalesOrg != null) {
+            getStdPricesForSalesOfficeAndSalesOrg.invalidate();
+        }
+        Cache getStdPricesForSalesOfficeAndSalesOrgMap = cacheManager.getCache(this.getStdPricesForSalesOfficeAndSalesOrgMapName);
+        if (getStdPricesForSalesOfficeAndSalesOrgMap != null) {
+            getStdPricesForSalesOfficeAndSalesOrgMap.invalidate();
+        }
+        for (Map.Entry<String, List<MaterialStdPriceDTO>> stringListEntry : collect.entrySet()) {
+            if (getStdPricesForSalesOfficeAndSalesOrg != null) {
+                getStdPricesForSalesOfficeAndSalesOrg.putIfAbsent(stringListEntry.getKey(), stringListEntry.getValue());
+            }
+            if (getStdPricesForSalesOfficeAndSalesOrgMap != null) {
+                getStdPricesForSalesOfficeAndSalesOrgMap.putIfAbsent(stringListEntry.getKey(), stringListEntry.getValue());
+            }
+        }
+
+        Cache stdPriceCache = cacheManager.getCache(this.stdPriceCacheName);
+        if (stdPriceCache != null) {
+            stdPriceCache.invalidate();
+        }
+        for(Map.Entry<String, List<MaterialStdPriceDTO>> stdPriceCacheItem : stdPriceCacheMap.entrySet()) {
+            if (stdPriceCache != null) {
+                stdPriceCache.putIfAbsent(stdPriceCacheItem.getKey(), stdPriceCacheItem.getValue());
+            }
+        }
+
+        log.debug("Standard Price Cache done");
+    }
+
+
+    @Override
+    //@Cacheable(cacheNames = {getStdPricesForSalesOfficeAndSalesOrgName}, keyGenerator = "stdPriceKeyGenerator")
+    public List<MaterialStdPriceDTO> getStdPricesForSalesOfficeAndSalesOrg(String salesOrg, String salesOffice, String zone) {
+        Object cacheKey = createCacheKeyForStdPriceList(salesOrg, salesOffice, zone != null ? zone : "");
+        Cache cache = cacheManager.getCache(getStdPricesForSalesOfficeAndSalesOrgName);
+
+        if(cache != null) {
+            if(cache.get(cacheKey) != null) {
+                log.debug("Cache hit");
+                return (List<MaterialStdPriceDTO>) cache.get(cacheKey).get();
+            }
+        }
+        log.debug("Cache not hit");
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -104,7 +182,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             standardPriceDTOList = filterStdPricesByZone(zone, standardPriceDTOList);
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
+
+            if(allMaterialsForSalesOrg.isEmpty()) {
+                return standardPriceDTOList;
+            }
 
             if(StringUtils.isBlank(zone)) {
                 List<MaterialDTO> nonZonedMaterialsDTO = allMaterialsForSalesOrg.stream().filter(p -> !"Sone differensiert".equals(p.getSubCategoryDescription())).toList();
@@ -117,10 +199,18 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             addMaterialDataToStandardPrice(standardPriceDTOList, materialDTOMap);
 
+            if (cache != null) {
+                cache.putIfAbsent(cacheKey, standardPriceDTOList);
+            }
+
             return standardPriceDTOList;
         }
         
         return new ArrayList<>();
+    }
+
+    private Object createCacheKeyForStdPriceList(String salesOrg, String salesOffice, String zone) {
+        return standardPriceKeyGenerator.generate(null, null, null, Stream.of(salesOrg, salesOffice, zone != null ? zone : "").toList());
     }
 
     private static List<MaterialStdPriceDTO> filterStdPricesByZone(String zone, List<MaterialStdPriceDTO> standardPriceDTOList) {
@@ -129,8 +219,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         if(StringUtils.isNotBlank(zone)) {
             standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isNotBlank(p.getZone()) && p.getZone().equals(zone)).toList();
-        } else {
-            standardPriceDTOList = standardPriceDTOList.stream().filter(p -> StringUtils.isBlank(p.getZone())).toList();
         }
         return standardPriceDTOList;
     }
@@ -150,13 +238,23 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         return materialDTOMap;
     }
-// TODO This must be cached
+
+    //@Cacheable(cacheNames = {getStdPricesForSalesOfficeAndSalesOrgMapName}, keyGenerator = "stdPriceKeyGenerator")
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
 
+        Object cacheKey = createCacheKeyForStdPriceList(salesOffice, salesOrg, zone);
+        Cache cache = cacheManager.getCache(getStdPricesForSalesOfficeAndSalesOrgMapName);
+
+        if(cache != null) {
+            if(cache.get(cacheKey) != null) {
+                return (Map<String, MaterialPrice>) cache.get(cacheKey).get();
+            }
+        }
+
         String formattedZone = getFormattedZone(zone);
         log.debug("Getting standard prices for sales org {}, sales office {}, zone {}", salesOrg, salesOffice, formattedZone);
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, formattedZone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, null, null);
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
         if(response.statusCode() == HttpStatus.OK.value()) {
@@ -178,7 +276,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 return new HashMap<>();
             }
 
-            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgByZone(salesOrg, 0, 5000);
+            List<MaterialDTO> allMaterialsForSalesOrg = sapMaterialService.getAllMaterialsForSalesOrgBy(salesOrg, 0, 5000);
 
             Map<String, MaterialDTO> materialDTOMap = createMaterialDTOMap(allMaterialsForSalesOrg);
 
@@ -186,7 +284,13 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
             List<MaterialPrice> materialPrices = List.of(modelMapper.map(materialStdPriceDTO, MaterialPrice[].class));
 
-            return materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+            Map<String, MaterialPrice> materialPriceMap = materialPrices.stream().collect(Collectors.toMap(MaterialPrice::getUniqueMaterialNumber, Function.identity()));
+
+            if(cache != null) {
+                cache.putIfAbsent(cacheKey, materialPriceMap);
+            }
+
+            return materialPriceMap;
         }
         
         return new HashMap<>();
@@ -196,16 +300,11 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return StringUtils.isNotBlank(zone) ? String.format("0%d", Integer.valueOf(zone)) : null;
     }
 
+    @Cacheable(cacheNames = {getStdPricesForSalesOfficeAndSalesOrgName}, keyGenerator = "stdPriceKeyGenerator")
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceForSalesOrgSalesOfficeAndMaterial(String salesOrg, String salesOffice, String material, String zone) {
 
-        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberCombination(salesOffice, material, zone, null);
-
-        if(inMemoryCache.contains(salesOrg, salesOfficeMaterialNumber)) {
-            return Collections.singletonList(inMemoryCache.get(salesOrg, salesOfficeMaterialNumber));
-        }
-
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, zone, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
@@ -217,11 +316,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             priceDTOS = priceDTOS.stream().filter(materialStdPriceDTO -> materialStdPriceDTO.getSalesOffice().equals(salesOffice) && materialStdPriceDTO.getMaterial().equals(material)).collect(Collectors.toList());
 
             if(!priceDTOS.isEmpty()) {
-                priceDTOS.forEach(materialStdPriceDTO -> {
-                    String combination = createSalesOfficeMaterialNumberCombination(materialStdPriceDTO.getSalesOffice(), materialStdPriceDTO.getMaterial(), materialStdPriceDTO.getZone(), materialStdPriceDTO.getDeviceType());
-
-                    inMemoryCache.put(salesOrg, combination, materialStdPriceDTO);
-                });
                 return priceDTOS;
             }
         }
@@ -231,7 +325,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return new ArrayList<>();
     }
 
-    private String createSalesOfficeMaterialNumberCombination(String salesOffice, String material, String zone, CharSequence deviceType) {
+    private String createSalesOfficeMaterialNumberLookupKey(String salesOffice, String material, String zone, CharSequence deviceType) {
         StringBuilder sb = new StringBuilder();
         sb.append(salesOffice).append("_").append(material);
 
@@ -258,17 +352,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         return sapHttpClient.getResponse(request);
     }
 
-    private void initiateCacheBuild(String salesOrg, String salesOffice) {
-        log.debug("Getting Materials data for sales org {} and sales office {}", salesOrg, salesOffice);
-        String filterQuery = createFilterQuery(salesOffice, salesOrg);
-
-        log.debug(String.format("Filter query: %s", filterQuery));
-
-        buildUpStandardPriceCache(salesOffice, filterQuery);
-
-        log.debug("Returning from new cache");
-    }
-
     private MaterialPrice materialDtoToMaterialPrice(String materialNumber, MaterialStdPriceDTO materialStdPriceDTO) {
         return MaterialPrice.builder(materialStdPriceDTO.getSalesOrg(), materialStdPriceDTO.getSalesOffice(),
                         materialNumber, materialStdPriceDTO.getDeviceType(), materialStdPriceDTO.getZone())
@@ -280,25 +363,12 @@ public class StandardPriceServiceImpl implements StandardPriceService {
                 .quantumUnit(materialStdPriceDTO.getQuantumUnit())
                 .build();
     }
-    
-    private void buildUpStandardPriceCache(String salesOffice, String filterQuery) {
-        HttpResponse<String> response = prepareAndPerformSapRequest(filterQuery);
 
-        log.debug("Response code: {}", response.statusCode());
-        if(response.statusCode() == HttpStatus.OK.value()) {
-            List<MaterialStdPriceDTO> standardPriceDTOList = jsonToMaterialStdPriceDTO(response);
-
-            addMaterialsToCache(salesOffice, standardPriceDTOList);
-        } else {
-            log.debug("Response code was {}", response.statusCode());
-        }
-    }
-    
     private String createFilterQuery(String salesOffice, String salesOrg) {
-        return createFilterQuery(salesOffice, salesOrg, null, null, null);
+        return createFilterQuery(salesOffice, salesOrg, null, null);
     }
     
-    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String zone, String deviceType) {
+    private String createFilterQuery(String salesOffice, String salesOrg, String materialNumber, String deviceType) {
         StringBuilder filterQuery = new StringBuilder();
         filterQuery.append(
                 String.format("%s eq '%s' and %s eq '%s' and %s eq ''",
@@ -309,8 +379,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
 
         addMaterialNumber(materialNumber, filterQuery);
 
-        addOrExcludeZone(zone, filterQuery);
-
         addDeviceType(deviceType, filterQuery, "and %s eq '%s'", MaterialField.DeviceCategory);
         return filterQuery.toString();
     }
@@ -318,16 +386,6 @@ public class StandardPriceServiceImpl implements StandardPriceService {
     private static void addDeviceType(String deviceType, StringBuilder filterQuery, String format, MaterialField deviceCategory) {
         if (StringUtils.isNotBlank(deviceType)) {
             filterQuery.append(String.format(format, deviceCategory.getValue(), deviceType));
-        }
-    }
-
-    private static void addOrExcludeZone(String zoneString, StringBuilder filterQuery) {
-        if(StringUtils.isNotBlank(zoneString)) {
-            Integer zoneNumber = Integer.valueOf(zoneString);
-
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), String.format("0%d", zoneNumber)));
-        } else {
-            filterQuery.append(String.format(" and %s eq '%s'", MaterialField.SalesZone.getValue(), ""));
         }
     }
 
@@ -345,18 +403,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
             throw new Error(e.getMessage(), e);
         }
     }
-    
-    private void addMaterialsToCache(String salesOffice, List<MaterialStdPriceDTO> standardPriceDTOList) {
-        log.debug(String.format("Adding %d items to cache.", standardPriceDTOList.size()));
-        for(MaterialStdPriceDTO material : standardPriceDTOList) {
-            String tempObjectKey = createSalesOfficeMaterialNumberCombination(material.getSalesOffice(), material.getMaterial(), material.getZone(), material.getDeviceType());
 
-            inMemoryCache.put(salesOffice, tempObjectKey, material);
-        }
-        int amountAddedForSalesOffice = inMemoryCache.size(salesOffice);
-        log.debug(String.format("Added %d items to cache.", amountAddedForSalesOffice));
-    }
-    
     private List<MaterialStdPriceDTO> jsonToMaterialStdPriceDTO(HttpResponse<String> response) {
         JSONObject jsonObject = new JSONObject(response.body());
         
@@ -391,24 +438,19 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
     }
 
+    //@Cacheable(stdPriceCacheName)
     @Override
     public List<MaterialStdPriceDTO> getStandardPriceDTO(String salesOrg, String salesOffice, String material) {
 
-        String salesOfficeMaterialNumber = createSalesOfficeMaterialNumberCombination(salesOffice, material, null, null);
-
-        if(inMemoryCache.contains(salesOrg, salesOfficeMaterialNumber)) {
-            return Collections.singletonList(inMemoryCache.get(salesOffice, salesOfficeMaterialNumber));
-        }
-
-        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null, null);
+        String filterQuery = createFilterQuery(salesOffice, salesOrg, material, null);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", filterQuery);
         params.add("$format", "json");
         HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
-        
+
         log.debug("Created request: " + request.toString());
-        
+
         HttpResponse<String> response = sendRequest(request);
 
         log.debug("Response code: {}", response.statusCode());
@@ -417,6 +459,25 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         return new ArrayList<>();
     }
-    
-    
+
+    public List<MaterialStdPriceDTO> getAllStandardPrices() {
+        String filterQuery = "SalesOrganization eq '100'";
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("$filter", filterQuery);
+        params.add("$top", "1000000");
+        params.add("$format", "json");
+
+        HttpRequest request = sapHttpClient.createGetRequest(standardPriceSapUrl, params);
+
+        log.debug("Created request: " + request.toString());
+
+        HttpResponse<String> response = sendRequest(request);
+
+        log.debug("Response code: {}", response.statusCode());
+        if(response.statusCode() == HttpStatus.OK.value()) {
+            return jsonToMaterialStdPriceDTO(response);
+        }
+        return new ArrayList<>();
+    }
 }

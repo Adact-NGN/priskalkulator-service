@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.transaction.Transactional;
@@ -196,26 +195,28 @@ public class PriceRowServiceImpl implements PriceRowService {
         entity.setSubCategoryDescription(materialPriceRow.getSubCategoryDescription());
         entity.setClassId(materialPriceRow.getClassId());
         entity.setClassDescription(materialPriceRow.getClassDescription());
+
         entity.setNeedsApproval(materialPriceRow.getNeedsApproval());
+        entity.setApproved(materialPriceRow.getApproved());
 
         entity = repository.save(entity);
 
         if(materialPriceRow.getMaterial() != null) {
 
-            Material material = getMaterial(salesOrg, salesOffice, materialPriceRow.getMaterial(), materialPrice);
+            Material material = getMaterial(materialPriceRow.getMaterial(), materialPrice);
             log.debug("PriceRow->Material: {}", material);
 
             if(material.getId() == null) {
 
                 log.debug("New Material to create with material number: {}", material.getMaterialNumber());
-                MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrgAndSalesOffice(material.getMaterialNumber(), salesOrg, salesOffice, zone);
+                MaterialDTO sapMaterial = sapMaterialService.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material.getMaterialNumber());
 
                 if(sapMaterial != null) {
                     log.debug("Mapping MaterialDTO: {}", sapMaterial);
                     Material fromSap = modelMapper.map(sapMaterial, Material.class);
                     log.debug("Mapping result: {}", fromSap);
 
-                    updateMaterialWithMaterialPriceValues(materialPriceRow, materialPrice, fromSap);
+                    updateMaterialWithMaterialPriceValues(materialPrice, fromSap);
 
                     material = materialService.save(fromSap);
                 } else {
@@ -228,7 +229,7 @@ public class PriceRowServiceImpl implements PriceRowService {
             } else {
                 log.debug("Adding material to PriceRow: {}", material.getMaterialNumber());
 
-                updateMaterialWithMaterialPriceValues(entity, materialPrice, material);
+                updateMaterialWithMaterialPriceValues(materialPrice, material);
                 material = materialService.save(material);
                 if(entity.getMaterial() == null) {
                     entity.setMaterial(material);
@@ -239,11 +240,14 @@ public class PriceRowServiceImpl implements PriceRowService {
         if(materialPriceRow.getManualPrice() != null) {
             entity.setDiscountedPrice(entity.getManualPrice());
 
-            Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
-            if(discountLevel != null) {
-                entity.setDiscountLevel(discountLevel);
-            } else {
-                log.info("Could not get discount level equivalent for manual price.");
+            if(entity.getDiscountLevel() == null) {
+                Integer discountLevel = getEquivalentDiscountLevel(entity, salesOrg, salesOffice);
+                if (discountLevel != null) {
+                    entity.setDiscountLevel(discountLevel);
+                } else {
+                    log.info("Could not get discount level equivalent for manual price. Setting highest disount level.");
+                    entity.setDiscountLevel(6);
+                }
             }
         } else if(materialPriceRow.getDiscountLevel() != null) {
             entity.setDiscountLevel(materialPriceRow.getDiscountLevel());
@@ -267,7 +271,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return repository.save(entity);
     }
 
-    private void updateMaterialWithMaterialPriceValues(PriceRow materialPriceRow, MaterialPrice materialPrice, Material material) {
+    private void updateMaterialWithMaterialPriceValues(MaterialPrice materialPrice, Material material) {
         if(materialPrice != null) {
             material.setDeviceType(StringUtils.isNotBlank(materialPrice.getDeviceType()) ? materialPrice.getDeviceType() : null);
             material.setQuantumUnit(materialPrice.getQuantumUnit());
@@ -304,24 +308,6 @@ public class PriceRowServiceImpl implements PriceRowService {
             return null;
         }
         return discounts.get(0);
-    }
-
-    private List getMaterials(Material material) {
-        log.debug("Getting material from DB: {}", material);
-        EntityManager em = emFactory.createEntityManager();
-        log.debug("Is material attached: {}", em.contains(material));
-
-        em.getTransaction().begin();
-        List materials;
-
-        if(StringUtils.isNotBlank(material.getDeviceType())) {
-            materials = em.createNamedQuery("findMaterialByMaterialNumberAndDeviceType").setParameter("materialNumber", material.getMaterialNumber()).setParameter("deviceType", material.getDeviceType()).getResultList();
-        } else {
-            materials = em.createNamedQuery("findMaterialByMaterialNumber").setParameter("materialNumber", material.getMaterialNumber()).getResultList();
-        }
-        em.getTransaction().commit();
-        em.close();
-        return materials;
     }
 
     private void calculateDiscountPrice(PriceRow entity, Double currentDiscountedPrice, String salesOrg, String salesOffice, String zone) {
@@ -369,7 +355,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         }
     }
 
-    private Material getMaterial(String salesOrg, String salesOffice, Material material, MaterialPrice materialPrice) {
+    private Material getMaterial(Material material, MaterialPrice materialPrice) {
 
         if(material.getId() != null) {
             log.debug("Material has ID: {}", material.getId());
@@ -388,35 +374,4 @@ public class PriceRowServiceImpl implements PriceRowService {
         return material;
     }
 
-    private void updateMaterial(Material to, Material from) {
-        log.debug("To: {}, from: {}", to, from);
-        to.setDesignation(from.getDesignation());
-        to.setMaterialGroup(from.getMaterialGroup());
-        to.setMaterialGroupDesignation(from.getMaterialGroupDesignation());
-        to.setMaterialType(from.getMaterialType());
-        to.setMaterialTypeDescription(from.getMaterialTypeDescription());
-        to.setDeviceType(from.getDeviceType());
-
-        to.setCurrency(from.getCurrency());
-        to.setPricingUnit(from.getPricingUnit());
-        to.setQuantumUnit(from.getQuantumUnit());
-
-        to.setCategoryId(from.getCategoryId());
-        to.setCategoryDescription(from.getCategoryDescription());
-        to.setSubCategoryId(from.getSubCategoryId());
-        to.setSubCategoryDescription(from.getSubCategoryDescription());
-        to.setClassId(from.getClassId());
-        to.setClassDescription(from.getClassDescription());
-    }
-    
-    private void updateMaterialPrice(MaterialPrice to, MaterialPrice from) {
-        log.debug("To: {}, from: {}", to, from);
-        to.setStandardPrice(from.getStandardPrice());
-        to.setValidFrom(from.getValidFrom());
-        to.setValidTo(from.getValidTo());
-        to.setDeviceType(from.getDeviceType());
-        to.setPricingUnit(from.getPricingUnit());
-        to.setMaterialNumber(from.getMaterialNumber());
-        to.setQuantumUnit(from.getQuantumUnit());
-    }
 }

@@ -30,10 +30,11 @@ public class PriceOfferServiceConfig {
                                                UserService userService,
                                                SalesOfficePowerOfAttorneyService poaService,
                                                CustomerTermsService customerTermsService,
-                                               @Qualifier("modelMapperV2") ModelMapper modelMapper) {
+                                               @Qualifier("modelMapperV2") ModelMapper modelMapper,
+                                               ContactPersonRepository contactPersonRepository) {
         List<Integer> salesOfficeRequiringOwnFaApproverList = new ArrayList<>();
         salesOfficeRequiringOwnFaApproverList.add(100);
-        return new PriceOfferServiceImpl(priceOfferRepository, salesOfficeService, userService, poaService,
+        return new PriceOfferServiceImpl(priceOfferRepository, contactPersonRepository, salesOfficeService, userService, poaService,
                 customerTermsService, modelMapper, salesOfficeRequiringOwnFaApproverList);
     }
 
@@ -51,14 +52,8 @@ public class PriceOfferServiceConfig {
     }
 
     @Bean
-    public InMemory3DCache<String, String, MaterialPrice> materialPriceCache() {
-        return new PingInMemory3DCache<>(5000);
-    }
-
-    @Bean
-    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository,
-                                                     InMemory3DCache<String, String, MaterialPrice> materialPriceCache) {
-        return new MaterialPriceServiceImpl(materialPriceRepository, materialPriceCache);
+    public MaterialPriceService materialPriceService(MaterialPriceRepository materialPriceRepository) {
+        return new MaterialPriceServiceImpl(materialPriceRepository);
     }
 
     @Bean

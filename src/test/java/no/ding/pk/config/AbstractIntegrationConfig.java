@@ -33,6 +33,9 @@ public abstract class AbstractIntegrationConfig {
     private CustomerTermsRepository customerTermsRepository;
 
     @Autowired
+    private ContactPersonRepository contactPersonRepository;
+
+    @Autowired
     private PriceOfferRepository priceOfferRepository;
 
     @Autowired

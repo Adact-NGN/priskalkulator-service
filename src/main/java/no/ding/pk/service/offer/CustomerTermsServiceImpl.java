@@ -2,6 +2,7 @@ package no.ding.pk.service.offer;
 
 import no.ding.pk.domain.offer.CustomerTerms;
 import no.ding.pk.repository.offer.CustomerTermsRepository;
+import no.ding.pk.repository.specifications.CustomerTermsSpecifications;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,11 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
         return newTerm;
     }
 
+    @Override
+    public List<CustomerTerms> findAll() {
+        return repository.findAll();
+    }
+
     private void processPreviousCustomerTerms(String salesOffice, String customerNumber, Date agreementStartDate) {
         List<CustomerTerms> currentCustomerTerms = repository.findAllBySalesOfficeAndCustomerNumber(salesOffice, customerNumber);
 
@@ -78,8 +84,8 @@ public class CustomerTermsServiceImpl implements CustomerTermsService {
     }
 
     @Override
-    public List<CustomerTerms> findAll(String salesOffice, String customerNumber) {
-        return repository.findAll(Specification.where(withSalesOffice(salesOffice).and(withCustomerNumber(customerNumber))));
+    public List<CustomerTerms> findAll(String salesOffice, String customerNumber, List<String> customerTermList) {
+        return repository.findAll(Specification.where(withSalesOffice(salesOffice).and(withCustomerNumber(customerNumber).and(CustomerTermsSpecifications.withCustomerTermsInList(customerTermList)))));
     }
 
     private void invalidatePreviousCustomerTerm(List<CustomerTerms> currentCustomerTerms, Date agreementStartDate) {
