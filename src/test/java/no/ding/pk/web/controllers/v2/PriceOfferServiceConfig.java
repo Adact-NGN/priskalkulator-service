@@ -66,11 +66,10 @@ public class PriceOfferServiceConfig {
             DiscountService discountService,
             PriceRowRepository priceRowRepository,
                                            MaterialService materialService,
-                                           MaterialPriceService materialPriceService,
-                                           EntityManagerFactory emFactory,
+            EntityManagerFactory emFactory,
                                            SapMaterialService sapMaterialService,
                                            @Qualifier("modelMapperV2") ModelMapper modelMapper) {
-        return new PriceRowServiceImpl(discountService, priceRowRepository, materialService, materialPriceService, emFactory,
+        return new PriceRowServiceImpl(discountService, priceRowRepository, materialService, emFactory,
                 sapMaterialService, modelMapper);
     }
 

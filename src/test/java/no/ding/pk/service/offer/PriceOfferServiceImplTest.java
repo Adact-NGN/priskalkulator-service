@@ -107,7 +107,6 @@ class PriceOfferServiceImplTest extends AbstractIntegrationConfig {
                 discountService,
                 getPriceRowRepository(),
                 materialService,
-                materialPriceService,
                 getEmFactory(),
                 sapMaterialService,
                 modelMapper);

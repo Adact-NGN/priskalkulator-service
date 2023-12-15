@@ -150,7 +150,7 @@ public class StandardPriceServiceImpl implements StandardPriceService {
         }
         return materialDTOMap;
     }
-
+// TODO This must be cached
     @Override
     public Map<String, MaterialPrice> getStandardPriceForSalesOrgAndSalesOfficeMap(String salesOrg, String salesOffice, String zone) {
 

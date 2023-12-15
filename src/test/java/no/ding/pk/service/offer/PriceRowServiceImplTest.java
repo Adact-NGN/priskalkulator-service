@@ -63,7 +63,6 @@ public class PriceRowServiceImplTest extends AbstractIntegrationConfig {
                 discountService,
                 priceRowRepository,
                 materialService,
-                materialPriceService,
                 emFactory,
                 sapMaterialService,
                 modelMapper);
