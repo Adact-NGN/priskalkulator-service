@@ -37,4 +37,6 @@ public interface PriceOfferService {
     void updateCustomerNumber(Long id, String customerNumber);
 
     PriceOffer updatePriceOffer(PriceOffer updatedOffer);
+
+    boolean forceDeleteById(Long id);
 }
