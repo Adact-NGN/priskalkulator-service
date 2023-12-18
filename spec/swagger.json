@@ -3732,7 +3732,7 @@
     "/api/v2/price-offer/approval/{approverId}/{priceOfferId}" : {
       "put" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "priceOfferApproval",
+        "summary" : "Approve price offer",
         "operationId" : "priceOfferApprovalUsingPUT",
         "consumes" : [ "application/json" ],
         "produces" : [ "*/*" ],
@@ -3761,7 +3761,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns true if the price offer was able to be approved, else false.",
             "schema" : {
               "type" : "boolean"
             }
@@ -3784,12 +3784,12 @@
     "/api/v2/price-offer/bo-report/ready" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "getPriceOffersReadyForBoReport",
+        "summary" : "Get all price offers ready for BO-report (aka. Price report)",
         "operationId" : "getPriceOffersReadyForBoReportUsingGET",
         "produces" : [ "application/json" ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "List of PriceOfferListDTO objects.",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -3812,7 +3812,7 @@
     "/api/v2/price-offer/create" : {
       "post" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "create",
+        "summary" : "Create a new price offer",
         "operationId" : "createUsingPOST_2",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],
@@ -3827,7 +3827,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Newly created price offer",
             "schema" : {
               "$ref" : "#/definitions/PriceOfferDTO"
             }
@@ -3850,7 +3850,7 @@
     "/api/v2/price-offer/delete/{id}" : {
       "delete" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "delete",
+        "summary" : "Soft delete price offer by id",
         "operationId" : "deleteUsingDELETE_1",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3863,7 +3863,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "True if price offer was set to deleted, else false",
             "schema" : {
               "type" : "boolean"
             }
@@ -3883,7 +3883,7 @@
     "/api/v2/price-offer/force/delete/{id}" : {
       "delete" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "forceDelete",
+        "summary" : "Force delete price offer by id",
         "operationId" : "forceDeleteUsingDELETE",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3896,7 +3896,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "True if price offer was deleted, else false",
             "schema" : {
               "type" : "boolean"
             }
@@ -3916,7 +3916,7 @@
     "/api/v2/price-offer/id/{id}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "getById",
+        "summary" : "Get price offer by id",
         "operationId" : "getByIdUsingGET_1",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3929,7 +3929,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Price offer object if found, else none.",
             "schema" : {
               "$ref" : "#/definitions/PriceOfferDTO"
             }
@@ -3949,7 +3949,7 @@
     "/api/v2/price-offer/list" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "list",
+        "summary" : "Get all price offers",
         "operationId" : "listUsingGET_3",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -3961,7 +3961,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "List of PriceOfferDTOList objects.",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -3984,7 +3984,7 @@
     "/api/v2/price-offer/list/approver/{approverId}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "listByApprover",
+        "summary" : "Find and filter all price offers for approver",
         "operationId" : "listByApproverUsingGET",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -4003,7 +4003,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "Returns a list of PriceOfferList objects.",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -4067,7 +4067,7 @@
     "/api/v2/price-offer/list/{salesEmployeeId}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "listBySalesEmployee",
+        "summary" : "Get all price offers created by sales employee",
         "operationId" : "listBySalesEmployeeUsingGET",
         "produces" : [ "application/json" ],
         "parameters" : [ {
@@ -4086,7 +4086,7 @@
         } ],
         "responses" : {
           "200" : {
-            "description" : "OK",
+            "description" : "List of PriceOfferDTOList objects.",
             "schema" : {
               "type" : "array",
               "items" : {
@@ -4109,7 +4109,7 @@
     "/api/v2/price-offer/save/{id}" : {
       "put" : {
         "tags" : [ "price-offer-controller" ],
-        "summary" : "save",
+        "summary" : "Update price offer",
         "operationId" : "saveUsingPUT_2",
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ],

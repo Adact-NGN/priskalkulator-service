@@ -100,7 +100,7 @@ class PriceOfferControllerIntegrationTest {
 
     @BeforeEach
     public void setup() {
-        PriceOfferController priceOfferController1 = new PriceOfferController(priceOfferService, sopoaService, modelMapper);
+        PriceOfferController priceOfferController1 = new PriceOfferController(priceOfferService, modelMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(priceOfferController1).build();
     }
 
