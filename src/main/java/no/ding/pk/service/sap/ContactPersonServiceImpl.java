@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +23,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+@CacheConfig(cacheNames = "contactPersonCache")
 @Service
 public class ContactPersonServiceImpl implements ContactPersonService {
 
@@ -69,6 +72,7 @@ public class ContactPersonServiceImpl implements ContactPersonService {
         return new ArrayList<>();
     }
 
+    @Cacheable(key = "#contactPersonNumber")
     @Override
     public List<ContactPersonDTO> findContactPersonByNumber(String contactPersonNumber) {
         MultiValueMap<String, String> params = getDefaultParams();

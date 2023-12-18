@@ -1,12 +1,11 @@
 package no.ding.pk.service.sap;
 
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.ding.pk.utils.SapHttpClient;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
+import no.ding.pk.web.enums.SalesOrgField;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,14 +17,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import no.ding.pk.utils.SapHttpClient;
-import no.ding.pk.web.enums.SalesOrgField;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesOrgServiceImpl implements SalesOrgService {
@@ -49,7 +47,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
     }
 
     @Override
-    @Cacheable("salesOrganizationCache")
+    @Cacheable(cacheNames = "salesOrganizationCache")
     public List<SalesOrgDTO> getAll() {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("$filter", "SalesOrganization eq '100'");
@@ -86,6 +84,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         return new ArrayList<>();
     }
 
+    @Cacheable(cacheNames = "salesOrganizationCache", key = "#salesOrg")
     @Override
     public List<SalesOrgDTO> getAllBySalesOrganization(String salesOrg) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -101,6 +100,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         return new ArrayList<>();
     }
 
+    @Cacheable(cacheNames = "salesOrganizationCache", key = "#salesOffice")
     @Override
     public List<SalesOrgDTO> getAllBySalesOffice(String salesOffice) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -116,6 +116,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         return new ArrayList<>();
     }
 
+    @Cacheable(cacheNames = "salesOrganizationCache", key = "#postalCode")
     @Override
     public List<SalesOrgDTO> getAllByPostalNumber(String postalCode) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -131,6 +132,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         return new ArrayList<>();
     }
 
+    @Cacheable(cacheNames = "salesOrganizationCache", key = "#salesZone")
     @Override
     public List<SalesOrgDTO> getAllBySalesZone(String salesZone) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -146,6 +148,7 @@ public class SalesOrgServiceImpl implements SalesOrgService {
         return new ArrayList<>();
     }
 
+    @Cacheable(cacheNames = "salesOrganizationCache", key = "#city")
     @Override
     public List<SalesOrgDTO> getAllByCity(String city) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

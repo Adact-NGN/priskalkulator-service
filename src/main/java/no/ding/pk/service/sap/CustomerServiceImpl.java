@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@CacheConfig(cacheNames = "customerServiceCache")
 @Service
 public class CustomerServiceImpl implements CustomerService {
     
@@ -54,7 +57,9 @@ public class CustomerServiceImpl implements CustomerService {
         this.customerSapServiceUrl = customerSapServiceUrl;
         this.objectMapper = objectMapper;
     }
-    
+
+    @Cacheable()
+    @Override
     public List<CustomerDTO> fetchCustomersJSON(String motherCompany, String customerType, List<String> expansionFields, Integer skipToken) {
         String localMotherCompany = checkString(motherCompany, "");
         
@@ -103,7 +108,9 @@ public class CustomerServiceImpl implements CustomerService {
         
         return new ArrayList<>();
     }
-    
+
+    @Cacheable(key = "{#salesOrg + '_' + #name}")
+    @Override
     public List<CustomerDTO> findCustomersBySalesOrgAndName(String salesOrg, String name) {
         MultiValueMap<String, String> params = getDefaultParams();
         
@@ -118,7 +125,9 @@ public class CustomerServiceImpl implements CustomerService {
         
         return new ArrayList<>();
     }
-    
+
+    @Cacheable(key = "#knr")
+    @Override
     public List<CustomerDTO> findCustomerByCustomerNumber(String knr) {
         MultiValueMap<String, String> params = getDefaultParams();
         params.add("$filter", String.format("Kundenummer eq '%s'", knr));
@@ -132,7 +141,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
         return new ArrayList<>();
     }
-    
+
+    @Cacheable(key = "#salesOrg")
     @Override
     public List<CustomerDTO> findCustomersBySalesOrg(String salesOrg) {
         MultiValueMap<String, String> params = getDefaultParams();
@@ -148,7 +158,8 @@ public class CustomerServiceImpl implements CustomerService {
         
         return new ArrayList<>();
     }
-    
+
+    @Cacheable()
     @Override
     public List<CustomerDTO> searchCustomerBy(String salesOrg, String searchField, String searchString) {
         MultiValueMap<String, String> params = getDefaultParams();
