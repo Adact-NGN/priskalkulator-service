@@ -5,11 +5,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import no.ding.pk.domain.PowerOfAttorney;
-import no.ding.pk.domain.User;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
-import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
@@ -41,18 +38,14 @@ public class PriceOfferController {
     private static final Logger log = LoggerFactory.getLogger(PriceOfferController.class);
     
     private final PriceOfferService service;
-    
-    private final SalesOfficePowerOfAttorneyService sopoaService;
-    
+
     private final ModelMapper modelMapper;
     
     @Autowired
     public PriceOfferController(
             PriceOfferService service,
-            SalesOfficePowerOfAttorneyService sopoaService,
             @Qualifier(value = "modelMapperV2") ModelMapper modelMapper) {
         this.service = service;
-        this.sopoaService = sopoaService;
         this.modelMapper = modelMapper;
     }
     
@@ -61,6 +54,15 @@ public class PriceOfferController {
      * @param statuses list of all price offer with statuses to be inn the list.
      * @return List of price offers, else empty list
      */
+    @Operation(summary = "Get all price offers",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of PriceOfferDTOList objects.")
+    })
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferListDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
 
@@ -84,6 +86,16 @@ public class PriceOfferController {
      * @param salesEmployeeId User id to list price offers for.
      * @return list of price offers connected to sales employee, else empty list.
      */
+    @Operation(summary = "Get all price offers created by sales employee",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesEmployeeId", description = "User id to list price offers for.", required = true),
+                    @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of PriceOfferDTOList objects.")
+    })
     @GetMapping(path = "/list/{salesEmployeeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferListDTO> listBySalesEmployee(@PathVariable("salesEmployeeId") Long salesEmployeeId,
                                                        @RequestParam(value = "statuses", required = false) String statuses) {
@@ -104,10 +116,11 @@ public class PriceOfferController {
     }
 
     @Operation(summary = "List Price offers with filtering by sales office number and by status.",
-    parameters = {
-            @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
-            @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
-    })
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
+                    @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
+            })
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "A list of price offers filtered on sales office numbers and, if given, a list of statuses.")
     })
@@ -138,6 +151,7 @@ public class PriceOfferController {
      * @return true if price offer is updated, else false
      */
     @Operation(summary = "Activate price offer",
+            method = "PUT",
             parameters = {
                     @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by."),
                     @Parameter(name = "priceOfferId", description = "ID for the price offer being activated."),
@@ -169,6 +183,17 @@ public class PriceOfferController {
      * @param approvalRequest Approval status
      * @return True if price offer was successfully approved, else false.
      */
+    @Operation(summary = "Approve price offer",
+            method = "PUT",
+            parameters = {
+            @Parameter(name = "approverId", description = "The user id to the user which is approving this price offer."),
+                    @Parameter(name = "priceOfferId", description = "The id to the price offer to approve.")
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body containing the status to be set and a comment with additional information.", ref = "ApprovalRequest")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns true if the price offer was able to be approved, else false.")
+    })
     @PutMapping(path = "/approval/{approverId}/{priceOfferId}")
     public Boolean priceOfferApproval(@PathVariable("approverId") Long approverId,
                                       @PathVariable("priceOfferId") Long priceOfferId,
@@ -183,11 +208,21 @@ public class PriceOfferController {
      * @param priceOfferStatus price offer status to filter on {@code not required}
      * @return List of price offers for approver
      */
+    @Operation(summary = "Find and filter all price offers for approver",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "approverId", description = "Approver user ID", required = true),
+                    @Parameter(name = "priceOfferStatus", description = "Price offer status to filter on")
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns a list of PriceOfferList objects.")
+    })
     @GetMapping(path = "/list/approver/{approverId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferListDTO> listByApprover(@PathVariable("approverId") Long approverId,
                                               @RequestParam(value = "status", required = false) String priceOfferStatus) {
         List<PriceOffer> priceOffers = service.findAllByApproverIdAndPriceOfferStatus(approverId, priceOfferStatus);
-        
+
         if(!priceOffers.isEmpty()) {
             log.debug("Found price offers, {}, for approver", priceOffers.size());
             PriceOfferDTO[] priceOfferDTOS = modelMapper.map(priceOffers, PriceOfferDTO[].class);
@@ -205,6 +240,12 @@ public class PriceOfferController {
      * @param id price offer id
      * @return Price offer, else null
      */
+    @Operation(summary = "Get price offer by id",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID to price offer to get", required = true)
+            })
+    @ApiResponse(responseCode = "200", description = "Price offer object if found, else none.")
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO getById(@PathVariable("id") Long id) {
         if(id != null) {
@@ -233,6 +274,13 @@ public class PriceOfferController {
      * @return Newly created price offer
      * @throws JsonProcessingException if not real JSON is passed
      */
+    @Operation(summary = "Create a new price offer",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "PriceOfferDTO object with all values to persist.")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Newly created price offer")
+    })
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PriceOfferDTO> create(@RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Got new Price offer object: " + priceOfferDTO);
@@ -259,6 +307,7 @@ public class PriceOfferController {
      * @return Message if the update was successfull.
      */
     @Operation(summary = "Set new status for the price offer by id.",
+            method = "PUT",
             parameters = {
                     @Parameter(name = "id", required = true, description = "ID for price offer to update"),
                     @Parameter(name = "status", required = true, description = "The status to update the price offer with.")
@@ -295,6 +344,8 @@ public class PriceOfferController {
      * @return Updated price offer
      * @throws JsonProcessingException if not real JSON is passed.
      */
+    @Operation(summary = "Update price offer",
+            method = "PUT")
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
@@ -318,35 +369,18 @@ public class PriceOfferController {
         return modelMapper.map(updatedOffer, PriceOfferDTO.class);
     }
 
-    private static List<Integer> collectSalesOfficeNumbers(PriceOffer updatedOffer) {
-        return updatedOffer.getSalesOfficeList().stream().map(salesOffice -> Integer.parseInt(salesOffice.getSalesOffice())).collect(Collectors.toList());
-    }
-
-    private static boolean priceOfferCandidateForApprovalAndIsNotApproved(PriceOffer updatedOffer) {
-        return updatedOffer.getNeedsApproval() && !PriceOfferStatus.isApprovalState(updatedOffer.getPriceOfferStatus());
-    }
-
-    private User getApproverForPriceOffer(List<PowerOfAttorney> poa) {
-        Optional<PowerOfAttorney> findAnyPoaLvl1 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlOneHolder() != null).findAny();
-        
-        if(findAnyPoaLvl1.isPresent()) {
-            PowerOfAttorney lvl1Poa = findAnyPoaLvl1.get();
-            return lvl1Poa.getOrdinaryWasteLvlOneHolder();
-        } else {
-            Optional<PowerOfAttorney> findAnyPoaLvl2 = poa.stream().filter(tmppoa -> tmppoa.getOrdinaryWasteLvlTwoHolder() != null).findAny();
-            
-            if(findAnyPoaLvl2.isPresent()) {
-                return findAnyPoaLvl2.get().getOrdinaryWasteLvlTwoHolder();
-            }
-        }
-        return null;
-    }
-    
     /**
      * Soft deletes price offer by id
      * @param id Price offer id
-     * @return true if deleted, else false
+     * @return true if set to deleted, else false
      */
+    @Operation(summary = "Soft delete price offer by id",
+            method = "DELETE",
+            parameters = {
+                @Parameter(name = "id", description = "ID for Price offer to be soft deleted", required = true)
+            }
+    )
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "True if price offer was set to deleted, else false")})
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);
@@ -360,9 +394,31 @@ public class PriceOfferController {
     }
 
     /**
+     * Force deletes price offer by id
+     * @param id Price offer id
+     * @return true if deleted, else false
+     */
+    @Operation(summary = "Force delete price offer by id",
+            method = "DELETE",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for Price offer to be deleted", required = true)
+            }
+    )
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "True if price offer was deleted, else false")})
+    @DeleteMapping(path = "/force/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean forceDelete(@PathVariable("id") Long id) {
+        log.debug("Force deleting PriceOffer with id: {}", id);
+        return service.forceDeleteById(id);
+    }
+
+    /**
      * Get all price offers ready for BO-report.
      * @return List of all price offers ready for BO-report.
      */
+    @Operation(summary = "Get all price offers ready for BO-report (aka. Price report)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of PriceOfferListDTO objects.")
+    })
     @GetMapping(path = "/bo-report/ready", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferListDTO> getPriceOffersReadyForBoReport() {
         log.debug("Getting all offers ready for BO-report");

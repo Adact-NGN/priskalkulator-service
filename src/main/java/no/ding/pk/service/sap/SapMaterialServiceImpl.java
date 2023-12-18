@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ import org.springframework.util.MultiValueMap;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +33,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
     private final String materialServiceUrl;
     private final SapHttpClient sapHttpClient;
-    private final CacheManager cacheManager;
 
     private final LocalJSONUtils localJSONUtils;
     private final String DISTRIBUTION_CHANNEL_DOWN_STREAM = "01";
@@ -43,10 +40,9 @@ public class SapMaterialServiceImpl implements SapMaterialService {
     @Autowired
     public SapMaterialServiceImpl(@Value(value = "${PK_SAP_API_MATERIAL_URL}") String materialServiceUrl,
                                   SapHttpClient sapHttpClient,
-                                  CacheManager cacheManager, LocalJSONUtils localJSONUtils) {
+                                  LocalJSONUtils localJSONUtils) {
         this.materialServiceUrl = materialServiceUrl;
         this.sapHttpClient = sapHttpClient;
-        this.cacheManager = cacheManager;
         this.localJSONUtils = localJSONUtils;
     }
 
@@ -107,56 +103,6 @@ public class SapMaterialServiceImpl implements SapMaterialService {
         } else {
             log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }
-
-        return new ArrayList<>();
-    }
-
-    private Integer getCountFromSap(String salesOrg) {
-        String countUrl = String.format("%s/%s", materialServiceUrl, "$count");
-
-        LogicExpression salesOrgExpression = LogicExpression.builder().field(MaterialField.SalesOrganization).value(salesOrg).comparator(LogicComparator.Equal).build();
-        LinkedHashMap<LogicExpression, LogicOperator> queryMap = Maps.newLinkedHashMap(ImmutableMap.of(salesOrgExpression, LogicOperator.And));
-
-        String filterQuery = createFilterQuery(queryMap);
-
-        MultiValueMap<String, String> params = createParameterMap(filterQuery, null, null, null);
-
-        HttpRequest request = sapHttpClient.createGetRequest(countUrl, params);
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
-
-        log.debug("Count response: {}", response);
-
-        String headerContentType = response.headers().firstValue(HttpHeaders.CONTENT_TYPE).orElse(null);
-
-        if(response.statusCode() == HttpStatus.OK.value() && StringUtils.equals(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
-            return Integer.valueOf(response.body());
-        }
-
-        return -1;
-    }
-
-    /**
-     * Execute request to SAP Material service with filter query
-     * @param filterQuery filter query
-     * @param page page to start from
-     * @param pageSize amount of elements per page
-     * @return List of MaterialDTO
-     */
-    private List<MaterialDTO> requestSapMaterialService(String filterQuery, Integer page, Integer pageSize) {
-        MultiValueMap<String, String> params = createParameterMap(filterQuery, page, pageSize, "json");
-
-        HttpRequest request = sapHttpClient.createGetRequest(materialServiceUrl, params);
-
-        log.debug("Created request: " + request.toString());
-
-        HttpResponse<String> response = sapHttpClient.getResponse(request);
-
-        if(response.statusCode() == HttpStatus.OK.value()) {
-
-            return localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
-        }
-
-        log.debug("Response code {}", response.statusCode());
 
         return new ArrayList<>();
     }
