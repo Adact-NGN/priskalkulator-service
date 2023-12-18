@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
@@ -55,7 +54,7 @@ class SapMaterialServiceImplTest {
 
         // Setting objectMapper for util class.
         LocalJSONUtils localJSONUtils = new LocalJSONUtils(objectMapper);
-        sapMaterialService = new SapMaterialServiceImpl("rubbish", sapHttpClient, new CaffeineCacheManager(), localJSONUtils);
+        sapMaterialService = new SapMaterialServiceImpl("rubbish", sapHttpClient, localJSONUtils);
     }
 
     @Test

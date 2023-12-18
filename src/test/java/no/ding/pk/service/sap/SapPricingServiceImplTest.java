@@ -70,7 +70,7 @@ class SapPricingServiceImplTest extends AbstractIntegrationConfig {
         standardPriceService = new StandardPriceServiceImpl(standardPriceSapUrl, getObjectMapper(), sapMaterialService,
                 sapHttpClient, modelMapper, salesOrgService, new CaffeineCacheManager());
         String materialServiceUrl = "";
-        sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new CaffeineCacheManager(), new LocalJSONUtils(getObjectMapper()));
+        sapMaterialService = new SapMaterialServiceImpl(materialServiceUrl, sapHttpClient, new LocalJSONUtils(getObjectMapper()));
         materialPriceService = new MaterialPriceServiceImpl(getMaterialPriceRepository());
         materialService = new MaterialServiceImpl(getMaterialRepository(), materialPriceService);
         discountService = new DiscountServiceImpl(getDiscountRepository(), getDiscountLevelRepository());
