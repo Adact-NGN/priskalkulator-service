@@ -43,6 +43,6 @@ jobs:
           PK_MSAL_SECRET: ${{ secrets.PK_MSAL_SECRET }}
           PK_MSAL_SCOPE: ${{ secrets.PK_MSAL_SCOPE }}
           PK_MSAL_AD_USER_INFO_SELECT_LIST: ${{ secrets.PK_MSAL_AD_USER_INFO_SELECT_LIST }}
-        run: mvn -Dspring.profiles.active=$ENVIRONMENT -DskipTests -B package --file pom.xml
+        run: mvn clean -Dspring.profiles.active=$ENVIRONMENT -DskipTests -B package --file pom.xml
 
 
