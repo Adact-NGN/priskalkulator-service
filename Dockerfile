@@ -6,7 +6,7 @@ ARG ENVIRONMENT=dev
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN echo "Building with environment set to: $ENVIRONMENT" | mvn clean package -P$ENVIRONMENT -DskipTests
+RUN echo "Building docker image, environment set to: $ENVIRONMENT" | mvn clean package -P$ENVIRONMENT -DskipTests
 
 #
 # Package stage
