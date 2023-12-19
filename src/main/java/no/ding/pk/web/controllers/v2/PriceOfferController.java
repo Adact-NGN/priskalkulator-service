@@ -387,6 +387,30 @@ public class PriceOfferController {
         return service.delete(id);
     }
 
+    @DeleteMapping(path = "/force/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean forceDelete(@PathVariable("id") Long id) {
+        log.debug("Force deleting PriceOffer with id: {}", id);
+        return service.forceDeleteById(id);
+    }
+
+    /**
+     * Force deletes price offer by id
+     * @param id Price offer id
+     * @return true if deleted, else false
+     */
+    @Operation(summary = "Force delete price offer by id",
+            method = "DELETE",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for Price offer to be deleted", required = true)
+            }
+    )
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "True if price offer was deleted, else false")})
+    @DeleteMapping(path = "/force/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean forceDelete(@PathVariable("id") Long id) {
+        log.debug("Force deleting PriceOffer with id: {}", id);
+        return service.forceDeleteById(id);
+    }
+
     /**
      * Force deletes price offer by id
      * @param id Price offer id
