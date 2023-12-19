@@ -70,7 +70,13 @@ public class SapMaterialServiceImpl implements SapMaterialService {
 
         if (response.statusCode() == HttpStatus.OK.value() && StringUtils.contains(headerContentType, MediaType.APPLICATION_JSON_VALUE)) {
 
-            return localJSONUtils.jsonStringToObject(response.body(), MaterialDTO.class);
+            List<MaterialDTO> materialDTOS = localJSONUtils.jsonToObjects(response.body(), MaterialDTO.class);
+
+            if(materialDTOS.isEmpty()) {
+                throw new RuntimeException("SAP could not find any materials with material number: " + material);
+            }
+
+            return materialDTOS.get(0);
         } else {
             log.debug("Response code was {}, but expected content type did not match. Expected content type is {}, got {}", response.statusCode(), MediaType.APPLICATION_JSON_VALUE, headerContentType);
         }

@@ -1,0 +1,39 @@
+{
+  "@odata.context":"$metadata#Materials",
+  "@odata.metadataEtag":"W/\"20231013093734\"",
+  "value":[
+    {
+      "Material":"150203",
+      "SalesOrganization":"100",
+      "DistributionChannel":"01",
+      "MaterialDescription":"Hvitevarer - andre",
+      "ManufacturerMaterialNumber":"",
+      "MaterialGroup":"1502",
+      "MaterialGroupDescription":"St. hush.apparater",
+      "MaterialType":"ZWAF",
+      "MaterialTypeDescription":"Avfallsmateriale",
+      "AccountingRequirement":"ZI",
+      "MaterialExpired":"",
+      "Volume":0.000,
+      "VolumeUnit":"",
+      "NetWeight":0.000,
+      "WeightUnit":"KG",
+      "Dimensions":"",
+      "Depth":0.000,
+      "Width":0.000,
+      "Height":0.000,
+      "DimensionUnit":"",
+      "MaxLoad":0.000,
+      "MaxLoadUnit":"",
+      "CategoryId":"00300",
+      "CategoryDescription":"Avfall",
+      "SubCategoryId":"0030000190",
+      "SubCategoryDescription":"EE avfall",
+      "ClassId":"",
+      "ClassDescription":"",
+      "LastChangedTimestamp":20231214122602,
+      "LastChangedTime":"13:26:02",
+      "LastChangedDate":"2023-12-14"
+    }
+  ]
+}
