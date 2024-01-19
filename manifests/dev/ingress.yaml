@@ -2,12 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: apimpriskalkulatoringress
+  namespace: priskalkulator-dev
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: api-internal-dev.ngn.no
+      http:
         paths:
           - path: /priskalkulator-dev(/|$)(.*)
             pathType: Prefix
@@ -16,3 +18,7 @@ spec:
                 name: ding-ip-app-pk
                 port:
                   number: 8080
+  tls:
+    - hosts:
+        - api-internal-dev.ngn.no
+      secretName: wildcard-ngn-no
