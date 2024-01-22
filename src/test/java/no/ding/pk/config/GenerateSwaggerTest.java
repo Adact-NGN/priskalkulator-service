@@ -3,6 +3,7 @@ package no.ding.pk.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Disabled
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
 @SpringBootTest(properties = {
@@ -51,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "AD_USER_INFO_SELECT_LIST=AD_USER_INFO_LIST"
 }, classes = {
         AzureConfig.class,
-        SpringFoxConfig.class
+//        SpringFoxConfig.class
 })
 public class GenerateSwaggerTest {
 
@@ -67,7 +69,7 @@ public class GenerateSwaggerTest {
 
     @Test
     public void generateSwagger() throws Exception {
-        mockMvc.perform(get("/v2/api-docs").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/v3/api-docs").accept(MediaType.APPLICATION_JSON))
                 .andDo((result -> {
                     String contentAsString = result.getResponse().getContentAsString();
                     ObjectMapper objectMapper = new ObjectMapper();

@@ -1,5 +1,7 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.web.dto.web.client.SalesRoleDTO;
@@ -74,8 +76,16 @@ public class SalesRoleController {
      * @param salesRole Data to update the SalesRole object with.
      * @return Updated SalesRole object.
      */
+    @Operation(summary = " Update a single SalesRole object",
+            method = "PUT",
+            parameters = {
+                @Parameter(name = "id",
+                        description = "Numeric ID for the SalesRole to get",
+                        required = true
+                )
+            })
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public SalesRoleDTO updateSalesRole(@RequestBody SalesRole salesRole) {
+    public SalesRoleDTO updateSalesRole(@PathVariable("id") Long id, @RequestBody SalesRole salesRole) {
         return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
     }
 

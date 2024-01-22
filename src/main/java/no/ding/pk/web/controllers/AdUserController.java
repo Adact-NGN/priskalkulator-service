@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Ad User Controller", description = "Controller enabling communication with Azure AD.")
 @RestController
 @RequestMapping("/api/ad/users")
 public class AdUserController {

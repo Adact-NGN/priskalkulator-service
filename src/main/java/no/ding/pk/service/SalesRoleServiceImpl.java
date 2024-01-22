@@ -29,7 +29,6 @@ public class SalesRoleServiceImpl implements SalesRoleService {
 
     @Override
     public SalesRole save(SalesRole salesRole) {
-
         return repository.save(salesRole);
     }
 

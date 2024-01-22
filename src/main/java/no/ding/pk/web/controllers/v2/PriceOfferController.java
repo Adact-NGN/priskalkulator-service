@@ -186,7 +186,9 @@ public class PriceOfferController {
     @Operation(summary = "Approve price offer",
             method = "PUT",
             parameters = {
-            @Parameter(name = "approverId", description = "The user id to the user which is approving this price offer."),
+                    @Parameter(name = "approverId",
+                            description = "The user id to the user which is approving this price offer.",
+                            required = true),
                     @Parameter(name = "priceOfferId", description = "The id to the price offer to approve.")
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body containing the status to be set and a comment with additional information.", ref = "ApprovalRequest")
