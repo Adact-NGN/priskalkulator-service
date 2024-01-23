@@ -1,6 +1,7 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * Controller for getting Price offers.
  * @deprecated This controller will be removed in future releases. Use /api/v2/price-offer
  */
+@Tag(name = "Price Offer Controller V1", description = "Controller for handling price offers.")
 @RestController
 @RequestMapping("/api/v1/price-offer")
 public class PriceOfferController {

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.service.UserService;
@@ -26,6 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Arrays;
 import java.util.List;
 
+@Tag(name = "Price Offer Template Controller", description = "Controller for handling price offers templates.")
 @RestController
 @RequestMapping("/api/v1/price-offer-template")
 public class PriceOfferTemplateController {

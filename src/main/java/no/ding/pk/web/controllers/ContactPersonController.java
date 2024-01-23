@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.ContactPersonService;
 import no.ding.pk.web.dto.sap.ContactPersonDTO;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Tag(name = "ContactPersonController", description = "Get contact person for customers from SAP")
 @RestController
 @RequestMapping("/api/contact-person")
 public class ContactPersonController {

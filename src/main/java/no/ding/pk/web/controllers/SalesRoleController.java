@@ -2,6 +2,7 @@ package no.ding.pk.web.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.SalesRole;
 import no.ding.pk.service.SalesRoleService;
 import no.ding.pk.web.dto.web.client.SalesRoleDTO;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Tag(name = "Sales Role Controller", description = "Get sales roles for users")
 @RestController
 @RequestMapping({"/api/sales-role", "/api/v1/sales-role"})
 public class SalesRoleController {

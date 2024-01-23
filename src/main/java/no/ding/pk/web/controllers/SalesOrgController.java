@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.SalesOrgService;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Tag(name = "Sales Organization Controller", description = "Get sales organisation information.")
 @RestController
 @RequestMapping(value = {"/api/salesorg", "/api/v1/salesorg"})
 public class SalesOrgController {

@@ -44,7 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
         return messageConverter;
     }
 
-    @Bean
+    //@Bean
     public OpenAPI api() {
         Server server = new Server().url("https://api-internal-dev.ngn.no/price-calculator-api-dev");
 //        "", "https://api-internal-dev.ngn.no/price-calculator-api-dev", "",

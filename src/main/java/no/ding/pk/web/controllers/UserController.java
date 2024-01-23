@@ -1,6 +1,7 @@
 package no.ding.pk.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Tag(name = "User Controller", description = "Controller for handling application users.")
 @RestController
 @RequestMapping(value = {"/api/users", "/api/v1/users"})
 public class UserController {

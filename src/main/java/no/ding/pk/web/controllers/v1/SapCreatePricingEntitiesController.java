@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.SapPricingService;
 import no.ding.pk.web.dto.sap.pricing.SapCreatePricingEntitiesRequest;
 import no.ding.pk.web.dto.sap.pricing.SapCreatePricingEntitiesResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "Sap Create Pricing Entities Controller", description = "Controller for creating and sending new customer prices to SAP.")
 @RestController
 @RequestMapping("/api/v1/sap-pricing")
 public class SapCreatePricingEntitiesController {

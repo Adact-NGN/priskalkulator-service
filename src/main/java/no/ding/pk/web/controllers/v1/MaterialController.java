@@ -1,6 +1,8 @@
 package no.ding.pk.web.controllers.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.SapMaterialService;
 import no.ding.pk.web.dto.sap.MaterialDTO;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Material Controller", description = "Controller for getting material information from SAP.")
 @RestController
 @RequestMapping("/api/v1/material")
 public class MaterialController {
@@ -32,6 +35,14 @@ public class MaterialController {
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
+    @Operation(summary = "Get Material by sales organization and material number",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales org number. The sales org to get materials for.", required = true),
+                    @Parameter(name = "material", description = "Material number.", required = true),
+            },
+            tags = "CustomerTermsController"
+    )
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public ResponseEntity<MaterialDTO> getMaterialByMaterialNumber(@PathVariable(value = "salesOrg") String salesOrg,
@@ -53,11 +64,19 @@ public class MaterialController {
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
-    @Operation(deprecated = true)
+    @Operation(deprecated = true,
+            description = "Get Material by material number, sales organization and sales office.",
+            parameters = {
+                    @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
+                    @Parameter(name = "salesOffice", required = true, description = "Sales office to get material for."),
+                    @Parameter(name = "material", required = true, description = "Material number to get information for."),
+            },
+            tags = "CustomerTermsController"
+    )
     @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
-                                                                       @PathVariable(value = "salesOffice") String salesOffice,
-                                                                       @PathVariable(value = "material") String material) {
+                                                                 @PathVariable(value = "salesOffice") String salesOffice,
+                                                                 @PathVariable(value = "material") String material) {
         log.debug("Getting material {} for sales organization {} and sales office {}", material, salesOrg, salesOffice);
 
         return service.getMaterialByMaterialNumberAndSalesOrg(salesOrg, material);
@@ -70,6 +89,15 @@ public class MaterialController {
      * @param pageSize How many entries a page can include, default 5000
      * @return List of {@code MaterialDTO}, else empty
      */
+    @Operation(
+            description = "Get all materials for given sales organization number.",
+            parameters = {
+                    @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
+                    @Parameter(name = "page", required = true, description = "Amount of pages to get", allowEmptyValue = true),
+                    @Parameter(name = "pageSize", required = true, description = "Amount for elements per page.", allowEmptyValue = true),
+            },
+            tags = "CustomerTermsController"
+    )
     @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialList(@PathVariable(value = "salesOrg") String salesOrg,
                                              @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -88,6 +116,17 @@ public class MaterialController {
      * @deprecated function is similar to {@code getMaterialList(...)}
      * @return list of Materials with standard price
      */
+    @Operation(
+            description = "Get all materials for given sales organization number.",
+            parameters = {
+                    @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
+                    @Parameter(name = "salesOffice", description = "Sales office to get material for.", deprecated = true),
+                    @Parameter(name = "zone", description = "Zone to get materials for.", deprecated = true),
+                    @Parameter(name = "page", required = true, description = "Amount of pages to get", allowEmptyValue = true),
+                    @Parameter(name = "pageSize", required = true, description = "Amount for elements per page.", allowEmptyValue = true),
+            },
+            tags = "CustomerTermsController"
+    )
     @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialsWithStdPrice(@PathVariable(value = "salesOrg") String salesOrg,
                                                       @PathVariable(value = "salesOffice", required = false) String salesOffice,
@@ -104,6 +143,10 @@ public class MaterialController {
      * NB: This is used by the PriceOfferTemplate page to create templates.
      * @return list of Materials.
      */
+    @Operation(
+            description = "Get a list of all materials for sales org 100.",
+            tags = "CustomerTermsController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MaterialDTO>>  getAllMaterialsForTemplate() {
         log.debug("Getting all materials for PriceOffer Template");

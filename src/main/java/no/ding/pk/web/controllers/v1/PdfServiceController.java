@@ -1,6 +1,7 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.itextpdf.text.DocumentException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.converters.PdfService;
 import no.ding.pk.service.offer.PriceOfferService;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
 
+@Tag(name = "PDF Service Controller", description = "Controller generating PDF's.")
 @RestController
 @RequestMapping(path = "/api/v1/pdf")
 public class PdfServiceController {

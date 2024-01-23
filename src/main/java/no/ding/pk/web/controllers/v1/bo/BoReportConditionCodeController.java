@@ -1,5 +1,8 @@
 package no.ding.pk.web.controllers.v1.bo;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.bo.BoReportCondition;
 import no.ding.pk.domain.bo.ConditionCode;
 import no.ding.pk.domain.bo.KeyCombination;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Tag(name = "BoReportConditionController", description = "Controller for handling Back Office reports.")
 @RestController
 @RequestMapping(path = "/api/v1/bo-report/condition-code")
 public class BoReportConditionCodeController {
@@ -41,6 +45,15 @@ public class BoReportConditionCodeController {
      * Get list of {@code ConditionCodeDTO}
      * @return List of {@code ConditionCodeDTO}
      */
+    @Operation(summary = "Get list of ConditionCodeDTO",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "code",
+                            description = "Code type to get ConditionCodes for."
+                    )
+            },
+            tags = "BoReportConditionController"
+    )
     @GetMapping(path = "/list")
     public List<ConditionCodeDTO> list(@RequestParam(value = "code", required = false) String code) {
         log.debug("Requesting for all title types with key combinations.");
@@ -54,6 +67,15 @@ public class BoReportConditionCodeController {
      * @param conditionCode condition code to look up key combinations for, not required.
      * @return List of all key combinations, else if condition code is given all key combinations related to given code.
      */
+    @Operation(summary = "Get list of KeyCombination based on selected ConditionCode.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "conditionCode",
+                            description = "The condition code to get key combinations for."
+                    )
+            },
+            tags = "BoReportConditionController"
+    )
     @GetMapping(path = "/list/key-combination")
     public List<KeyCombinationDTO> listKeyCombinations(@RequestParam(name = "conditionCode", required = false) String conditionCode) {
         if(StringUtils.isNotBlank(conditionCode)) {
@@ -72,6 +94,15 @@ public class BoReportConditionCodeController {
      * @param priceOfferId price offer id
      * @return Map of condition codes and key combinations
      */
+    @Operation(summary = "Get condition code and key combination suggestion map for all materials in a price offer.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id",
+                            description = "Price offer id."
+                    )
+            },
+            tags = "BoReportConditionController"
+    )
     @GetMapping(path = "/suggestions/price-offer/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Map<String, BoKeyCodeSuggestionDTO>> getSuggestions(@PathVariable("id") Long priceOfferId) {
         Optional<PriceOffer> priceOfferOptional = priceOfferService.findById(priceOfferId);

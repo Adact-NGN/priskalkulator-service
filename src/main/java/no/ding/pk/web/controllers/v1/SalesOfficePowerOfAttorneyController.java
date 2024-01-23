@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
 import no.ding.pk.web.dto.web.client.SalesOfficePowerOfAttorneyDTO;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "Sales Office Power Of Attorney Controller", description = "Controller for handling authorization matrix.")
 @RestController
 @RequestMapping(path = "/api/v1/sales-office-power-of-attorney")
 public class SalesOfficePowerOfAttorneyController {

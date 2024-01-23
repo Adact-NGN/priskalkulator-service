@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.web.dto.sap.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Tag(name = "CustomerController", description = "Get Customer data from SAP")
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {

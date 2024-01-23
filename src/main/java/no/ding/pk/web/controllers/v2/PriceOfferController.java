@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.offer.PriceOfferService;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Tag(name = "Price Offer Controller V2", description = "Controller for handling price offers.")
 @RestController(value = "priceOfferControllerV2")
 @RequestMapping("/api/v2/price-offer")
 public class PriceOfferController {
@@ -58,7 +60,8 @@ public class PriceOfferController {
             method = "GET",
             parameters = {
                     @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
-            }
+            },
+            tags = "priceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of PriceOfferDTOList objects.")

@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.StandardPriceService;
 import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Standard Price Controller", description = "Controller for getting material standard price from SAP.")
 @RestController
 @RequestMapping(value = {"/api/standard-price", "/api/v1/standard-price"})
 public class StandardPriceController {

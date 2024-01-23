@@ -1,5 +1,7 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserAzureAdService;
 import no.ding.pk.service.UserService;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Ad User Controller", description = "Controller enabling communication with Azure AD.")
+@Tag(name = "AdUserController", description = "Controller enabling communication with Azure AD.")
 @RestController
 @RequestMapping("/api/ad/users")
 public class AdUserController {
@@ -41,6 +43,12 @@ public class AdUserController {
      * @param email The e-mail to identify the user in AD.
      * @return UserDTO object if fount in AD, else null.
      */
+    @Operation(summary = "Get User information from AD by user e-mail",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "email", description = "User email to look up.", required = true)
+            },
+            tags = {"AdUserController"})
     @GetMapping(path = "/mail/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getAdUserByMail(@PathVariable("email") String email) {
         log.debug("Starting request to AD for user with email: " + email);
@@ -61,6 +69,12 @@ public class AdUserController {
      * @param email Partial or complete email address to use in the search.
      * @return List of all possible UserDTO object, else empty list of there where no hits.
      */
+    @Operation(summary = "Search for users with partial or complete email address.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "email", description = "Partial or complete email address to use in the search.", required = true)
+            },
+            tags = {"AdUserController"})
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserDTO> searchForUserByEmail(@RequestParam("email") String email) {
         log.debug("Searching for user with email: " + email);

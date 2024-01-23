@@ -1,5 +1,6 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "DiscountController", description = "Get discounts for sales organization")
 @RestController
 @RequestMapping(value = {"/api/discount", "/api/v1/discount"})
 public class DiscountController {
