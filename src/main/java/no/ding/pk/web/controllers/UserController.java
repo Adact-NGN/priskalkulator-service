@@ -1,6 +1,9 @@
 package no.ding.pk.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.User;
 import no.ding.pk.service.UserService;
 import no.ding.pk.web.dto.web.client.UserDTO;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Tag(name = "UserController", description = "Controller for handling application users.")
 @RestController
 @RequestMapping(value = {"/api/users", "/api/v1/users"})
 public class UserController {
@@ -45,6 +49,10 @@ public class UserController {
      * List all users
      * @return A list of all users, else empty.
      */
+    @Operation(description = "List all users.",
+            method = "GET",
+            tags = "UserController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<UserDTO> list() {
         List<User> userList = userService.findAll();
@@ -61,6 +69,11 @@ public class UserController {
      * @param id the user id
      * @return User object if found, else null.
      */
+    @Operation(description = "Get user by id.",
+            method = "GET",
+            parameters = @Parameter(name = "id", description = "ID for user to get", required = true),
+            tags = "UserController"
+    )
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getById(@PathVariable("id") Long id) {
         log.debug("Got id: " + id);
@@ -82,6 +95,11 @@ public class UserController {
      * @param userDTO User DTO object with values
      * @return Newly created User object.
      */
+    @Operation(description = "Create new User object.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "UserDTO", required = true),
+            tags = "UserController"
+    )
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO create(@RequestBody UserDTO userDTO) {
         User tempUser = modelMapper.map(userDTO, User.class);
@@ -106,6 +124,12 @@ public class UserController {
      * @return Updated User object.
      * @throws JsonProcessingException thorwn when proccessing of JSON fails.
      */
+    @Operation(description = "Update existing user with new values.",
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "ID for user to get", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "UserDTO", required = true),
+            tags = "UserController"
+    )
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO save(@PathVariable("id") Long id, @RequestBody UserDTO userDTO) throws JsonProcessingException {
         log.debug("Trying to update a user with id: " + id);
@@ -139,6 +163,11 @@ public class UserController {
      * @param id The User ID for the user to be removed.
      * @return True if User object was found and deleted, else false.
      */
+    @Operation(description = "Delete user by ID",
+            method = "DELETE",
+            parameters = @Parameter(name = "id", description = "ID for user to delete", required = true),
+            tags = "UserController"
+    )
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String delete(@PathVariable("id") Long id) {
         log.debug("Trying to delete user with id: " + id);
@@ -160,6 +189,11 @@ public class UserController {
      * @param email email address to use
      * @return A UserDTO object if any found, else Exception
      */
+    @Operation(description = "Get user by email",
+            method = "GET",
+            parameters = @Parameter(name = "email", description = "User email to lookup with.", required = true),
+            tags = "UserController"
+    )
     @GetMapping(path = "/email/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDTO getUserByEmail(@PathVariable("email") String email) {
         log.debug("Trying to get user by email: {}", email);
@@ -170,6 +204,6 @@ public class UserController {
             return modelMapper.map(byEmail, UserDTO.class);
         }
 
-        throw new UserNotFoundException(String.format("User with email: {} not found.", email));
+        throw new UserNotFoundException(String.format("User with email: %s not found.", email));
     }
 }

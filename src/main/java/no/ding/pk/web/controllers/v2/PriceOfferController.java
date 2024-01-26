@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
 import no.ding.pk.service.offer.PriceOfferService;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Tag(name = "PriceOfferControllerV2", description = "Controller for handling price offers.")
 @RestController(value = "priceOfferControllerV2")
 @RequestMapping("/api/v2/price-offer")
 public class PriceOfferController {
@@ -58,7 +60,8 @@ public class PriceOfferController {
             method = "GET",
             parameters = {
                     @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of PriceOfferDTOList objects.")
@@ -91,7 +94,8 @@ public class PriceOfferController {
             parameters = {
                     @Parameter(name = "salesEmployeeId", description = "User id to list price offers for.", required = true),
                     @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of PriceOfferDTOList objects.")
@@ -120,7 +124,9 @@ public class PriceOfferController {
             parameters = {
                     @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
                     @Parameter(name = "statuses", description = "Comma separated list of price offer status to filter for.", example = "APPROVED,PENDING")
-            })
+            },
+            tags = "PriceOfferControllerV2"
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "A list of price offers filtered on sales office numbers and, if given, a list of statuses.")
     })
@@ -153,10 +159,11 @@ public class PriceOfferController {
     @Operation(summary = "Activate price offer",
             method = "PUT",
             parameters = {
-                    @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by."),
-                    @Parameter(name = "priceOfferId", description = "ID for the price offer being activated."),
+                    @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by.", required = true),
+                    @Parameter(name = "priceOfferId", description = "ID for the price offer being activated.", required = true),
             },
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body must contain updated contract terms. Optionally users can add a general comment to the priceing team.")
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body must contain updated contract terms. Optionally users can add a general comment to the priceing team."),
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns value true or false depending on if the offer was activated or not.")
@@ -186,10 +193,13 @@ public class PriceOfferController {
     @Operation(summary = "Approve price offer",
             method = "PUT",
             parameters = {
-            @Parameter(name = "approverId", description = "The user id to the user which is approving this price offer."),
-                    @Parameter(name = "priceOfferId", description = "The id to the price offer to approve.")
+                    @Parameter(name = "approverId",
+                            description = "The user id to the user which is approving this price offer.",
+                            required = true),
+                    @Parameter(name = "priceOfferId", description = "The id to the price offer to approve.", required = true)
             },
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body containing the status to be set and a comment with additional information.", ref = "ApprovalRequest")
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Request body containing the status to be set and a comment with additional information.", ref = "ApprovalRequest"),
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns true if the price offer was able to be approved, else false.")
@@ -213,7 +223,8 @@ public class PriceOfferController {
             parameters = {
                     @Parameter(name = "approverId", description = "Approver user ID", required = true),
                     @Parameter(name = "priceOfferStatus", description = "Price offer status to filter on")
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns a list of PriceOfferList objects.")
@@ -244,7 +255,8 @@ public class PriceOfferController {
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID to price offer to get", required = true)
-            })
+            },
+            tags = "PriceOfferControllerV2")
     @ApiResponse(responseCode = "200", description = "Price offer object if found, else none.")
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO getById(@PathVariable("id") Long id) {
@@ -276,7 +288,8 @@ public class PriceOfferController {
      */
     @Operation(summary = "Create a new price offer",
             method = "POST",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "PriceOfferDTO object with all values to persist.")
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "PriceOfferDTO object with all values to persist."),
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Newly created price offer")
@@ -311,7 +324,8 @@ public class PriceOfferController {
             parameters = {
                     @Parameter(name = "id", required = true, description = "ID for price offer to update"),
                     @Parameter(name = "status", required = true, description = "The status to update the price offer with.")
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns status OK when status has successfully been updated."),
@@ -345,7 +359,11 @@ public class PriceOfferController {
      * @throws JsonProcessingException if not real JSON is passed.
      */
     @Operation(summary = "Update price offer",
-            method = "PUT")
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "ID for price offer to update", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferDTO"),
+            tags = "PriceOfferControllerV2"
+    )
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferDTO save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) throws JsonProcessingException {
         log.debug("Trying to update price offer with id: {}", id);
@@ -378,7 +396,8 @@ public class PriceOfferController {
             method = "DELETE",
             parameters = {
                 @Parameter(name = "id", description = "ID for Price offer to be soft deleted", required = true)
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({@ApiResponse(responseCode = "200", description = "True if price offer was set to deleted, else false")})
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -396,7 +415,8 @@ public class PriceOfferController {
             method = "DELETE",
             parameters = {
                     @Parameter(name = "id", description = "ID for Price offer to be deleted", required = true)
-            }
+            },
+            tags = "PriceOfferControllerV2"
     )
     @ApiResponses({@ApiResponse(responseCode = "200", description = "True if price offer was deleted, else false")})
     @DeleteMapping(path = "/force/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -409,7 +429,10 @@ public class PriceOfferController {
      * Get all price offers ready for BO-report.
      * @return List of all price offers ready for BO-report.
      */
-    @Operation(summary = "Get all price offers ready for BO-report (aka. Price report)")
+    @Operation(summary = "Get all price offers ready for BO-report (aka. Price report)",
+            method = "GET",
+            tags = "PriceOfferControllerV2"
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of PriceOfferListDTO objects.")
     })

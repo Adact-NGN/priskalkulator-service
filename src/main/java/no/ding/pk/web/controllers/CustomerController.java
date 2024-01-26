@@ -1,5 +1,8 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.CustomerService;
 import no.ding.pk.web.dto.sap.CustomerDTO;
 import no.ding.pk.web.enums.SapCustomerField;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Tag(name = "CustomerController", description = "Get Customer data from SAP")
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
@@ -30,7 +34,7 @@ public class CustomerController {
     
     /**
      * Get all customers by parent company (SalesOrg).
-     * @param parentCompany (<i>Required</i>) Parent company number (SalesOrg number), ex 100
+     * @param parentCompany (<i>Required</i>) Parent company number (SalesOrg number), e.g. 100
      * @param customerType (<i>Optional</i>) Customer type to filter for, ex Node, Betaler etc.
      * @param expand (<i>Optional</i>) Comma separated list of fields in the object to expand.
      * <ul>
@@ -40,6 +44,16 @@ public class CustomerController {
      * @param skipToken (<i>Optional</i>) Amount of items to skip for this request
      * @return List of customer object, else empty list.
      */
+    @Operation(description = "Get all customers by parent company (SalesOrg).",
+          method = "GET",
+            parameters = {
+                    @Parameter(name = "parentCompany", description = "Parent company number (SalesIrg number), e.g. 100", required = true),
+                    @Parameter(name = "customerType", description = "Customer type to filter for, e.g. Node, Betaler etc."),
+                    @Parameter(name = "expand", description = "Comma separated list of fields in the object to expand."),
+                    @Parameter(name = "skipToken", description = "Amount of items to skip for this request.")
+            },
+            tags = "CustomerController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> fetchAllCustomers(
     @RequestParam(value = "parentCompany") String parentCompany,
@@ -70,6 +84,11 @@ public class CustomerController {
      * @param knr Customer number to search for.
      * @return List with single customer object, else empty list.
      */
+    @Operation(description = "Get customer by customer number.",
+            method = "GET",
+            parameters = @Parameter(name = "knr", description = "Customer number to search for.", required = true),
+            tags = "CustomerController"
+    )
     @GetMapping(path = "/{knr}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> getCustomerByCustomerNumber(@PathVariable("knr") String knr) {
         log.debug("Request received with params: knr=" + knr);
@@ -82,6 +101,14 @@ public class CustomerController {
      * @param searchString Search string containing either part of the customer number or name
      * @return List of customer object, else empty list
      */
+    @Operation(description = "Search for customer by partial name or number.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Which sales organization to search in.", required = true),
+                    @Parameter(name = "searchString", description = "Search string containing either part of the customer number or name.")
+            },
+            tags = "CustomerController"
+    )
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CustomerDTO> searchForCustomer(@RequestParam("salesOrg") String salesOrg, @RequestParam("searchString") String searchString) {
         log.debug(String.format("Getting search request with salesOrg: '%s' and searchString: '%s'", salesOrg, searchString));

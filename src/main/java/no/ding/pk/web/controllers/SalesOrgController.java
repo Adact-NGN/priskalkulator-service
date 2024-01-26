@@ -1,5 +1,8 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.SalesOrgService;
 import no.ding.pk.web.dto.sap.SalesOrgDTO;
 import no.ding.pk.web.dto.v1.web.client.ZoneDTO;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+@Tag(name = "SalesOrganizationController", description = "Get sales organisation information.")
 @RestController
 @RequestMapping(value = {"/api/salesorg", "/api/v1/salesorg"})
 public class SalesOrgController {
@@ -31,13 +35,17 @@ public class SalesOrgController {
      * Gets all sales organizations
      * @return List of sales organizations, else empty list
      */
+    @Operation(description = "Get all sales organizations.",
+            method = "GET",
+            tags = "SalesOrganizationController"
+    )
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesOrgDTO> getAll() {
         return service.getAll();
     }
 
     /**
-     * Search for Sales oraganization by different parameters
+     * Search for Sales organization by different parameters
      * @param salesOrg number value for sales organization
      * @param salesOffice number value for sales office
      * @param postalCode number value for postal number
@@ -46,6 +54,19 @@ public class SalesOrgController {
      * @param greedy whether to use greedy or un-greedy query, 'or' or 'and'. Default greedy (true): or
      * @return List of sales organizations, else empty list
      */
+    @Operation(description = "Search for Sales organization by different parameters",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100"),
+                    @Parameter(name = "salesOffice", description = "Sales office number. E.g. 104"),
+                    @Parameter(name = "postalCode", description = "postal code number. E.g. 0100"),
+                    @Parameter(name = "salesZone", description = "Sales zone number. E.g. 3"),
+                    @Parameter(name = "city", description = "Sales organization number. E.g. oslo"),
+                    @Parameter(name = "skiptokens", description = "Amount of items to skip. E.g. 0 for no skip, 100 to skip 100 items. Default 0"),
+                    @Parameter(name = "greedy", description = "Whether to use greedy or un-greedy query, 'or' or 'and'. Default greedy (true): or"),
+            },
+            tags = "SalesOrganizationController"
+    )
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesOrgDTO> findByRequestParams(
             @RequestParam(name = "salesOrg", required = false) String salesOrg,
@@ -138,6 +159,15 @@ public class SalesOrgController {
      * @param postalCode Set postal code to get the standard zone.
      * @return A list of ZoneDTO, else empty list
      */
+    @Operation(description = "Get all zones for a Sales office",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization for too look into.", deprecated = true),
+                    @Parameter(name = "salesOffice", description = "Sales office number to look up zones for.", required = true),
+                    @Parameter(name = "postalCode", description = "Set postal code to get the standard zone.")
+            },
+            tags = "SalesOrgController"
+    )
     @GetMapping(path = "/{salesOrg}/{salesOffice}/zones", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ZoneDTO> getZonesForSalesOffice(
             @PathVariable("salesOrg") String salesOrg,

@@ -1,49 +1,51 @@
 package no.ding.pk.config;
 
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
-import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
-import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.Server;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import java.util.ArrayList;
 
+//@EnableSwagger2
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
-        return new BeanPostProcessor() {
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("no.ding.pk.web.controllers"))
+                .paths(PathSelectors.any())
+                .build()
+                .servers(serverInfoMetaData())
+                .apiInfo(apiInfoMetaData());
 
-            @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (bean instanceof WebMvcRequestHandlerProvider || bean instanceof WebFluxRequestHandlerProvider) {
-                    customizeSpringfoxHandlerMappings(getHandlerMappings(bean));
-                }
-                return bean;
-            }
+    }
 
-            private <T extends RequestMappingInfoHandlerMapping> void customizeSpringfoxHandlerMappings(List<T> mappings) {
-                List<T> copy = mappings.stream()
-                        .filter(mapping -> mapping.getPatternParser() == null)
-                        .toList();
-                mappings.clear();
-                mappings.addAll(copy);
-            }
+    private Server serverInfoMetaData() {
+        return new Server(
+                "Priskalkulator Service APIM server",
+                "https://api-internal-dev.ngn.no/price-calculator-api-dev",
+                "",
+                new ArrayList<>(),
+                new ArrayList<>());
+    }
 
-            @SuppressWarnings("unchecked")
-            private List<RequestMappingInfoHandlerMapping> getHandlerMappings(Object bean) {
-                try {
-                    Field field = ReflectionUtils.findField(bean.getClass(), "handlerMappings");
-                    field.setAccessible(true);
-                    return (List<RequestMappingInfoHandlerMapping>) field.get(bean);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        };
+    private ApiInfo apiInfoMetaData() {
+
+        return new ApiInfoBuilder().title("Priskalkulator Service API")
+                .description("Service API for Priskalkulator, connecting the web application with SAP and other services.")
+                .contact(new Contact("priceteam", "https://github.com/Adact-NGN/priskalkulator-service", "kjetil.torvund.minde@ngn.com"))
+                .license("Apache 2.0")
+                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
+                .version("1.0.0")
+
+                .build();
     }
 }

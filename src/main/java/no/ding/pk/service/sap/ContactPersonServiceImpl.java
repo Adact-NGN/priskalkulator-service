@@ -67,7 +67,7 @@ public class ContactPersonServiceImpl implements ContactPersonService {
             return responseToContactPersonsDTOList(response);
         }
 
-        log.debug(String.format("Requsting ContactPerson resulting in bad response: %d", response.statusCode()));
+        log.debug(String.format("Requesting ContactPerson resulting in bad response: %d", response.statusCode()));
 
         return new ArrayList<>();
     }
