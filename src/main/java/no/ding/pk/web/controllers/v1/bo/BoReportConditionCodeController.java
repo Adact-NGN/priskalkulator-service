@@ -98,7 +98,7 @@ public class BoReportConditionCodeController {
             method = "GET",
             parameters = {
                     @Parameter(name = "id",
-                            description = "Price offer id."
+                            description = "Price offer id.", required = true
                     )
             },
             tags = "BoReportConditionController"

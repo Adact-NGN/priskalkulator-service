@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Tag(name = "Sales Role Controller", description = "Get sales roles for users")
+@Tag(name = "SalesRoleController", description = "Get sales roles for users")
 @RestController
 @RequestMapping({"/api/sales-role", "/api/v1/sales-role"})
 public class SalesRoleController {
@@ -44,6 +44,10 @@ public class SalesRoleController {
      * Get a list of Sales Roles.
      * @return A list of SalesRoles.
      */
+    @Operation(description = "Get a list of Sales roles.",
+            method = "GET",
+            tags = "SalesRoleController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> getSalesRoleList() {
         log.debug("Getting Sales Role list");
@@ -58,6 +62,11 @@ public class SalesRoleController {
      * @param salesRole Data for SalesRole
      * @return Newly created SalesRole object.
      */
+    @Operation(description = "Create new Sales role.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesRoleDTO"),
+            tags = "SalesRoleController"
+    )
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesRoleDTO saveSalesRole(@RequestBody SalesRole salesRole) {
         return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
@@ -68,6 +77,11 @@ public class SalesRoleController {
      * @param salesRoles List of objects with data for new SalesRole objects.
      * @return A list of all the newly created SalesRole objects.
      */
+    @Operation(description = "Create a list of Sales roles.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesRoleDTO"),
+            tags = "SalesRoleController"
+    )
     @PostMapping(path = "/batch", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> saveBatchSalesRole(@RequestBody List<SalesRole> salesRoles) {
         return service.saveAll(salesRoles).stream().map(mapToDTO()).collect(Collectors.toList());
@@ -85,7 +99,8 @@ public class SalesRoleController {
                         description = "Numeric ID for the SalesRole to get",
                         required = true
                 )
-            })
+            },
+            tags = "SalesRoleController")
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesRoleDTO updateSalesRole(@PathVariable("id") Long id, @RequestBody SalesRole salesRole) {
         return modelMapper.map(service.save(salesRole), SalesRoleDTO.class);
@@ -96,6 +111,11 @@ public class SalesRoleController {
      * @param userId The ID to identify the user with.
      * @return A list of SalesRoles connected to the user.
      */
+    @Operation(description = "Get all SalesRole object connected to a user.",
+            method = "GET",
+            parameters = @Parameter(name = "userId", description = "ID for user to get sales roles for.", required = true),
+            tags = "SalesRoleController"
+    )
     @GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesRoleDTO> getSalesRoleForUser(@PathVariable("userId") Long userId) {
         return service.findSalesRoleForUser(userId).stream().map(mapToDTO()).collect(Collectors.toList());

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Material Controller", description = "Controller for getting material information from SAP.")
+@Tag(name = "MaterialController", description = "Controller for getting material information from SAP.")
 @RestController
 @RequestMapping("/api/v1/material")
 public class MaterialController {
@@ -41,7 +41,7 @@ public class MaterialController {
                     @Parameter(name = "salesOrg", description = "Sales org number. The sales org to get materials for.", required = true),
                     @Parameter(name = "material", description = "Material number.", required = true),
             },
-            tags = "CustomerTermsController"
+            tags = "MaterialController"
     )
     @GetMapping(path = "/{salesOrg}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasAuthority('SCOPE_Sales')")
@@ -71,7 +71,7 @@ public class MaterialController {
                     @Parameter(name = "salesOffice", required = true, description = "Sales office to get material for."),
                     @Parameter(name = "material", required = true, description = "Material number to get information for."),
             },
-            tags = "CustomerTermsController"
+            tags = "MaterialController"
     )
     @GetMapping(path = "/{salesOrg}/{salesOffice}/{material}", produces = MediaType.APPLICATION_JSON_VALUE)
     public MaterialDTO getMaterialByMaterialNumberAndSalesOffice(@PathVariable(value = "salesOrg") String salesOrg,
@@ -96,7 +96,7 @@ public class MaterialController {
                     @Parameter(name = "page", required = true, description = "Amount of pages to get", allowEmptyValue = true),
                     @Parameter(name = "pageSize", required = true, description = "Amount for elements per page.", allowEmptyValue = true),
             },
-            tags = "CustomerTermsController"
+            tags = "MaterialController"
     )
     @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialList(@PathVariable(value = "salesOrg") String salesOrg,
@@ -125,7 +125,7 @@ public class MaterialController {
                     @Parameter(name = "page", required = true, description = "Amount of pages to get", allowEmptyValue = true),
                     @Parameter(name = "pageSize", required = true, description = "Amount for elements per page.", allowEmptyValue = true),
             },
-            tags = "CustomerTermsController"
+            tags = "MaterialController"
     )
     @GetMapping(path = "/list/{salesOrg}/{salesOffice}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MaterialDTO> getMaterialsWithStdPrice(@PathVariable(value = "salesOrg") String salesOrg,
@@ -145,7 +145,7 @@ public class MaterialController {
      */
     @Operation(
             description = "Get a list of all materials for sales org 100.",
-            tags = "CustomerTermsController"
+            tags = "MaterialController"
     )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MaterialDTO>>  getAllMaterialsForTemplate() {

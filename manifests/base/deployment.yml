@@ -8,7 +8,7 @@ metadata:
     tier: backend
 spec:
   progressDeadlineSeconds: 3600
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ding-ip-app-pk
@@ -29,10 +29,10 @@ spec:
               name: ding-ip-app-pk-dev-secrets
           resources:
             requests:
-              memory: "1Gi"
+              #memory: "1Gi"
               cpu: "50m"
             limits:
 #              cpu: "500m"
-              memory: "1Gi"
+              #memory: "1Gi"
           ports:
             - containerPort: 8080

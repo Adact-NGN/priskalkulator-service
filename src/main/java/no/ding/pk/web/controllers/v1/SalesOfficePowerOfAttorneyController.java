@@ -1,5 +1,9 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.PowerOfAttorney;
 import no.ding.pk.service.SalesOfficePowerOfAttorneyService;
@@ -21,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "Sales Office Power Of Attorney Controller", description = "Controller for handling authorization matrix.")
+@Tag(name = "SalesOfficePowerOfAttorneyController", description = "Controller for handling authorization matrix.")
 @RestController
 @RequestMapping(path = "/api/v1/sales-office-power-of-attorney")
 public class SalesOfficePowerOfAttorneyController {
@@ -42,6 +46,16 @@ public class SalesOfficePowerOfAttorneyController {
      * @param id power of attorney id
      * @return {@code SalesOfficePowerOfAttorneyDTO} object
      */
+    @Operation(description = "Get power of attorney by ID",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for power of attorney",required = true)
+            },
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "ID for power of attorney", ref = "SalesOfficePowerOfAttorneyDTO")
+    })
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO byId(@PathVariable("id") Long id) {
         log.debug("Getting entity for id {}", id);
@@ -60,6 +74,16 @@ public class SalesOfficePowerOfAttorneyController {
      * @param salesOfficeNumber Sales office number to look up
      * @return SalesOffice object or null
      */
+    @Operation(description = "Get power of attorney by sales office number",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOfficeNubmer", description = "Sales office number to look up", required = true)
+            },
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sales office object or null", ref = "SalesOfficePowerOfAttorneyDTO")
+    })
     @GetMapping(path = "/office/{salesOfficeNumber}")
     public SalesOfficePowerOfAttorneyDTO bySalesOfficeNumber(@PathVariable("salesOfficeNumber") Integer salesOfficeNumber) {
 
@@ -78,6 +102,13 @@ public class SalesOfficePowerOfAttorneyController {
      * Get all power og attorney objects
      * @return List of {@code SalesOfficePowerOfAttorneyDTO}
      */
+    @Operation(description = "Get all power of attorneys",
+            method = "GET",
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of power of attorney objects", ref = "SalesOfficePowerOfAttorneyDTO")
+    })
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<SalesOfficePowerOfAttorneyDTO> list() {
         log.debug("Received request for all PowerOfAttorneys");
@@ -91,6 +122,13 @@ public class SalesOfficePowerOfAttorneyController {
      * @param sopa {@code SalesOfficePowerOfAttorneyDTO} power of attorney values
      * @return Newlye persisted power of attorney as {@code SalesOfficePowerOfAttorneyDTO}
      */
+    @Operation(description = "Create new power of attorney",
+            method = "POST",
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sales office object or null", ref = "SalesOfficePowerOfAttorneyDTO")
+    })
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO create(@RequestBody SalesOfficePowerOfAttorneyDTO sopa) {
         log.debug("Creating new Power of Attorney");
@@ -108,6 +146,12 @@ public class SalesOfficePowerOfAttorneyController {
      * @param sopoaDTO Updated power of attorney object.
      * @return {@code SalesOfficePowerOfAttorneyDTO} Updated power of attorney object
      */
+    @Operation(description = "Update power of attorney object",
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "ID for sales office to update"),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesOfficePowerOfAttorneyDTO", required = true),
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
     @PutMapping(path = "/save/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public SalesOfficePowerOfAttorneyDTO save(@PathVariable("id") Long id, @RequestBody SalesOfficePowerOfAttorneyDTO sopoaDTO) {
         log.debug("Trying to update poa with id {}", id);
@@ -128,6 +172,11 @@ public class SalesOfficePowerOfAttorneyController {
      * @param id Power of attorney id to delete
      * @return true if deleted, else false
      */
+    @Operation(description = "Delete power of attorney by id",
+            method = "DELETE",
+            parameters = @Parameter(name = "id", description = "ID for power of attorney to delete"),
+            tags = "SalesOfficePowerOfAttorneyController"
+    )
     @DeleteMapping(path = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Trying to delete entity with id {}", id);

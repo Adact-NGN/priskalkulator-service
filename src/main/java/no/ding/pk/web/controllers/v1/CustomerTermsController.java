@@ -99,10 +99,6 @@ public class CustomerTermsController {
      */
     @Operation(summary = "Create new CustomerTerms object.",
             method = "POST",
-            parameters = {
-                    @Parameter(name = "salesOffice", description = "Sales offices to filter for."),
-                    @Parameter(name = "customerNumber", description = "Customer number to filter for."),
-            },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, ref = "CustomerTermsDTO"),
             tags = "CustomerTermsController"
     )
@@ -137,7 +133,7 @@ public class CustomerTermsController {
     @Operation(summary = "Update existing customer terms with new values.",
             method = "PUT",
             parameters = {
-                    @Parameter(name = "id", description = "Existing customer terms ID."),
+                    @Parameter(name = "id", description = "Existing customer terms ID.", required = true),
             },
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, ref = "CustomerTermsDTO"),
             tags = "CustomerTermsController"

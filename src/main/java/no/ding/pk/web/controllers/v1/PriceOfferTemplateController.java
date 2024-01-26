@@ -27,13 +27,13 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Arrays;
 import java.util.List;
 
-@Tag(name = "Price Offer Template Controller", description = "Controller for handling price offers templates.")
+@Tag(name = "PriceOfferTemplateController", description = "Controller for handling price offers templates.")
 @RestController
 @RequestMapping("/api/v1/price-offer-template")
 public class PriceOfferTemplateController {
 
     private static final Logger log = LoggerFactory.getLogger(PriceOfferTemplateController.class);
-    
+
     private final PriceOfferTemplateService service;
     private final UserService userService;
     private final ModelMapper modelMapper;
@@ -51,6 +51,13 @@ public class PriceOfferTemplateController {
      * List all Price offer templates.
      * @return A list of PriceOfferTemplates
      */
+    @Operation(description = "List all Price offer templates",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "user", description = "User name to filter the templates by.")
+            },
+            tags = "PriceOfferTemplateController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferTemplateDTO> getAllTemplates(@RequestParam(value = "user", required = false) String userEmail) {
 
@@ -68,7 +75,9 @@ public class PriceOfferTemplateController {
      * @return A list of PriceOfferTemplates
      */
     @Operation(summary = "List all price offer templates shared with user by email",
-            parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")})
+            method = "GET",
+            parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")},
+            tags = "PriceOfferTemplateController")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns a list of shared price offer templates")
     })
@@ -84,7 +93,16 @@ public class PriceOfferTemplateController {
      * @param id the id for the template
      * @return PriceOfferTemplate
      */
-    @Operation(summary = "Get a specific price offer template")
+    @Operation(summary = "Get a specific price offer template",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for price offer template to get.", required = true)
+            },
+            tags = "PriceOfferTemplateController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Price offer template", ref = "PriceOfferTempalteDTO")
+    })
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO getTemplateById(@PathVariable("id") Long id) {
         return modelMapper.map(service.findById(id), PriceOfferTemplateDTO.class);
@@ -96,7 +114,10 @@ public class PriceOfferTemplateController {
      * @return Newly created PriceOfferTemplate object.
      */
     @Operation(summary = "Create a new price offer template",
-            description = "Creates a new price offer template with the given request body.")
+            method = "POST",
+            description = "Creates a new price offer template with the given request body.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
+            tags = "PriceOfferTemplateController")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns newly created price offer template"),
             @ApiResponse(responseCode = "400", description = "Bad request, missing name for template.")
@@ -141,8 +162,11 @@ public class PriceOfferTemplateController {
      * @return Updated PriceOfferTemplate object.
      */
     @Operation(description = "Update existing price offer template with new values.",
-    summary = "Update price offer template",
-            parameters = @Parameter(name = "id", description = "Price offer templates id", required = true)
+            method = "PUT",
+            summary = "Update price offer template",
+            parameters = @Parameter(name = "id", description = "Price offer templates id", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
+            tags = "PriceOfferTemplateController"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Updated price offer template")
