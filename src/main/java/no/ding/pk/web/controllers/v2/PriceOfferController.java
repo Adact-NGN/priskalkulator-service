@@ -83,6 +83,19 @@ public class PriceOfferController {
         
         return new ArrayList<>();
     }
+
+    @Operation(summary = "PriceOffer get all extended objects")
+    @GetMapping(path = "/list/extended")
+    public ResponseEntity<List<PriceOfferDTO>> listExtendedObjects(@RequestParam(value = "statuses", required = false) String statuses) {
+        log.debug("Getting list of extended price offers");
+        if(StringUtils.isNotBlank(statuses)) {
+            List<String> statusList = Arrays.stream(statuses.split(",")).toList();
+            List<PriceOfferDTO> priceOfferDTOS = service.findAllByPriceOfferStatusInList(statusList).stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList());
+            return ResponseEntity.ok(priceOfferDTOS);
+        }
+
+        return ResponseEntity.ok(service.findAll().stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList()));
+    }
     
     /**
      * Get all price offers created by sales employee
