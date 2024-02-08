@@ -35,7 +35,7 @@ public class MaterialController {
      * @param material The material number
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
-    @Operation(summary = "Get Material by sales organization and material number",
+    @Operation(summary = "Material - Get Material by sales organization and material number",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales org number. The sales org to get materials for.", required = true),
@@ -65,6 +65,7 @@ public class MaterialController {
      * @return {@code MaterialDTO} if material is found, else empty object.
      */
     @Operation(deprecated = true,
+            summary = "Material - Get material by material number, sales org and sales office",
             description = "Get Material by material number, sales organization and sales office.",
             parameters = {
                     @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
@@ -89,7 +90,7 @@ public class MaterialController {
      * @param pageSize How many entries a page can include, default 5000
      * @return List of {@code MaterialDTO}, else empty
      */
-    @Operation(
+    @Operation(summary = "Material - Get all materials for given sales org",
             description = "Get all materials for given sales organization number.",
             parameters = {
                     @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
@@ -116,7 +117,7 @@ public class MaterialController {
      * @deprecated function is similar to {@code getMaterialList(...)}
      * @return list of Materials with standard price
      */
-    @Operation(
+    @Operation(summary = "Material - Get all materrials for given sales org",
             description = "Get all materials for given sales organization number.",
             parameters = {
                     @Parameter(name = "salesOrg", required = true, description = "Sales org to get material for."),
@@ -143,7 +144,7 @@ public class MaterialController {
      * NB: This is used by the PriceOfferTemplate page to create templates.
      * @return list of Materials.
      */
-    @Operation(
+    @Operation(summary = "Material - Get all for sales org 100",
             description = "Get a list of all materials for sales org 100.",
             tags = "MaterialController"
     )

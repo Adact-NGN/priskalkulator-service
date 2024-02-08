@@ -6,14 +6,9 @@ metadata:
   name: priskalkulator-ingress
   namespace: priskalkulator-prod
 spec:
-  defaultBackend:
-    service:
-      name: ding-ip-app-pk
-      port:
-        number: 8080
   ingressClassName: nginx
   rules:
-    - host: priskalkulator.ngn.no
+    - host: api.ngn.no
       http:
         paths:
           - backend:
@@ -21,9 +16,8 @@ spec:
                 name: ding-ip-app-pk
                 port:
                   number: 8080
-            path: /service(/|$)(.*)
+            path: /priskalkulator-prod(/|$)(.*)
             pathType: Prefix
   tls:
     - hosts:
-        - priskalkulator.ngn.no
-      secretName: wildcard-ngn-no
+        - api.ngn.no

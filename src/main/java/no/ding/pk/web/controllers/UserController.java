@@ -49,7 +49,9 @@ public class UserController {
      * List all users
      * @return A list of all users, else empty.
      */
-    @Operation(description = "List all users.",
+    @Operation(
+            summary = "User - Get list of users",
+            description = "List all users.",
             method = "GET",
             tags = "UserController"
     )
@@ -69,7 +71,9 @@ public class UserController {
      * @param id the user id
      * @return User object if found, else null.
      */
-    @Operation(description = "Get user by id.",
+    @Operation(
+            summary = "User - Get user by ID",
+            description = "Get user by id.",
             method = "GET",
             parameters = @Parameter(name = "id", description = "ID for user to get", required = true),
             tags = "UserController"
@@ -95,7 +99,9 @@ public class UserController {
      * @param userDTO User DTO object with values
      * @return Newly created User object.
      */
-    @Operation(description = "Create new User object.",
+    @Operation(
+            summary = "User - Create user",
+            description = "Create new User object.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "UserDTO", required = true),
             tags = "UserController"
@@ -124,7 +130,9 @@ public class UserController {
      * @return Updated User object.
      * @throws JsonProcessingException thorwn when proccessing of JSON fails.
      */
-    @Operation(description = "Update existing user with new values.",
+    @Operation(
+            summary = "User - Update user",
+            description = "Update existing user with new values.",
             method = "PUT",
             parameters = @Parameter(name = "id", description = "ID for user to get", required = true),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "UserDTO", required = true),
@@ -163,7 +171,9 @@ public class UserController {
      * @param id The User ID for the user to be removed.
      * @return True if User object was found and deleted, else false.
      */
-    @Operation(description = "Delete user by ID",
+    @Operation(
+            summary = "User - Delete user by ID",
+            description = "Delete user by ID",
             method = "DELETE",
             parameters = @Parameter(name = "id", description = "ID for user to delete", required = true),
             tags = "UserController"
@@ -189,7 +199,9 @@ public class UserController {
      * @param email email address to use
      * @return A UserDTO object if any found, else Exception
      */
-    @Operation(description = "Get user by email",
+    @Operation(
+            summary = "User - Get by email",
+            description = "Get user by email",
             method = "GET",
             parameters = @Parameter(name = "email", description = "User email to lookup with.", required = true),
             tags = "UserController"

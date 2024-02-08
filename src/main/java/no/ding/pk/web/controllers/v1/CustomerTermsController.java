@@ -47,7 +47,7 @@ public class CustomerTermsController {
      * @param customerNumber customer number to filter for, { {@code @required}  false } .
      * @return List of {@code CustomerTermsDTO}
      */
-    @Operation(summary = "Get list of CustomerTermsDTO",
+    @Operation(summary = "CustomerTerms - Get list of CustomerTermsDTO",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOffice", description = "Comma separated list of sales offices to filter for."),
@@ -76,13 +76,13 @@ public class CustomerTermsController {
      * @param customerNumber Customer number to filter for
      * @return List of {@code CustomerTermsDTO}
      */
-    @Operation(summary = "Get list of all active CustomerTermsDTO for sales office and customer number",
+    @Operation(summary = "CustomerTerms - Get list of all active CustomerTermsDTO for sales office and customer number",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOffice", description = "Sales offices to filter for."),
                     @Parameter(name = "customerNumber", description = "Customer number to filter for."),
             },
-            tags = "CustomerTermsController"
+            tags = {"CustomerTermsController"}
     )
     @GetMapping("/list/active")
     public List<CustomerTermsDTO> listAllActive(@RequestParam(name = "salesOffice", required = false) String salesOffice,
@@ -97,7 +97,7 @@ public class CustomerTermsController {
      * @param customerTermsDTO Customer terms object tot persist.
      * @return Newly persisted customer terms as {@code CustomerTermsDTO}
      */
-    @Operation(summary = "Create new CustomerTerms object.",
+    @Operation(summary = "CustomerTerms - Create new CustomerTerms object.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, ref = "CustomerTermsDTO"),
             tags = "CustomerTermsController"
@@ -130,7 +130,7 @@ public class CustomerTermsController {
      * @param customerTermsDTO updated customer terms values.
      * @return updated customer terms as {@code CustomerTermsDTO}
      */
-    @Operation(summary = "Update existing customer terms with new values.",
+    @Operation(summary = "CustomerTerms - Update existing customer terms with new values.",
             method = "PUT",
             parameters = {
                     @Parameter(name = "id", description = "Existing customer terms ID.", required = true),

@@ -37,7 +37,9 @@ public class DiscountLevelController {
      * @param zone           Zone to get discount for
      * @return A list with all the discount levels returned for the criteria given, else empty list.
      */
-    @Operation(description = "Get discount level for a specific material which  belongs to a given material. The material resides under a sales organization and sales office.",
+    @Operation(
+            summary = "DiscountLevel - Get discount level for material",
+            description = "Get discount level for a specific material which  belongs to a given material. The material resides under a sales organization and sales office.",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100", required = true),
@@ -67,7 +69,9 @@ public class DiscountLevelController {
      * @param zone           Specify for which zone to get discount levels for.
      * @return A list of all the discount levels for one or multiple materials, else empty list.
      */
-    @Operation(description = "Get a list of discount levels for a specific material or a list of material numbers.",
+    @Operation(
+            summary = "DiscountLevel - Get list of discounts for materials",
+            description = "Get a list of discount levels for a specific material or a list of material numbers.",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100", required = true),
@@ -92,7 +96,9 @@ public class DiscountLevelController {
      * @param discountLevel New values for the DiscountLevel object.
      * @return The updated DiscountLevel object.
      */
-    @Operation(description = "Update existing DiscountLevel object.",
+    @Operation(
+            summary = "DiscountLevel - Update discount level",
+            description = "Update existing DiscountLevel object.",
             method = "PUT",
             parameters = @Parameter(name = "id", description = "ID for the object to update.", required = true),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "DiscountLevel"),

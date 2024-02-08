@@ -46,7 +46,8 @@ public class SalesOfficePowerOfAttorneyController {
      * @param id power of attorney id
      * @return {@code SalesOfficePowerOfAttorneyDTO} object
      */
-    @Operation(description = "Get power of attorney by ID",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Get sopoa by ID",
+            description = "Get power of attorney by ID",
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID for power of attorney",required = true)
@@ -74,7 +75,8 @@ public class SalesOfficePowerOfAttorneyController {
      * @param salesOfficeNumber Sales office number to look up
      * @return SalesOffice object or null
      */
-    @Operation(description = "Get power of attorney by sales office number",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Get by sales office",
+            description = "Get power of attorney by sales office number",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOfficeNubmer", description = "Sales office number to look up", required = true)
@@ -102,7 +104,8 @@ public class SalesOfficePowerOfAttorneyController {
      * Get all power og attorney objects
      * @return List of {@code SalesOfficePowerOfAttorneyDTO}
      */
-    @Operation(description = "Get all power of attorneys",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Get all sopoa",
+            description = "Get all power of attorneys",
             method = "GET",
             tags = "SalesOfficePowerOfAttorneyController"
     )
@@ -122,7 +125,8 @@ public class SalesOfficePowerOfAttorneyController {
      * @param sopa {@code SalesOfficePowerOfAttorneyDTO} power of attorney values
      * @return Newlye persisted power of attorney as {@code SalesOfficePowerOfAttorneyDTO}
      */
-    @Operation(description = "Create new power of attorney",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Create new",
+            description = "Create new power of attorney",
             method = "POST",
             tags = "SalesOfficePowerOfAttorneyController"
     )
@@ -146,7 +150,8 @@ public class SalesOfficePowerOfAttorneyController {
      * @param sopoaDTO Updated power of attorney object.
      * @return {@code SalesOfficePowerOfAttorneyDTO} Updated power of attorney object
      */
-    @Operation(description = "Update power of attorney object",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Update sopoa",
+            description = "Update power of attorney object",
             method = "PUT",
             parameters = @Parameter(name = "id", description = "ID for sales office to update"),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesOfficePowerOfAttorneyDTO", required = true),
@@ -172,7 +177,8 @@ public class SalesOfficePowerOfAttorneyController {
      * @param id Power of attorney id to delete
      * @return true if deleted, else false
      */
-    @Operation(description = "Delete power of attorney by id",
+    @Operation(summary = "SalesOfficePowerOfAttorney - Delete sopoa",
+            description = "Delete power of attorney by id",
             method = "DELETE",
             parameters = @Parameter(name = "id", description = "ID for power of attorney to delete"),
             tags = "SalesOfficePowerOfAttorneyController"

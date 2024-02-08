@@ -43,7 +43,7 @@ public class AdUserController {
      * @param email The e-mail to identify the user in AD.
      * @return UserDTO object if fount in AD, else null.
      */
-    @Operation(summary = "Get User information from AD by user e-mail",
+    @Operation(summary = "AdUser - Get User information from AD by user e-mail",
             method = "GET",
             parameters = {
                     @Parameter(name = "email", description = "User email to look up.", required = true)
@@ -69,7 +69,7 @@ public class AdUserController {
      * @param email Partial or complete email address to use in the search.
      * @return List of all possible UserDTO object, else empty list of there where no hits.
      */
-    @Operation(summary = "Search for users with partial or complete email address.",
+    @Operation(summary = "AdUser - Search for users with partial or complete email address.",
             method = "GET",
             parameters = {
                     @Parameter(name = "email", description = "Partial or complete email address to use in the search.", required = true)
@@ -85,10 +85,8 @@ public class AdUserController {
 
         List<User> users = userService.findByEmailInList(adUserEmails);
 
-        adUsers.forEach(adUser -> {
-            users.stream().filter(user -> user.getEmail().equals(adUser.getEmail())).findFirst()
-                    .ifPresent(filteredUser -> adUser.setSalesRole(filteredUser.getSalesRole()));
-        });
+        adUsers.forEach(adUser -> users.stream().filter(user -> user.getEmail().equals(adUser.getEmail())).findFirst()
+                .ifPresent(filteredUser -> adUser.setSalesRole(filteredUser.getSalesRole())));
 
         return mapperService.toUserDTOList(adUsers);
     }

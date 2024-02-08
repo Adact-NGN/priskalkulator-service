@@ -44,7 +44,8 @@ public class CustomerController {
      * @param skipToken (<i>Optional</i>) Amount of items to skip for this request
      * @return List of customer object, else empty list.
      */
-    @Operation(description = "Get all customers by parent company (SalesOrg).",
+    @Operation(summary = "Customer - Get all customers by parent company (Sales org)",
+            description = "Get all customers by parent company (SalesOrg).",
           method = "GET",
             parameters = {
                     @Parameter(name = "parentCompany", description = "Parent company number (SalesIrg number), e.g. 100", required = true),
@@ -84,7 +85,9 @@ public class CustomerController {
      * @param knr Customer number to search for.
      * @return List with single customer object, else empty list.
      */
-    @Operation(description = "Get customer by customer number.",
+    @Operation(
+            summary = "Customer - Get customer by customer number",
+            description = "Get customer by customer number.",
             method = "GET",
             parameters = @Parameter(name = "knr", description = "Customer number to search for.", required = true),
             tags = "CustomerController"
@@ -101,7 +104,9 @@ public class CustomerController {
      * @param searchString Search string containing either part of the customer number or name
      * @return List of customer object, else empty list
      */
-    @Operation(description = "Search for customer by partial name or number.",
+    @Operation(
+            summary = "Customer - Search for customer",
+            description = "Search for customer by partial name or number.",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Which sales organization to search in.", required = true),

@@ -36,7 +36,7 @@ public class PriceOfferController {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PriceOfferController(ObjectMapper objectMapper, PriceOfferService service, ModelMapper modelMapper) {
+    public PriceOfferController(PriceOfferService service, ModelMapper modelMapper) {
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -45,7 +45,8 @@ public class PriceOfferController {
      * List all {@code PriceOffer}
      * @return List of {@code PriceOffer}
      */
-    @Operation(description = "List all Price offers",
+    @Operation(summary = "PriceOffer - Get all price offers",
+            description = "List all Price offers",
             method = "GET",
             tags = "PriceOfferControllerV1"
     )
@@ -66,7 +67,8 @@ public class PriceOfferController {
      * @param id for entity to get.
      * @return PriceOffer object, else empty if not found
      */
-    @Operation(description = "Get Price offer by ID",
+    @Operation(summary = "PriceOffer - Get price offer by ID",
+            description = "Get Price offer by ID",
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID for PriceOffer to get", required = true)
@@ -95,7 +97,9 @@ public class PriceOfferController {
      * @param priceOfferDTO The {@code PriceOffer} to create
      * @return Newly created {@code PriceOffer}
      */
-    @Operation(description = "Create a new PriceOffer",
+    @Operation(
+            summary = "PriceOffer - Create new PriceOffer",
+            description = "Create a new PriceOffer",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferDTO"),
             tags = "PriceOfferControllerV1"
@@ -126,7 +130,8 @@ public class PriceOfferController {
      * @param priceOfferDTO updated {@code PriceOffer} object
      * @return Updated {@code PriceOffer}
      */
-    @Operation(description = "Create a new PriceOffer",
+    @Operation(summary = "PriceOffer - Update PriceOffer",
+            description = "Update a PriceOffer",
             method = "PUT",
             parameters = {
                     @Parameter(name = "id", description = "ID for PriceOffer to update.", required = true)
@@ -167,7 +172,8 @@ public class PriceOfferController {
      * @param id The id for the {@code PriceOffer} to delete
      * @return {@code true} if successful, else {@code false}
      */
-    @Operation(description = "Delete PriceOffer by ID",
+    @Operation(summary = "PriceOffer - Delete PriceOffer",
+            description = "Delete PriceOffer by ID",
             method = "DELETE",
             parameters = {
                     @Parameter(name = "id", description = "ID for PriceOffer to delete", required = true)

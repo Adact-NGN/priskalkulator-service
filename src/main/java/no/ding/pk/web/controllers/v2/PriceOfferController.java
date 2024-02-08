@@ -71,7 +71,7 @@ public class PriceOfferController {
      * @param statuses list of all price offer with statuses to be inn the list.
      * @return List of price offers, else empty list
      */
-    @Operation(summary = "Get all price offers",
+    @Operation(summary = "PriceOfferList - Get all price offers",
             method = "GET",
             parameters = {
                     @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
@@ -100,7 +100,7 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
-    @Operation(summary = "PriceOffer get all extended objects",
+    @Operation(summary = "PriceOffer - Get all extended objects",
             method = "GET",
             parameters = {
             @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
@@ -176,7 +176,7 @@ public class PriceOfferController {
      * @param salesEmployeeId User id to list price offers for.
      * @return list of price offers connected to sales employee, else empty list.
      */
-    @Operation(summary = "Get all price offers created by sales employee",
+    @Operation(summary = "PriceOfferList - Get all price offers created by sales employee",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesEmployeeId", description = "User id to list price offers for.", required = true),
@@ -206,7 +206,7 @@ public class PriceOfferController {
         return new ArrayList<>();
     }
 
-    @Operation(summary = "List Price offers with filtering by sales office number and by status.",
+    @Operation(summary = "PriceOfferList - List Price offers with filtering by sales office number and by status.",
             method = "GET",
             parameters = {
                     @Parameter(name = "offices", required = true, description = "Comma separated list of sales office numbers", example = "100,101,102"),
@@ -243,7 +243,7 @@ public class PriceOfferController {
      * @param activatePriceOfferRequest request object with completed customer terms to be added to the price offer.
      * @return true if price offer is updated, else false
      */
-    @Operation(summary = "Activate price offer",
+    @Operation(summary = "PriceOffer - Activate price offer",
             method = "PUT",
             parameters = {
                     @Parameter(name = "activatedById", description = "ID of the user the offer is being activated by.", required = true),
@@ -277,7 +277,7 @@ public class PriceOfferController {
      * @param approvalRequest Approval status
      * @return True if price offer was successfully approved, else false.
      */
-    @Operation(summary = "Approve price offer",
+    @Operation(summary = "PriceOffer - Approve price offer",
             method = "PUT",
             parameters = {
                     @Parameter(name = "approverId",
@@ -305,7 +305,7 @@ public class PriceOfferController {
      * @param priceOfferStatus price offer status to filter on {@code not required}
      * @return List of price offers for approver
      */
-    @Operation(summary = "Find and filter all price offers for approver",
+    @Operation(summary = "PriceOffer - Find and filter all price offers for approver",
             method = "GET",
             parameters = {
                     @Parameter(name = "approverId", description = "Approver user ID", required = true),
@@ -338,7 +338,7 @@ public class PriceOfferController {
      * @param id price offer id
      * @return Price offer, else null
      */
-    @Operation(summary = "Get price offer by id",
+    @Operation(summary = "PriceOffer - Get price offer by id",
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID to price offer to get", required = true)
@@ -373,7 +373,7 @@ public class PriceOfferController {
      * @return Newly created price offer
      * @throws JsonProcessingException if not real JSON is passed
      */
-    @Operation(summary = "Create a new price offer",
+    @Operation(summary = "PriceOffer - Create a new price offer",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "PriceOfferDTO object with all values to persist."),
             tags = "PriceOfferControllerV2"
@@ -406,7 +406,7 @@ public class PriceOfferController {
      * @param status the new status to set
      * @return Message if the update was successfull.
      */
-    @Operation(summary = "Set new status for the price offer by id.",
+    @Operation(summary = "PriceOffer - Set new status for the price offer by id.",
             method = "PUT",
             parameters = {
                     @Parameter(name = "id", required = true, description = "ID for price offer to update"),
@@ -445,7 +445,7 @@ public class PriceOfferController {
      * @return Updated price offer
      * @throws JsonProcessingException if not real JSON is passed.
      */
-    @Operation(summary = "Update price offer",
+    @Operation(summary = "PriceOffer - Update price offer",
             method = "PUT",
             parameters = @Parameter(name = "id", description = "ID for price offer to update", required = true),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferDTO"),
@@ -479,7 +479,7 @@ public class PriceOfferController {
      * @param id Price offer id
      * @return true if set to deleted, else false
      */
-    @Operation(summary = "Soft delete price offer by id",
+    @Operation(summary = "PriceOffer - Soft delete price offer by id",
             method = "DELETE",
             parameters = {
                 @Parameter(name = "id", description = "ID for Price offer to be soft deleted", required = true)
@@ -498,7 +498,7 @@ public class PriceOfferController {
      * @param id Price offer id
      * @return true if deleted, else false
      */
-    @Operation(summary = "Force delete price offer by id",
+    @Operation(summary = "PriceOffer - Force delete price offer by id",
             method = "DELETE",
             parameters = {
                     @Parameter(name = "id", description = "ID for Price offer to be deleted", required = true)
@@ -516,7 +516,7 @@ public class PriceOfferController {
      * Get all price offers ready for BO-report.
      * @return List of all price offers ready for BO-report.
      */
-    @Operation(summary = "Get all price offers ready for BO-report (aka. Price report)",
+    @Operation(summary = "PriceOfferList - Get all price offers ready for BO-report (aka. Price report)",
             method = "GET",
             tags = "PriceOfferControllerV2"
     )

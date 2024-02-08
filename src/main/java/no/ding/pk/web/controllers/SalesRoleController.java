@@ -44,7 +44,9 @@ public class SalesRoleController {
      * Get a list of Sales Roles.
      * @return A list of SalesRoles.
      */
-    @Operation(description = "Get a list of Sales roles.",
+    @Operation(
+            summary = "SalesRole - Get all sales roles",
+            description = "Get a list of Sales roles.",
             method = "GET",
             tags = "SalesRoleController"
     )
@@ -62,7 +64,9 @@ public class SalesRoleController {
      * @param salesRole Data for SalesRole
      * @return Newly created SalesRole object.
      */
-    @Operation(description = "Create new Sales role.",
+    @Operation(
+            summary = "SalesRole - Create sales role",
+            description = "Create new Sales role.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesRoleDTO"),
             tags = "SalesRoleController"
@@ -77,7 +81,9 @@ public class SalesRoleController {
      * @param salesRoles List of objects with data for new SalesRole objects.
      * @return A list of all the newly created SalesRole objects.
      */
-    @Operation(description = "Create a list of Sales roles.",
+    @Operation(
+            summary = "SalesRole - Create a list of sales roles.",
+            description = "Create a list of Sales roles.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SalesRoleDTO"),
             tags = "SalesRoleController"
@@ -92,7 +98,8 @@ public class SalesRoleController {
      * @param salesRole Data to update the SalesRole object with.
      * @return Updated SalesRole object.
      */
-    @Operation(summary = " Update a single SalesRole object",
+    @Operation(
+            summary = "SalesRole - Update a single SalesRole object",
             method = "PUT",
             parameters = {
                 @Parameter(name = "id",
@@ -111,7 +118,9 @@ public class SalesRoleController {
      * @param userId The ID to identify the user with.
      * @return A list of SalesRoles connected to the user.
      */
-    @Operation(description = "Get all SalesRole object connected to a user.",
+    @Operation(
+            summary = "SalesRole - Get all sales roles for a user.",
+            description = "SalesRole Get all SalesRole object connected to a user.",
             method = "GET",
             parameters = @Parameter(name = "userId", description = "ID for user to get sales roles for.", required = true),
             tags = "SalesRoleController"

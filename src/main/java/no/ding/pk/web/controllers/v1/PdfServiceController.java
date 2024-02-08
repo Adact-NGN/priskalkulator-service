@@ -43,7 +43,7 @@ public class PdfServiceController {
         this.templateService = templateService;
     }
 
-    @Operation(summary = "Create PDF from request body.",
+    @Operation(summary = "PDF - Create PDF from request body.",
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID for Price offer to get.", required = true),

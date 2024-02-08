@@ -51,7 +51,8 @@ public class PriceOfferTemplateController {
      * List all Price offer templates.
      * @return A list of PriceOfferTemplates
      */
-    @Operation(description = "List all Price offer templates",
+    @Operation(summary = "PriceOfferTemplate - List all Price offer templates",
+            description = "List all Price offer templates",
             method = "GET",
             parameters = {
                     @Parameter(name = "user", description = "User name to filter the templates by.")
@@ -74,7 +75,7 @@ public class PriceOfferTemplateController {
      * @param sharedWithEmail User email
      * @return A list of PriceOfferTemplates
      */
-    @Operation(summary = "List all price offer templates shared with user by email",
+    @Operation(summary = "PriceOfferTemplate - List all price offer templates shared with user by email",
             method = "GET",
             parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")},
             tags = "PriceOfferTemplateController")
@@ -93,7 +94,7 @@ public class PriceOfferTemplateController {
      * @param id the id for the template
      * @return PriceOfferTemplate
      */
-    @Operation(summary = "Get a specific price offer template",
+    @Operation(summary = "PriceOfferTemplate - Get a specific price offer template",
             method = "GET",
             parameters = {
                     @Parameter(name = "id", description = "ID for price offer template to get.", required = true)
@@ -113,7 +114,7 @@ public class PriceOfferTemplateController {
      * @param newTemplateDto the object
      * @return Newly created PriceOfferTemplate object.
      */
-    @Operation(summary = "Create a new price offer template",
+    @Operation(summary = "PriceOfferTemplate - Create a new price offer template",
             method = "POST",
             description = "Creates a new price offer template with the given request body.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
@@ -161,9 +162,9 @@ public class PriceOfferTemplateController {
      * @param priceOfferTemplateDto object with updated values.
      * @return Updated PriceOfferTemplate object.
      */
-    @Operation(description = "Update existing price offer template with new values.",
+    @Operation(summary = "PriceOfferTemplate - Update PriceOfferTemplate",
+            description = "Update existing price offer template with new values.",
             method = "PUT",
-            summary = "Update price offer template",
             parameters = @Parameter(name = "id", description = "Price offer templates id", required = true),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
             tags = "PriceOfferTemplateController"

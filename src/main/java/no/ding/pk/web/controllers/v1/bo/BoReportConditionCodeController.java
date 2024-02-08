@@ -45,7 +45,7 @@ public class BoReportConditionCodeController {
      * Get list of {@code ConditionCodeDTO}
      * @return List of {@code ConditionCodeDTO}
      */
-    @Operation(summary = "Get list of ConditionCodeDTO",
+    @Operation(summary = "BoReport - Get list of ConditionCodeDTO",
             method = "GET",
             parameters = {
                     @Parameter(name = "code",
@@ -67,7 +67,7 @@ public class BoReportConditionCodeController {
      * @param conditionCode condition code to look up key combinations for, not required.
      * @return List of all key combinations, else if condition code is given all key combinations related to given code.
      */
-    @Operation(summary = "Get list of KeyCombination based on selected ConditionCode.",
+    @Operation(summary = "BoReport - Get list of KeyCombination based on selected ConditionCode.",
             method = "GET",
             parameters = {
                     @Parameter(name = "conditionCode",

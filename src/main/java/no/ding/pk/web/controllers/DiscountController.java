@@ -31,7 +31,9 @@ public class DiscountController {
      * A list of all the Discount objects.
      * @return List of all Discount objects.
      */
-    @Operation(description = "Get list of all Discount objects",
+    @Operation(
+            summary = "Discount - Get list of discounts",
+            description = "Get list of all Discount objects",
             method = "GET",
             tags = "DiscountController"
     )
@@ -48,7 +50,9 @@ public class DiscountController {
      * @param zone Which zone to get discount for, not required
      * @return A list of all discounts, else empty list
      */
-    @Operation(description = "Get a list of all discount for a given sales organization, material number and zone",
+    @Operation(
+            summary = "Discount - Get list of discounts by sales org, material number and zone",
+            description = "Get a list of all discount for a given sales organization, material number and zone",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization number.", required = true),
@@ -74,7 +78,9 @@ public class DiscountController {
      * @param zones Which zones to get discount for, not required.
      * @return A list of all discounts, else empty list
      */
-    @Operation(description = "Returns a list over all discounts for a given sales organization and for a list of material numbers.",
+    @Operation(
+            summary = "Discount - Get discounts for sales org, sales office and material numbers",
+            description = "Returns a list over all discounts for a given sales organization and for a list of material numbers.",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization number.", required = true),
@@ -98,7 +104,9 @@ public class DiscountController {
      * @param discount - The Discount object.
      * @return The persisted Discount object with its own id.
      */
-    @Operation(description = "Create a new Discount object and persist it.",
+    @Operation(
+            summary = "Discount - Create discount",
+            description = "Create a new Discount object and persist it.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),
             tags = "DiscountController"
@@ -114,7 +122,9 @@ public class DiscountController {
      * @param discounts A list of Discount objects to be created.
      * @return A list of all the newly created Discount objects.
      */
-    @Operation(description = "A batch job to create multiple new Discount object and persist them.",
+    @Operation(
+            summary = "Discount - Create multiple discounts",
+            description = "A batch job to create multiple new Discount object and persist them.",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),
             tags = "DiscountController"
@@ -131,7 +141,9 @@ public class DiscountController {
      * @param discount New values for the existing Discount object.
      * @return The updated Discount object.
      */
-    @Operation(description = "Update an existing Discount object",
+    @Operation(
+            summary = "Discount - Update discount",
+            description = "Update an existing Discount object",
             method = "PUT",
             parameters = @Parameter(name = "id", description = "ID for discount to update", required = true),
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),

@@ -29,7 +29,8 @@ public class SapCreatePricingEntitiesController {
         this.sapPricingService = sapPricingService;
     }
 
-    @Operation(description = "Create new material pricing for customer and sales office in SAP",
+    @Operation(summary = "SapCreatePricingEntity - Create new material pricing for customer and sales office in SAP",
+            description = "Create new material pricing for customer and sales office in SAP",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SapCreatePricingEntitiesRequest", required = true),
             tags = "SapCreatePricingEntitiesController"
@@ -49,7 +50,8 @@ public class SapCreatePricingEntitiesController {
                 pricingEntitiesRequest.getPricingEntityCombinationMaps());
     }
 
-    @Operation(description = "Batch operation for creating new material pricing for customer and sales office in SAP",
+    @Operation(summary = "SapCreatePricingEntity - Batch operation for creating pricing for SAP",
+            description = "Batch operation for creating new material pricing for customer and sales office in SAP",
             method = "POST",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SapCreatePricingEntitiesRequest", required = true),
             tags = "SapCreatePricingEntitiesController"

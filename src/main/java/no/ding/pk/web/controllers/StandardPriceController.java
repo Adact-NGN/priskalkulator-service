@@ -34,7 +34,9 @@ public class StandardPriceController {
      * @param zone Set the zone number for only getting Material prices for a specific zone.
      * @return list of MaterialStdPriceDTO objects
      */
-    @Operation(description = "Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office and Sales Organization.",
+    @Operation(
+            summary = "MaterialStdPrice - Get list of standard prices",
+            description = "Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office and Sales Organization.",
             method = "GET",
             parameters = {
                 @Parameter(name = "salesorg", description = "Sales organization to get prices for.", required = true),
@@ -55,7 +57,9 @@ public class StandardPriceController {
         return materialList;
     }
 
-    @Operation(description = "Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office, Sales Organization and material.",
+    @Operation(
+            summary = "MaterialStdPrice - Get list of standard prices for a material.",
+            description = "Get a list of Materials with standard price from SAP. Prices is fetch with the combination of Sales Office, Sales Organization and material.",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesorg", description = "Sales organization to get prices for.", required = true),

@@ -39,7 +39,9 @@ public class ContactPersonController {
      * @param skipToken Amount of items to skip for this request.
      * @return List of contact person objects, else empty list.
      */
-    @Operation(description = "Get list of all contact persons. The service returns 100 entries per request.",
+    @Operation(
+            summary = "ContactPerson - Get list of contact persons",
+            description = "Get list of all contact persons. The service returns 100 entries per request.",
             method = "GET",
             parameters = {
                     @Parameter(name = "expand", description = "Comma separated list of fields to expand, default '_Customers'"),
@@ -66,7 +68,8 @@ public class ContactPersonController {
      * @param contactPersonNumber Contact person number.
      * @return List with one contact person objects, else empty list.
      */
-    @Operation(description = "Get contact person object by number.",
+    @Operation(summary = "ContactPerson - Get contact person by contact person number",
+            description = "Get contact person object by number.",
             method = "GET",
             parameters = {
                     @Parameter(name = "cpn", description = "Contact person number.", required = true),
