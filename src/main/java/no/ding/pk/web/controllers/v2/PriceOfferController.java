@@ -1,6 +1,7 @@
 package no.ding.pk.web.controllers.v2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.Gson;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
+import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
@@ -26,12 +28,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import javax.persistence.EntityManager;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Tag(name = "PriceOfferControllerV2", description = "Controller for handling price offers.")
 @RestController(value = "priceOfferControllerV2")
@@ -42,6 +51,12 @@ public class PriceOfferController {
     private final PriceOfferService service;
 
     private final ModelMapper modelMapper;
+
+    @Autowired
+    private PriceOfferRepository priceOfferRepository;
+
+    @Autowired
+    private EntityManager entityManager;
     
     @Autowired
     public PriceOfferController(
@@ -68,7 +83,7 @@ public class PriceOfferController {
     })
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferListDTO> list(@RequestParam(value = "statuses", required = false) String statuses) {
-
+        log.debug("Getting list of price offers with statuses: {}", statuses);
         List<PriceOffer> priceOfferList;
         if(StringUtils.isNotBlank(statuses)) {
             List<String> statusList = new ArrayList<>(Arrays.stream(statuses.split(",")).toList());
@@ -78,14 +93,24 @@ public class PriceOfferController {
         }
 
         if(!priceOfferList.isEmpty()) {
+            log.debug("Mapping and returning: {}", priceOfferList.size());
             return priceOfferList.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferListDTO.class)).collect(Collectors.toList());
         }
         
         return new ArrayList<>();
     }
 
-    @Operation(summary = "PriceOffer get all extended objects")
-    @GetMapping(path = "/list/extended")
+    @Operation(summary = "PriceOffer get all extended objects",
+            method = "GET",
+            parameters = {
+            @Parameter(name = "statuses", description = "Comma separated list of price offer statuses to filter on.")
+            },
+            tags = "PriceOfferControllerV2"
+        )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of PriceOfferDTO objects")
+    })
+    @GetMapping(path = "/list/extended", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PriceOfferDTO>> listExtendedObjects(@RequestParam(value = "statuses", required = false) String statuses) {
         log.debug("Getting list of extended price offers");
         if(StringUtils.isNotBlank(statuses)) {
@@ -93,8 +118,57 @@ public class PriceOfferController {
             List<PriceOfferDTO> priceOfferDTOS = service.findAllByPriceOfferStatusInList(statusList).stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList());
             return ResponseEntity.ok(priceOfferDTOS);
         }
+        List<PriceOffer> priceOffers = service.findAll();
+        log.debug("Mapping and returning: {}", priceOffers.size());
+        return ResponseEntity.ok(priceOffers.stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList()));
+    }
 
-        return ResponseEntity.ok(service.findAll().stream().map(priceOffer -> modelMapper.map(priceOffer, PriceOfferDTO.class)).collect(Collectors.toList()));
+    private final ExecutorService nonBlockingService = Executors.newCachedThreadPool();
+
+
+    @Operation(deprecated = true)
+    @GetMapping(path = "/list/sse")
+    public SseEmitter handlePriceOfferSse() {
+        SseEmitter emitter = new SseEmitter();
+        nonBlockingService.execute(() -> {
+
+            try (Stream<PriceOffer> priceOffers = service.findAllAsStream()) {
+                priceOffers.forEach(po -> {
+                    try {
+                        emitter.send(modelMapper.map(po, PriceOfferDTO.class));
+                    } catch (IOException e) {
+                        emitter.completeWithError(e);
+                    }
+                });
+
+                emitter.complete();
+            } catch (Exception ex) {
+                emitter.completeWithError(ex);
+            }
+        });
+
+        return emitter;
+    }
+
+    @Operation(deprecated = true)
+    @GetMapping("/list/stream")
+    public StreamingResponseBody streamingResponseBody() {
+        Gson gson = new Gson();
+        try {
+            Stream<PriceOffer> priceOfferStream = service.findAllAsStream();
+            return outputStream -> priceOfferStream.forEach(priceOffer -> {
+                PriceOfferDTO priceOfferDTO = modelMapper.map(priceOffer, PriceOfferDTO.class);
+                String line = gson.toJson(priceOfferDTO);
+
+                try {
+                    outputStream.write(line.getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     
     /**
