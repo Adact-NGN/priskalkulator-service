@@ -18,11 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static no.ding.pk.repository.specifications.PriceOfferSpecifications.*;
 
@@ -343,8 +345,16 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = {"findAll"})
     public List<PriceOffer> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @Cacheable(cacheNames = {"findAllAsStream"})
+    public Stream<PriceOffer> findAllAsStream() {
+        return repository.findAllAsStream();
     }
 
     @Override
@@ -512,66 +522,9 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
+    @Cacheable(cacheNames = {"findAllWithStatuses"}, keyGenerator = "priceOffersWithStatusKeyGenerator")
     public List<PriceOffer> findAllByPriceOfferStatusInList(List<String> statusList) {
         return repository.findAllByPriceOfferStatusIn(statusList);
-    }
-
-    private void approveMaterialsSinceLastUpdate(PriceOffer priceOfferToApprove) {
-        List<String> materialsToApprove = convertMaterialsStringToList(priceOfferToApprove);
-        List<String> approvedMaterials = new ArrayList<>();
-
-        boolean priceOfferIsApproved = PriceOfferStatus.getApprovalStates().contains(priceOfferToApprove.getPriceOfferStatus());
-
-        for(SalesOffice so : priceOfferToApprove.getSalesOfficeList()) {
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getMaterialList(), priceOfferIsApproved));
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getTransportServiceList(), priceOfferIsApproved));
-            approvedMaterials.addAll(setApprovalStatusForMaterials(materialsToApprove, so.getRentalList(), priceOfferIsApproved));
-        }
-
-        Collections.sort(approvedMaterials);
-
-        materialsToApprove.removeAll(approvedMaterials);
-
-        priceOfferToApprove.setMaterialsForApproval(String.join(",", materialsToApprove));
-    }
-
-    private static List<String> convertMaterialsStringToList(PriceOffer priceOfferToApprove) {
-        List<String> returnList = new ArrayList<>();
-        if(StringUtils.isNotBlank(priceOfferToApprove.getMaterialsForApproval())) {
-            String[] array = priceOfferToApprove.getMaterialsForApproval().split(",");
-            if(array.length > 0)
-                returnList.addAll(Arrays.stream(array).sorted().toList());
-        }
-
-        return returnList;
-    }
-
-    private List<String> setApprovalStatusForMaterials(List<String> materialsToApprove, List<PriceRow> materialList, Boolean isApproved) {
-        List<String> approvedMaterials = new ArrayList<>();
-
-        if(materialList == null || materialList.isEmpty()) {
-            return approvedMaterials;
-        }
-
-        List<PriceRow> filteredMaterials = materialList.stream().filter(priceRow -> {
-            if(priceRow.getMaterial() == null) {
-                return false;
-            }
-            return materialsToApprove.contains(priceRow.getMaterial().getMaterialNumber());
-        }).toList();
-        for(PriceRow pr : filteredMaterials) {
-
-            if(pr.getNeedsApproval() && !pr.isApproved()) {
-                pr.setApproved(isApproved);
-                approvedMaterials.add(pr.getMaterial().getMaterialNumber());
-            }
-
-            if(!pr.getNeedsApproval()) {
-                approvedMaterials.add(pr.getMaterial().getMaterialNumber());
-            }
-        }
-
-        return approvedMaterials;
     }
 
     @Override
@@ -602,11 +555,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     @Override
     public void updateCustomerNumber(Long id, String customerNumber) {
         repository.updateCustomerNumber(id, customerNumber);
-    }
-
-    @Override
-    public PriceOffer updatePriceOffer(PriceOffer priceOffer) {
-        return repository.save(priceOffer);
     }
 
 }

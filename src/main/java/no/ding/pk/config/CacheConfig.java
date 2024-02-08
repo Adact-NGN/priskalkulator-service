@@ -1,14 +1,9 @@
 package no.ding.pk.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import no.ding.pk.config.cache.PriceOffersWithStatusKeyGenerator;
 import no.ding.pk.config.cache.SapMaterialKeyGenerator;
 import no.ding.pk.config.cache.StandardPriceKeyGenerator;
-import no.ding.pk.domain.offer.MaterialPrice;
-import no.ding.pk.service.cache.InMemory3DCache;
-import no.ding.pk.service.cache.PingInMemory3DCache;
-import no.ding.pk.web.dto.sap.MaterialDTO;
-import no.ding.pk.web.dto.sap.MaterialStdPriceDTO;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -50,4 +45,10 @@ public class CacheConfig extends CachingConfigurerSupport {
     public KeyGenerator sapMaterialKeyGenerator() {
         return new SapMaterialKeyGenerator();
     }
+
+    @Bean("priceOffersWithStatusKeyGenerator")
+    public KeyGenerator priceOffersWithStatusKeyGenerator() {
+        return new PriceOffersWithStatusKeyGenerator();
+    }
+
 }

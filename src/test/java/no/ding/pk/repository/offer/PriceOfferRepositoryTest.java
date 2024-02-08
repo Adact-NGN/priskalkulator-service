@@ -76,14 +76,16 @@ public class PriceOfferRepositoryTest {
 
         priceOffer = repository.save(priceOffer);
 
-//        priceOffer.setDeleted(true);
         PriceOffer updatedPriceOffer = repository.findById(priceOffer.getId()).orElse(null);
 
         assertThat(updatedPriceOffer, notNullValue());
 
+        priceOffer.setDeleted(true);
         updatedPriceOffer = repository.save(updatedPriceOffer);
 
-        repository.existsByIdAndDeleted(priceOffer.getId());
+        boolean result = repository.existsByIdAndDeleted(priceOffer.getId());
+
+        assertThat(result, is(true));
     }
 
     @Test

@@ -86,7 +86,7 @@ public class PriceRowServiceImpl implements PriceRowService {
         return null;
     }
 
-    private static boolean isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(PriceRow entity, Double currentDiscountedPrice) {
+    private static boolean isDiscountedPriceNotSetOrNotEqualToIncomingDiscountedPrice(PriceRow entity, Double currentDiscountedPrice) {
         return entity.getDiscountedPrice() == null || (currentDiscountedPrice != null && !entity.getDiscountedPrice().equals(currentDiscountedPrice));
     }
 
@@ -245,7 +245,7 @@ public class PriceRowServiceImpl implements PriceRowService {
                 if (discountLevel != null) {
                     entity.setDiscountLevel(discountLevel);
                 } else {
-                    log.info("Could not get discount level equivalent for manual price. Setting highest disount level.");
+                    log.info("Could not get discount level equivalent for manual price. Setting highest discount level.");
                     entity.setDiscountLevel(6);
                 }
             }
@@ -311,7 +311,7 @@ public class PriceRowServiceImpl implements PriceRowService {
     }
 
     private void calculateDiscountPrice(PriceRow entity, Double currentDiscountedPrice, String salesOrg, String salesOffice, String zone) {
-        if(isDiscountedPriceNotSetOrNotEqualToIncommingDiscountedPrice(entity, currentDiscountedPrice)) {
+        if(isDiscountedPriceNotSetOrNotEqualToIncomingDiscountedPrice(entity, currentDiscountedPrice)) {
             if(entity.getDiscountLevel() != null) {
                 Integer zoneAsInt = StringUtils.isNotBlank(zone) ? Integer.valueOf(zone) : null;
                 List<DiscountLevel> discountLevels = discountService.findDiscountLevelsBySalesOrgAndMaterialNumberAndDiscountLevel(salesOrg, salesOffice, entity.getMaterial().getMaterialNumber(), entity.getDiscountLevel(), zoneAsInt);

@@ -35,7 +35,7 @@ public class SalesOrgController {
      * Gets all sales organizations
      * @return List of sales organizations, else empty list
      */
-    @Operation(description = "Get all sales organizations.",
+    @Operation(summary = "SalesOrg list", description = "Get all sales organizations.",
             method = "GET",
             tags = "SalesOrganizationController"
     )
@@ -54,7 +54,7 @@ public class SalesOrgController {
      * @param greedy whether to use greedy or un-greedy query, 'or' or 'and'. Default greedy (true): or
      * @return List of sales organizations, else empty list
      */
-    @Operation(description = "Search for Sales organization by different parameters",
+    @Operation(summary = "SalesOrg By Search parameters", description = "Search for Sales organization by different parameters",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100"),
@@ -159,7 +159,7 @@ public class SalesOrgController {
      * @param postalCode Set postal code to get the standard zone.
      * @return A list of ZoneDTO, else empty list
      */
-    @Operation(description = "Get all zones for a Sales office",
+    @Operation(summary = "Zones for sales office", description = "Get all zones for a Sales office",
             method = "GET",
             parameters = {
                     @Parameter(name = "salesOrg", description = "Sales organization for too look into.", deprecated = true),
