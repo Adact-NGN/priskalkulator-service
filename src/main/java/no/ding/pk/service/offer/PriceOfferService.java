@@ -5,6 +5,7 @@ import no.ding.pk.domain.offer.PriceOfferTerms;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface PriceOfferService {
 
@@ -13,6 +14,8 @@ public interface PriceOfferService {
     Optional<PriceOffer> findById(Long id);
 
     List<PriceOffer> findAll();
+
+    Stream<PriceOffer> findAllAsStream();
 
     List<PriceOffer> findAllWithoutStatusInList(List<String> status);
 
@@ -35,8 +38,6 @@ public interface PriceOfferService {
     List<PriceOffer> findAllBySalesOfficeAndStatus(List<String> salesOffices, List<String> statuses);
 
     void updateCustomerNumber(Long id, String customerNumber);
-
-    PriceOffer updatePriceOffer(PriceOffer updatedOffer);
 
     boolean forceDeleteById(Long id);
 }

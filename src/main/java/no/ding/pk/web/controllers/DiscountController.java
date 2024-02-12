@@ -1,23 +1,19 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.Discount;
 import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "DiscountController", description = "Get discounts for sales organization")
 @RestController
 @RequestMapping(value = {"/api/discount", "/api/v1/discount"})
 public class DiscountController {
@@ -35,6 +31,12 @@ public class DiscountController {
      * A list of all the Discount objects.
      * @return List of all Discount objects.
      */
+    @Operation(
+            summary = "Discount - Get list of discounts",
+            description = "Get list of all Discount objects",
+            method = "GET",
+            tags = "DiscountController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscounts() {
         return service.findAll();
@@ -48,6 +50,18 @@ public class DiscountController {
      * @param zone Which zone to get discount for, not required
      * @return A list of all discounts, else empty list
      */
+    @Operation(
+            summary = "Discount - Get list of discounts by sales org, material number and zone",
+            description = "Get a list of all discount for a given sales organization, material number and zone",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization number.", required = true),
+                    @Parameter(name = "salesOffice", description = "Sales office number", required = true),
+                    @Parameter(name = "materialNumber", description = "Material number to look up."),
+                    @Parameter(name = "zone", description = "Which zone to get discounts for.")
+            },
+            tags = "DiscountController"
+    )
     @GetMapping(path = "/list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscountsForSalesOrg(@PathVariable("salesOrg") String salesOrg,
                                                      @RequestParam(value = "salesOffice") String salesOffice,
@@ -64,6 +78,18 @@ public class DiscountController {
      * @param zones Which zones to get discount for, not required.
      * @return A list of all discounts, else empty list
      */
+    @Operation(
+            summary = "Discount - Get discounts for sales org, sales office and material numbers",
+            description = "Returns a list over all discounts for a given sales organization and for a list of material numbers.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization number.", required = true),
+                    @Parameter(name = "salesOffice", description = "Sales office number", required = true),
+                    @Parameter(name = "materialNumbers", description = "Comma separated list of material numbers.", required = true),
+                    @Parameter(name = "zone", description = "Which zone to get discounts for.")
+            },
+            tags = "DiscountController"
+    )
     @GetMapping(path = "/in-list/{salesOrg}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> getAllDiscountsForSalesOrgAndMaterialNumbersInList(@PathVariable("salesOrg") String salesOrg,
                                                                              @RequestParam(value = "salesOffice") String salesOffice,
@@ -78,6 +104,13 @@ public class DiscountController {
      * @param discount - The Discount object.
      * @return The persisted Discount object with its own id.
      */
+    @Operation(
+            summary = "Discount - Create discount",
+            description = "Create a new Discount object and persist it.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),
+            tags = "DiscountController"
+    )
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Discount createDiscount(@RequestBody Discount discount) {
         log.debug("Creating Discount object.");
@@ -89,6 +122,13 @@ public class DiscountController {
      * @param discounts A list of Discount objects to be created.
      * @return A list of all the newly created Discount objects.
      */
+    @Operation(
+            summary = "Discount - Create multiple discounts",
+            description = "A batch job to create multiple new Discount object and persist them.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),
+            tags = "DiscountController"
+    )
     @PostMapping(path = "/batch", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Discount> createDiscounts(@RequestBody List<Discount> discounts) {
         log.debug("Batch creating Discount objects. Amount of items: " + discounts.size());
@@ -101,6 +141,14 @@ public class DiscountController {
      * @param discount New values for the existing Discount object.
      * @return The updated Discount object.
      */
+    @Operation(
+            summary = "Discount - Update discount",
+            description = "Update an existing Discount object",
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "ID for discount to update", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "Discount", required = true),
+            tags = "DiscountController"
+    )
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Discount updateDiscount(@PathVariable("id") Long id, @RequestBody Discount discount) {
         log.debug("Updating Discount object with id: " + id);

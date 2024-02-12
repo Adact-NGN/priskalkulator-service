@@ -1,5 +1,7 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.service.sap.SapPricingService;
 import no.ding.pk.web.dto.sap.pricing.SapCreatePricingEntitiesRequest;
 import no.ding.pk.web.dto.sap.pricing.SapCreatePricingEntitiesResponse;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "SapCreatePricingEntitiesController", description = "Controller for creating and sending new customer prices to SAP.")
 @RestController
 @RequestMapping("/api/v1/sap-pricing")
 public class SapCreatePricingEntitiesController {
@@ -26,6 +29,12 @@ public class SapCreatePricingEntitiesController {
         this.sapPricingService = sapPricingService;
     }
 
+    @Operation(summary = "SapCreatePricingEntity - Create new material pricing for customer and sales office in SAP",
+            description = "Create new material pricing for customer and sales office in SAP",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SapCreatePricingEntitiesRequest", required = true),
+            tags = "SapCreatePricingEntitiesController"
+    )
     @PostMapping(path = "/create")
     public List<SapCreatePricingEntitiesResponse> createNewSapPricingEntities(@RequestBody SapCreatePricingEntitiesRequest pricingEntitiesRequest) {
         if(pricingEntitiesRequest.getPriceOfferId() == null) {
@@ -41,6 +50,12 @@ public class SapCreatePricingEntitiesController {
                 pricingEntitiesRequest.getPricingEntityCombinationMaps());
     }
 
+    @Operation(summary = "SapCreatePricingEntity - Batch operation for creating pricing for SAP",
+            description = "Batch operation for creating new material pricing for customer and sales office in SAP",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "SapCreatePricingEntitiesRequest", required = true),
+            tags = "SapCreatePricingEntitiesController"
+    )
     @PostMapping(path = "/create/batch")
     public List<SapCreatePricingEntitiesResponse> createNewSapPricingEntitiesBatchOperation(@RequestBody SapCreatePricingEntitiesRequest pricingEntitiesRequest) {
         if(pricingEntitiesRequest.getPriceOfferId() == null) {
@@ -54,6 +69,4 @@ public class SapCreatePricingEntitiesController {
                 pricingEntitiesRequest.getCustomerName(),
                 pricingEntitiesRequest.getPricingEntityCombinationMaps());
     }
-
-
 }

@@ -2,10 +2,11 @@
 # Build stage
 # Set arguments with --build-arg [arg-variable]=[value]
 FROM maven:3.8-openjdk-17-slim AS build
+ARG ENVIRONMENT=dev
 COPY src /home/app/src
 COPY pom.xml /home/app
 WORKDIR /home/app
-RUN mvn clean package -DskipTests
+RUN echo "Building docker image, environment set to: $ENVIRONMENT" | mvn clean package -P$ENVIRONMENT -DskipTests
 
 #
 # Package stage

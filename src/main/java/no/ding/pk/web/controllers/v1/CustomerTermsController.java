@@ -1,5 +1,8 @@
 package no.ding.pk.web.controllers.v1;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.CustomerTerms;
 import no.ding.pk.service.offer.CustomerTermsService;
 import no.ding.pk.web.dto.v1.web.client.offer.CustomerTermsDTO;
@@ -21,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "CustomerTermsController", description = "Controller for handling customer terms.")
 @RestController
 @RequestMapping(path = "/api/v1/terms/customer")
 public class CustomerTermsController {
@@ -43,6 +47,15 @@ public class CustomerTermsController {
      * @param customerNumber customer number to filter for, { {@code @required}  false } .
      * @return List of {@code CustomerTermsDTO}
      */
+    @Operation(summary = "CustomerTerms - Get list of CustomerTermsDTO",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOffice", description = "Comma separated list of sales offices to filter for."),
+                    @Parameter(name = "customerNumber", description = "Comma separated list of customer number to filter for."),
+                    @Parameter(name = "byTerms", description = "Comma separated list of term types to filter for..")
+            },
+            tags = "CustomerTermsController"
+    )
     @GetMapping("/list")
     public List<CustomerTermsDTO> list(@RequestParam(name = "salesOffice", required = false) String salesOffice,
                                        @RequestParam(name = "customerNumber", required = false) String customerNumber,
@@ -63,6 +76,14 @@ public class CustomerTermsController {
      * @param customerNumber Customer number to filter for
      * @return List of {@code CustomerTermsDTO}
      */
+    @Operation(summary = "CustomerTerms - Get list of all active CustomerTermsDTO for sales office and customer number",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOffice", description = "Sales offices to filter for."),
+                    @Parameter(name = "customerNumber", description = "Customer number to filter for."),
+            },
+            tags = {"CustomerTermsController"}
+    )
     @GetMapping("/list/active")
     public List<CustomerTermsDTO> listAllActive(@RequestParam(name = "salesOffice", required = false) String salesOffice,
                                                 @RequestParam(name = "customerNumber", required = false) String customerNumber) {
@@ -76,6 +97,11 @@ public class CustomerTermsController {
      * @param customerTermsDTO Customer terms object tot persist.
      * @return Newly persisted customer terms as {@code CustomerTermsDTO}
      */
+    @Operation(summary = "CustomerTerms - Create new CustomerTerms object.",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, ref = "CustomerTermsDTO"),
+            tags = "CustomerTermsController"
+    )
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomerTermsDTO create(@RequestBody CustomerTermsDTO customerTermsDTO) {
 
@@ -104,6 +130,14 @@ public class CustomerTermsController {
      * @param customerTermsDTO updated customer terms values.
      * @return updated customer terms as {@code CustomerTermsDTO}
      */
+    @Operation(summary = "CustomerTerms - Update existing customer terms with new values.",
+            method = "PUT",
+            parameters = {
+                    @Parameter(name = "id", description = "Existing customer terms ID.", required = true),
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, ref = "CustomerTermsDTO"),
+            tags = "CustomerTermsController"
+    )
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CustomerTermsDTO save(@PathVariable Long id, @RequestBody CustomerTermsDTO customerTermsDTO) {
         log.debug("Received CustomerTerms: {}", customerTermsDTO);

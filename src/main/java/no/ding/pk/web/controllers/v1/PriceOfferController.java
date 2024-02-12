@@ -1,6 +1,9 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.v1.web.client.PriceOfferDTO;
@@ -21,6 +24,7 @@ import java.util.Optional;
  * Controller for getting Price offers.
  * @deprecated This controller will be removed in future releases. Use /api/v2/price-offer
  */
+@Tag(name = "PriceOfferControllerV1", description = "Controller for handling price offers.")
 @RestController
 @RequestMapping("/api/v1/price-offer")
 public class PriceOfferController {
@@ -32,7 +36,7 @@ public class PriceOfferController {
     private final ModelMapper modelMapper;
 
     @Autowired
-    public PriceOfferController(ObjectMapper objectMapper, PriceOfferService service, ModelMapper modelMapper) {
+    public PriceOfferController(PriceOfferService service, ModelMapper modelMapper) {
         this.service = service;
         this.modelMapper = modelMapper;
     }
@@ -41,6 +45,11 @@ public class PriceOfferController {
      * List all {@code PriceOffer}
      * @return List of {@code PriceOffer}
      */
+    @Operation(summary = "PriceOffer - Get all price offers",
+            description = "List all Price offers",
+            method = "GET",
+            tags = "PriceOfferControllerV1"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('SCOPE_Sales')")
     public List<PriceOffer> list() {
@@ -58,6 +67,14 @@ public class PriceOfferController {
      * @param id for entity to get.
      * @return PriceOffer object, else empty if not found
      */
+    @Operation(summary = "PriceOffer - Get price offer by ID",
+            description = "Get Price offer by ID",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for PriceOffer to get", required = true)
+            },
+            tags = "PriceOfferControllerV1"
+    )
     @GetMapping(path = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOffer getById(@PathVariable("id") Long id) {
         if(id != null) {
@@ -80,6 +97,13 @@ public class PriceOfferController {
      * @param priceOfferDTO The {@code PriceOffer} to create
      * @return Newly created {@code PriceOffer}
      */
+    @Operation(
+            summary = "PriceOffer - Create new PriceOffer",
+            description = "Create a new PriceOffer",
+            method = "POST",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferDTO"),
+            tags = "PriceOfferControllerV1"
+    )
     @PostMapping(path = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOffer create(@RequestBody PriceOfferDTO priceOfferDTO) {
         log.debug("Got new Price offer object: " + priceOfferDTO);
@@ -106,6 +130,15 @@ public class PriceOfferController {
      * @param priceOfferDTO updated {@code PriceOffer} object
      * @return Updated {@code PriceOffer}
      */
+    @Operation(summary = "PriceOffer - Update PriceOffer",
+            description = "Update a PriceOffer",
+            method = "PUT",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for PriceOffer to update.", required = true)
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferDTO"),
+            tags = "PriceOfferControllerV1"
+    )
     @PutMapping(path = "/save/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOffer save(@PathVariable("id") Long id, @RequestBody PriceOfferDTO priceOfferDTO) {
         log.debug("Trying to update price offer with id: " + id);
@@ -139,6 +172,14 @@ public class PriceOfferController {
      * @param id The id for the {@code PriceOffer} to delete
      * @return {@code true} if successful, else {@code false}
      */
+    @Operation(summary = "PriceOffer - Delete PriceOffer",
+            description = "Delete PriceOffer by ID",
+            method = "DELETE",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for PriceOffer to delete", required = true)
+            },
+            tags = "PriceOfferControllerV1"
+    )
     @DeleteMapping(path = "/delete/{id}")
     public boolean delete(@PathVariable("id") Long id) {
         log.debug("Deleting PriceOffer with id: {}", id);

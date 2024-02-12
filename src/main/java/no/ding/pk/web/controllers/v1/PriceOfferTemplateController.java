@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.template.PriceOfferTemplate;
 import no.ding.pk.domain.offer.template.TemplateMaterial;
 import no.ding.pk.service.UserService;
@@ -26,12 +27,13 @@ import org.springframework.web.context.request.WebRequest;
 import java.util.Arrays;
 import java.util.List;
 
+@Tag(name = "PriceOfferTemplateController", description = "Controller for handling price offers templates.")
 @RestController
 @RequestMapping("/api/v1/price-offer-template")
 public class PriceOfferTemplateController {
 
     private static final Logger log = LoggerFactory.getLogger(PriceOfferTemplateController.class);
-    
+
     private final PriceOfferTemplateService service;
     private final UserService userService;
     private final ModelMapper modelMapper;
@@ -49,6 +51,14 @@ public class PriceOfferTemplateController {
      * List all Price offer templates.
      * @return A list of PriceOfferTemplates
      */
+    @Operation(summary = "PriceOfferTemplate - List all Price offer templates",
+            description = "List all Price offer templates",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "user", description = "User name to filter the templates by.")
+            },
+            tags = "PriceOfferTemplateController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<PriceOfferTemplateDTO> getAllTemplates(@RequestParam(value = "user", required = false) String userEmail) {
 
@@ -65,8 +75,10 @@ public class PriceOfferTemplateController {
      * @param sharedWithEmail User email
      * @return A list of PriceOfferTemplates
      */
-    @Operation(summary = "List all price offer templates shared with user by email",
-            parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")})
+    @Operation(summary = "PriceOfferTemplate - List all price offer templates shared with user by email",
+            method = "GET",
+            parameters = {@Parameter(name = "sharedWithEmail", required = true, description = "User email", example = "test.testesen@testing.no")},
+            tags = "PriceOfferTemplateController")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns a list of shared price offer templates")
     })
@@ -82,7 +94,16 @@ public class PriceOfferTemplateController {
      * @param id the id for the template
      * @return PriceOfferTemplate
      */
-    @Operation(summary = "Get a specific price offer template")
+    @Operation(summary = "PriceOfferTemplate - Get a specific price offer template",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for price offer template to get.", required = true)
+            },
+            tags = "PriceOfferTemplateController"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Price offer template", ref = "PriceOfferTempalteDTO")
+    })
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public PriceOfferTemplateDTO getTemplateById(@PathVariable("id") Long id) {
         return modelMapper.map(service.findById(id), PriceOfferTemplateDTO.class);
@@ -93,8 +114,11 @@ public class PriceOfferTemplateController {
      * @param newTemplateDto the object
      * @return Newly created PriceOfferTemplate object.
      */
-    @Operation(summary = "Create a new price offer template",
-            description = "Creates a new price offer template with the given request body.")
+    @Operation(summary = "PriceOfferTemplate - Create a new price offer template",
+            method = "POST",
+            description = "Creates a new price offer template with the given request body.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
+            tags = "PriceOfferTemplateController")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Returns newly created price offer template"),
             @ApiResponse(responseCode = "400", description = "Bad request, missing name for template.")
@@ -138,9 +162,12 @@ public class PriceOfferTemplateController {
      * @param priceOfferTemplateDto object with updated values.
      * @return Updated PriceOfferTemplate object.
      */
-    @Operation(description = "Update existing price offer template with new values.",
-    summary = "Update price offer template",
-            parameters = @Parameter(name = "id", description = "Price offer templates id", required = true)
+    @Operation(summary = "PriceOfferTemplate - Update PriceOfferTemplate",
+            description = "Update existing price offer template with new values.",
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "Price offer templates id", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "PriceOfferTemplateDTO", required = true),
+            tags = "PriceOfferTemplateController"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Updated price offer template")

@@ -1,6 +1,9 @@
 package no.ding.pk.web.controllers.v1;
 
 import com.itextpdf.text.DocumentException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.service.converters.PdfService;
 import no.ding.pk.service.offer.PriceOfferService;
@@ -14,19 +17,13 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
-
+@Tag(name = "PdfServiceController", description = "Controller generating PDF's.")
 @RestController
 @RequestMapping(path = "/api/v1/pdf")
 public class PdfServiceController {
@@ -46,6 +43,14 @@ public class PdfServiceController {
         this.templateService = templateService;
     }
 
+    @Operation(summary = "PDF - Create PDF from request body.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "id", description = "ID for Price offer to get.", required = true),
+            },
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "String"),
+            tags = "PdfServiceController"
+    )
     @PostMapping(path = "/create/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<Resource> createPdf(@PathVariable("id") Long priceOfferId, @RequestBody String json) throws DocumentException, com.lowagie.text.DocumentException, IOException {
         

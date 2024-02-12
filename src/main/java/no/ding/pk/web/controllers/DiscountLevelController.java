@@ -1,5 +1,8 @@
 package no.ding.pk.web.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.DiscountLevel;
 import no.ding.pk.service.DiscountService;
 import org.slf4j.Logger;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "DiscountLevelController", description = "Get discount levels for materials, sales organisations and sales offices.")
 @RestController
 @RequestMapping({"/api/discount/level", "/api/v1/discount/level"})
 public class DiscountLevelController {
@@ -30,8 +34,22 @@ public class DiscountLevelController {
      * @param salesOffice    Sales office number
      * @param materialNumber Material number
      * @param level          Discount level
+     * @param zone           Zone to get discount for
      * @return A list with all the discount levels returned for the criteria given, else empty list.
      */
+    @Operation(
+            summary = "DiscountLevel - Get discount level for material",
+            description = "Get discount level for a specific material which  belongs to a given material. The material resides under a sales organization and sales office.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100", required = true),
+                    @Parameter(name = "salesOffice", description = "Sales office number. E.g. 104", required = true),
+                    @Parameter(name = "materialNumber", description = "Material number. E.g. 50103", required = true),
+                    @Parameter(name = "level", description = "Discount level. E.g. 2"),
+                    @Parameter(name = "zone", description = "Zone which the discount applies to. E.g. 3"),
+            },
+            tags = "DiscountLevelController"
+    )
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getSpecificDiscountLevel(@RequestParam("salesOrg") String salesOrg,
                                                         @RequestParam("salesOffice") String salesOffice,
@@ -51,6 +69,18 @@ public class DiscountLevelController {
      * @param zone           Specify for which zone to get discount levels for.
      * @return A list of all the discount levels for one or multiple materials, else empty list.
      */
+    @Operation(
+            summary = "DiscountLevel - Get list of discounts for materials",
+            description = "Get a list of discount levels for a specific material or a list of material numbers.",
+            method = "GET",
+            parameters = {
+                    @Parameter(name = "salesOrg", description = "Sales organization number. E.g. 100", required = true),
+                    @Parameter(name = "salesOffice", description = "Sales office number. E.g. 104", required = true),
+                    @Parameter(name = "materialNumbers", description = "Material number or a comma separated number list. E.g. 50103", required = true),
+                    @Parameter(name = "zone", description = "Zone which the discount applies to. E.g. 3"),
+            },
+            tags = "DiscountLevelController"
+    )
     @GetMapping(path = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<DiscountLevel> getAllDiscountLevelsForSpecificDiscount(@RequestParam("salesOrg") String salesOrg,
                                                                        @RequestParam("salesOffice") String salesOffice,
@@ -66,6 +96,14 @@ public class DiscountLevelController {
      * @param discountLevel New values for the DiscountLevel object.
      * @return The updated DiscountLevel object.
      */
+    @Operation(
+            summary = "DiscountLevel - Update discount level",
+            description = "Update existing DiscountLevel object.",
+            method = "PUT",
+            parameters = @Parameter(name = "id", description = "ID for the object to update.", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(ref = "DiscountLevel"),
+            tags = "DiscountLevelController"
+    )
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DiscountLevel updateDiscountLevel(@PathVariable("id") Long id, @RequestBody DiscountLevel discountLevel) {
         return service.updateDiscountLevel(id, discountLevel);

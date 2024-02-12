@@ -1,7 +1,7 @@
 package no.ding.pk.utils;
 
-import javax.management.RuntimeErrorException;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import javax.management.RuntimeErrorException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +69,7 @@ public class LocalJSONUtils {
 
             for(int i = 0; i < results.length(); i++) {
                 JSONObject o = (JSONObject) results.get(i);
-                
+
                 T object = jsonStringToObject(o.toString(), clazz);
                 objectList.add(object);
             }
