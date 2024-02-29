@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import no.ding.pk.domain.offer.PriceOffer;
 import no.ding.pk.domain.offer.PriceOfferTerms;
-import no.ding.pk.repository.offer.PriceOfferRepository;
 import no.ding.pk.service.offer.PriceOfferService;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferDTO;
 import no.ding.pk.web.dto.web.client.offer.PriceOfferListDTO;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,12 +50,6 @@ public class PriceOfferController {
 
     private final ModelMapper modelMapper;
 
-    @Autowired
-    private PriceOfferRepository priceOfferRepository;
-
-    @Autowired
-    private EntityManager entityManager;
-    
     @Autowired
     public PriceOfferController(
             PriceOfferService service,

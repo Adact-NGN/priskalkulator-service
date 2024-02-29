@@ -3913,6 +3913,72 @@
         }
       }
     },
+    "/api/v2/price-offer/force/delete/{id}" : {
+      "delete" : {
+        "tags" : [ "price-offer-controller" ],
+        "summary" : "forceDelete",
+        "operationId" : "forceDeleteUsingDELETE",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "True if price offer was set to deleted, else false",
+            "schema" : {
+              "type" : "boolean"
+            }
+          },
+          "204" : {
+            "description" : "No Content"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v2/price-offer/force/delete/{id}" : {
+      "delete" : {
+        "tags" : [ "price-offer-controller" ],
+        "summary" : "Force delete price offer by id",
+        "operationId" : "forceDeleteUsingDELETE",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "description" : "id",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int64"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "True if price offer was deleted, else false",
+            "schema" : {
+              "type" : "boolean"
+            }
+          },
+          "204" : {
+            "description" : "No Content"
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          },
+          "403" : {
+            "description" : "Forbidden"
+          }
+        }
+      }
+    },
     "/api/v2/price-offer/id/{id}" : {
       "get" : {
         "tags" : [ "price-offer-controller" ],
