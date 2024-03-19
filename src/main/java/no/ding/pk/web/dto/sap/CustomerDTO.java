@@ -2,22 +2,13 @@ package no.ding.pk.web.dto.sap;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Builder
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @JsonIgnoreProperties(value = { "AbcKlassifisering" })
 public class CustomerDTO {
     @JsonAlias("Kundenummer")
