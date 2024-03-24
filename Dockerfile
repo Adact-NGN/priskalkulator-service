@@ -11,7 +11,7 @@ RUN echo "Building docker image, environment set to: $ENVIRONMENT" | mvn clean p
 #
 # Package stage
 #
-FROM openjdk:17-slim
+FROM openjdk:22-slim
 LABEL maintainer="kjetil.torvund.minde@ngn.no"
 WORKDIR /usr/local/lib
 COPY --from=build /home/app/target/*.jar app.jar
