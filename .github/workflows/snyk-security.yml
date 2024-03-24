@@ -40,6 +40,7 @@ jobs:
         # Snyk can be used to break the build when it detects security issues.
         # In this case we want to upload the SAST issues to GitHub Code Scanning
         uses: snyk/actions/maven@master
+        continue-on-error: true # To make sure that SARIF upload gets called
 
         # For Snyk Open Source you must first set up the development environment for your application's dependencies
         # For example for Node
